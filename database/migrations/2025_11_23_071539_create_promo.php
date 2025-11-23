@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('promo', function (Blueprint $table) {
             $table->increments('idPromo');
             $table->string('gambar');
-            $table->string('namaPrmo',60);
+            $table->string('namaPromo',60);
             $table->string('jenisPromo',60);
             $table->string('kode',12);
             $table->unsignedInteger('diskon');
