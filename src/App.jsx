@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Layout
+import CustomerLayout from "./Customer/CustomerLayout";
+import AdminLayout from "./admin/AdminLayout";
 
+// Customer Pages
+import LandingPage from "./Customer/LandingPage/LandingPage";
+import PromoPage from "./Customer/promoPage/promoPage";
+import ProdukPage from "./Customer/produkPage/produkPage";
+import ReservasiPage from "./Customer/reservasiPage/reservasiPage";
+import EventPage from "./Customer/eventPage/eventPage";
+
+// Admin Pages
+import AdminDashboard from "./admin/dashboard/dashboard";
+import AdminProduk from "./admin/produk/produk";
+import AdminReservasi from "./admin/reservasi/reservasi";
+
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Routes>
 
-export default App
+      {/* ================= CUSTOMER ROUTES ================= */}
+      <Route path="/" element={<CustomerLayout />}>
+        <Route index element={<LandingPage />} /> 
+        <Route path="promo" element={<PromoPage />} />
+        <Route path="produk" element={<ProdukPage />} />
+        <Route path="reservasi" element={<ReservasiPage />} />
+        <Route path="event" element={<EventPage />} />
+      </Route>
+
+
+      {/* ================= ADMIN ROUTES ================= */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="produk" element={<AdminProduk />} />
+        <Route path="reservasi" element={<AdminReservasi />} />
+      </Route>
+
+    </Routes>
+  );
+}
