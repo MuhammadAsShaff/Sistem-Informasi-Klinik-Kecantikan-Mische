@@ -127,14 +127,13 @@ class AutentikasiController extends Controller
     public function logoutUser(Request $request)
     {
         try {
-            $cookieName = env('JWT_COOKIE', 'jwt_token');
-            // Coba ambil token dari Header Authorization ATAU dari cookie yang tersimpan
-            $token = $request->bearerToken() ?: $request->cookie($cookieName);
-
-            if ($token) {
-                // Hancurkan token menggunakan object guard API
-                auth('api')->setToken($token)->logout();
+            // [Refaktor Kustom] Karena Middleware JwtFromCookie mengekstraksi token ke Header, kita cukup cek session.
+            // Tidak perlu lagi mengambil token secara manual menggunakan $request->cookie() !
+            if (auth('api')->check()) {
+                auth('api')->logout();
             }
+
+            $cookieName = env('JWT_COOKIE', 'jwt_token');
 
             return response()->json([
                 'success' => true,
@@ -154,19 +153,18 @@ class AutentikasiController extends Controller
     public function getUserProfile(Request $request)
     {
         try {
-            $cookieName = env('JWT_COOKIE', 'jwt_token');
-            // Sedot token dari penyimpanan Header ataupun Cookie
-            $token = $request->bearerToken() ?: $request->cookie($cookieName);
-
-            if (!$token) {
+            // [Refaktor Kustom] Cek token dari header. 
+            // Jika dulunya user bawa token di Cookie, Middleware JwtFromCookie kita yang memindahkannya ke sini.
+            if (!$request->bearerToken()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Akses ditolak. Anda belum login.'
                 ], 401);
             }
 
-            // Gunakan token tersebut untuk menguraikan identitas pengguna dari database
-            $user = auth('api')->setToken($token)->user();
+            // [Refaktor Kustom] Langsung ambil user menggunakan bawaan JWT:
+            // Sistem akan otomatis menerjemahkan token yang tertempel di Header tadi menjadi data spesifik `User`.
+            $user = auth('api')->user();
 
             if (!$user) {
                 return response()->json([
@@ -193,20 +191,18 @@ class AutentikasiController extends Controller
     public function resetPassword(Request $request)
     {
         try {
-            $cookieName = env('JWT_COOKIE', 'jwt_token');
-            // Coba ambil token dari Header Authorization ATAU dari cookie
-            $token = $request->bearerToken() ?: $request->cookie($cookieName);
-
-            // 1. Wajib Login (Pengecekan Token)
-            if (!$token) {
+            // [Refaktor Kustom] Cek token dari request. Terima kasih kepada Middleware kustom kita, 
+            // sekalipun pengguna hanya punya Cookie, `$request->bearerToken()` akan terisi!
+            if (!$request->bearerToken()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Akses ditolak. Anda belum memasukkan Token JWT. Harap tambahkan di Authorization: Bearer <token>'
+                    'message' => 'Akses ditolak. Anda belum memasukkan Token JWT. Harap login lalu tambahkan token di Authorization: Bearer <token>'
                 ], 401);
             }
 
-            // Gunakan instance JWT Guard untuk mengecek status auth
-            $user = auth('api')->setToken($token)->user();
+            // [Refaktor Kustom] Cukup panggil user(). Ini memotong boilerplate sintaks "setToken($token)"
+            // yang sebelumnya harus ditulis manual. Token yg di Header diterjemahkan otomatis.
+            $user = auth('api')->user();
 
             if (!$user) {
                 return response()->json([
