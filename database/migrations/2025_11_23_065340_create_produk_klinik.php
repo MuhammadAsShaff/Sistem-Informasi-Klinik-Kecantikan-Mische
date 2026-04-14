@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('produkKlinik', function (Blueprint $table) {
             $table->increments('idProduk');
+            $table->string('gambar');
             $table->string('nama',60);
             $table->text('deskripsi');
             $table->unsignedInteger('harga');

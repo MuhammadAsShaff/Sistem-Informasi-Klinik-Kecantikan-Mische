@@ -15,6 +15,7 @@ class ProfilPerusahaan extends Model
     protected $fillable = [
         'visi',
         'misi',
+        'fotoPerusahaan',
         'deskripsiPerusahaan',
         'nomorCustomerService',
         'jamBukak',

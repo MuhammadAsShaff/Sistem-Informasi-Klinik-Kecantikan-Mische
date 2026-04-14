@@ -15,6 +15,7 @@ return new class extends Migration
             $table->increments('idProfil');
             $table->text('visi');
             $table->text('misi');
+            $table->string('fotoPerusahaan');
             $table->text('deskripsiPerusahaan');
             $table->unsignedInteger('nomorCustomerService');
             $table->time('jamBukak');

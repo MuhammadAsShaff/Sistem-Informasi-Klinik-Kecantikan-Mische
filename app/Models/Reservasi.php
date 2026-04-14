@@ -10,7 +10,7 @@ class Reservasi extends Model
 
     public $timestamps = true;
 
-    protected $table = 'reservasi';
+    protected $table = 'reservasi'; 
 
     protected $primaryKey = 'idReservasi';
 
@@ -29,7 +29,7 @@ class Reservasi extends Model
         return $this->belongsTo(User::class,'idUser');
     } 
 
-    public function dokrter(){
+    public function dokter(){
         return $this->belongsTo(ProfilDokter::class,'idDokter');
     }
 
