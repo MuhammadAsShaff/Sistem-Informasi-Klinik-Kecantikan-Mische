@@ -8,9 +8,9 @@ class ProfilPerusahaan extends Model
 {
     public $incrementing = true;
     public $timestamps = true;
-    protected $table = 'profildokter';
+    protected $table = 'profilperusahaan';
 
-    protected $primaryKey = 'idDokter';
+    protected $primaryKey = 'idProfil';
 
     protected $fillable = [
         'visi',

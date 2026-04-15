@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('misi');
             $table->string('fotoPerusahaan');
             $table->text('deskripsiPerusahaan');
-            $table->unsignedInteger('nomorCustomerService');
+            $table->string('nomorCustomerService');
             $table->time('jamBukak');
             $table->time('jamKeluar');
             $table->timestamps();

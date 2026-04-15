@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AutentikasiController;
-use App\Http\Controllers\ProfileKlinikController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\ProfilePerusahaanController;
+use App\Http\Controllers\Api\KelolaUserController;
 use Illuminate\Support\Facades\Route;
 
 // ============================================
@@ -23,7 +23,7 @@ Route::prefix('auth')->group(function () {
 // ============================================
 Route::prefix('customer')->group(function () {
     // Endpoint khusus pasien/publik melihat data Profil Klinik
-    Route::get('clinic', [ProfileKlinikController::class, 'getPublicProfile'])->name('customer.clinic');
+    Route::get('clinic', [ProfilePerusahaanController::class, 'getPublicProfile'])->name('customer.clinic');
 });
 
 // ============================================
@@ -37,10 +37,10 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Prefix turunan: /api/admin/users/...
     // ----------------------------------------
     Route::prefix('users')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Api\KelolaUserController::class, 'getAllUsers'])->name('admin.users');
-        Route::put('/{idUser}', [\App\Http\Controllers\Api\KelolaUserController::class, 'updateUser'])->name('admin.updateUser');
-        Route::delete('/{idUser}', [\App\Http\Controllers\Api\KelolaUserController::class, 'deleteUser'])->name('admin.deleteUser');
-        Route::post('/{idUser}', [\App\Http\Controllers\Api\KelolaUserController::class, 'createUser'])->name('admin.createUser');
+        Route::get('/', [KelolaUserController::class, 'getAllUsers'])->name('admin.users');
+        Route::put('/{idUser}', [KelolaUserController::class, 'updateUser'])->name('admin.updateUser');
+        Route::delete('/{idUser}', [KelolaUserController::class, 'deleteUser'])->name('admin.deleteUser');
+        Route::post('/', [KelolaUserController::class, 'createUser'])->name('admin.createUser');
     });
 
     // ----------------------------------------
@@ -48,11 +48,9 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     // Prefix turunan: /api/admin/clinic/...
     // ----------------------------------------
     Route::prefix('clinic')->group(function () {
-        Route::get('/', [ProfileKlinikController::class, 'getProfile'])->name('admin.clinic');
-        Route::put('/{idProfile}', [ProfileKlinikController::class, 'updateProfile'])->name('admin.updateProfile');
-        Route::delete('/{idProfile}', [ProfileKlinikController::class, 'deleteProfile'])->name('admin.deleteProfile');
-        Route::post('/{idProfile}', [ProfileKlinikController::class, 'createProfile'])->name('admin.createProfile');
+        Route::post('/', [ProfilePerusahaanController::class, 'createProfile'])->name('admin.createProfile');
+        Route::get('/', [ProfilePerusahaanController::class, 'getProfile'])->name('admin.clinic');
+        Route::post('/{idProfile}', [ProfilePerusahaanController::class, 'updateProfile'])->name('admin.updateProfile');
+        Route::delete('/{idProfile}', [ProfilePerusahaanController::class, 'deleteProfile'])->name('admin.deleteProfile');
     });
-
-
 });

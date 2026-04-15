@@ -1,31 +1,194 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\ProfilPerusahaan;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
-class ProfileKlinikController extends Controller
+// Perbaikan nama class menyesuaikan nama file (wajib PSR-4)
+class ProfilePerusahaanController extends Controller
 {
     public function getProfile()
     {
-        
+        $profil = ProfilPerusahaan::first();
+
+        if (!$profil) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data profil perusahaan belum dibuat.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil mengambil profil perusahaan (Admin)',
+            'data' => $profil
+        ], 200);
     }
 
     public function getPublicProfile()
     {
+        $profil = ProfilPerusahaan::first();
 
+        if (!$profil) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada data profil yang tersedia.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil mengambil profil perusahaan (public)',
+            'data' => $profil
+        ], 200);
     }
 
-    public function updateProfile(Request $request)
+    public function createProfile(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'visi' => 'required|string',
+            'misi' => 'required|string',
+            'fotoPerusahaan' => 'required|image|mimes:jpeg,png,jpg|max:4000', // Benar-benar file gambar. Maks 2MB
+            'deskripsiPerusahaan' => 'required|string',
+            'nomorCustomerService' => 'required|string|max:16',
+            'jamBukak' => 'required|date_format:H:i',
+            'jamKeluar' => 'required|date_format:H:i',
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mohon periksa kembali inputan',
+                'error' => $validator->errors(),
+            ], 400);
+        }
+
+        try {
+            $fotoPath = null;
+            // Jika ada payload FILE masuk dengan nama field 'fotoPerusahaan'
+            if ($request->hasFile('fotoPerusahaan')) {
+                $file = $request->file('fotoPerusahaan');
+                
+                // BYPASS Windows/Laragon real_path bug
+                $filename = $file->hashName(); // Buat nama file unik acak
+                Storage::disk('public')->put('profil_perusahaan/' . $filename, file_get_contents($file->getPathname()));
+                
+                $fotoPath = 'profil_perusahaan/' . $filename;
+            }
+
+            $profilPerusahaan = ProfilPerusahaan::create([
+                'visi' => $request->visi,
+                'misi' => $request->misi,
+                'fotoPerusahaan' => $fotoPath, // Simpan path lokasi foto ke dalam table database
+                'deskripsiPerusahaan' => $request->deskripsiPerusahaan,
+                'nomorCustomerService' => $request->nomorCustomerService,
+                'jamBukak' => $request->jamBukak,
+                'jamKeluar' => $request->jamKeluar,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menambahkan data profil',
+                'data' => $profilPerusahaan,
+            ], 201); // 201 Created code
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem saat menambahkan profil',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    public function creatProfile(Request $request)
+    public function updateProfile(Request $request, $idProfile) // Menangkap parameter dari URL /admin/clinic/{idProfile}
     {
+        try {
+            $profilPerusahaan = ProfilPerusahaan::findOrFail($idProfile);
+
+            $validator = Validator::make($request->all(), [
+                'visi' => 'required|string',
+                'misi' => 'required|string',
+                'fotoPerusahaan' => 'nullable|image|mimes:jpeg,png,jpg|max:4000', // Boleh kosong jika tidak mau ganti jepretan foto
+                'deskripsiPerusahaan' => 'required|string',
+                'nomorCustomerService' => 'required|string|max:16',
+                'jamBukak' => 'required|date_format:H:i',
+                'jamKeluar' => 'required|date_format:H:i',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mohon periksa kembali inputan',
+                    'error' => $validator->errors(),
+                ], 400);
+            }
+
+            // Keranjang penampung data teks biasa (selain foto)
+            $dataToUpdate = [
+                'visi' => $request->visi,
+                'misi' => $request->misi,
+                'deskripsiPerusahaan' => $request->deskripsiPerusahaan,
+                'nomorCustomerService' => $request->nomorCustomerService,
+                'jamBukak' => $request->jamBukak,
+                'jamKeluar' => $request->jamKeluar,
+            ];
+
+            // Jika ada kiriman file foto PERBAIKAN dari Client
+            if ($request->hasFile('fotoPerusahaan')) {
+                // Sapu bersih/Hapus gambar lama dari Harddisk Server agar tidak menumpuk memenuhi kuota
+                if ($profilPerusahaan->fotoPerusahaan) {
+                    Storage::disk('public')->delete($profilPerusahaan->fotoPerusahaan);
+                }
+
+                $file = $request->file('fotoPerusahaan');
+                
+                // BYPASS Windows/Laragon real_path bug
+                $filename = $file->hashName();
+                Storage::disk('public')->put('profil_perusahaan/' . $filename, file_get_contents($file->getPathname()));
+                
+                $dataToUpdate['fotoPerusahaan'] = 'profil_perusahaan/' . $filename;
+            }
+
+            $profilPerusahaan->update($dataToUpdate);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mengubah data profil',
+                'data' => $profilPerusahaan,
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['success' => false, 'message' => 'Profil yang mau diedit tidak ditemukan'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui data', 'error' => $e->getMessage()], 500);
+        }
     }
 
-    public function deleteProfile(Request $request)
+    public function deleteProfile($idProfile) // Langsung ambil parameter dari Route URL
     {
+        try {
+            $profilPerusahaan = ProfilPerusahaan::findOrFail($idProfile);
+
+            // Perhatian: Karena ini di luar database, hancurkan juga file asli dari Server jika rute datanya dihapus
+            if ($profilPerusahaan->fotoPerusahaan) {
+                Storage::disk('public')->delete($profilPerusahaan->fotoPerusahaan);
+            }
+
+            $profilPerusahaan->delete(); // Perbaikan fatal: panggil dengan object ->delete() (BUKAN ::delete())
+
+            // Perbaikan fatal: kembalikan response JSON setelah berhasil
+            return response()->json([
+                'success' => true,
+                'message' => 'Data profil berhasil dihapus'
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['success' => false, 'message' => 'Profil yang mau dihapus tidak ditemukan'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal menghapus data', 'error' => $e->getMessage()], 500);
+        }
     }
 }
