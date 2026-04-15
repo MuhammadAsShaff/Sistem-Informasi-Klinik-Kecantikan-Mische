@@ -1,17 +1,17 @@
-
 import React from 'react';
-import { Leaf } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Logo from '../../assets/LogoMische.png';
-
 
 const NavbarLogo = () => {
   return (
-    <div className="flex items-center gap-2 cursor-pointer">
-      <img src={Logo} alt="Logo Mische" className="h-10 w-auto" />
-    </div>
+    <Link to="/" className="flex items-center gap-2 shrink-0">
+      <img
+        src={Logo}
+        alt="Logo Mische"
+        className="h-10 w-auto sm:h-12 md:h-20 lg:h-[82px] xl:h-[125px]"
+      />
+    </Link>
   );
 };
 
 export default NavbarLogo;
-
-//

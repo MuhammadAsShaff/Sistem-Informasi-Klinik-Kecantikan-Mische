@@ -1,14 +1,19 @@
-
-
 export const NAV_LINKS = [
-  { label: 'Beranda', href: '#', active: true },
-  { label: 'Produk', href: '#' },
-  { label: 'Promo', href: '#' },
-  { label: 'Event', href: '#' },
-  { label: 'Reservasi', href: '#' },
-  { label: 'Tentang Kami', href: '#', hasDropdown: true },
+  { label: 'Beranda', href: '/' },
+  { label: 'Produk', href: '/produk' },
+  { label: 'Promo', href: '/promo' },
+  { label: 'Event', href: '/event' },
+  { label: 'Reservasi', href: '/reservasi' },
+  { 
+    label: 'Tentang Kami', 
+    href: '/tentang-kami', 
+    hasDropdown: true,
+    subItems: [
+      { label: 'Cabang', href: '/tentang-kami/cabang' },
+      { label: 'Kritik & Saran', href: '/tentang-kami/kritik-saran' },
+    ]
+  },
 ];
 
 //href :Link tujuan nya 
-//active : artinya linknya aktif
 //hasDropdown : link itu ada icon aarownya

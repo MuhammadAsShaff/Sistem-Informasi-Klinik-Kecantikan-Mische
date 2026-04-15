@@ -1,26 +1,31 @@
-import HeroCarousel from "./Carousel";
+import HeroCarousel from "./Carousel/Index";
+import DoctorSection from "./SectionDokter/Index";
+import SectionInfoPerawatan from "./SectionInfoPerawatan/Index";
+import ProdukBestSeller from "./ProdukBestSeller/Index";
+import HasilKlinik from "./HasilKlinik/Index";
+import KeunggulanKlinik from "./KeunggulanKlinik/Index";
 
 export default function LandingPage() {
   return (
     <div className="w-full">
 
-      {/* BAGIAN 1: HERO CAROUSEL */}
+      {/* BERANDA / HERO CAROUSEL */}
       <HeroCarousel />
 
-      {/* BAGIAN 2: CARD DOKTER */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold mb-6">Dokter Kami</h2>
-      </section>
+      {/* DOKTER SECTION */}
+      <DoctorSection />
 
-      {/* BAGIAN 3: PROMO */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold mb-6">Promo Terbaru</h2>
-      </section>
+      {/* INFO PERAWATAN */}
+      <SectionInfoPerawatan />
 
-      {/* BAGIAN 4: PRODUK */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl font-bold mb-6">Produk Unggulan</h2>
-      </section>
+      {/* PRODUK BEST SELLER */}
+      <ProdukBestSeller />
+
+      {/* HASIL KLINIK (BEFORE/AFTER) */}
+      <HasilKlinik />
+
+      {/* KEUNGGULAN KLINIK */}
+      <KeunggulanKlinik />
 
     </div>
   );
