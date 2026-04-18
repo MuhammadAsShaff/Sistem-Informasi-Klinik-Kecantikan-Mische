@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AutentikasiController;
+use App\Http\Controllers\Api\ProfilCustomerController;
 use App\Http\Controllers\Api\ProfilePerusahaanController;
 use App\Http\Controllers\Api\KelolaUserController;
 use Illuminate\Support\Facades\Route;
@@ -24,13 +25,18 @@ Route::prefix('auth')->group(function () {
 Route::prefix('customer')->group(function () {
     // Endpoint khusus pasien/publik melihat data Profil Klinik
     Route::get('clinic', [ProfilePerusahaanController::class, 'getPublicProfile'])->name('customer.clinic');
+
+    Route::prefix('profile')->middleware(['role:customer'])->group(function () {
+        Route::get('/', [ProfilCustomerController::class, 'getProfileCustomer'])->name('customer.profile');
+        Route::put('/', [ProfilCustomerController::class, 'updateProfileCustomer'])->name('customer.updateProfile');
+    });
 });
 
 // ============================================
 // AREA ADMINISTRATOR (Hanya Boleh Diakses Admin Ber-Token)
 // Prefix: /api/admin/...
 // ============================================
-Route::prefix('admin')->middleware(['admin'])->group(function () {
+Route::prefix('admin')->middleware(['role:admin'])->group(function () {
 
     // ----------------------------------------
     // RUTE KELOLA USER (Staff, Pasien, dll)
@@ -50,7 +56,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     Route::prefix('clinic')->group(function () {
         Route::post('/', [ProfilePerusahaanController::class, 'createProfile'])->name('admin.createProfile');
         Route::get('/', [ProfilePerusahaanController::class, 'getProfile'])->name('admin.clinic');
-        Route::post('/{idProfile}', [ProfilePerusahaanController::class, 'updateProfile'])->name('admin.updateProfile');
+        Route::put('/{idProfile}', [ProfilePerusahaanController::class, 'updateProfile'])->name('admin.updateProfile');
         Route::delete('/{idProfile}', [ProfilePerusahaanController::class, 'deleteProfile'])->name('admin.deleteProfile');
     });
 });

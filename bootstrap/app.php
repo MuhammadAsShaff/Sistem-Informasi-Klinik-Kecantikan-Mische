@@ -18,9 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\JwtFromCookie::class);
 
         // [Middleware Custom Kita]:
-        // Mendaftarkan label alias 'admin' sehingga kita cukup tulis `->middleware('admin')` pada route terkait
+        // Mendaftarkan label alias 'role' sehingga kita bisa pakai `->middleware('role:admin')` atau `role:customer`
         $middleware->alias([
-            'admin' => \App\Http\Middleware\EnsureAdminRole::class,
+            'role' => \App\Http\Middleware\CheckRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

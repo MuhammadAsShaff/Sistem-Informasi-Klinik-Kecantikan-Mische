@@ -15,7 +15,7 @@ class KelolaUserController extends Controller
         try {
             // Mengambil semua data user dengan paginasi 
             $users = User::latest()->paginate(10);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil mengambil semua data user',
@@ -35,7 +35,7 @@ class KelolaUserController extends Controller
         try {
             // Mencari user langsung ke intinya berdasarkan ID (findOrFail)
             $user = User::findOrFail($idUser);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil menemukan user',
@@ -108,9 +108,8 @@ class KelolaUserController extends Controller
                 'jenisKelamin' => 'sometimes|string|max:12',
                 'tanggalLahir' => 'sometimes|date',
                 'role' => 'sometimes|string|max:12',
-                'email' => 'sometimes|email|unique:user,email,' . $user->id,
+                'email' => 'sometimes|email|unique:user,email,' . $user->idUser . ',idUser',
                 'nomorWa' => 'sometimes|string|max:16',
-                // Password tidak wajib diisi saat mode edit
             ]);
 
             if ($validator->fails()) {
@@ -123,7 +122,7 @@ class KelolaUserController extends Controller
 
             // Pisahkan password dari data regular
             $dataToUpdate = $request->except('password');
-            
+
             // Re-hash sandi jika ternyata diganti
             if ($request->filled('password')) {
                 $dataToUpdate['password'] = Hash::make($request->password);

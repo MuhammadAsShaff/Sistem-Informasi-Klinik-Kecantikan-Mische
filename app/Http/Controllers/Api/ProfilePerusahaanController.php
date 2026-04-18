@@ -72,11 +72,11 @@ class ProfilePerusahaanController extends Controller
             // Jika ada payload FILE masuk dengan nama field 'fotoPerusahaan'
             if ($request->hasFile('fotoPerusahaan')) {
                 $file = $request->file('fotoPerusahaan');
-                
+
                 // BYPASS Windows/Laragon real_path bug
                 $filename = $file->hashName(); // Buat nama file unik acak
                 Storage::disk('public')->put('profil_perusahaan/' . $filename, file_get_contents($file->getPathname()));
-                
+
                 $fotoPath = 'profil_perusahaan/' . $filename;
             }
 
@@ -145,11 +145,11 @@ class ProfilePerusahaanController extends Controller
                 }
 
                 $file = $request->file('fotoPerusahaan');
-                
+
                 // BYPASS Windows/Laragon real_path bug
                 $filename = $file->hashName();
                 Storage::disk('public')->put('profil_perusahaan/' . $filename, file_get_contents($file->getPathname()));
-                
+
                 $dataToUpdate['fotoPerusahaan'] = 'profil_perusahaan/' . $filename;
             }
 

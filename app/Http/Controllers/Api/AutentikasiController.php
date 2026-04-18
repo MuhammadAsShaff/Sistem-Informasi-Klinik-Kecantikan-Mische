@@ -153,25 +153,9 @@ class AutentikasiController extends Controller
     public function getUserProfile(Request $request)
     {
         try {
-            // [Refaktor Kustom] Cek token dari header. 
-            // Jika dulunya user bawa token di Cookie, Middleware JwtFromCookie kita yang memindahkannya ke sini.
-            if (!$request->bearerToken()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak. Anda belum login.'
-                ], 401);
-            }
-
             // [Refaktor Kustom] Langsung ambil user menggunakan bawaan JWT:
             // Sistem akan otomatis menerjemahkan token yang tertempel di Header tadi menjadi data spesifik `User`.
             $user = auth('api')->user();
-
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Sesi telah kedaluwarsa atau token tidak valid.'
-                ], 401);
-            }
 
             return response()->json([
                 'success' => true,
@@ -191,25 +175,9 @@ class AutentikasiController extends Controller
     public function resetPassword(Request $request)
     {
         try {
-            // [Refaktor Kustom] Cek token dari request. Terima kasih kepada Middleware kustom kita, 
-            // sekalipun pengguna hanya punya Cookie, `$request->bearerToken()` akan terisi!
-            if (!$request->bearerToken()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak. Anda belum memasukkan Token JWT. Harap login lalu tambahkan token di Authorization: Bearer <token>'
-                ], 401);
-            }
-
             // [Refaktor Kustom] Cukup panggil user(). Ini memotong boilerplate sintaks "setToken($token)"
             // yang sebelumnya harus ditulis manual. Token yg di Header diterjemahkan otomatis.
             $user = auth('api')->user();
-
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token Anda tidak valid, sudah kedaluwarsa (expired), atau akun telah dihapus. Silakan login kembali untuk mendapatkan token baru.'
-                ], 401);
-            }
 
             // 2. Validasi Inputan Sesuai Ketentuan Ketat (Harus 8 Karakter & Huruf Besar/Kecil)
             $pesanEror = [

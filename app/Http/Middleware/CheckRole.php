@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class CheckRole
+{
+    /**
+     * Middleware Pengecekan Peran (Role) Dinamis
+     * Mengecek identitas jwt dan mencocokkan perannya
+     */
+    public function handle(Request $request, Closure $next, ...$roles)
+    {
+        $user = auth('api')->user();
+
+        // 1. Cek apakah ada profil di dalam token JWT
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki token otentikasi!'
+            ], 401);
+        }
+
+        // 2. Cek apakah pengguna memiliki Role yang diizinkan (jika parameter roles diisi)
+        if (!empty($roles) && !in_array($user->role, $roles)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak: Anda tidak memiliki izin untuk masuk ke halaman ini.'
+            ], 403); // HTTP 403 singkatan dari Forbidden/Diharamkan
+        }
+
+        // Jika lolos ujian di atas, baru biarkan jalankan script Controller nya!
+        return $next($request);
+    }
+}
