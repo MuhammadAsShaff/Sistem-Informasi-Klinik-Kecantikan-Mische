@@ -131,13 +131,16 @@ class AutentikasiController extends Controller
             // Tidak perlu lagi mengambil token secara manual menggunakan $request->cookie() !
             if (auth('api')->check()) {
                 auth('api')->logout();
+                $pesan = 'Sesi Anda berhasil diakhiri (Logout).';
+            } else {
+                $pesan = 'Permintaan diterima, namun sesi Anda tampaknya memang sudah tidak aktif.';
             }
 
             $cookieName = env('JWT_COOKIE', 'jwt_token');
 
             return response()->json([
                 'success' => true,
-                'message' => 'Logout berhasil'
+                'message' => $pesan
             ])->withCookie(cookie()->forget($cookieName));
 
         } catch (\Exception $e) {
@@ -153,6 +156,13 @@ class AutentikasiController extends Controller
     public function getUserProfile(Request $request)
     {
         try {
+            if (!auth('api')->check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sesi Anda telah kedaluwarsa atau tidak valid. Silakan login kembali.'
+                ], 401);
+            }
+
             // [Refaktor Kustom] Langsung ambil user menggunakan bawaan JWT:
             // Sistem akan otomatis menerjemahkan token yang tertempel di Header tadi menjadi data spesifik `User`.
             $user = auth('api')->user();
@@ -175,6 +185,13 @@ class AutentikasiController extends Controller
     public function resetPassword(Request $request)
     {
         try {
+            if (!auth('api')->check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sesi Anda telah kedaluwarsa atau tidak valid. Silakan login kembali.'
+                ], 401);
+            }
+
             // [Refaktor Kustom] Cukup panggil user(). Ini memotong boilerplate sintaks "setToken($token)"
             // yang sebelumnya harus ditulis manual. Token yg di Header diterjemahkan otomatis.
             $user = auth('api')->user();

@@ -13,9 +13,24 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        $user = auth('api')->user();
+        try {
+            // auth('api')->check() akan memvalidasi Token secara mendalam (termasuk ngecek Blacklist)
+            if (!auth('api')->check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Token Anda tidak valid atau sudah kadaluarsa (Logout).'
+                ], 401);
+            }
 
-        // 1. Cek apakah ada profil di dalam token JWT
+            $user = auth('api')->user();
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sesi Token Anda ditolak oleh server (Mungkin sudah Logout).',
+                'error' => $e->getMessage()
+            ], 401);
+        }
+
         if (!$user) {
             return response()->json([
                 'success' => false,

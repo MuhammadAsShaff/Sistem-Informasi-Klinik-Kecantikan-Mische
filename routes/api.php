@@ -4,7 +4,17 @@ use App\Http\Controllers\Api\AutentikasiController;
 use App\Http\Controllers\Api\ProfilCustomerController;
 use App\Http\Controllers\Api\ProfilePerusahaanController;
 use App\Http\Controllers\Api\KelolaUserController;
+use App\Http\Controllers\Api\JadwalReservasiController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/test-db', function() {
+    try {
+        $caches = \Illuminate\Support\Facades\DB::table('cache')->limit(10)->get();
+        return response()->json(['success' => true, 'caches' => $caches]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'error' => $e->getMessage()]);
+    }
+});
 
 // ============================================
 // AREA AUTENTIKASI (Proses Log Masuk & Daftar)
@@ -23,8 +33,10 @@ Route::prefix('auth')->group(function () {
 // Prefix: /api/customer/...
 // ============================================
 Route::prefix('customer')->group(function () {
-    // Endpoint khusus pasien/publik melihat data Profil Klinik
+
     Route::get('clinic', [ProfilePerusahaanController::class, 'getPublicProfile'])->name('customer.clinic');
+    
+    Route::get('schedules', [JadwalReservasiController::class, 'getPublicSchedule'])->name('customer.schedules');
 
     Route::prefix('profile')->middleware(['role:customer'])->group(function () {
         Route::get('/', [ProfilCustomerController::class, 'getProfileCustomer'])->name('customer.profile');
@@ -58,5 +70,16 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::get('/', [ProfilePerusahaanController::class, 'getProfile'])->name('admin.clinic');
         Route::put('/{idProfile}', [ProfilePerusahaanController::class, 'updateProfile'])->name('admin.updateProfile');
         Route::delete('/{idProfile}', [ProfilePerusahaanController::class, 'deleteProfile'])->name('admin.deleteProfile');
+    });
+
+    // ----------------------------------------
+    // RUTE KELOLA JADWAL RESERVASI
+    // Prefix turunan: /api/admin/schedules/...
+    // ----------------------------------------
+    Route::prefix('schedules')->group(function () {
+        Route::get('/', [JadwalReservasiController::class, 'getAllSchedule'])->name('admin.schedules');
+        Route::post('/', [JadwalReservasiController::class, 'createSchedule'])->name('admin.createSchedule');
+        Route::put('/{idJadwal}', [JadwalReservasiController::class, 'updateSchedule'])->name('admin.updateSchedule');
+        Route::delete('/{idJadwal}', [JadwalReservasiController::class, 'deleteSchedule'])->name('admin.deleteSchedule');
     });
 });
