@@ -4,10 +4,11 @@ import SectionInfoPerawatan from "./SectionInfoPerawatan/Index";
 import ProdukBestSeller from "./ProdukBestSeller/Index";
 import HasilKlinik from "./HasilKlinik/Index";
 import KeunggulanKlinik from "./KeunggulanKlinik/Index";
+import FloatingCta from "./FloatingCta";
 
 export default function LandingPage() {
   return (
-    <div className="w-full">
+    <div className="relative w-full">
 
       {/* BERANDA / HERO CAROUSEL */}
       <HeroCarousel />
@@ -26,6 +27,9 @@ export default function LandingPage() {
 
       {/* KEUNGGULAN KLINIK */}
       <KeunggulanKlinik />
+
+      {/* FLOATING ACTION BUTTONS (WA + SCROLL TO TOP) */}
+      <FloatingCta />
 
     </div>
   );

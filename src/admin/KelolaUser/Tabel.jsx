@@ -8,15 +8,15 @@ export default function Tabel({ data, onEdit, onDelete }) {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-gray-100 bg-[#F9FAFB]/50">
-              <th className="px-3 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">No</th>
-              <th className="px-3 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Nama</th>
-              <th className="px-3 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Alamat</th>
-              <th className="px-3 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Jenis Kelamin</th>
-              <th className="px-3 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Tanggal Lahir</th>
-              <th className="px-3 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Role</th>
-              <th className="px-3 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-3 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider">Nomor Whatsapp</th>
-              <th className="px-3 py-4 text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Action</th>
+              <th className="px-3 py-4 text-[11px] font-bold text-gray-600 uppercase tracking-wider text-center">No</th>
+              <th className="px-3 py-4 text-[11px] font-bold text-gray-600 uppercase tracking-wider">Nama</th>
+              <th className="px-3 py-4 text-[11px] font-bold text-gray-600 uppercase tracking-wider">Alamat</th>
+              <th className="px-3 py-4 text-[11px] font-bold text-gray-600 uppercase tracking-wider">Jenis Kelamin</th>
+              <th className="px-3 py-4 text-[11px] font-bold text-gray-600 uppercase tracking-wider">Tanggal Lahir</th>
+              <th className="px-3 py-4 text-[11px] font-bold text-gray-600 uppercase tracking-wider text-center">Role</th>
+              <th className="px-3 py-4 text-[11px] font-bold text-gray-600 uppercase tracking-wider">Email</th>
+              <th className="px-3 py-4 text-[11px] font-bold text-gray-600 uppercase tracking-wider">Nomor Whatsapp</th>
+              <th className="px-3 py-4 text-[11px] font-bold text-black uppercase tracking-wider text-center">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">

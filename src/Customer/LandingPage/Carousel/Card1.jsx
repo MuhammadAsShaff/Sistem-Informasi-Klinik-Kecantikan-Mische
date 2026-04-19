@@ -13,18 +13,18 @@ export default function Card1() {
         <div className="flex flex-col gap-2 sm:gap-3 md:gap-6 text-white max-w-[70%] md:max-w-[800px] text-left items-start z-20">
           
           {/* JUDUL: Ukuran teks otomatis membesar dari Mobile (text-xl) ke Desktop (lg:text-7xl) */}
-          <h1 className="text-xl sm:text-2xl md:text-5xl lg:text-7xl font-extrabold leading-tight">
+          <h1 className="text-xl sm:text-2xl md:text-5xl lg:text-7xl font-bold leading-tight">
             <span className="block">THE FIRST ACNE EXPERT </span>
             <span className="block">IN TOWN</span>
           </h1>
 
           {/* SUB-TEXT / LABEL: Menggunakan background hijau muda transparan */}
-          <p className="max-w-[90%] sm:max-w-[80%] md:max-w-[500px] bg-[#85C583] px-3 py-1.5 md:px-6 md:py-3 text-white font-semibold text-[10px] sm:text-xs md:text-lg lg:text-[28px] shadow-lg leading-snug break-words">
+          <p className="max-w-[90%] sm:max-w-[80%] md:max-w-[500px] bg-[#85C583] px-3 py-1.5 md:px-6 md:py-3 text-white font-regular text-[10px] sm:text-xs md:text-lg lg:text-[28px] shadow-lg leading-snug break-words">
             Atasi Berbagai Masalah Kulit dan Wajah
           </p>
 
           {/* TOMBOL AKSI: Menggunakan hover efek agar interaktif */}
-          <button className="w-fit whitespace-nowrap bg-[#85C583] px-3 py-1.5 md:px-6 md:py-3 rounded-full text-[12px] sm:text-sm md:text-lg lg:text-[26px] font-semibold hover:bg-white hover:text-[#266E0F] transition duration-300 shadow-lg mt-1 md:mt-2">
+          <button className="w-fit whitespace-nowrap bg-[#85C583] px-3 py-1.5 md:px-6 md:py-3 rounded-full text-[12px] sm:text-sm md:text-lg lg:text-[26px] font-regular hover:bg-[#2da509] transition duration-300 shadow-lg mt-1 md:mt-2">
             Lihat Promo
           </button>
         </div>

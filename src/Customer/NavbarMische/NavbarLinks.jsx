@@ -12,7 +12,7 @@ const NavbarLinks = () => {
             to={link.href}
             className={({ isActive }) =>
               [
-                'inline-flex items-center gap-1 whitespace-nowrap border-b-[4px] border-transparent py-2 text-[14px] font-semibold transition-colors duration-200 sm:text-base md:text-lg lg:text-[22px] xl:text-[26px]',
+                'inline-flex items-center gap-1 whitespace-nowrap border-b-[4px] border-transparent py-2 text-[14px] font-medium transition-colors duration-200 sm:text-base md:text-lg lg:text-[22px] xl:text-[26px]',
                 isActive
                   ? 'border-[#8CC461] text-gray-900'
                   : 'text-gray-900 hover:text-[#8CC461]',

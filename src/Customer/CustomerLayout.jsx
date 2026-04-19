@@ -1,5 +1,5 @@
-import Navbar from "../Customer/navbar"; 
-import Footer from "../Customer/Footer";
+import Navbar from "./NavbarMische/NavbarMische";
+import Footer from "./Footer/Footer";
 import { Outlet } from "react-router-dom";
 
 export default function CustomerLayout() {

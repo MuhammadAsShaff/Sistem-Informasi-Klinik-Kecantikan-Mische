@@ -25,3 +25,16 @@
     scrollbar-width: none;
   }
 }
+
+/* Swiper Custom Pagination */
+.swiper-pagination-bullet {
+  background: #85C583 !important;
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  background: #ffffff !important;
+  opacity: 1;
+  width: 24px;
+  border-radius: 4px;
+}

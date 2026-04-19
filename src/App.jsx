@@ -13,12 +13,13 @@ import EventPage from "./Customer/EventPage/eventPage";
 import LoginPage from "./authentication/Login";
 import RegistrasiPage from "./authentication/Registrasi";
 import TentangKamiPage from "./Customer/TentangKami";
+import ProfilCustomerPage from "./Customer/ProfilCustomer/Index";
 
 // Admin Pages
 import AdminDashboard from "./admin/dashboard/dashboard";
 import AdminProduk from "./admin/produk/produk";
-import AdminReservasi from "./admin/reservasi/reservasi";
 import KelolaUser from "./admin/KelolaUser/index";
+import KelolaJadwalReservasiTreatment from "./admin/KelolaJadwalReservasiTreatment/Index";
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="tentang-kami" element={<TentangKamiPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="registrasi" element={<RegistrasiPage />} />
+        <Route path="ProfilCustomer" element={<ProfilCustomerPage />} />
       </Route>
 
 
@@ -41,8 +43,8 @@ export default function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="produk" element={<AdminProduk />} />
-        <Route path="reservasi" element={<AdminReservasi />} />
         <Route path="kelolauser" element={<KelolaUser />} />
+        <Route path="jadwal" element={<KelolaJadwalReservasiTreatment />} />
       </Route>
 
     </Routes>
