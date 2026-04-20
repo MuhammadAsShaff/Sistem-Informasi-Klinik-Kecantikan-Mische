@@ -7,14 +7,6 @@ use App\Http\Controllers\Api\KelolaUserController;
 use App\Http\Controllers\Api\JadwalReservasiController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/test-db', function() {
-    try {
-        $caches = \Illuminate\Support\Facades\DB::table('cache')->limit(10)->get();
-        return response()->json(['success' => true, 'caches' => $caches]);
-    } catch (\Exception $e) {
-        return response()->json(['success' => false, 'error' => $e->getMessage()]);
-    }
-});
 
 // ============================================
 // AREA AUTENTIKASI (Proses Log Masuk & Daftar)
