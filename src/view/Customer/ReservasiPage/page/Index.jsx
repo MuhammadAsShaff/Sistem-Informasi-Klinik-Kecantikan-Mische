@@ -9,6 +9,8 @@ import { useFetchPublicJadwal } from '../hooks/useFetchPublicJadwal';
 import { useCreateReservasi } from '../hooks/useCreateReservasi';
 import ToastAlert from '@/view/components/ToastAlert';
 import CustomerLoading from '@/components/CustomerLoading';
+import { treatments as listKategoriTreatment } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/hooks/TreatmentsData';
+import { dataJenisPerawatan } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/hooks/DataJenisPerawatan';
 
 export default function ReservasiPage() {
   const navigate = useNavigate();
@@ -22,7 +24,7 @@ export default function ReservasiPage() {
     return `${yyyy}-${mm}-${dd}`;
   });
   
-  const [treatment, setTreatment] = useState("Acne Treatment");
+  const [treatment, setTreatment] = useState("Refresh Facial");
   const [doctor, setDoctor] = useState("-");
   
   // 2. DATA DARI API (Dokter)
@@ -103,8 +105,13 @@ export default function ReservasiPage() {
   const handleBooking = () => {
     if (!selectedDoctorObj) return;
 
+    const selectedTreatmentObj = dataJenisPerawatan.find(t => t.title === treatment);
+    const selectedKategoriObj = listKategoriTreatment.find(c => c.id === selectedTreatmentObj?.categoryId);
+    const kategoriValue = selectedKategoriObj ? selectedKategoriObj.title : '';
+
     const payload = {
-      jenisTreatment: treatment,
+      kategoriReservasi: kategoriValue,
+      jenisReservasi: treatment,
       tanggalReservasi: selectedDate,
       idDokter: selectedDoctorObj.idDokter || selectedDoctorObj.id,
       idJadwal: selectedSlot.id
@@ -115,7 +122,7 @@ export default function ReservasiPage() {
       showToast(msg, "success");
       setTimeout(() => navigate('/ProfilCustomer'), 2000); // Redirect ke profil untuk melihat history
     }, (errMsg) => {
-      showToast(errMsg, "error");
+      showToast(errMsg || "Gagal membuat reservasi.", "error");
       setIsModalOpen(false);
     });
   };
@@ -132,7 +139,16 @@ export default function ReservasiPage() {
   return (
     <div className="min-h-screen bg-[#F8FAF9] py-8 md:py-16 px-4 md:px-12 lg:px-24 font-poppins" ref={dropdownRef}>
       <ToastAlert isOpen={toast.isOpen} message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, isOpen: false })} />
-      <div className="max-w-[1440px] mx-auto space-y-12">
+      <div className="max-w-[1440px] mx-auto space-y-12 relative">
+        <button 
+          onClick={() => navigate(-1)}
+          className="absolute -top-4 md:-top-8 left-0 flex items-center text-gray-500 hover:text-[#56BC36] transition-colors bg-white/50 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="ml-1 font-medium text-sm">Kembali</span>
+        </button>
         <HeaderSection />
         <FilterSection 
           treatment={treatment} setTreatment={setTreatment}
@@ -152,6 +168,10 @@ export default function ReservasiPage() {
             timeSlots={timeSlots} 
             isDoctorAvailable={isDoctorAvailable} 
             onSlotClick={(slot) => {
+              if (!treatment || treatment === "") {
+                showToast("Harap pilih Jenis Treatment terlebih dahulu!", "error");
+                return;
+              }
               if (slot.status === "Kosong") {
                 setSelectedSlot(slot);
                 setIsModalOpen(true);
@@ -169,6 +189,11 @@ export default function ReservasiPage() {
           isSubmitting={isSubmitting}
           slot={selectedSlot}
           treatment={treatment}
+          kategoriTreatment={
+            listKategoriTreatment.find(c => 
+              c.id === dataJenisPerawatan.find(t => t.title === treatment)?.categoryId
+            )?.title || ''
+          }
           doctor={doctor}
           date={selectedDate}
           formatTgl={formatTgl}

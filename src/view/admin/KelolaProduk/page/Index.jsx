@@ -120,12 +120,12 @@ const KelolaProduk = () => {
         data={selectedDetailCategory}
       />
 
-      {toast && (
-        <ToastAlert 
-          isOpen={true}
-          message={toast.message} 
-          type={toast.type} 
-          onClose={() => setToast(null)} 
+      {toast && toast.isOpen && (
+        <ToastAlert
+          isOpen={toast.isOpen}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, isOpen: false })}
         />
       )}
     </div>

@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { treatments } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/TreatmentsData';
-import { dataJenisPerawatan } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/DataJenisPerawatan';
-import JenisPerawatanCard from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/JenisPerawatanCard';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { treatments } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/hooks/TreatmentsData';
+import { dataJenisPerawatan } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/hooks/DataJenisPerawatan';
+import JenisPerawatanCard from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/page/JenisPerawatanCard';
 
 const DetailJenisPerawatan = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   
   // Ambil detail kategori perawatan dari treatments (Landing Page)
   const categoryId = parseInt(id) || 1;
@@ -34,26 +35,39 @@ const DetailJenisPerawatan = () => {
         
         {/* Banner Content */}
         <div className="relative z-10 max-w-3xl">
-          <h1 className="text-white text-3xl md:text-4xl font-bold mb-2">
-            {category.title}: Perawatan Dasar Wajah
+          <h1 className="text-white text-3xl md:text-4xl font-bold mb-2 drop-shadow-md">
+            {category.title}
           </h1>
-          <p className="text-white text-lg md:text-xl font-medium">
-            Kulit Bersih Dan Segar Dengan Perawatan Facial Rutin
+          <p className="text-white text-lg md:text-xl font-medium drop-shadow-md">
+            {category.description}
           </p>
         </div>
       </div>
 
       {/* Content Area */}
-      <div className="container mx-auto px-6 md:px-12 max-w-6xl pt-12">
+      <div className="container mx-auto px-6 md:px-12 max-w-6xl pt-8">
+        {/* Back Button */}
+        <button 
+          onClick={() => navigate(-1)}
+          className="flex items-center text-[#5c6e84] hover:text-[#56BC36] transition-colors mb-8 group"
+        >
+          <svg className="w-6 h-6 mr-3 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span className="text-[17px] font-semibold">Kembali</span>
+        </button>
+
         <h2 className="text-2xl md:text-3xl font-bold text-[#56BC36] text-center mb-10">
           Pilihan {category.title} Yang Cocok Untukmu
         </h2>
 
         {/* Grid Cards */}
         {items.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 justify-items-center">
             {items.map((item) => (
-              <JenisPerawatanCard key={item.id} item={item} />
+              <div key={item.id} className="w-full max-w-[380px]">
+                <JenisPerawatanCard item={item} />
+              </div>
             ))}
           </div>
         ) : (

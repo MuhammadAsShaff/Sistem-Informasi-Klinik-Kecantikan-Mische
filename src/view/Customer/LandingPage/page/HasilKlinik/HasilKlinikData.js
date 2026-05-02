@@ -1,19 +1,19 @@
-import BeforeCauterSkinTag from '@/assets/images/BeforeCauterSkinTag.jpeg';
-import AfterCauterSkinTag from '@/assets/images/AfterCauterSkinTag.jpeg';
-import BeforeCauterMilia from '@/assets/images/BeforeCauterMilia.jpeg';
-import AfterCauterMilia from '@/assets/images/AfterCauterMilia.jpeg';
-import BeforeIPLAcne from '@/assets/images/BeforeIPLAcne.jpeg';
-import AfterIPLAcne from '@/assets/images/AfterIPLAcne.jpeg';
-import BeforeBotoxDahi from '@/assets/images/BeforeBotoxDahi.jpeg';
-import AfterBotoxDahi from '@/assets/images/AfterBotoxDahi.jpeg';
-import BeforeLipLaserRejuvenation from '@/assets/images/BeforeLipLaserRejuvenation.jpeg';
-import AfterLipLaserRejuvenation from '@/assets/images/AfterLipLaserRejuvenation.jpeg';
-import BeforeNoseFiller from '@/assets/images/BeforeNoseFiller.jpeg';
-import AfterNoseFiller from '@/assets/images/AfterNoseFiller.jpeg';
-import BeforeThreadlift from '@/assets/images/BeforeThreadlift.jpeg';
-import AfterThreadlift from '@/assets/images/AfterThreadlift.jpeg';
-import BeforeRadianceGlowInfusion from '@/assets/images/BeforeRadianceGlowInfusion.jpeg';
-import AfterRadianceGlowInfusion from '@/assets/images/AfterRadianceGlowInfusion.jpeg';
+import BeforeCauterSkinTag from '@/assets/images/Hasiltreatment/BeforeCauterSkinTag.jpeg';
+import AfterCauterSkinTag from '@/assets/images/Hasiltreatment/AfterCauterSkinTag.jpeg';
+import BeforeCauterMilia from '@/assets/images/Hasiltreatment/BeforeCauterMilia.jpeg';
+import AfterCauterMilia from '@/assets/images/Hasiltreatment/AfterCauterMilia.jpeg';
+import BeforeIPLAcne from '@/assets/images/Hasiltreatment/BeforeIPLAcne.jpeg';
+import AfterIPLAcne from '@/assets/images/Hasiltreatment/AfterIPLAcne.jpeg';
+import BeforeBotoxDahi from '@/assets/images/Hasiltreatment/BeforeBotoxDahi.jpeg';
+import AfterBotoxDahi from '@/assets/images/Hasiltreatment/AfterBotoxDahi.jpeg';
+import BeforeLipLaserRejuvenation from '@/assets/images/Hasiltreatment/BeforeLipLaserRejuvenation.jpeg';
+import AfterLipLaserRejuvenation from '@/assets/images/Hasiltreatment/AfterLipLaserRejuvenation.jpeg';
+import BeforeNoseFiller from '@/assets/images/Hasiltreatment/BeforeNoseFiller.jpeg';
+import AfterNoseFiller from '@/assets/images/Hasiltreatment/AfterNoseFiller.jpeg';
+import BeforeThreadlift from '@/assets/images/Hasiltreatment/BeforeThreadlift.jpeg';
+import AfterThreadlift from '@/assets/images/Hasiltreatment/AfterThreadlift.jpeg';
+import BeforeRadianceGlowInfusion from '@/assets/images/Hasiltreatment/BeforeRadianceGlowInfusion.jpeg';
+import AfterRadianceGlowInfusion from '@/assets/images/Hasiltreatment/AfterRadianceGlowInfusion.jpeg';
 
 export const results = [
   {

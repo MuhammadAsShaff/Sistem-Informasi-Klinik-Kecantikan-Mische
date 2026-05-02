@@ -32,7 +32,8 @@ export default function ModalDetail({ isOpen, onClose, selectedReservasi }) {
             {renderField("ID Reservasi", `#${data.idReservasi || data.id}`)}
             {renderField("Nama Customer", data.namaCustomer)}
             {renderField("Nomor WhatsApp", data.nomorWa)}
-            {renderField("Jenis Treatment", data.jenisTreatment)}
+            {renderField("Kategori Treatment", data.kategoriReservasi)}
+            {renderField("Jenis Treatment", data.jenisReservasi)}
           </div>
 
           <div className="space-y-6">

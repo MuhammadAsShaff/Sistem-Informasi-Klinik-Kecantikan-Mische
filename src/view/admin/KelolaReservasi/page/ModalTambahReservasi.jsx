@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useFetchDokter } from '../../KelolaProfilDokter/hooks/useFetchDokter';
 import { useFetchPublicJadwal } from '../../../Customer/ReservasiPage/hooks/useFetchPublicJadwal';
+import { treatments as listKategoriTreatment } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/hooks/TreatmentsData';
+import { dataJenisPerawatan } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/hooks/DataJenisPerawatan';
 
 export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubmitting }) {
   const [formData, setFormData] = useState({
@@ -25,6 +27,9 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
     if (!dataJadwal || !Array.isArray(dataJadwal)) return [];
     return dataJadwal.filter(j => j.status === 'Tersedia' || !j.status);
   }, [dataJadwal]);
+
+  // Derived state untuk jenis treatment dropdown (menampilkan semua)
+  const availableJenisTreatments = dataJenisPerawatan.map(item => item.title);
 
   // Saat modal terbuka, paksa set tanggal hari ini
   useEffect(() => {
@@ -64,8 +69,16 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Hitung kategori berdasarkan jenis treatment
+    const selectedTreatmentObj = dataJenisPerawatan.find(t => t.title === formData.jenisTreatment);
+    const selectedKategoriObj = listKategoriTreatment.find(c => c.id === selectedTreatmentObj?.categoryId);
+    const kategoriValue = selectedKategoriObj ? selectedKategoriObj.title : '';
+
     onSubmit({
       ...formData,
+      kategoriReservasi: kategoriValue,
+      jenisReservasi: formData.jenisTreatment,
       idDokter: parseInt(formData.idDokter) || '',
       idJadwal: parseInt(formData.idJadwal) || ''
     });
@@ -117,8 +130,8 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
               </div>
             </div>
 
-            {/* ROW 2 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* ROW 2: Jenis Treatment */}
+            <div className="grid grid-cols-1 gap-8">
               <div className="space-y-2">
                 <label className="text-sm text-black">Jenis Treatment</label>
                 <select
@@ -129,12 +142,15 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
                   className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-green-500 text-sm"
                 >
                   <option value="" disabled>Pilih Jenis Treatment</option>
-                  <option value="Acne Treatment">Acne Treatment</option>
-                  <option value="Facial Rejuvenation">Facial Rejuvenation</option>
-                  <option value="Laser Therapy">Laser Therapy</option>
-                  <option value="Brightening Therapy">Brightening Therapy</option>
+                  {availableJenisTreatments.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
                 </select>
               </div>
+            </div>
+
+            {/* ROW 3: Dokter */}
+            <div className="grid grid-cols-1 gap-8">
 
               <div className="space-y-2">
                 <label className="text-sm text-black">Dokter</label>
@@ -159,7 +175,7 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
               </div>
             </div>
 
-            {/* ROW 3 */}
+            {/* ROW 4: Jam */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
                 <label className="text-sm text-black">Jam Mulai</label>

@@ -112,7 +112,16 @@ export default function ModalDetailPembelian({ isOpen, onClose, selectedOrder })
                <div className="mt-2 text-xs text-gray-500">
                  <div className="flex items-start gap-1">
                    <MapPin size={14} className="mt-0.5 shrink-0" />
-                   <span>{order.alamatCustomer?.detailAlamat || order.alamatPengiriman || 'Alamat tidak ditemukan'}</span>
+                   <span>
+                     {order.alamat ? (
+                       <>
+                         <div className="font-semibold">{order.alamat.namaPenerima} ({order.alamat.nomorHp})</div>
+                         <div>{order.alamat.detailAlamat}, {order.alamat.districtId ? `${order.alamat.districtId}, ` : ''}{order.alamat.cityId}, {order.alamat.provinceId} {order.alamat.kodePos}</div>
+                       </>
+                     ) : (
+                       order.alamatCustomer?.detailAlamat || order.alamatPengiriman || 'Alamat tidak ditemukan'
+                     )}
+                   </span>
                  </div>
                </div>
             </div>

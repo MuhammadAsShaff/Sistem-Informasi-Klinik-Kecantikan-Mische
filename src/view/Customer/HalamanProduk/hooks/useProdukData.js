@@ -5,33 +5,22 @@ import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 export const useProdukData = () => {
   const [activeCategory, setActiveCategory] = useState('semua');
 
-  // Fetch using SWR-like cache with global TTL
-  const { data: productsData, isLoading: isProdLoading } = useFetchWithCache(endpoints.customer.product);
-  const { data: categoriesData, isLoading: isCatLoading } = useFetchWithCache(endpoints.admin.kategori);
+  // Menyusun URL endpoint berdasarkan kategori aktif
+  const productEndpoint = activeCategory === 'semua' 
+    ? endpoints.customer.product 
+    : `${endpoints.customer.product}?idKategori=${activeCategory}`;
+
+  // Fetch menggunakan public endpoint yang baru untuk kategori
+  const { data: categoriesData, isLoading: isCatLoading } = useFetchWithCache(endpoints.customer.productCategories);
+  const { data: productsData, isLoading: isProdLoading } = useFetchWithCache(productEndpoint);
 
   const products = productsData || [];
-  let categories = categoriesData || [];
+  const categories = categoriesData || [];
 
-  // Fallback category extraction if API fails
-  if (categories.length === 0 && products.length > 0) {
-     const uniqueCategoriesMap = new Map();
-     products.forEach(p => {
-       if (p.kategori) {
-         uniqueCategoriesMap.set(p.kategori.idKategori, p.kategori);
-       }
-     });
-     categories = Array.from(uniqueCategoriesMap.values());
-  }
+  const isLoading = isProdLoading || isCatLoading;
 
-  const isLoading = isProdLoading || (isCatLoading && categories.length === 0);
-
-  // Filter products based on active category
-  const filteredProducts = activeCategory === 'semua' 
-    ? products 
-    : products.filter(product => {
-        const catId = product.kategori?.idKategori || product.idKategori;
-        return catId?.toString() === activeCategory?.toString();
-      });
+  // Karena sekarang backend sudah memfilter berdasarkan idKategori, kita tidak perlu filter manual lagi
+  const filteredProducts = products;
 
   return {
     products,

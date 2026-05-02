@@ -1,5 +1,6 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
+import { dataJenisPerawatan } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/hooks/DataJenisPerawatan';
 
 // --- SUB-KOMPONEN UNTUK DROPDOWN ---
 const DropdownItem = ({ label, value, options, isOpen, onToggle, onSelect }) => (
@@ -16,7 +17,7 @@ const DropdownItem = ({ label, value, options, isOpen, onToggle, onSelect }) => 
       </div>
     </div>
     {isOpen && (
-      <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+      <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-y-auto overflow-x-hidden max-h-56 animate-in fade-in slide-in-from-top-2 custom-scrollbar">
         {options.map((opt) => (
           <div key={opt} onClick={() => onSelect(opt)} className="px-8 py-3 hover:bg-green-50 cursor-pointer text-sm text-gray-700 transition-colors">
             {opt}
@@ -47,7 +48,8 @@ export default function FilterSection({
   countKosong = 0,
   countTerisi = 0
 }) {
-  const treatments = ["Acne Treatment", "Facial Rejuvenation", "Laser Therapy", "Brightening Therapy"];
+  // Mengambil judul dari setiap jenis perawatan spesifik secara keseluruhan
+  const treatments = dataJenisPerawatan.map(item => item.title);
   
   // Filter dokter yang statusnya "Tersedia"
   const availableDoctors = doctorsList.filter(d => (d.status || "Tersedia") === "Tersedia");

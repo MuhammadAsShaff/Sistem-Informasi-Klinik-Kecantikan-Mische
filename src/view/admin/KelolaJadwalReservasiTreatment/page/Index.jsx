@@ -90,12 +90,12 @@ export default function KelolaJadwalReservasiTreatment() {
 
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen animate-in fade-in duration-700">
-      {toast && (
+      {toast && toast.isOpen && (
         <ToastAlert
-          isOpen={true}
+          isOpen={toast.isOpen}
           message={toast.message}
           type={toast.type}
-          onClose={() => setToast(null)}
+          onClose={() => setToast({ ...toast, isOpen: false })}
         />
       )}
 

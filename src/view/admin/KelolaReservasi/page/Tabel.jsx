@@ -18,6 +18,7 @@ const Tabel = ({ isLoading, data, meta, page, setPage, onEditStatus, onDelete, o
             <thead className="bg-white text-gray-500 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 font-medium whitespace-nowrap">Nama Customer</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Kategori Treatment</th>
                 <th className="px-4 py-3 font-medium whitespace-nowrap">Jenis Treatment</th>
                 <th className="px-4 py-3 font-medium whitespace-nowrap">Jam</th>
                 <th className="px-4 py-3 font-medium whitespace-nowrap">Tanggal</th>
@@ -61,7 +62,8 @@ const Tabel = ({ isLoading, data, meta, page, setPage, onEditStatus, onDelete, o
                   return (
                     <tr key={item.idReservasi || item.id || index} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-4 text-black">{item.namaCustomer}</td>
-                      <td className="px-4 py-4">{item.jenisTreatment}</td>
+                      <td className="px-4 py-4">{item.kategoriReservasi || "-"}</td>
+                      <td className="px-4 py-4">{item.jenisReservasi}</td>
                       <td className="px-4 py-4">
                         {item.jadwal ? `${item.jadwal.jamMulai.substring(0, 5)} - ${item.jadwal.jamSelesai.substring(0, 5)}` : "-"}
                       </td>

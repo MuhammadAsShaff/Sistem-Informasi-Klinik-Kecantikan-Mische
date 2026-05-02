@@ -49,6 +49,7 @@ export const endpoints = {
     event: '/customer/event',
     testimonials: '/customer/testimonials',
     product: '/customer/product',
+    productCategories: '/customer/product/categories',
     cart: '/customer/card', // Menggunakan 'card' sesuai prefix di route PHP
     alamat: '/customer/alamat',
     setAlamatUtama: '/customer/profile/alamat-utama',

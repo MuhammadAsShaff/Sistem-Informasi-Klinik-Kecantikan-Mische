@@ -154,12 +154,12 @@ export default function KelolaPromo() {
         />
 
         {/* TOAST NOTIFICATION */}
-        {toast && (
+        {toast && toast.isOpen && (
           <ToastAlert
-            isOpen={true}
+            isOpen={toast.isOpen}
             message={toast.message}
             type={toast.type}
-            onClose={() => setToast(null)}
+            onClose={() => setToast({ ...toast, isOpen: false })}
           />
         )}
       </div>

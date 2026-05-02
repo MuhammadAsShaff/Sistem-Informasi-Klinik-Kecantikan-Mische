@@ -22,6 +22,9 @@ export function useCreateReservasi() {
       }
       if (err.response?.data?.errors) {
         errMsg = Object.values(err.response.data.errors).flat().join(" ");
+      } else if (err.response?.data?.error) {
+        // Menampilkan pesan error teknis dari backend (seperti exception DB)
+        errMsg += " Detail: " + err.response.data.error;
       }
       setError(errMsg);
       if (onError) onError(errMsg);

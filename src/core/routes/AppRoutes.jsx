@@ -68,14 +68,13 @@ export default function AppRoutes() {
         <Route path="dokter/:id" element={<DetailDokterPage />} />
         <Route path="produk" element={<HalamanProduk />} />
         <Route path="produk/:id" element={<DetailProduk />} />
-        <Route path="keranjang" element={<DetailKeranjang />} />
-        
         {/* Rute Customer yang Wajib Login */}
         <Route element={<ProtectedRoute allowedRoles={['customer']} />}>
           <Route path="ProfilCustomer" element={<ProfilCustomerPage />} />
           <Route path="ProfilCustomer/riwayat-reservasi" element={<RiwayatReservasiPage />} />
           <Route path="ProfilCustomer/riwayat-pembelian" element={<RiwayatPembelianPage />} />
           <Route path="reservasi" element={<ReservasiPage />} />
+          <Route path="keranjang" element={<DetailKeranjang />} />
         </Route>
       </Route>
 

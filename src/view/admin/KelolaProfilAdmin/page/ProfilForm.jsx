@@ -143,11 +143,6 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
             Simpan Perubahan
           </button>
         </div>
-
-        <div className="text-center w-full">
-          <span className="text-black text-[16px]">Lupa Password Anda? </span>
-          <button className="text-[#56BC36] hover:underline cursor-pointer text-[16px]">klik Di sini.</button>
-        </div>
       </div>
 
       {/* MODAL UBAH PASSWORD */}

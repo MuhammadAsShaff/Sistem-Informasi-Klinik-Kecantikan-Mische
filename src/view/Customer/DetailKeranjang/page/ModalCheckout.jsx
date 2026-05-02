@@ -6,6 +6,17 @@ import { useNavigate } from 'react-router-dom';
 import ToastAlert from '@/view/components/ToastAlert';
 import { useCartContext } from '@/core/context/CartContext';
 
+// Import Payment Method Images
+import imgBCA from '@/assets/images/MetodePembayaran/BCA.png';
+import imgBNI from '@/assets/images/MetodePembayaran/BNI.png';
+import imgBRI from '@/assets/images/MetodePembayaran/BRI.png';
+import imgMandiri from '@/assets/images/MetodePembayaran/MANDIRI.png';
+import imgPermata from '@/assets/images/MetodePembayaran/PERMATA.png';
+import imgGoPay from '@/assets/images/MetodePembayaran/GOPAY.png';
+import imgShopeePay from '@/assets/images/MetodePembayaran/SHOPEEPAY.png';
+import imgIndomaret from '@/assets/images/MetodePembayaran/INDOMARET.png';
+import imgAlfamart from '@/assets/images/MetodePembayaran/ALFAMART.png';
+
 export default function ModalCheckout({ 
   isOpen, 
   onClose, 
@@ -373,16 +384,15 @@ export default function ModalCheckout({
               <h3 className="font-bold text-gray-800 text-lg mb-4">Metode Pembayaran</h3>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {[
-                  { id: 'bca_va', name: 'BCA VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg' },
-                  { id: 'bni_va', name: 'BNI VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Bank_Negara_Indonesia_logo_%282004%29.svg' },
-                  { id: 'bri_va', name: 'BRI VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg' },
-                  { id: 'echannel', name: 'Mandiri VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Bank_Mandiri_logo_2016.svg' },
-                  { id: 'permata_va', name: 'Permata VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/PermataBank_logo.svg' },
-                  { id: 'gopay', name: 'GoPay', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg' },
-                  { id: 'shopeepay', name: 'ShopeePay', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg' },
-                  { id: 'qris', name: 'QRIS', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg' },
-                  { id: 'indomaret', name: 'Indomaret', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Logo_Indomaret.png' },
-                  { id: 'alfamart', name: 'Alfamart', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Alfamart_logo.svg' },
+                  { id: 'bca_va', name: 'BCA VA', logo: imgBCA },
+                  { id: 'bni_va', name: 'BNI VA', logo: imgBNI },
+                  { id: 'bri_va', name: 'BRI VA', logo: imgBRI },
+                  { id: 'echannel', name: 'Mandiri VA', logo: imgMandiri },
+                  { id: 'permata_va', name: 'Permata VA', logo: imgPermata },
+                  { id: 'gopay', name: 'GoPay', logo: imgGoPay },
+                  { id: 'shopeepay', name: 'ShopeePay', logo: imgShopeePay },
+                  { id: 'indomaret', name: 'Indomaret', logo: imgIndomaret },
+                  { id: 'alfamart', name: 'Alfamart', logo: imgAlfamart },
                 ].map((method) => (
                   <div 
                     key={method.id}

@@ -7,6 +7,7 @@ export default function ModalDetailReservasi({
   onConfirm,
   isSubmitting,
   slot, 
+  kategoriTreatment,
   treatment, 
   doctor, 
   date, 
@@ -108,11 +109,19 @@ export default function ModalDetailReservasi({
               </div>
             </div>
 
-            {/* Pilih Jenis Treatment */}
-            <div className="bg-[#f0fdf4]/50 p-5 rounded-2xl border border-green-100/50">
-              <label className="block text-green-700 text-sm font-medium mb-1">Jenis Treatment</label>
-              <div className="font-bold text-green-900 text-lg md:text-xl">
-                {treatment}
+            {/* Pilih Kategori & Jenis Treatment */}
+            <div className="bg-[#f0fdf4]/50 p-5 rounded-2xl border border-green-100/50 space-y-4">
+              <div>
+                <label className="block text-green-700 text-sm font-medium mb-1">Kategori Treatment</label>
+                <div className="font-bold text-green-900 text-lg md:text-xl">
+                  {kategoriTreatment}
+                </div>
+              </div>
+              <div>
+                <label className="block text-green-700 text-sm font-medium mb-1">Jenis Treatment</label>
+                <div className="font-bold text-green-900 text-lg md:text-xl">
+                  {treatment}
+                </div>
               </div>
             </div>
 

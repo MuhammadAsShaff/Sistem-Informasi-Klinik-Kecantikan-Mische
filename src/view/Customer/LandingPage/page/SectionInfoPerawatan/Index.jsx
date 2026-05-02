@@ -1,10 +1,11 @@
 import React from 'react';
 import LogoMischee from '@/assets/images/LogoMischee.png';
-import { treatments } from './TreatmentsData';
-import TreatmentBanner from './TreatmentBanner';
-import TreatmentCard from './TreatmentCard';
+import TreatmentBanner from './page/TreatmentBanner';
+import TreatmentCard from './page/TreatmentCard';
+import { treatments } from './hooks/TreatmentsData';
 
 const SectionInfoPerawatan = () => {
+
   return (
     <section className="w-full bg-[#F9FAFB] py-12 md:py-20 overflow-hidden">
       {/* WRAPPER GESER UTAMA: Mengaktifkan Snap Scroll agar pergerakan halus dan serentak */}

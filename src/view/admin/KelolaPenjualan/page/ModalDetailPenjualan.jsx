@@ -84,18 +84,34 @@ const ModalDetailPenjualan = ({ isOpen, onClose, data }) => {
 
           <hr className="border-gray-100" />
 
-          {/* Pengiriman & Promo */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Pengiriman</label>
-              <div className="text-gray-800 font-medium">
-                {data.shippingCourier ? `${data.shippingCourier.toUpperCase()} (${data.shippingService})` : '-'}
+          {/* Pengiriman, Promo & Alamat */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Pengiriman</label>
+                <div className="text-gray-800 font-medium">
+                  {data.shippingCourier ? `${data.shippingCourier.toUpperCase()} (${data.shippingService})` : '-'}
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Promo Digunakan</label>
+                <div className="text-gray-800 font-medium">
+                  {data.promo ? `${data.promo.namaPromo} (${data.promo.kode})` : '-'}
+                </div>
               </div>
             </div>
+            
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Promo Digunakan</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Alamat Pengiriman</label>
               <div className="text-gray-800 font-medium">
-                {data.promo ? `${data.promo.namaPromo} (${data.promo.kode})` : '-'}
+                {data.alamat ? (
+                  <>
+                    <div>{data.alamat.namaPenerima} ({data.alamat.nomorHp})</div>
+                    <div className="text-sm font-normal text-gray-600 mt-0.5">
+                      {data.alamat.detailAlamat}, {data.alamat.districtId ? `${data.alamat.districtId}, ` : ''}{data.alamat.cityId}, {data.alamat.provinceId} {data.alamat.kodePos}
+                    </div>
+                  </>
+                ) : '-'}
               </div>
             </div>
           </div>

@@ -54,9 +54,12 @@ axiosClient.interceptors.response.use(
         // Hapus data dari storage
         clearAuth();
 
-        // Arahkan user kembali ke halaman login (mencegah error beruntun)
-        // Note: Gunakan cara ini agar bisa terpicu meski dari luar komponen React
-        if (window.location.pathname !== '/login') {
+        // Hanya arahkan ke halaman login jika user berada di halaman yang wajib login
+        // agar pengunjung di halaman publik (seperti Landing Page, Promo) tidak terganggu.
+        const protectedPaths = ['/ProfilCustomer', '/reservasi', '/keranjang', '/admin'];
+        const isProtectedPath = protectedPaths.some(path => window.location.pathname.startsWith(path));
+
+        if (isProtectedPath && window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
       }

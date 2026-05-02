@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { useProdukData } from '../../../HalamanProduk/hooks/useProdukData';
 
@@ -27,6 +28,18 @@ export default function ProdukBestSeller() {
                 <ProductCard product={p} />
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Tombol Lihat Lainnya */}
+        {!isLoading && products && products.length > 0 && (
+          <div className="mt-12 flex justify-center">
+            <Link
+              to="/produk"
+              className="bg-[#56BC36] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#2da509] transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              Lihat Lainnya
+            </Link>
           </div>
         )}
       </div>

@@ -9,7 +9,7 @@ const DoctorCard = ({ doc }) => {
       {/* IMAGE CONTAINER */}
       <div className="aspect-[4/5] w-full overflow-hidden">
         <img 
-          src={doc.foto} 
+          src={doc.foto}
           alt={doc.nama} 
           className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500"
         />
