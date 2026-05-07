@@ -2,7 +2,4 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    // return view('welcome');
-    dd('acop test aja ini');
-});
+Route::redirect('/', '/docs/api');

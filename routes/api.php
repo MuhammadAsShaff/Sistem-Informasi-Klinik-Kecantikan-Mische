@@ -14,10 +14,19 @@ use Illuminate\Support\Facades\Route;
 // ============================================
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AutentikasiController::class, 'registerUser'])->name('auth.register');
-    Route::post('/login', [AutentikasiController::class, 'loginUser'])->name('auth.login');
+
+    // Menerapkan Rate Limiter: Maksimal 5x percobaan Login dalam 1 menit (Mencegah Brute Force Password)
+    Route::post('/login', [AutentikasiController::class, 'loginUser'])
+         ->middleware('throttle:5,1')
+         ->name('auth.login');
+
     Route::post('/logout', [AutentikasiController::class, 'logoutUser'])->name('auth.logout');
     Route::get('/me', [AutentikasiController::class, 'getUserProfile'])->name('auth.me');
-    Route::post('/reset-password', [AutentikasiController::class, 'resetPassword'])->name('auth.reset-password');
+
+    // Menerapkan Rate Limiter: Maksimal 3x percobaan Reset Sandi dalam 1 menit
+    Route::post('/reset-password', [AutentikasiController::class, 'resetPassword'])
+         ->middleware('throttle:3,1')
+         ->name('auth.reset-password');
 });
 
 // ============================================

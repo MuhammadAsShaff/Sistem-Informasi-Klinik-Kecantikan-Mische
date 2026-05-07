@@ -19,7 +19,7 @@ class ProfilCustomerController extends Controller
                 'success' => true,
                 'message' => 'Berhasil mengambil data profil customer',
                 'data' => $user
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

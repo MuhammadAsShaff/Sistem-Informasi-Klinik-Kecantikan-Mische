@@ -38,7 +38,7 @@ class JadwalReservasiController extends Controller
         try {
             // Bisa menambahkan filter tertentu jika diperlukan (misal yang masih tersedia)
             $jadwal = JadwalReservasi::orderBy('jamMulai', 'asc')->get();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil mengambil list jadwal reservasi publik',
@@ -70,9 +70,9 @@ class JadwalReservasiController extends Controller
                 'errors' => $validator->errors()
             ], 400);
         }
-        
+
         // Logika agar jamSelesai tidak lebih kecil/sama dengan jamMulai
-        if(strtotime($request->jamSelesai) <= strtotime($request->jamMulai)) {
+        if (strtotime($request->jamSelesai) <= strtotime($request->jamMulai)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Jam Selesai harus lebih besar dari Jam Mulai!'
@@ -123,14 +123,14 @@ class JadwalReservasiController extends Controller
             // Validasi Logika agar jamSelesai tidak lebih kecil dari jamMulai
             $jamMulai = $request->jamMulai ?? $jadwal->jamMulai;
             $jamSelesai = $request->jamSelesai ?? $jadwal->jamSelesai;
-            
+
             // Format ulang untuk strtotime
             // Karena dari DB kadang formatnya H:i:s, dari JSON H:i.
-            $jamMulai = substr($jamMulai, 0, 5); 
-            $jamSelesai = substr($jamSelesai, 0, 5); 
+            $jamMulai = substr($jamMulai, 0, 5);
+            $jamSelesai = substr($jamSelesai, 0, 5);
 
-            if(strtotime($jamSelesai) <= strtotime($jamMulai)) {
-                 return response()->json([
+            if (strtotime($jamSelesai) <= strtotime($jamMulai)) {
+                return response()->json([
                     'success' => false,
                     'message' => 'Jam Selesai harus lebih besar dari Jam Mulai!'
                 ], 400);
