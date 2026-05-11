@@ -1,7 +1,28 @@
 import React from 'react';
 import { Calendar, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ProfileForm = () => {
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.post('http://127.0.0.1:8000/api/auth/logout', {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                withCredentials: true
+            });
+        } catch (error) {
+            console.error("Gagal mengirim perintah logout ke server:", error);
+        } finally {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            navigate('/login');
+        }
+    };
     return (
         <div className="w-full">
             {/* ========================================================== */}
@@ -50,8 +71,9 @@ const ProfileForm = () => {
                         </div>
                     </div>
 
-                    <div className="w-full mt-4">
+                    <div className="w-full mt-4 flex flex-col gap-3">
                         <button className="w-full bg-[#74b35e] text-white font-extrabold py-3 rounded-2xl shadow-lg">Simpan</button>
+                        <button onClick={handleLogout} className="w-full bg-[#c85a53] text-white font-extrabold py-3 rounded-2xl shadow-lg">Log Out</button>
                     </div>
                 </div>
             </div>
@@ -149,6 +171,9 @@ const ProfileForm = () => {
                     </div>
                     <button className="w-full max-w-[250px] bg-white border-2 border-gray-100 text-gray-500 font-extrabold text-lg py-4 rounded-2xl shadow-sm hover:bg-gray-50 transition-colors">
                         Pilih Gambar
+                    </button>
+                    <button onClick={handleLogout} className="w-full max-w-[180px] mt-4 bg-[#c85a53] text-white font-bold text-sm py-2.5 rounded-lg shadow-md hover:bg-[#b54a43] transition-colors">
+                        Log Out
                     </button>
                 </div>
             </div>
