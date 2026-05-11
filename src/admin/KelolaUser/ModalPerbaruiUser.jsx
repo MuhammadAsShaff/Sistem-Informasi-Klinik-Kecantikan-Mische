@@ -1,7 +1,41 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
-export default function ModalPerbaruiUser({ isOpen, onClose, userData }) {
+export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit }) {
+  const [formData, setFormData] = useState({
+    nama: "",
+    email: "",
+    jenisKelamin: "",
+    alamat: "",
+    role: "",
+    tanggalLahir: "",
+    nomorWa: ""
+  });
+
+  // Saat userData berubah (saat tombol Edit ditekan), masukkan datanya ke form
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        nama: userData.nama || "",
+        email: userData.email || "",
+        jenisKelamin: userData.jenisKelamin || userData.gender || userData.jenis_kelamin || "",
+        alamat: userData.alamat || "",
+        role: userData.role || "",
+        // Karena Laravel sudah mengembalikan format YYYY-MM-DD (contoh: 1991-04-16), kita bisa langsung pakai
+        tanggalLahir: userData.tanggalLahir || userData.birth || userData.tanggal_lahir || "",
+        nomorWa: userData.nomorWa || userData.whatsapp || userData.nomor_whatsapp || userData.no_wa || ""
+      });
+    }
+  }, [userData]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = () => {
+    onSubmit(formData);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -25,7 +59,9 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData }) {
               <label className="text-sm font-bold text-[#1A1A1A]">Nama user</label>
               <input 
                 type="text" 
-                defaultValue={userData?.nama}
+                name="nama"
+                value={formData.nama}
+                onChange={handleChange}
                 placeholder="Nama user" 
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
@@ -36,7 +72,9 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData }) {
               <label className="text-sm font-bold text-[#1A1A1A]">Email</label>
               <input 
                 type="email" 
-                defaultValue={userData?.email}
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Email" 
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
@@ -45,9 +83,15 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData }) {
             {/* Jenis Kelamin */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Jenis Kelamin</label>
-              <select defaultValue={userData?.gender} className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-700 font-medium">
-                <option>Laki-laki</option>
-                <option>Perempuan</option>
+              <select 
+                name="jenisKelamin"
+                value={formData.jenisKelamin}
+                onChange={handleChange}
+                className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-700 font-medium"
+              >
+                <option value="">Pilih Jenis Kelamin</option>
+                <option value="Laki-Laki">Laki-Laki</option>
+                <option value="Perempuan">Perempuan</option>
               </select>
             </div>
 
@@ -56,7 +100,9 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData }) {
               <label className="text-sm font-bold text-[#1A1A1A]">Alamat</label>
               <input 
                 type="text" 
-                defaultValue={userData?.alamat}
+                name="alamat"
+                value={formData.alamat}
+                onChange={handleChange}
                 placeholder="Alamat" 
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
@@ -65,19 +111,26 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData }) {
             {/* Role */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Role</label>
-              <select defaultValue={userData?.role} className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-700 font-medium">
-                <option>Admin</option>
-                <option>Staff</option>
-                <option>Customer</option>
+              <select 
+                name="role"
+                value={formData.role.toLowerCase()}
+                onChange={handleChange}
+                className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-700 font-medium"
+              >
+                <option value="">Pilih Role</option>
+                <option value="admin">Admin</option>
+                <option value="customer">Customer</option>
               </select>
             </div>
 
-            {/* Tanggal Lahir */}
+            {/* Tanggal Lahir (Date Picker) */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Tanggal Lahir</label>
               <input 
                 type="date" 
-                defaultValue={userData?.birth?.split('/').reverse().join('-')}
+                name="tanggalLahir"
+                value={formData.tanggalLahir}
+                onChange={handleChange}
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-700"
               />
             </div>
@@ -87,7 +140,9 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData }) {
               <label className="text-sm font-bold text-[#1A1A1A]">Nomor Whatsapp</label>
               <input 
                 type="text" 
-                defaultValue={userData?.whatsapp}
+                name="nomorWa"
+                value={formData.nomorWa}
+                onChange={handleChange}
                 placeholder="Nomor Whatsapp" 
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
@@ -97,7 +152,10 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData }) {
 
           {/* FOOTER ACTION */}
           <div className="flex justify-end pt-8 border-t border-gray-100">
-            <button className="bg-[#7CC052] text-white px-10 py-4 rounded-xl font-bold text-sm hover:bg-[#68a741] transition-all shadow-lg shadow-green-100">
+            <button 
+              onClick={handleSubmit}
+              className="bg-[#7CC052] text-white px-10 py-4 rounded-xl font-bold text-sm hover:bg-[#68a741] transition-all shadow-lg shadow-green-100"
+            >
               Simpan Perubahan
             </button>
           </div>

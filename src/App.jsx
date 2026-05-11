@@ -8,18 +8,21 @@ import AdminLayout from "./admin/AdminLayout";
 import LandingPage from "./Customer/LandingPage/landingPage";
 import PromoPage from "./Customer/promoPage/promoPage";
 import ProdukPage from "./Customer/produkPage/produkPage";
-import ReservasiPage from "./Customer/reservasiPage/reservasiPage";
+import ReservasiPage from "./Customer/ReservasiPage/Index";
 import EventPage from "./Customer/EventPage/eventPage";
 import LoginPage from "./authentication/Login";
 import RegistrasiPage from "./authentication/Registrasi";
 import TentangKamiPage from "./Customer/TentangKami";
 import ProfilCustomerPage from "./Customer/ProfilCustomer/Index";
+import ProtectedRoute from "./authentication/ProtectedRoute";
+import Page404 from "./authentication/Page404";
 
 // Admin Pages
 import AdminDashboard from "./admin/dashboard/dashboard";
-import AdminProduk from "./admin/produk/produk";
+import AdminProduk from "./admin/Produk/Index";
 import KelolaUser from "./admin/KelolaUser/index";
 import KelolaJadwalReservasiTreatment from "./admin/KelolaJadwalReservasiTreatment/Index";
+import KelolaProfilKlinik from "./admin/KelolaProfilKlinik/Index";
 
 export default function App() {
   return (
@@ -35,17 +38,28 @@ export default function App() {
         <Route path="tentang-kami" element={<TentangKamiPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="registrasi" element={<RegistrasiPage />} />
-        <Route path="ProfilCustomer" element={<ProfilCustomerPage />} />
+        
+        {/* Rute Customer yang Wajib Login */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="ProfilCustomer" element={<ProfilCustomerPage />} />
+        </Route>
       </Route>
 
 
       {/* ================= ADMIN ROUTES ================= */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="produk" element={<AdminProduk />} />
-        <Route path="kelolauser" element={<KelolaUser />} />
-        <Route path="jadwal" element={<KelolaJadwalReservasiTreatment />} />
+      {/* Menggunakan ProtectedRoute untuk membungkus halaman Admin */}
+      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="produk" element={<AdminProduk />} />
+          <Route path="kelolauser" element={<KelolaUser />} />
+          <Route path="jadwal" element={<KelolaJadwalReservasiTreatment />} />
+          <Route path="profilklinik" element={<KelolaProfilKlinik />} />
+        </Route>
       </Route>
+
+      {/* ================= CATCH-ALL (404 NOT FOUND) ================= */}
+      <Route path="*" element={<Page404 />} />
 
     </Routes>
   );

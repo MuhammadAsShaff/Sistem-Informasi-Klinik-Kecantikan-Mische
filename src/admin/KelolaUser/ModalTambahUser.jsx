@@ -1,7 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { X } from "lucide-react";
 
-export default function ModalTambahUser({ isOpen, onClose }) {
+export default function ModalTambahUser({ isOpen, onClose, onSubmit }) {
+  // State untuk form
+  const [formData, setFormData] = useState({
+    nama: "",
+    email: "",
+    password: "", // User baru butuh password
+    jenisKelamin: "",
+    alamat: "",
+    role: "",
+    tanggalLahir: "",
+    nomorWa: ""
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = () => {
+    onSubmit(formData);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -25,6 +45,9 @@ export default function ModalTambahUser({ isOpen, onClose }) {
               <label className="text-sm font-bold text-[#1A1A1A]">Nama user</label>
               <input 
                 type="text" 
+                name="nama"
+                value={formData.nama}
+                onChange={handleChange}
                 placeholder="Nama user" 
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
@@ -35,7 +58,23 @@ export default function ModalTambahUser({ isOpen, onClose }) {
               <label className="text-sm font-bold text-[#1A1A1A]">Email</label>
               <input 
                 type="email" 
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Email" 
+                className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col gap-2.5">
+              <label className="text-sm font-bold text-[#1A1A1A]">Password</label>
+              <input 
+                type="password" 
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Masukkan Password" 
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
             </div>
@@ -43,10 +82,15 @@ export default function ModalTambahUser({ isOpen, onClose }) {
             {/* Jenis Kelamin */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Jenis Kelamin</label>
-              <select className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-400">
-                <option>Pilih Jenis Kelamin</option>
-                <option>Laki-laki</option>
-                <option>Perempuan</option>
+              <select 
+                name="jenisKelamin" 
+                value={formData.jenisKelamin} 
+                onChange={handleChange} 
+                className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-400"
+              >
+                <option value="">Pilih Jenis Kelamin</option>
+                <option value="Laki-Laki">Laki-Laki</option>
+                <option value="Perempuan">Perempuan</option>
               </select>
             </div>
 
@@ -55,6 +99,9 @@ export default function ModalTambahUser({ isOpen, onClose }) {
               <label className="text-sm font-bold text-[#1A1A1A]">Alamat</label>
               <input 
                 type="text" 
+                name="alamat"
+                value={formData.alamat}
+                onChange={handleChange}
                 placeholder="Alamat" 
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
@@ -63,11 +110,15 @@ export default function ModalTambahUser({ isOpen, onClose }) {
             {/* Role */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Role</label>
-              <select className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-400">
-                <option>Pilih Role</option>
-                <option>Admin</option>
-                <option>Staff</option>
-                <option>Customer</option>
+              <select 
+                name="role" 
+                value={formData.role} 
+                onChange={handleChange} 
+                className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-400"
+              >
+                <option value="">Pilih Role</option>
+                <option value="admin">Admin</option>
+                <option value="customer">Customer</option>
               </select>
             </div>
 
@@ -76,6 +127,9 @@ export default function ModalTambahUser({ isOpen, onClose }) {
               <label className="text-sm font-bold text-[#1A1A1A]">Tanggal Lahir</label>
               <input 
                 type="date" 
+                name="tanggalLahir"
+                value={formData.tanggalLahir}
+                onChange={handleChange}
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-400"
               />
             </div>
@@ -85,6 +139,9 @@ export default function ModalTambahUser({ isOpen, onClose }) {
               <label className="text-sm font-bold text-[#1A1A1A]">Nomor Whatsapp</label>
               <input 
                 type="text" 
+                name="nomorWa"
+                value={formData.nomorWa}
+                onChange={handleChange}
                 placeholder="Nomor Whatsapp" 
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
@@ -94,7 +151,10 @@ export default function ModalTambahUser({ isOpen, onClose }) {
 
           {/* FOOTER ACTION */}
           <div className="flex justify-end pt-8 border-t border-gray-100">
-            <button className="bg-[#7CC052] text-white px-10 py-4 rounded-xl font-bold text-sm hover:bg-[#68a741] transition-all shadow-lg shadow-green-100">
+            <button 
+              onClick={handleSubmit}
+              className="bg-[#7CC052] text-white px-10 py-4 rounded-xl font-bold text-sm hover:bg-[#68a741] transition-all shadow-lg shadow-green-100"
+            >
               Tambah User
             </button>
           </div>
