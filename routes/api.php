@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ProfilCustomerController;
 use App\Http\Controllers\Api\ProfilePerusahaanController;
 use App\Http\Controllers\Api\KelolaUserController;
 use App\Http\Controllers\Api\JadwalReservasiController;
+use App\Http\Controllers\Api\ProfilAdminController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -50,6 +51,15 @@ Route::prefix('customer')->group(function () {
 // Prefix: /api/admin/...
 // ============================================
 Route::prefix('admin')->middleware(['role:admin'])->group(function () {
+
+    // ----------------------------------------
+    // RUTE PROFIL ADMIN PRIBADI
+    // Prefix turunan: /api/admin/profile/...
+    // ----------------------------------------
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfilAdminController::class, 'getProfileAdmin'])->name('admin.profile');
+        Route::put('/', [ProfilAdminController::class, 'updateProfileAdmin'])->name('admin.updateProfile');
+    });
 
     // ----------------------------------------
     // RUTE KELOLA USER (Staff, Pasien, dll)
