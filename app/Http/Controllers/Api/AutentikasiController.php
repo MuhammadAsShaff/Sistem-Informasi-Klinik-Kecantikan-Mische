@@ -32,7 +32,7 @@ class AutentikasiController extends Controller
             'jenisKelamin' => 'required|string|max:12',
             'tanggalLahir' => 'required|date',
             'role' => 'required|string|max:12',
-            'email' => 'required|email|unique:user,email|max:20',
+            'email' => 'required|email|unique:user,email|max:50',
             'nomorWa' => 'required|string|max:16',
             'password' => ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
         ], $pesanEror);
@@ -106,7 +106,7 @@ class AutentikasiController extends Controller
         $cookie = cookie(
             $cookieName,
             $token,
-            auth('api')->factory()->getTTL(),
+            0, // Diubah menjadi 0 (Session Cookie) agar hancur otomatis saat browser/PC ditutup
             '/',
             null,
             $isSecure,
