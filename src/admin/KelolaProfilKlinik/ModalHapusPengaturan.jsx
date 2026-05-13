@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertCircle } from "lucide-react";
 
-const ModalHapusPengaturan = ({ isOpen, onClose }) => {
+const ModalHapusPengaturan = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
 
   return (
@@ -22,6 +22,7 @@ const ModalHapusPengaturan = ({ isOpen, onClose }) => {
           {/* BUTTONS */}
           <div className="flex items-center gap-3 w-full">
             <button 
+              onClick={onConfirm}
               className="flex-1 bg-[#55BC36] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#46a02b] transition-all shadow-md shadow-green-100"
             >
               Ya, Hapus

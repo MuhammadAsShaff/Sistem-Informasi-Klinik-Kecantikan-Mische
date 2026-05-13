@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import AdminNavbar from "./Navbar/Index";
+import AdminNavbar from "./SideBar/Index";
 
 export default function AdminLayout() {
   return (

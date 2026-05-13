@@ -4,7 +4,7 @@ import SectionInfoPerawatan from "./SectionInfoPerawatan/Index";
 import ProdukBestSeller from "./ProdukBestSeller/Index";
 import HasilKlinik from "./HasilKlinik/Index";
 import KeunggulanKlinik from "./KeunggulanKlinik/Index";
-import FloatingCta from "./FloatingCta";
+import WhatsAppButton from "./WhatsAppButton";
 
 export default function LandingPage() {
   return (
@@ -29,7 +29,7 @@ export default function LandingPage() {
       <KeunggulanKlinik />
 
       {/* FLOATING ACTION BUTTONS (WA + SCROLL TO TOP) */}
-      <FloatingCta />
+      <WhatsAppButton />
 
     </div>
   );

@@ -1,8 +1,6 @@
 import React from 'react';
 
-const GaleriKegiatan = ({ onTambahClick, onPerbaruiClick, onHapusClick }) => {
-  const items = [1, 2, 3, 4, 5, 6];
-
+const GaleriKegiatan = ({ data = [], onTambahClick, onPerbaruiClick, onHapusClick }) => {
   return (
     <div className="border border-black p-6 rounded-none bg-transparent">
       <div className="flex justify-between items-start mb-6">
@@ -16,25 +14,29 @@ const GaleriKegiatan = ({ onTambahClick, onPerbaruiClick, onHapusClick }) => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
-        {items.map((item) => (
-          <div key={item} className="border border-black flex flex-col h-48 bg-transparent relative">
-            <div className="flex-1 flex items-center justify-center text-[13px] font-semibold">
-              Foto
+        {data.map((item) => (
+          <div key={item.idKegiatan || item.id} className="border border-black flex flex-col h-48 bg-transparent relative">
+            <div className="flex-1 overflow-hidden flex items-center justify-center text-[13px] font-semibold">
+              {item.foto ? (
+                <img src={`http://127.0.0.1:8000/storage/${item.foto}`} alt={item.namaKegiatan} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-gray-500">Foto Kegiatan</span>
+              )}
             </div>
             
             <div className="px-4 pb-4">
-              <div className="bg-[#1f2937] text-white text-[11px] px-3 py-1 w-max mb-0 border border-black border-b-0">
-                Deskripsi foto
+              <div className="bg-[#1f2937] text-white text-[11px] px-3 py-1 w-max mb-0 border border-black border-b-0 max-w-full truncate">
+                {item.namaKegiatan}
               </div>
               <div className="flex space-x-2 w-max">
                 <button 
-                  onClick={() => onPerbaruiClick(item)} 
+                  onClick={() => onPerbaruiClick(item.idKegiatan || item.id)} 
                   className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-5 py-1.5 text-[13px] font-medium"
                 >
                   Perbarui
                 </button>
                 <button 
-                  onClick={() => onHapusClick(item)} 
+                  onClick={() => onHapusClick(item.idKegiatan || item.id)} 
                   className="bg-[#d9534f] hover:bg-[#c9302c] text-white px-5 py-1.5 text-[13px] font-medium"
                 >
                   Hapus
@@ -44,6 +46,9 @@ const GaleriKegiatan = ({ onTambahClick, onPerbaruiClick, onHapusClick }) => {
           </div>
         ))}
       </div>
+      {data.length === 0 && (
+        <p className="text-center text-gray-500 mt-4">Belum ada kegiatan yang ditambahkan.</p>
+      )}
     </div>
   );
 };

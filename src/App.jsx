@@ -22,7 +22,8 @@ import AdminDashboard from "./admin/dashboard/dashboard";
 import AdminProduk from "./admin/Produk/Index";
 import KelolaUser from "./admin/KelolaUser/index";
 import KelolaJadwalReservasiTreatment from "./admin/KelolaJadwalReservasiTreatment/Index";
-import KelolaProfilKlinik from "./admin/KelolaProfilKlinik/Index";
+import KelolaProfilKlinik from "./admin/KelolaProfilKlinik/index";
+import KelolaProfilAdmin from "./admin/KelolaProfilAdmin/Index";
 
 export default function App() {
   return (
@@ -40,7 +41,7 @@ export default function App() {
         <Route path="registrasi" element={<RegistrasiPage />} />
         
         {/* Rute Customer yang Wajib Login */}
-        <Route element={<ProtectedRoute />}>
+        <Route element={<ProtectedRoute allowedRoles={['customer']} />}>
           <Route path="ProfilCustomer" element={<ProfilCustomerPage />} />
         </Route>
       </Route>
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="kelolauser" element={<KelolaUser />} />
           <Route path="jadwal" element={<KelolaJadwalReservasiTreatment />} />
           <Route path="profilklinik" element={<KelolaProfilKlinik />} />
+          <Route path="profiladmin" element={<KelolaProfilAdmin />} />
         </Route>
       </Route>
 
