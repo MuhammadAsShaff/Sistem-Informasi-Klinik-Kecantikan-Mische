@@ -70,8 +70,8 @@ class ProfilePerusahaanController extends Controller
             'fotoPerusahaan' => 'required|image|mimes:jpeg,png,jpg|max:4000', // Benar-benar file gambar. Maks 2MB
             'deskripsiPerusahaan' => 'required|string',
             'nomorCustomerService' => 'required|string|max:16',
-            'jamBukak' => 'required|date_format:H:i',
-            'jamKeluar' => 'required|date_format:H:i',
+            'jamBuka' => 'required|date_format:H:i',
+            'jamTutup' => 'required|date_format:H:i',
         ]);
 
         if ($validator->fails()) {
@@ -101,8 +101,8 @@ class ProfilePerusahaanController extends Controller
                 'fotoPerusahaan' => $fotoPath, // Simpan path lokasi foto ke dalam table database
                 'deskripsiPerusahaan' => $request->deskripsiPerusahaan,
                 'nomorCustomerService' => $request->nomorCustomerService,
-                'jamBukak' => $request->jamBukak,
-                'jamKeluar' => $request->jamKeluar,
+                'jamBuka' => $request->jamBuka,
+                'jamTutup' => $request->jamTutup,
             ]);
 
             return response()->json([
@@ -135,8 +135,8 @@ class ProfilePerusahaanController extends Controller
                 'fotoPerusahaan' => 'nullable|image|mimes:jpeg,png,jpg|max:4000', // Boleh kosong jika tidak mau ganti jepretan foto
                 'deskripsiPerusahaan' => 'required|string',
                 'nomorCustomerService' => 'required|string|max:16',
-                'jamBukak' => 'required|date_format:H:i',
-                'jamKeluar' => 'required|date_format:H:i',
+                'jamBuka' => 'required|date_format:H:i',
+                'jamTutup' => 'required|date_format:H:i',
             ]);
 
             if ($validator->fails()) {
@@ -153,8 +153,8 @@ class ProfilePerusahaanController extends Controller
                 'misi' => $request->misi,
                 'deskripsiPerusahaan' => $request->deskripsiPerusahaan,
                 'nomorCustomerService' => $request->nomorCustomerService,
-                'jamBukak' => $request->jamBukak,
-                'jamKeluar' => $request->jamKeluar,
+                'jamBuka' => $request->jamBuka,
+                'jamTutup' => $request->jamTutup,
             ];
 
             // Jika ada kiriman file foto PERBAIKAN dari Client
