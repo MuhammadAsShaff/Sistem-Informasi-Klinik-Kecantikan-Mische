@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
         // Memanggil daftar class seeder yang ingin dijalankan secara sentral
         $this->call([
             UserSeeder::class,
-            ProfilPerusahaanSeeder::class,
+            ProfilePerusahaanSeeder::class,
             JadwalReservasiSeeder::class,
         ]);
     }

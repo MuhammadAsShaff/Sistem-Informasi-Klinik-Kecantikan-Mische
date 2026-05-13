@@ -18,7 +18,7 @@ class ProfilPerusahaan extends Model
         'fotoPerusahaan',
         'deskripsiPerusahaan',
         'nomorCustomerService',
-        'jamBukak',
-        'jamKeluar'
+        'jamBuka',
+        'jamTutup'
     ];
 }

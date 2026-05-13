@@ -28,8 +28,8 @@ Kami menyadari bahwa masalah kulit seperti jerawat akut, penuaan dini, flek hita
 
 Komitmen terbesar kami bukan sekadar merias atau menutupi kekurangan, melainkan menyehatkan struktur lapisan kulit dari dalam sehingga Anda tetap merasa rupawan bahkan ketika baru bangun tidur tanpa riasan apa pun.',
             'nomorCustomerService' => '081234567890',
-            'jamBukak' => '09:00',
-            'jamKeluar' => '20:00'
+            'jamBuka' => '09:00',
+            'jamTutup' => '20:00'
         ]);
     }
 }

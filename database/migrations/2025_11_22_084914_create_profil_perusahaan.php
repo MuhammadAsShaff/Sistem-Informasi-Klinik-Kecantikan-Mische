@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('fotoPerusahaan');
             $table->mediumText('deskripsiPerusahaan');
             $table->string('nomorCustomerService');
-            $table->time('jamBukak');
-            $table->time('jamKeluar');
+            $table->time('jamBuka');
+            $table->time('jamTutup');
             $table->timestamps();
         });
     }
