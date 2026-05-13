@@ -52,9 +52,16 @@ const PengaturanTentangKami = ({ data, onSimpan, onHapusClick }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validasi ukuran maksimal 4MB (sesuai backend max:4000)
-      if (file.size > 4 * 1024 * 1024) {
-        alert("Ukuran file terlalu besar! Maksimal 4MB.");
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
+        e.target.value = ''; // Reset input file
+        return;
+      }
+      
+      // Validasi ukuran maksimal 4MB (sesuai backend max:4000) -> Wait, user asked for "maksimal 2mb mimes:jpeg,png,jpg"
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Ukuran file terlalu besar! Maksimal 2MB mimes:jpeg,png,jpg.");
         e.target.value = ''; // Reset input file
         return;
       }
@@ -188,7 +195,7 @@ const PengaturanTentangKami = ({ data, onSimpan, onHapusClick }) => {
             <span className="text-gray-500 text-center px-2">Foto Perusahaan</span>
           )}
         </div>
-        <div className="flex items-center">
+        <div className="flex flex-col">
           <input
             ref={fileInputRef}
             type="file"
@@ -196,6 +203,7 @@ const PengaturanTentangKami = ({ data, onSimpan, onHapusClick }) => {
             onChange={handleFileChange}
             className="w-full file:bg-[#1f2937] file:text-white file:border-black file:rounded-none file:px-3 file:py-1.5 file:cursor-pointer file:text-xs file:font-medium text-xs text-black border border-black p-0"
           />
+          <span className="text-[11px] text-red-500 mt-1">* Maksimal 2MB (Format: jpeg, png, jpg)</span>
         </div>
       </div>
 

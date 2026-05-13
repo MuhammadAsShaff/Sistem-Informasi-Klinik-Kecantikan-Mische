@@ -7,7 +7,7 @@ const KeunggulanCard = ({ item }) => {
         {item.icon}
       </div>
       <div>
-        <h3 className="text-[#000000] text-sm md:text-2xl font-bold mb-1 md:mb-2 leading-tight">
+        <h3 className="text-[#000000] text-lg md:text-2xl font-bold mb-1 md:mb-2 leading-tight">
           {item.title}
         </h3>
         <p className="text-gray-500 text-[10px] md:text-lg font-regular opacity-80">

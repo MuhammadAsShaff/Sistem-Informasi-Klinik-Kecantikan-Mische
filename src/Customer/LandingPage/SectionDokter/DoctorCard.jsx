@@ -3,8 +3,7 @@ import React from 'react';
 const DoctorCard = ({ doc }) => {
   return (
     <div 
-      className="relative group overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.1)] transition-all duration-500 hover:scale-[1.02]"
-      style={{ borderRadius: '60px 0px 60px 0px' }}
+      className="relative group overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.1)] transition-all duration-500 hover:scale-[1.02] rounded-tl-[60px] rounded-br-[60px]"
     >
       {/* IMAGE CONTAINER */}
       <div className="aspect-[4/5] w-full overflow-hidden">

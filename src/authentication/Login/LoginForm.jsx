@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -15,10 +15,59 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // RATE LIMITING STATE
+  const MAX_ATTEMPTS = 3;
+  const LOCKOUT_DURATION = 60 * 1000; // 60 detik
+
+  const [attempts, setAttempts] = useState(0);
+  const [lockoutTime, setLockoutTime] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+
+  // Inisialisasi status rate limit dari localStorage
+  useEffect(() => {
+    const savedAttempts = parseInt(localStorage.getItem('login_attempts')) || 0;
+    const savedLockout = localStorage.getItem('login_lockout_time');
+    
+    setAttempts(savedAttempts);
+    if (savedLockout) {
+      setLockoutTime(parseInt(savedLockout));
+    }
+  }, []);
+
+  // Timer hitung mundur untuk Lockout
+  useEffect(() => {
+    let timer;
+    if (lockoutTime) {
+      timer = setInterval(() => {
+        const now = Date.now();
+        const diff = lockoutTime - now;
+        
+        if (diff <= 0) {
+          // Masa tunggu selesai, reset semua
+          setLockoutTime(null);
+          setAttempts(0);
+          setTimeLeft(0);
+          localStorage.removeItem('login_lockout_time');
+          localStorage.setItem('login_attempts', '0');
+          setErrorMessage('');
+        } else {
+          setTimeLeft(Math.ceil(diff / 1000));
+        }
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [lockoutTime]);
+
   // Fungsi yang dipanggil saat tombol login ditekan
   const handleLogin = async (e) => {
     e.preventDefault(); // Mencegah halaman refresh bawaan browser
     
+    // Cek apakah sedang di-lockout
+    if (lockoutTime) {
+      setErrorMessage(`Terlalu banyak percobaan gagal. Silakan coba lagi dalam ${timeLeft} detik.`);
+      return;
+    }
+
     // Reset pesan error dan nyalakan status loading
     setErrorMessage('');
     setIsLoading(true);
@@ -35,6 +84,11 @@ const LoginForm = () => {
 
       // Jika backend merespon sukses
       if (response.data.success) {
+        // RESET RATE LIMIT ON SUCCESS
+        setAttempts(0);
+        localStorage.removeItem('login_attempts');
+        localStorage.removeItem('login_lockout_time');
+
         // Simpan token ke localStorage sebagai tanda bukti login berhasil
         const token = response.data.token;
         localStorage.setItem('token', token);
@@ -69,11 +123,33 @@ const LoginForm = () => {
 
     } catch (error) {
       console.error("Error Login:", error);
-      // Menangkap pesan error dari backend (misal: "Email atau password salah")
-      if (error.response && error.response.data) {
-        setErrorMessage(error.response.data.message);
+
+      // Hitung percobaan gagal
+      const isBackendRateLimit = error.response && error.response.status === 429;
+      let newAttempts = attempts + 1;
+
+      // Jika backend Laravel merespon 429 Too Many Requests, langsung paksakan limit
+      if (isBackendRateLimit) {
+          newAttempts = MAX_ATTEMPTS;
+      }
+
+      setAttempts(newAttempts);
+      localStorage.setItem('login_attempts', newAttempts.toString());
+
+      if (newAttempts >= MAX_ATTEMPTS) {
+          // Kunci login jika batas maksimal tercapai
+          const lockTime = Date.now() + LOCKOUT_DURATION;
+          setLockoutTime(lockTime);
+          localStorage.setItem('login_lockout_time', lockTime.toString());
+          setTimeLeft(60); // Set detik pertama langsung 60
+          setErrorMessage(`Terlalu banyak percobaan gagal. Akses ditangguhkan selama 60 detik.`);
       } else {
-        setErrorMessage("Terjadi kesalahan pada server. Pastikan backend berjalan.");
+          // Tampilkan pesan error biasa dari backend
+          if (error.response && error.response.data) {
+            setErrorMessage(`${error.response.data.message} (Sisa percobaan: ${MAX_ATTEMPTS - newAttempts})`);
+          } else {
+            setErrorMessage(`Terjadi kesalahan pada server. (Sisa percobaan: ${MAX_ATTEMPTS - newAttempts})`);
+          }
       }
     } finally {
       setIsLoading(false); // Matikan efek loading
@@ -132,12 +208,12 @@ const LoginForm = () => {
       {/* TOMBOL LOGIN */}
       <button 
         type="submit"
-        disabled={isLoading} // Tombol mati kalau sedang loading
+        disabled={isLoading || lockoutTime} // Tombol mati kalau sedang loading atau lockout
         className={`w-full transition-colors duration-300 text-white font-bold text-[18px] py-4 rounded-3xl mt-4 shadow-lg active:scale-[0.98] ${
-          isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-[#56BC36] hover:bg-[#4ea830]"
+          (isLoading || lockoutTime) ? "bg-gray-400 cursor-not-allowed" : "bg-[#56BC36] hover:bg-[#4ea830]"
         }`}
       >
-        {isLoading ? "Sedang Memproses..." : "Login"}
+        {isLoading ? "Sedang Memproses..." : lockoutTime ? `Terkunci (${timeLeft}s)` : "Login"}
       </button>
     </form>
   );

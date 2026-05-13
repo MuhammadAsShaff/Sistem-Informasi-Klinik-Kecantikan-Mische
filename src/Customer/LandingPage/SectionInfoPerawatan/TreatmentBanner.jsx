@@ -2,7 +2,7 @@ import React from 'react';
 
 const TreatmentBanner = ({ logo }) => {
   return (
-    <div className="snap-start shrink-0 w-[85vw] md:w-[450px] lg:w-[550px] bg-[linear-gradient(225deg,#C6FFD1_0%,#56BC36_50%)] rounded-[0px_0px_0px_0px] p-8 md:p-12 lg:p-16 text-white relative overflow-hidden flex flex-col justify-center shadow-lg">
+    <div className="snap-start shrink-0 w-[85vw] md:w-[450px] lg:w-[550px] bg-[linear-gradient(225deg,#C6FFD1_0%,#56BC36_50%)] p-8 md:p-12 lg:p-16 text-white relative overflow-hidden flex flex-col justify-center shadow-lg">
       {/* WATERMARK LOGO MISCHE (Bottom aligned) */}
       <div className="absolute right-[-5%] bottom-0 pointer-events-none w-[250px] md:w-[350px]">
         <img 

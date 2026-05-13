@@ -3,10 +3,10 @@ import React from 'react';
 const TreatmentCard = ({ item }) => {
   return (
     <div 
-      className="snap-start shrink-0 w-[200px] md:w-[280px] bg-white rounded-[60px_15px_60px_15px] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] flex flex-col group transition-all duration-300"
+      className="snap-start shrink-0 w-[200px] md:w-[280px] bg-white rounded-tl-[60px] rounded-br-[60px] overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] flex flex-col group transition-all duration-300"
     >
       {/* BAGIAN FOTO */}
-      <div className="h-64 md:h-50 overflow-hidden rounded-[60px_0px_0px_0px]">
+      <div className="h-64 md:h-50 overflow-hidden rounded-tl-[60px]">
         <img 
           src={item.image} 
           alt={item.title} 

@@ -1,9 +1,9 @@
 import React from 'react';
 const ProductCard = ({ product }) => {
   return (
-    <div className="bg-white rounded-[60px_0px_60px_0px] pb-8 shadow-[0_30px_60px_rgba(0,0,0,0.08)] flex flex-col items-center text-center transition-all duration-300 hover:translate-y-[-15px]">
+    <div className="bg-white rounded-tl-[60px] rounded-br-[60px] pb-8 shadow-[0_30px_60px_rgba(0,0,0,0.08)] flex flex-col items-center text-center transition-all duration-300 hover:translate-y-[-15px]">
       {/* yang memberikan efek melompat itu adalah kode ini hover:translate-y-[-15px] */}
-      <div className="w-full h-full object-cover mb-8 overflow-hidden bg-white  rounded-[60px_0px_0px_0px]">
+      <div className="w-full h-full object-cover mb-8 overflow-hidden bg-white  rounded-tl-[60px]">
         <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
       </div>
       {/* title */}

@@ -16,8 +16,8 @@ const Tabel = ({ data, onEdit, onDelete }) => (
         {data.map((item, index) => (
           <tr key={index} className="hover:bg-gray-50 transition-colors">
             <td className="px-6 py-4 text-center">{index + 1}</td>
-            <td className="px-6 py-4 text-center h-16">{item.jamMulai}</td>
-            <td className="px-6 py-4 text-center">{item.jamSelesai}</td>
+            <td className="px-6 py-4 text-center h-16">{item.jamMulai ? item.jamMulai.substring(0,5) : ''}</td>
+            <td className="px-6 py-4 text-center">{item.jamSelesai ? item.jamSelesai.substring(0,5) : ''}</td>
             <td className="px-6 py-4">
               <div className="flex justify-center gap-6">
                 <button 

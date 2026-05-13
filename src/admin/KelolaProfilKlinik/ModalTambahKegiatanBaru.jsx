@@ -22,8 +22,14 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, onSuccess }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (!allowedTypes.includes(file.type)) {
+        alert("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
+        e.target.value = '';
+        return;
+      }
       if (file.size > 2 * 1024 * 1024) {
-        alert('Ukuran file maksimal 2MB!');
+        alert('Maksimal 2MB mimes:jpeg,png,jpg');
         e.target.value = '';
         return;
       }
@@ -94,7 +100,7 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, onSuccess }) => {
               </div>
             </div>
             
-            <div className="flex items-center">
+            <div className="flex flex-col">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -102,6 +108,7 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, onSuccess }) => {
                 onChange={handleFileChange}
                 className="w-full file:bg-[#1f2937] file:text-white file:border-black file:rounded-none file:px-3 file:py-1.5 file:cursor-pointer file:text-xs file:font-medium text-xs text-black border border-black p-0 bg-white"
               />
+              <span className="text-[11px] text-red-500 mt-1">* Maksimal 2MB (Format: jpeg, png, jpg)</span>
             </div>
           </div>
 
