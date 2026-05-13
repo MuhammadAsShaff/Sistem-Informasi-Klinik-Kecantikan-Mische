@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProfilePerusahaanSeeder::class,
             JadwalReservasiSeeder::class,
+            KegiatanSeeder::class,
         ]);
     }
 }
