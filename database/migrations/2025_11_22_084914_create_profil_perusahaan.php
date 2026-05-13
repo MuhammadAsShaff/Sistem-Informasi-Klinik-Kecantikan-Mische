@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('profilPerusahaan', function (Blueprint $table) {
             $table->increments('idProfil');
-            $table->text('visi');
-            $table->text('misi');
+            $table->mediumText('visi');
+            $table->mediumText('misi');
             $table->string('fotoPerusahaan');
-            $table->text('deskripsiPerusahaan');
+            $table->mediumText('deskripsiPerusahaan');
             $table->string('nomorCustomerService');
             $table->time('jamBukak');
             $table->time('jamKeluar');
