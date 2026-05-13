@@ -89,7 +89,7 @@ class KegiatanController extends Controller
                 $fotoPath = $request->file('foto')->store('kegiatan', 'public');
                 $data['foto'] = $fotoPath;
             } else {
-                $data['foto'] = null; // atau beri default gambar
+                $data['foto'] = 'kegiatan/default.png'; // Fallback gambar default agar tidak error NOT NULL di DB
             }
 
             $kegiatan = Kegiatan::create($data);
