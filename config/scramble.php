@@ -24,12 +24,26 @@ return [
         /*
          * API version.
          */
-        'version' => env('API_VERSION', '0.0.1'),
+        'version' => env('API_VERSION', '1.0.0'),
 
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
          */
-        'description' => '',
+        'description' => 'Selamat datang di Pusat Dokumentasi Resmi **Mische Beauty Clinic API**.
+
+Sistem API ini merupakan fondasi utama bagi seluruh infrastruktur digital Mische Beauty Clinic, dirancang untuk melayani aplikasi pelanggan (Frontend) dan dashboard operasional (Admin) dengan performa tinggi dan keamanan mutakhir.
+
+### 🛡️ Keamanan & Otentikasi
+Seluruh rute privat dalam sistem ini dilindungi oleh **Stateless JWT (JSON Web Tokens)**. 
+Untuk mengakses rute terlindungi, Anda diwajibkan untuk melakukan otentikasi melalui *endpoint* **Login** terlebih dahulu guna mendapatkan Token *Session Cookie*.
+
+### 👥 Hak Akses (Roles)
+Sistem ini membagi hak akses secara ketat ke dalam 3 level:
+- **Public / Tamu** : Dapat melihat profil perusahaan, daftar kegiatan, dan jadwal dokter secara bebas (Tanpa Login).
+- **Customer** : Membutuhkan akun *Customer* untuk mengelola profil pribadinya.
+- **Administrator** : Membutuhkan akun *Admin* untuk mengelola seluruh data operasional klinik secara mutlak (CRUD).
+
+*Dokumentasi interaktif ini dihasilkan secara otomatis dan mematuhi spesifikasi OpenAPI.*',
     ],
 
     /*
@@ -39,7 +53,7 @@ return [
         /*
          * Define the title of the documentation's website. App name is used when this config is `null`.
          */
-        'title' => null,
+        'title' => 'Mische Beauty Clinic - API Docs',
 
         /*
          * Define the theme of the documentation. Available options are `light`, `dark`, and `system`.
