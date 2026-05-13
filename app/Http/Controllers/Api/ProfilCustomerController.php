@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfilCustomerController extends Controller
 {
+    /**
+     * Tampil Profil Customer
+     * 
+     * Mengambil data profil milik customer yang sedang login saat ini.
+     */
     public function getProfileCustomer(Request $request)
     {
 
@@ -29,6 +34,11 @@ class ProfilCustomerController extends Controller
         }
     }
 
+    /**
+     * Edit Profil Customer
+     * 
+     * Memperbarui profil milik customer yang sedang login saat ini.
+     */
     public function updateProfileCustomer(Request $request)
     {
         try {

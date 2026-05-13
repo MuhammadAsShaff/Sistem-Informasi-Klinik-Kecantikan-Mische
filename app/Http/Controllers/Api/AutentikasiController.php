@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 class AutentikasiController extends Controller
 {
+    /**
+     * Daftar Akun Baru
+     * 
+     * Membuat akun customer baru di sistem klinik.
+     */
     public function registerUser(Request $request)
     {
         $pesanEror = [
@@ -76,6 +81,11 @@ class AutentikasiController extends Controller
         }
     }
 
+    /**
+     * Login Pengguna
+     * 
+     * Otentikasi masuk pengguna dan menerbitkan Token JWT.
+     */
     public function loginUser(Request $request)
     {
         // Validasi Input agar tidak Crash 500 bila kosong
@@ -124,6 +134,11 @@ class AutentikasiController extends Controller
         ])->withCookie($cookie);
     }
 
+    /**
+     * Logout Pengguna
+     * 
+     * Mengakhiri sesi pengguna dan menghancurkan Token JWT.
+     */
     public function logoutUser(Request $request)
     {
         try {
@@ -153,6 +168,11 @@ class AutentikasiController extends Controller
         }
     }
 
+    /**
+     * Tampil Data Login Saat Ini
+     * 
+     * Mengambil profil pengguna berdasarkan token yang sedang aktif.
+     */
     public function getUserProfile(Request $request)
     {
         try {
@@ -182,6 +202,11 @@ class AutentikasiController extends Controller
         }
     }
 
+    /**
+     * Ubah Kata Sandi
+     * 
+     * Memperbarui kata sandi pengguna yang sedang login.
+     */
     public function resetPassword(Request $request)
     {
         try {

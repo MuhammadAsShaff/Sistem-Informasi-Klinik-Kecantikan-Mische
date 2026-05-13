@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Hash;
 class ProfilAdminController extends Controller
 {
     /**
-     * Mengambil data profil milik Admin yang sedang login
+     * Tampil Profil Admin
+     * 
+     * Mengambil data profil milik Admin yang saat ini sedang login.
      */
     public function getProfileAdmin(Request $request)
     {
@@ -32,7 +34,9 @@ class ProfilAdminController extends Controller
     }
 
     /**
-     * Memperbarui profil milik Admin yang sedang login
+     * Edit Profil Admin
+     * 
+     * Memperbarui profil milik Admin yang saat ini sedang login.
      */
     public function updateProfileAdmin(Request $request)
     {

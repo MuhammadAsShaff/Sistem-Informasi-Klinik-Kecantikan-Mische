@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ProfilePerusahaanController;
 use App\Http\Controllers\Api\KelolaUserController;
 use App\Http\Controllers\Api\JadwalReservasiController;
 use App\Http\Controllers\Api\ProfilAdminController;
+use App\Http\Controllers\Api\KegiatanController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -39,6 +40,8 @@ Route::prefix('customer')->group(function () {
     Route::get('clinic', [ProfilePerusahaanController::class, 'getPublicProfile'])->name('customer.clinic');
     
     Route::get('schedules', [JadwalReservasiController::class, 'getPublicSchedule'])->name('customer.schedules');
+
+    Route::get('activities', [KegiatanController::class, 'getPublicKegiatan'])->name('customer.activities');
 
     Route::prefix('profile')->middleware(['role:customer'])->group(function () {
         Route::get('/', [ProfilCustomerController::class, 'getProfileCustomer'])->name('customer.profile');
@@ -92,5 +95,16 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::post('/', [JadwalReservasiController::class, 'createSchedule'])->name('admin.createSchedule');
         Route::put('/{idJadwal}', [JadwalReservasiController::class, 'updateSchedule'])->name('admin.updateSchedule');
         Route::delete('/{idJadwal}', [JadwalReservasiController::class, 'deleteSchedule'])->name('admin.deleteSchedule');
+    });
+
+    // ----------------------------------------
+    // RUTE KELOLA KEGIATAN KLINIK
+    // Prefix turunan: /api/admin/activities/...
+    // ----------------------------------------
+    Route::prefix('activities')->group(function () {
+        Route::get('/', [KegiatanController::class, 'getAllKegiatan'])->name('admin.activities');
+        Route::post('/', [KegiatanController::class, 'createKegiatan'])->name('admin.createActivity');
+        Route::post('/{idKegiatan}', [KegiatanController::class, 'updateKegiatan'])->name('admin.updateActivity'); // Gunakan POST + _method=PUT via form-data jika ada upload file dari frontend
+        Route::delete('/{idKegiatan}', [KegiatanController::class, 'deleteKegiatan'])->name('admin.deleteActivity');
     });
 });

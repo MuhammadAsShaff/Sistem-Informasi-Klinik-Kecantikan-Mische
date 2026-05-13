@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Storage;
 // Perbaikan nama class menyesuaikan nama file (wajib PSR-4)
 class ProfilePerusahaanController extends Controller
 {
+    /**
+     * Tampil Profil Lengkap (Admin)
+     * 
+     * Mengambil data profil perusahaan beserta seluruh strukturnya (Khusus Admin).
+     */
     public function getProfile()
     {
         $profil = ProfilPerusahaan::first();
@@ -29,6 +34,11 @@ class ProfilePerusahaanController extends Controller
         ], 200);
     }
 
+    /**
+     * Tampil Profil (Publik)
+     * 
+     * Mengambil profil perusahaan untuk ditampilkan di Landing Page publik.
+     */
     public function getPublicProfile()
     {
         $profil = ProfilPerusahaan::first();
@@ -47,6 +57,11 @@ class ProfilePerusahaanController extends Controller
         ], 200);
     }
 
+    /**
+     * Tambah Profil Baru
+     * 
+     * Membuat data profil perusahaan baru jika sebelumnya kosong (Khusus Admin).
+     */
     public function createProfile(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -104,6 +119,11 @@ class ProfilePerusahaanController extends Controller
         }
     }
 
+    /**
+     * Edit Profil Perusahaan
+     * 
+     * Mengubah visi, misi, deskripsi, atau logo perusahaan (Khusus Admin).
+     */
     public function updateProfile(Request $request, $idProfile) // Menangkap parameter dari URL /admin/clinic/{idProfile}
     {
         try {
@@ -167,6 +187,11 @@ class ProfilePerusahaanController extends Controller
         }
     }
 
+    /**
+     * Hapus Profil Perusahaan
+     * 
+     * Menghapus profil perusahaan beserta logo dari server secara permanen (Khusus Admin).
+     */
     public function deleteProfile($idProfile) // Langsung ambil parameter dari Route URL
     {
         try {

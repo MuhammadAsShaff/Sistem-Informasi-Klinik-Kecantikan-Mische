@@ -9,8 +9,11 @@ use Illuminate\Support\Facades\Validator;
 
 class JadwalReservasiController extends Controller
 {
+   
     /**
-     * Mendapatkan semua jadwal reservasi (Untuk Admin)
+     * Tampil Semua Jadwal
+     * 
+     * Mengambil seluruh data jadwal reservasi tanpa filter (Khusus Admin).
      */
     public function getAllSchedule()
     {
@@ -32,6 +35,11 @@ class JadwalReservasiController extends Controller
 
     /**
      * Mendapatkan jadwal reservasi untuk Publik (Tampil di Landing Page/Customer)
+     */
+    /**
+     * Tampil Jadwal Publik
+     * 
+     * Mengambil daftar jadwal dokter yang aktif untuk dilihat pengunjung.
      */
     public function getPublicSchedule()
     {
@@ -55,6 +63,11 @@ class JadwalReservasiController extends Controller
 
     /**
      * Membuat jadwal reservasi baru (Hanya Admin)
+     */
+    /**
+     * Tambah Jadwal Baru
+     * 
+     * Membuat slot jadwal reservasi dokter baru (Khusus Admin).
      */
     public function createSchedule(Request $request)
     {
@@ -101,6 +114,11 @@ class JadwalReservasiController extends Controller
 
     /**
      * Mengubah jadwal reservasi (Hanya Admin)
+     */
+    /**
+     * Edit Jadwal
+     * 
+     * Mengubah data jadwal reservasi yang sudah ada (Khusus Admin).
      */
     public function updateSchedule(Request $request, $idJadwal)
     {
@@ -156,6 +174,11 @@ class JadwalReservasiController extends Controller
 
     /**
      * Menghapus jadwal reservasi permanen (Hanya Admin)
+     */
+    /**
+     * Hapus Jadwal
+     * 
+     * Menghapus slot jadwal secara permanen (Khusus Admin).
      */
     public function deleteSchedule($idJadwal)
     {

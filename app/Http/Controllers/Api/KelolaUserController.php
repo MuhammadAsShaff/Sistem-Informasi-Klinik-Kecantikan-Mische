@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Validator;
 
 class KelolaUserController extends Controller
 {
+    /**
+     * Tampil Semua Pengguna
+     * 
+     * Mengambil daftar seluruh pengguna terdaftar (Khusus Admin).
+     */
     public function getAllUsers()
     {
         try {
@@ -30,6 +35,11 @@ class KelolaUserController extends Controller
         }
     }
 
+    /**
+     * Tampil Pengguna Spesifik
+     * 
+     * Mengambil detail satu pengguna berdasarkan ID (Khusus Admin).
+     */
     public function getUserById($idUser)
     {
         try {
@@ -49,6 +59,11 @@ class KelolaUserController extends Controller
         }
     }
 
+    /**
+     * Tambah Pengguna Baru
+     * 
+     * Mendaftarkan pengguna atau admin baru ke dalam sistem (Khusus Admin).
+     */
     public function createUser(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -97,6 +112,11 @@ class KelolaUserController extends Controller
         }
     }
 
+    /**
+     * Edit Pengguna
+     * 
+     * Memperbarui informasi profil dari pengguna tertentu (Khusus Admin).
+     */
     public function updateUser(Request $request, $idUser)
     {
         try {
@@ -143,6 +163,11 @@ class KelolaUserController extends Controller
         }
     }
 
+    /**
+     * Hapus Pengguna
+     * 
+     * Menghapus data pengguna secara permanen dari sistem (Khusus Admin).
+     */
     public function deleteUser($idUser)
     {
         try {
