@@ -204,11 +204,8 @@ class ProfilePerusahaanController extends Controller
 
             $profilPerusahaan->delete(); // Perbaikan fatal: panggil dengan object ->delete() (BUKAN ::delete())
 
-            // Perbaikan fatal: kembalikan response JSON setelah berhasil
-            return response()->json([
-                'success' => true,
-                'message' => 'Data profil berhasil dihapus'
-            ], 200);
+            // Sesuai standar REST API, operasi DELETE yang berhasil tidak mengembalikan konten (204)
+            return response()->noContent();
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['success' => false, 'message' => 'Profil yang mau dihapus tidak ditemukan'], 404);

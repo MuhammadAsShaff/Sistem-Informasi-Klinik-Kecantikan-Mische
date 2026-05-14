@@ -176,11 +176,8 @@ class KegiatanController extends Controller
 
             $kegiatan->delete();
 
-            // Menggunakan 200 OK karena jika 204 JSON body tidak akan muncul di dokumentasi/response
-            return response()->json([
-                'success' => true,
-                'message' => 'Kegiatan berhasil dihapus'
-            ], 200);
+            // Sesuai standar REST API (204 No Content)
+            return response()->noContent();
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['success' => false, 'message' => 'Kegiatan tidak ditemukan'], 404);

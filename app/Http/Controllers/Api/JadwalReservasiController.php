@@ -186,10 +186,8 @@ class JadwalReservasiController extends Controller
             $jadwal = JadwalReservasi::findOrFail($idJadwal);
             $jadwal->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Jadwal reservasi telah dihapus secara permanen'
-            ], 200);
+            // Sesuai standar REST API (204 No Content)
+            return response()->noContent();
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['success' => false, 'message' => 'Data jadwal tidak ditemukan'], 404);
         } catch (\Exception $e) {

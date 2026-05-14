@@ -174,10 +174,8 @@ class KelolaUserController extends Controller
             $user = User::findOrFail($idUser);
             $user->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Satu pengguna telah dihilangkan secara permanen'
-            ], 200);
+            // Sesuai standar REST API (204 No Content)
+            return response()->noContent();
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['success' => false, 'message' => 'Data itu sudah dihapus atau tidak ditemukan'], 404);
         } catch (\Exception $e) {
