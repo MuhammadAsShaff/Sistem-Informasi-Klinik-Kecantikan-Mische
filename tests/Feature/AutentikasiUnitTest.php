@@ -11,134 +11,173 @@ class AutentikasiUnitTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Skenario 1: Menguji apakah tamu (Guest) bisa mendaftar akun baru
-     */
     public function test_user_bisa_register_akun_baru()
     {
-        // Data pendaftaran akun baru
-        $payload = [
-            'nama' => 'User Tester',
-            'alamat' => 'Jl. Testing No. 1',
-            'jenisKelamin' => 'Perempuan',
-            'tanggalLahir' => '1995-01-01',
-            'role' => 'Customer',
-            'email' => 'testerbaru@mische.com',
-            'nomorWa' => '08123456789',
-            'password' => 'SandiKuat123!'
-        ];
+        $response = $this->postJson('/api/auth/register', [
+            'nama' => 'John Doe',
+            'alamat' => 'Jl. Test No 123',
+            'jenisKelamin' => 'Laki-laki',
+            'tanggalLahir' => '1995-05-15',
+            'role' => 'customer',
+            'email' => 'john.doe@example.com',
+            'nomorWa' => '081234567890',
+            'password' => 'Password123'
+        ]);
 
-        // Tembak URL pendaftaran
-        $response = $this->postJson('/api/auth/register', $payload);
-
-        // Pastikan sukses dibuat (Status 201)
         $response->assertStatus(201)
-            ->assertJson([
-                'success' => true,
-                'message' => 'Registrasi berhasil!'
-            ]);
+                 ->assertJson(['success' => true, 'message' => 'Registrasi berhasil!']);
 
-        // Pastikan email benar-benar masuk ke database
         $this->assertDatabaseHas('user', [
-            'email' => 'testerbaru@mische.com'
+            'email' => 'john.doe@example.com'
         ]);
     }
 
-    /**
-     * Skenario 2: Menguji login dengan email dan sandi yang benar
-     */
+    public function test_register_gagal_karena_email_sudah_terdaftar()
+    {
+        User::create([
+            'nama' => 'Jane Doe', 'alamat' => 'Jl. Lama', 'jenisKelamin' => 'Perempuan',
+            'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'jane@example.com',
+            'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
+        ]);
+
+        $response = $this->postJson('/api/auth/register', [
+            'nama' => 'Jane Doe 2',
+            'alamat' => 'Jl. Baru',
+            'jenisKelamin' => 'Perempuan',
+            'tanggalLahir' => '1995-05-15',
+            'role' => 'customer',
+            'email' => 'jane@example.com',
+            'nomorWa' => '081234567890',
+            'password' => 'Password123'
+        ]);
+
+        $response->assertStatus(400)
+                 ->assertJsonStructure(['errors' => ['email']]);
+    }
+
     public function test_user_bisa_login_dengan_kredensial_benar()
     {
-        // 1. Buat 1 akun dummy di database
         User::create([
-            'nama' => 'Login Tester',
-            'alamat' => 'Jl. Test',
-            'jenisKelamin' => 'Perempuan',
-            'tanggalLahir' => '1995-01-01',
-            'role' => 'Customer',
-            'email' => 'loginbenar@mische.com',
-            'nomorWa' => '08123456789',
-            'password' => Hash::make('SandiKuat123!')
+            'nama' => 'John Login', 'alamat' => 'Jl. Test No 123', 'jenisKelamin' => 'Laki-laki',
+            'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'login@example.com',
+            'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
         ]);
 
-        // 2. Tembak endpoint login
         $response = $this->postJson('/api/auth/login', [
-            'email' => 'loginbenar@mische.com',
-            'password' => 'SandiKuat123!'
+            'email' => 'login@example.com',
+            'password' => 'Password123'
         ]);
 
-        // 3. Verifikasi kembalian JSON memuat token JWT
         $response->assertStatus(200)
-            ->assertJsonStructure([
-                'success',
-                'message',
-                'token',
-                'type',
-                'expires_in'
-            ]);
+                 ->assertJson(['success' => true])
+                 ->assertJsonStructure(['token', 'type', 'expires_in']);
     }
 
-    /**
-     * Skenario 3: Menguji keamanan jika user salah memasukkan sandi
-     */
     public function test_login_gagal_jika_password_salah()
     {
-        // 1. Buat akun dummy
         User::create([
-            'nama' => 'Login Gagal Tester',
-            'alamat' => 'Jl. Test',
-            'jenisKelamin' => 'Perempuan',
-            'tanggalLahir' => '1995-01-01',
-            'role' => 'Customer',
-            'email' => 'salahsandi@mische.com',
-            'nomorWa' => '08123456789',
-            'password' => Hash::make('SandiKuat123!')
+            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'login2@example.com',
+            'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
         ]);
 
-        // 2. Sengaja salahkan sandi saat login
         $response = $this->postJson('/api/auth/login', [
-            'email' => 'salahsandi@mische.com',
-            'password' => 'SandiSalah000'
+            'email' => 'login2@example.com',
+            'password' => 'SalahPassword'
         ]);
 
-        // 3. Verifikasi bahwa sistem menolak akses dengan status 401 Unauthorized
         $response->assertStatus(401)
-            ->assertJson([
-                'success' => false,
-                'message' => 'Email atau password yang Anda masukkan salah.'
-            ]);
+                 ->assertJson(['success' => false, 'message' => 'Email atau password yang Anda masukkan salah.']);
     }
 
-    /**
-     * Skenario 4: Menguji proses Logout yang membutuhkan Token
-     */
-    public function test_user_bisa_logout_dengan_token()
+    public function test_user_bisa_mendapatkan_profil_saat_ini()
     {
-        // 1. Buat user dummy
         $user = User::create([
-            'nama' => 'Logout Tester',
-            'alamat' => 'Jl. Test',
-            'jenisKelamin' => 'Perempuan',
-            'tanggalLahir' => '1995-01-01',
-            'role' => 'Customer',
-            'email' => 'logout@mische.com',
-            'nomorWa' => '08123456789',
-            'password' => Hash::make('SandiKuat123!')
+            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'profil@example.com',
+            'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
         ]);
 
-        // 2. Buatkan sesi/Token JWT secara paksa di memori untuk simulasi sudah login
         $token = auth('api')->login($user);
 
-        // 3. Tembak endpoint logout SAMBIL menyematkan Token di kepala (Header) request
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/auth/logout');
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+                         ->getJson('/api/auth/me');
 
-        // 4. Pastikan sesi diakhiri dengan mulus
         $response->assertStatus(200)
-            ->assertJson([
-                'success' => true,
-                'message' => 'Sesi Anda berhasil diakhiri (Logout).'
-            ]);
+                 ->assertJson(['success' => true])
+                 ->assertJsonPath('data.email', 'profil@example.com');
+    }
+
+    public function test_gagal_mendapatkan_profil_tanpa_token()
+    {
+        $response = $this->getJson('/api/auth/me');
+
+        $response->assertStatus(401)
+                 ->assertJson(['success' => false]);
+    }
+
+    public function test_user_bisa_reset_password()
+    {
+        $user = User::create([
+            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'reset@example.com',
+            'nomorWa' => '081234567890', 'password' => Hash::make('PasswordLama123')
+        ]);
+
+        $token = auth('api')->login($user);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+                         ->postJson('/api/auth/reset-password', [
+                             'password_lama' => 'PasswordLama123',
+                             'password_baru' => 'PasswordBaru123'
+                         ]);
+
+        $response->assertStatus(200)
+                 ->assertJson(['success' => true]);
+
+        // Verifikasi password baru dapat digunakan untuk login
+        $loginResponse = $this->postJson('/api/auth/login', [
+            'email' => 'reset@example.com',
+            'password' => 'PasswordBaru123'
+        ]);
+
+        $loginResponse->assertStatus(200);
+    }
+
+    public function test_reset_password_gagal_jika_password_lama_salah()
+    {
+        $user = User::create([
+            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'reset2@example.com',
+            'nomorWa' => '081234567890', 'password' => Hash::make('PasswordLama123')
+        ]);
+
+        $token = auth('api')->login($user);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+                         ->postJson('/api/auth/reset-password', [
+                             'password_lama' => 'PasswordSalah123',
+                             'password_baru' => 'PasswordBaru123'
+                         ]);
+
+        $response->assertStatus(400)
+                 ->assertJson(['success' => false, 'message' => 'Pembaruan gagal. Password lama yang Anda ketikkan salah.']);
+    }
+
+    public function test_user_bisa_logout_dengan_token()
+    {
+        $user = User::create([
+            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'logout@example.com',
+            'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
+        ]);
+
+        $token = auth('api')->login($user);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+                         ->postJson('/api/auth/logout');
+
+        $response->assertStatus(200)
+                 ->assertJson(['success' => true]);
     }
 }
