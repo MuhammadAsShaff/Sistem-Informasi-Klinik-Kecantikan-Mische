@@ -36,7 +36,6 @@ class AutentikasiController extends Controller
             'alamat' => 'required|string|max:60',
             'jenisKelamin' => 'required|string|max:12',
             'tanggalLahir' => 'required|date',
-            'role' => 'required|string|max:12',
             'email' => 'required|email|unique:user,email|max:50',
             'nomorWa' => 'required|string|max:16',
             'password' => ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
@@ -58,7 +57,7 @@ class AutentikasiController extends Controller
                 'alamat' => $request->alamat,
                 'jenisKelamin' => $request->jenisKelamin,
                 'tanggalLahir' => $request->tanggalLahir,
-                'role' => $request->role,
+                'role' => 'customer',
                 'email' => $request->email,
                 'nomorWa' => $request->nomorWa,
                 'password' => Hash::make($request->password)

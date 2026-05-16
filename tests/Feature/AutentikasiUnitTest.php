@@ -18,7 +18,6 @@ class AutentikasiUnitTest extends TestCase
             'alamat' => 'Jl. Test No 123',
             'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '1995-05-15',
-            'role' => 'customer',
             'email' => 'john.doe@example.com',
             'nomorWa' => '081234567890',
             'password' => 'Password123'
@@ -28,7 +27,8 @@ class AutentikasiUnitTest extends TestCase
                  ->assertJson(['success' => true, 'message' => 'Registrasi berhasil!']);
 
         $this->assertDatabaseHas('user', [
-            'email' => 'john.doe@example.com'
+            'email' => 'john.doe@example.com',
+            'role' => 'customer'
         ]);
     }
 
@@ -45,7 +45,6 @@ class AutentikasiUnitTest extends TestCase
             'alamat' => 'Jl. Baru',
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1995-05-15',
-            'role' => 'customer',
             'email' => 'jane@example.com',
             'nomorWa' => '081234567890',
             'password' => 'Password123'
