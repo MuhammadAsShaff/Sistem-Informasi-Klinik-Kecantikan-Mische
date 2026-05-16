@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
 
 export default function ModalTambahUser({ isOpen, onClose, onSubmit }) {
   // State untuk form
@@ -13,6 +13,7 @@ export default function ModalTambahUser({ isOpen, onClose, onSubmit }) {
     tanggalLahir: "",
     nomorWa: ""
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -69,14 +70,23 @@ export default function ModalTambahUser({ isOpen, onClose, onSubmit }) {
             {/* Password */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Password</label>
-              <input 
-                type="password" 
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Masukkan Password" 
-                className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Masukkan Password" 
+                  className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300 pr-14"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
 
             {/* Jenis Kelamin */}

@@ -11,13 +11,12 @@ const ModalHapusKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
-      const res = await axios.delete(`http://127.0.0.1:8000/api/admin/kegiatan/${id}`, {
+      await axios.delete(`http://127.0.0.1:8000/api/admin/kegiatan/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      if (res.data.success) {
-        onSuccess && onSuccess();
-      }
+      // API mengembalikan 204 No Content, jadi jika request tidak throw error, berarti sukses
+      if (onSuccess) onSuccess();
     } catch (error) {
       console.error('Error deleting kegiatan:', error);
       alert('Gagal menghapus kegiatan.');

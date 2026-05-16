@@ -31,6 +31,13 @@ const RegistrasiForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Validasi password minimal 8 karakter & mixed case (sesuai backend)
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        if (!passwordRegex.test(formData.password)) {
+            setToast({ isOpen: true, message: 'Password minimal 8 karakter dan harus mengandung huruf besar dan kecil!', type: 'error' });
+            return;
+        }
+
         // Validasi konfirmasi password
         if (formData.password !== formData.confirmPassword) {
             setToast({ isOpen: true, message: 'Konfirmasi password tidak cocok!', type: 'error' });
@@ -46,7 +53,6 @@ const RegistrasiForm = () => {
                 jenisKelamin: formData.jenisKelamin,
                 tanggalLahir: formData.tanggalLahir,
                 password: formData.password,
-                role: 'Customer' // default role
             });
 
             if (response.data.success) {
@@ -94,6 +100,7 @@ const RegistrasiForm = () => {
                             required
                             className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 placeholder:text-gray-300 focus:outline-none focus:border-[#56BC36] transition-colors"
                         />
+                        <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan nama lengkap Anda.</p>
                     </div>
 
                     {/* EMAIL */}
@@ -110,6 +117,7 @@ const RegistrasiForm = () => {
                             required
                             className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 placeholder:text-gray-300 focus:outline-none focus:border-[#56BC36] transition-colors"
                         />
+                        <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan format email yang valid.</p>
                     </div>
 
                     {/* NOMOR WHATSAPP */}
@@ -126,6 +134,7 @@ const RegistrasiForm = () => {
                             required
                             className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 placeholder:text-gray-300 focus:outline-none focus:border-[#56BC36] transition-colors"
                         />
+                        <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan nomor telepon aktif.</p>
                     </div>
 
                     {/* ALAMAT */}
@@ -142,6 +151,7 @@ const RegistrasiForm = () => {
                             required
                             className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 placeholder:text-gray-300 focus:outline-none focus:border-[#56BC36] transition-colors"
                         />
+                        <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan alamat domisili.</p>
                     </div>
 
                     {/* JENIS KELAMIN */}
@@ -160,6 +170,7 @@ const RegistrasiForm = () => {
                             <option value="Laki-laki">Laki-laki</option>
                             <option value="Perempuan">Perempuan</option>
                         </select>
+                        <p className="text-xs text-gray-500 mt-1">* Wajib memilih jenis kelamin.</p>
                     </div>
 
                     {/* TANGGAL LAHIR */}
@@ -175,6 +186,7 @@ const RegistrasiForm = () => {
                             required
                             className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 placeholder:text-gray-300 focus:outline-none focus:border-[#56BC36] transition-colors"
                         />
+                        <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan tanggal lahir yang sesuai.</p>
                     </div>
 
                     {/* PASSWORD */}
@@ -200,6 +212,7 @@ const RegistrasiForm = () => {
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
+                        <p className="text-xs text-red-500 font-medium mt-1">* Wajib diisi. Minimal 8 karakter dan mengandung huruf besar dan kecil.</p>
                     </div>
 
                     {/* KONFIRMASI PASSWORD */}
@@ -225,6 +238,7 @@ const RegistrasiForm = () => {
                                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
+                        <p className="text-xs text-gray-500 mt-1">* Wajib diisi. Pastikan sama dengan kolom password.</p>
                     </div>
                 </div>
 

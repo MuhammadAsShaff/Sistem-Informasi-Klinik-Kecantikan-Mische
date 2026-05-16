@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
 
 export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit }) {
   const [formData, setFormData] = useState({
     nama: "",
     email: "",
+    password: "", // Ditambahkan untuk update password
     jenisKelamin: "",
     alamat: "",
     role: "",
     tanggalLahir: "",
     nomorWa: ""
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   // Saat userData berubah (saat tombol Edit ditekan), masukkan datanya ke form
   useEffect(() => {
@@ -18,6 +20,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
       setFormData({
         nama: userData.nama || "",
         email: userData.email || "",
+        password: "", // Kosongkan agar hanya diisi jika ingin diubah
         jenisKelamin: userData.jenisKelamin || userData.gender || userData.jenis_kelamin || "",
         alamat: userData.alamat || "",
         role: userData.role || "",
@@ -78,6 +81,28 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
                 placeholder="Email" 
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
+            </div>
+
+            {/* Password (Opsional) */}
+            <div className="flex flex-col gap-2.5">
+              <label className="text-sm font-bold text-[#1A1A1A]">Password (Opsional)</label>
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Kosongkan jika tidak diubah" 
+                  className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300 pr-14"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
 
             {/* Jenis Kelamin */}

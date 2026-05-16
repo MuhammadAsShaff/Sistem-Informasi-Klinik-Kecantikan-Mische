@@ -107,14 +107,12 @@ const KelolaProfilKlinik = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.delete(`http://127.0.0.1:8000/api/admin/clinic/${id}`, {
+      await axios.delete(`http://127.0.0.1:8000/api/admin/clinic/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (res.data.success) {
-        setToast({ isOpen: true, message: 'Profil Klinik berhasil dihapus!', type: 'success' });
-        setProfileData(null);
-        setIsModalHapusPengaturanOpen(false);
-      }
+      setToast({ isOpen: true, message: 'Profil Klinik berhasil dihapus!', type: 'success' });
+      setProfileData(null);
+      setIsModalHapusPengaturanOpen(false);
     } catch (error) {
       setToast({ isOpen: true, message: 'Gagal menghapus profil klinik.', type: 'error' });
       setIsModalHapusPengaturanOpen(false);

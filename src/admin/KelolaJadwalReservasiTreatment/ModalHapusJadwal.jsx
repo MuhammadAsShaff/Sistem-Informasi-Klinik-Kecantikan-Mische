@@ -11,13 +11,11 @@ export default function ModalHapusJadwal({ isOpen, onClose, jadwalData, onSucces
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
-      const res = await axios.delete(`http://127.0.0.1:8000/api/admin/schedules/${jadwalData.idJadwal || jadwalData.id}`, {
+      await axios.delete(`http://127.0.0.1:8000/api/admin/schedules/${jadwalData.idJadwal || jadwalData.id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      if (res.data.success) {
-        onSuccess && onSuccess();
-      }
+      if (onSuccess) onSuccess();
     } catch (error) {
       console.error('Error delete schedule:', error.response?.data || error.message);
       alert(error.response?.data?.message || 'Gagal menghapus jadwal.');

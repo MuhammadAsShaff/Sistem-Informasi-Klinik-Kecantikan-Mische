@@ -1,4 +1,6 @@
-import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 
 // Layout
 import CustomerLayout from "./Customer/CustomerLayout";
@@ -26,6 +28,53 @@ import KelolaProfilKlinik from "./admin/KelolaProfilKlinik/index";
 import KelolaProfilAdmin from "./admin/KelolaProfilAdmin/Index";
 
 export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Setup Global Axios Interceptor untuk menangani 401 Unauthorized
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          // Token tidak valid atau user dihapus, hapus sesi dan arahkan ke login
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/login');
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, [navigate]);
+
+  // Cek validitas sesi ke backend pada setiap perubahan halaman
+  useEffect(() => {
+    const checkSession = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const res = await axios.get('http://127.0.0.1:8000/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          // Opsional: Perbarui data user di localStorage jika ada perubahan dari backend
+          if (res.data && res.data.data) {
+            localStorage.setItem('user', JSON.stringify(res.data.data));
+          }
+        } catch (error) {
+          // Jika gagal (terutama 401), interceptor di atas akan otomatis logout-kan
+          console.error("Session check failed, user might be deleted or token expired");
+        }
+      }
+    };
+
+    checkSession();
+  }, [location.pathname]);
+
   return (
     <Routes>
 

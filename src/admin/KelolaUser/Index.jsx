@@ -87,7 +87,13 @@ export default function KelolaUser() {
       fetchUsers(currentPage); // Refresh data tabel di halaman saat ini
     } catch (error) {
       console.error("Gagal menambah user:", error);
-      showToast("Gagal menambahkan user. Silakan coba lagi.", "error");
+      let errorMessage = "Gagal menambahkan user. Silakan coba lagi.";
+      if (error.response?.data?.errors) {
+        errorMessage = Object.values(error.response.data.errors)[0][0];
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      showToast(errorMessage, "error");
     }
   };
 
@@ -106,7 +112,13 @@ export default function KelolaUser() {
       fetchUsers(currentPage); // Refresh data
     } catch (error) {
       console.error("Gagal memperbarui user:", error);
-      showToast("Gagal memperbarui data user.", "error");
+      let errorMessage = "Gagal memperbarui data user.";
+      if (error.response?.data?.errors) {
+        errorMessage = Object.values(error.response.data.errors)[0][0];
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      showToast(errorMessage, "error");
     }
   };
 
@@ -131,7 +143,11 @@ export default function KelolaUser() {
       }
     } catch (error) {
       console.error("Gagal menghapus user:", error);
-      showToast("Terjadi kesalahan saat menghapus user.", "error");
+      let errorMessage = "Terjadi kesalahan saat menghapus user.";
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      showToast(errorMessage, "error");
     }
   };
 

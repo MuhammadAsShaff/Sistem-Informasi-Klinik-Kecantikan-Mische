@@ -14,6 +14,13 @@ const ModalUbahPassword = ({ isOpen, onClose, formData, onSuccess, onError }) =>
             onError('Password baru tidak boleh kosong!');
             return;
         }
+        
+        // Validasi sesuai backend: min 8 karakter dan mixed case
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        if (!passwordRegex.test(passwordModal.password)) {
+            onError('Password minimal 8 karakter dan harus mengandung huruf besar dan kecil!');
+            return;
+        }
         if (passwordModal.password !== passwordModal.confirmPassword) {
             onError('Konfirmasi password tidak cocok!');
             return;
@@ -76,8 +83,8 @@ const ModalUbahPassword = ({ isOpen, onClose, formData, onSuccess, onError }) =>
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">
-                            *Minimal 8 karakter dan harus mengandung kombinasi huruf <strong>BESAR</strong> dan <strong>kecil</strong>.
+                        <p className="text-xs text-red-500 mt-2 font-medium">
+                            *Wajib diisi. Minimal 8 karakter dan harus mengandung kombinasi huruf <strong>BESAR</strong> dan <strong>kecil</strong>.
                         </p>
                     </div>
                     <div>
