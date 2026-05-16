@@ -163,7 +163,7 @@ class ProfilePerusahaanController extends Controller
             $validator = Validator::make($request->all(), [
                 'visi' => 'required|string',
                 'misi' => 'required|string',
-                'fotoPerusahaan' => 'nullable|image|mimes:jpeg,png,jpg|max:4000', // Boleh kosong jika tidak mau ganti jepretan foto
+                'fotoPerusahaan' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
                 'deskripsiPerusahaan' => 'required|string',
                 'nomorCustomerService' => 'required|string|max:16',
                 'jamBuka' => 'required|date_format:H:i',

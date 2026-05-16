@@ -53,7 +53,8 @@ class ProfilCustomerController extends Controller
                 'email.email' => 'Format email tidak valid.',
                 'email.unique' => 'Email ini sudah terdaftar oleh pengguna lain.',
                 'nomorWa.required' => 'Nomor WhatsApp wajib diisi.',
-                'password.min' => 'Password minimal terdiri dari 8 karakter.'
+                'password.min' => 'Password minimal terdiri dari 8 karakter.',
+                'password.mixed' => 'Pastikan kata sandimu menantang dengan menyisipkan huruf BESAR (A-Z) dan kecil (a-z).'
             ];
 
             $validator = Validator::make($request->all(), [
@@ -63,7 +64,7 @@ class ProfilCustomerController extends Controller
                 'tanggalLahir' => 'required|date',
                 'email' => 'required|email|max:50|unique:user,email,' . $user->idUser . ',idUser',
                 'nomorWa' => 'required|string|max:16',
-                'password' => 'nullable|min:8'
+                'password' => ['nullable', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
             ], $pesanEror);
 
             if ($validator->fails()) {

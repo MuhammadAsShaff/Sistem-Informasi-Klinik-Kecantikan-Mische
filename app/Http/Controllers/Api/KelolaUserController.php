@@ -77,7 +77,8 @@ class KelolaUserController extends Controller
             'email.unique' => 'Email ini sudah terdaftar sebelumnya.',
             'nomorWa.required' => 'Nomor WhatsApp wajib diisi.',
             'password.required' => 'Password tidak boleh kosong.',
-            'password.min' => 'Password minimal terdiri dari 8 karakter.'
+            'password.min' => 'Password minimal terdiri dari 8 karakter.',
+            'password.mixed' => 'Pastikan kata sandimu menantang dengan menyisipkan huruf BESAR (A-Z) dan kecil (a-z).'
         ];
 
         $validator = Validator::make($request->all(), [
@@ -88,7 +89,7 @@ class KelolaUserController extends Controller
             'role' => 'required|string|max:12',
             'email' => 'required|email|unique:user,email|max:50',
             'nomorWa' => 'required|string|max:16',
-            'password' => 'required|min:8'
+            'password' => ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
         ], $pesanEror);
 
         if ($validator->fails()) {
@@ -145,7 +146,9 @@ class KelolaUserController extends Controller
                 'email.required' => 'Email wajib diisi.',
                 'email.email' => 'Format email tidak valid.',
                 'email.unique' => 'Email ini sudah terdaftar oleh pengguna lain.',
-                'nomorWa.required' => 'Nomor WhatsApp wajib diisi.'
+                'nomorWa.required' => 'Nomor WhatsApp wajib diisi.',
+                'password.min' => 'Password minimal terdiri dari 8 karakter.',
+                'password.mixed' => 'Pastikan kata sandimu menantang dengan menyisipkan huruf BESAR (A-Z) dan kecil (a-z).'
             ];
 
             $validator = Validator::make($request->all(), [
@@ -156,6 +159,7 @@ class KelolaUserController extends Controller
                 'role' => 'sometimes|string|max:12',
                 'email' => 'sometimes|email|unique:user,email,' . $user->idUser . ',idUser',
                 'nomorWa' => 'sometimes|string|max:16',
+                'password' => ['nullable', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
             ], $pesanEror);
 
             if ($validator->fails()) {

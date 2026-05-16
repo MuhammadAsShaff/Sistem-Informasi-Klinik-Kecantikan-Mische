@@ -90,13 +90,15 @@ class AutentikasiController extends Controller
         $pesanEror = [
             'email.required' => 'Email wajib diisi untuk masuk.',
             'email.email' => 'Format email tidak valid.',
-            'password.required' => 'Kata sandi wajib diisi.'
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.min' => 'Password minimal terdiri dari 8 karakter.',
+            'password.mixed' => 'Pastikan kata sandimu menantang dengan menyisipkan huruf BESAR (A-Z) dan kecil (a-z).'
         ];
 
         // Validasi Input agar tidak Crash 500 bila kosong
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string',
+            'password' => ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
         ], $pesanEror);
 
         if ($validator->fails()) {
