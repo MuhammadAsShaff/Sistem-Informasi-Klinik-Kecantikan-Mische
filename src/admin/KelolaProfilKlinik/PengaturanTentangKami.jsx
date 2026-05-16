@@ -71,6 +71,18 @@ const PengaturanTentangKami = ({ data, onSimpan, onHapusClick }) => {
   };
 
   const handleSubmit = () => {
+    // Validasi inputan form agar tidak ada yang kosong
+    if (!formData.deskripsiPerusahaan || !formData.visi || !formData.misi || !formData.jamBuka || !formData.jamTutup || !formData.nomorCustomerService) {
+      alert("Isi profile klinik sesuai dengan ketentuan inputan!");
+      return;
+    }
+    
+    // Jika menambah profil baru, pastikan foto juga diupload
+    if (!data && !formData.fotoPerusahaan) {
+      alert("Isi profile klinik sesuai dengan ketentuan inputan!");
+      return;
+    }
+
     onSimpan(formData);
   };
 

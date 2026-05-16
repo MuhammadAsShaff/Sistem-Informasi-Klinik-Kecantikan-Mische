@@ -67,8 +67,13 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, onSuccess }) => {
         onSuccess && onSuccess();
       }
     } catch (error) {
-      console.error('Error creating kegiatan:', error.response?.data || error.message);
-      alert('Gagal menambahkan kegiatan. Silakan cek inputan Anda.');
+      let errorMsg = 'Gagal menambahkan kegiatan. Silakan cek inputan Anda.';
+      if (error.response?.data?.errors) {
+        errorMsg = Object.values(error.response.data.errors)[0][0];
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      }
+      alert(errorMsg);
     } finally {
       setIsLoading(false);
     }

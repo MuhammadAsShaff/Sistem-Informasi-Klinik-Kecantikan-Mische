@@ -96,7 +96,13 @@ const KelolaProfilKlinik = () => {
       }
     } catch (error) {
       console.error('Update Profile Error:', error.response?.data || error.message);
-      setToast({ isOpen: true, message: 'Gagal memperbarui profil klinik.', type: 'error' });
+      let errorMsg = 'Gagal memperbarui profil klinik.';
+      if (error.response?.data?.errors) {
+         errorMsg = Object.values(error.response.data.errors)[0][0];
+      } else if (error.response?.data?.message) {
+         errorMsg = error.response.data.message;
+      }
+      setToast({ isOpen: true, message: errorMsg, type: 'error' });
     }
   };
 

@@ -79,8 +79,13 @@ export default function ModalTambahJadwal({ isOpen, onClose, onSuccess, existing
         onSuccess && onSuccess();
       }
     } catch (error) {
-      console.error('Error create schedule:', error.response?.data || error.message);
-      alert(error.response?.data?.message || 'Gagal menambahkan jadwal.');
+      let errorMsg = 'Gagal menambahkan jadwal.';
+      if (error.response?.data?.errors) {
+        errorMsg = Object.values(error.response.data.errors)[0][0];
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      }
+      alert(errorMsg);
     } finally {
       setIsLoading(false);
     }

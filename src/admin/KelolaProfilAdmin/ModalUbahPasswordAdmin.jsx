@@ -6,23 +6,26 @@ const ModalUbahPasswordAdmin = ({ isOpen, onClose, formData, onSuccess, onError 
     const [passwordModal, setPasswordModal] = useState({ password: '', confirmPassword: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     if (!isOpen) return null;
 
     const handleSave = async () => {
+        setErrorMessage(''); // Reset error message
+
         if (!passwordModal.password) {
-            onError('Password baru tidak boleh kosong!');
+            setErrorMessage('Password baru tidak boleh kosong!');
             return;
         }
         
         // Validasi sesuai backend: min 8 karakter dan mixed case
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
         if (!passwordRegex.test(passwordModal.password)) {
-            onError('Password minimal 8 karakter dan harus mengandung huruf besar dan kecil!');
+            setErrorMessage('Password minimal 8 karakter dan harus mengandung huruf besar dan kecil!');
             return;
         }
         if (passwordModal.password !== passwordModal.confirmPassword) {
-            onError('Konfirmasi password tidak cocok!');
+            setErrorMessage('Konfirmasi password tidak cocok!');
             return;
         }
 
@@ -40,6 +43,7 @@ const ModalUbahPasswordAdmin = ({ isOpen, onClose, formData, onSuccess, onError 
                 setPasswordModal({ password: '', confirmPassword: '' });
                 setShowPassword(false);
                 setShowConfirmPassword(false);
+                setErrorMessage('');
                 onSuccess(res.data.data); // kirim data user terbaru ke parent
             }
         } catch (error) {
@@ -50,7 +54,7 @@ const ModalUbahPasswordAdmin = ({ isOpen, onClose, formData, onSuccess, onError 
                     errorMsg = Object.values(error.response.data.errors)[0][0];
                 }
             }
-            onError(errorMsg);
+            setErrorMessage(errorMsg);
         }
     };
 
@@ -63,6 +67,12 @@ const ModalUbahPasswordAdmin = ({ isOpen, onClose, formData, onSuccess, onError 
                     </div>
                     <h2 className="text-xl font-extrabold text-gray-800 text-center">Ubah Password</h2>
                 </div>
+
+                {errorMessage && (
+                    <div className="bg-red-50 text-red-500 text-sm p-3 rounded-xl text-center font-medium border border-red-100">
+                        {errorMessage}
+                    </div>
+                )}
                 
                 <div className="flex flex-col gap-4">
                     <div>
@@ -117,6 +127,7 @@ const ModalUbahPasswordAdmin = ({ isOpen, onClose, formData, onSuccess, onError 
                             setPasswordModal({ password: '', confirmPassword: '' }); 
                             setShowPassword(false);
                             setShowConfirmPassword(false);
+                            setErrorMessage('');
                             onClose(); 
                         }} 
                         className="w-full bg-gray-100 hover:bg-gray-200 transition-colors text-gray-600 font-bold py-3 rounded-xl"

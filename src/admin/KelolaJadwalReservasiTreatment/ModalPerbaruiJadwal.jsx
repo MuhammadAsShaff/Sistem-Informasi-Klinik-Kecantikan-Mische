@@ -84,8 +84,13 @@ export default function ModalPerbaruiJadwal({ isOpen, onClose, jadwalData, onSuc
         onSuccess && onSuccess();
       }
     } catch (error) {
-      console.error('Error updating schedule:', error.response?.data || error.message);
-      alert(error.response?.data?.message || 'Gagal memperbarui jadwal.');
+      let errorMsg = 'Gagal memperbarui jadwal.';
+      if (error.response?.data?.errors) {
+        errorMsg = Object.values(error.response.data.errors)[0][0];
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      }
+      alert(errorMsg);
     } finally {
       setIsLoading(false);
     }
