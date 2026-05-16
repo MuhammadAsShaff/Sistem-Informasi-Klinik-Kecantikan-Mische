@@ -133,6 +133,7 @@ const KelolaProfilKlinik = () => {
       <PengaturanTentangKami
         data={profileData}
         onSimpan={handleUpdateProfile}
+        onError={(msg) => setToast({ isOpen: true, message: msg, type: 'error' })}
         onHapusClick={() => setIsModalHapusPengaturanOpen(true)}
       />
 

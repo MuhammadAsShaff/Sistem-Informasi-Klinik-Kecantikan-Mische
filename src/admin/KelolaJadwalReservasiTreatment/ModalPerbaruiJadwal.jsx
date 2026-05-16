@@ -11,6 +11,7 @@ export default function ModalPerbaruiJadwal({ isOpen, onClose, jadwalData, onSuc
   const [jamMulai, setJamMulai] = useState("");
   const [jamSelesai, setJamSelesai] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [clinicData, setClinicData] = useState(null);
 
   useEffect(() => {
@@ -43,13 +44,14 @@ export default function ModalPerbaruiJadwal({ isOpen, onClose, jadwalData, onSuc
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
+    setErrorMessage('');
     if (!jamMulai || !jamSelesai) {
-      alert("Harap isi jam mulai dan jam selesai!");
+      setErrorMessage("Harap isi jam mulai dan jam selesai!");
       return;
     }
 
     if (jamMulai >= jamSelesai) {
-      alert("Jam Selesai harus lebih lambat dari Jam Mulai!");
+      setErrorMessage("Jam Selesai harus lebih lambat dari Jam Mulai!");
       return;
     }
 
@@ -58,12 +60,12 @@ export default function ModalPerbaruiJadwal({ isOpen, onClose, jadwalData, onSuc
       const t = clinicData.jamTutup ? clinicData.jamTutup.substring(0, 5) : null;
 
       if (b && jamMulai < b) {
-        alert(`Jam Mulai tidak boleh lebih awal dari jam operasional buka (${b})`);
+        setErrorMessage(`Jam Mulai tidak boleh lebih awal dari jam operasional buka (${b})`);
         return;
       }
 
       if (t && jamSelesai > t) {
-        alert(`Jam Selesai tidak boleh lebih lambat dari jam operasional tutup (${t})`);
+        setErrorMessage(`Jam Selesai tidak boleh lebih lambat dari jam operasional tutup (${t})`);
         return;
       }
     }
@@ -90,7 +92,7 @@ export default function ModalPerbaruiJadwal({ isOpen, onClose, jadwalData, onSuc
       } else if (error.response?.data?.message) {
         errorMsg = error.response.data.message;
       }
-      alert(errorMsg);
+      setErrorMessage(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -171,6 +173,12 @@ export default function ModalPerbaruiJadwal({ isOpen, onClose, jadwalData, onSuc
             <X size={28} />
           </button>
         </div>
+
+        {errorMessage && (
+          <div className="mx-10 mt-6 bg-red-50 text-red-500 text-sm p-3 rounded-xl font-medium border border-red-100">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="px-10 py-8">
           <LocalizationProvider dateAdapter={AdapterDayjs}>

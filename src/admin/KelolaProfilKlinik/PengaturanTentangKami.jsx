@@ -6,7 +6,7 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import dayjs from 'dayjs';
 
-const PengaturanTentangKami = ({ data, onSimpan, onHapusClick }) => {
+const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
   const [formData, setFormData] = useState({
     deskripsiPerusahaan: '',
     visi: '',
@@ -54,14 +54,14 @@ const PengaturanTentangKami = ({ data, onSimpan, onHapusClick }) => {
     if (file) {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!allowedTypes.includes(file.type)) {
-        alert("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
+        onError("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
         e.target.value = ''; // Reset input file
         return;
       }
       
       // Validasi ukuran maksimal 4MB (sesuai backend max:4000) -> Wait, user asked for "maksimal 2mb mimes:jpeg,png,jpg"
       if (file.size > 2 * 1024 * 1024) {
-        alert("Ukuran file terlalu besar! Maksimal 2MB mimes:jpeg,png,jpg.");
+        onError("Ukuran file terlalu besar! Maksimal 2MB mimes:jpeg,png,jpg.");
         e.target.value = ''; // Reset input file
         return;
       }
@@ -73,13 +73,13 @@ const PengaturanTentangKami = ({ data, onSimpan, onHapusClick }) => {
   const handleSubmit = () => {
     // Validasi inputan form agar tidak ada yang kosong
     if (!formData.deskripsiPerusahaan || !formData.visi || !formData.misi || !formData.jamBuka || !formData.jamTutup || !formData.nomorCustomerService) {
-      alert("Isi profile klinik sesuai dengan ketentuan inputan!");
+      onError("Isi profile klinik sesuai dengan ketentuan inputan!");
       return;
     }
     
     // Jika menambah profil baru, pastikan foto juga diupload
     if (!data && !formData.fotoPerusahaan) {
-      alert("Isi profile klinik sesuai dengan ketentuan inputan!");
+      onError("Isi profile klinik sesuai dengan ketentuan inputan!");
       return;
     }
 

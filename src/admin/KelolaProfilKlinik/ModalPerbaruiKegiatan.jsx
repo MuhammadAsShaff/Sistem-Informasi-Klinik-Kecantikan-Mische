@@ -11,6 +11,7 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
   });
   const [previewImage, setPreviewImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -53,23 +54,25 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
     if (file) {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!allowedTypes.includes(file.type)) {
-        alert("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
+        setErrorMessage("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
         e.target.value = '';
         return;
       }
       if (file.size > 2 * 1024 * 1024) {
-        alert('Maksimal 2MB mimes:jpeg,png,jpg');
+        setErrorMessage('Maksimal ukuran gambar adalah 2MB.');
         e.target.value = '';
         return;
       }
+      setErrorMessage('');
       setFormData({ ...formData, foto: file });
       setPreviewImage(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async () => {
+    setErrorMessage('');
     if (!formData.namaKegiatan || !formData.deskripsi || !formData.tanggalKegiatan) {
-      alert('Harap isi nama kegiatan, deskripsi, dan tanggal kegiatan!');
+      setErrorMessage('Harap isi nama kegiatan, deskripsi, dan tanggal kegiatan!');
       return;
     }
 
@@ -101,7 +104,7 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
       } else if (error.response?.data?.message) {
         errorMsg = error.response.data.message;
       }
-      alert(errorMsg);
+      setErrorMessage(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -117,6 +120,12 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
             <X size={24} />
           </button>
         </div>
+
+        {errorMessage && (
+          <div className="mx-6 mt-6 bg-red-50 text-red-500 text-sm p-3 rounded-xl font-medium border border-red-100">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="p-6 grid grid-cols-12 gap-8">
           
