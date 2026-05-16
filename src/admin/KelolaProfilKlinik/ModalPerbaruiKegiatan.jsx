@@ -12,6 +12,7 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [hasFileError, setHasFileError] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -55,15 +56,18 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!allowedTypes.includes(file.type)) {
         setErrorMessage("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
+        setHasFileError(true);
         e.target.value = '';
         return;
       }
       if (file.size > 2 * 1024 * 1024) {
         setErrorMessage('Maksimal ukuran gambar adalah 2MB.');
+        setHasFileError(true);
         e.target.value = '';
         return;
       }
       setErrorMessage('');
+      setHasFileError(false);
       setFormData({ ...formData, foto: file });
       setPreviewImage(URL.createObjectURL(file));
     }
@@ -158,7 +162,7 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
             </p>
 
             <div className="mb-4">
-              <label className="block text-[14px] text-black mb-2">Nama Kegiatan</label>
+              <label className="block text-[14px] text-black mb-2">Nama Kegiatan <span className="text-red-500">*</span></label>
               <input 
                 type="text" 
                 name="namaKegiatan"
@@ -167,10 +171,11 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
                 className="w-full border border-gray-300 rounded-md p-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" 
                 placeholder="Nama Kegiatan" 
               />
+              {!formData.namaKegiatan && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
             </div>
 
             <div className="mb-4">
-              <label className="block text-[14px] text-black mb-2">Tanggal Kegiatan</label>
+              <label className="block text-[14px] text-black mb-2">Tanggal Kegiatan <span className="text-red-500">*</span></label>
               <input 
                 type="date" 
                 name="tanggalKegiatan"
@@ -178,10 +183,11 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded-md p-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" 
               />
+              {!formData.tanggalKegiatan && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
             </div>
 
             <div className="mb-2">
-              <label className="block text-[14px] text-black mb-2">Deskripsi Kegiatan</label>
+              <label className="block text-[14px] text-black mb-2">Deskripsi Kegiatan <span className="text-red-500">*</span></label>
               <textarea 
                 name="deskripsi"
                 value={formData.deskripsi}
@@ -189,6 +195,7 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
                 className="w-full border border-gray-300 rounded-md p-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white min-h-[100px] resize-none" 
                 placeholder="Deskripsi Kegiatan" 
               ></textarea>
+              {!formData.deskripsi && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
             </div>
           </div>
 
@@ -197,8 +204,8 @@ const ModalEditKegiatan = ({ isOpen, onClose, id, onSuccess }) => {
         <div className="p-6 border-t border-gray-200 flex justify-end">
           <button 
             onClick={handleSubmit}
-            disabled={isLoading}
-            className={`bg-[#55BC36] hover:bg-[#46a02b] text-white px-6 py-2.5 rounded-md font-medium text-[14px] transition-colors shadow-sm ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isLoading || !formData.namaKegiatan || !formData.deskripsi || !formData.tanggalKegiatan || hasFileError}
+            className={`bg-[#55BC36] hover:bg-[#46a02b] text-white px-6 py-2.5 rounded-md font-medium text-[14px] transition-colors shadow-sm ${isLoading || !formData.namaKegiatan || !formData.deskripsi || !formData.tanggalKegiatan || hasFileError ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {isLoading ? 'Menyimpan...' : 'Simpan Perubahan'}
           </button>

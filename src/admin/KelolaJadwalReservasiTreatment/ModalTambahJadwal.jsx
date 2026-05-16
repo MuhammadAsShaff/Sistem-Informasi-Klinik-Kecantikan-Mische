@@ -178,7 +178,7 @@ export default function ModalTambahJadwal({ isOpen, onClose, onSuccess, existing
             <div className="grid grid-cols-2 gap-x-12 gap-y-8 mb-10">
               
               <div className="flex flex-col gap-2.5">
-                <label className="text-sm font-bold text-[#1A1A1A]">Jam Mulai</label>
+                <label className="text-sm font-bold text-[#1A1A1A]">Jam Mulai <span className="text-red-500">*</span></label>
                 <TimePicker
                   ampm={false}
                   viewRenderers={{
@@ -208,10 +208,11 @@ export default function ModalTambahJadwal({ isOpen, onClose, onSuccess, existing
                     }
                   }}
                 />
+                {!jamMulai && <p className="text-[11px] text-red-500">* Wajib diisi</p>}
               </div>
 
               <div className="flex flex-col gap-2.5">
-                <label className="text-sm font-bold text-[#1A1A1A]">Jam Selesai</label>
+                <label className="text-sm font-bold text-[#1A1A1A]">Jam Selesai <span className="text-red-500">*</span></label>
                 <TimePicker
                   ampm={false}
                   viewRenderers={{
@@ -241,6 +242,7 @@ export default function ModalTambahJadwal({ isOpen, onClose, onSuccess, existing
                     }
                   }}
                 />
+                {!jamSelesai && <p className="text-[11px] text-red-500">* Wajib diisi</p>}
               </div>
 
             </div>
@@ -249,8 +251,8 @@ export default function ModalTambahJadwal({ isOpen, onClose, onSuccess, existing
           <div className="flex justify-end pt-8 border-t border-gray-100">
             <button 
               onClick={handleSubmit}
-              disabled={isLoading}
-              className={`bg-[#7CC052] text-white px-10 py-4 rounded-xl font-bold text-sm hover:bg-[#68a741] transition-all shadow-lg shadow-green-100 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={isLoading || !jamMulai || !jamSelesai}
+              className={`bg-[#7CC052] text-white px-10 py-4 rounded-xl font-bold text-sm hover:bg-[#68a741] transition-all shadow-lg shadow-green-100 ${isLoading || !jamMulai || !jamSelesai ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isLoading ? 'Menyimpan...' : 'Tambah Jadwal'}
             </button>

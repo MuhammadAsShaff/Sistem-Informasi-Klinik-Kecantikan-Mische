@@ -27,7 +27,13 @@ const ProfilForm = ({ user, onUpdate, onToast, onUserUpdated }) => {
   }, [user]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'nomorWa') {
+      const numericValue = value.replace(/\D/g, '');
+      setFormData({ ...formData, [name]: numericValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSimpan = () => {
@@ -128,14 +134,6 @@ const ProfilForm = ({ user, onUpdate, onToast, onUserUpdated }) => {
           </button>
         </div>
 
-        {/* FOTO PROFIL */}
-        <div className="flex flex-col gap-2">
-          <label className="text-black font-semibold text-lg">Foto Profil</label>
-          <input 
-            type="file" 
-            className="w-full file:bg-[#27303f] file:text-white file:border-0 file:rounded file:px-5 file:py-2.5 file:mr-4 file:cursor-pointer file:font-medium text-black font-medium"
-          />
-        </div>
       </div>
 
       <hr className="border-gray-300 mb-8" />

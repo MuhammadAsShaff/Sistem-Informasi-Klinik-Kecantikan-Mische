@@ -32,7 +32,13 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
   }, [userData]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'nomorWa') {
+      const numericValue = value.replace(/\D/g, '');
+      setFormData({ ...formData, [name]: numericValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = () => {
@@ -44,7 +50,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white w-full max-w-[900px] rounded-[24px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
-        
+
         {/* HEADER MODAL */}
         <div className="px-10 py-8 flex items-center justify-between border-b border-gray-100">
           <h2 className="text-2xl font-bold text-[#1A1A1A]">Perbarui User</h2>
@@ -56,16 +62,16 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
         {/* FORM BODY */}
         <div className="px-10 py-8">
           <div className="grid grid-cols-2 gap-x-12 gap-y-8 mb-10">
-            
+
             {/* Nama User */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Nama user</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="nama"
                 value={formData.nama}
                 onChange={handleChange}
-                placeholder="Nama user" 
+                placeholder="Nama user"
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
             </div>
@@ -73,12 +79,12 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
             {/* Email */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Email</label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Email" 
+                placeholder="Email"
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
             </div>
@@ -87,12 +93,12 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Password (Opsional)</label>
               <div className="relative">
-                <input 
-                  type={showPassword ? "text" : "password"} 
+                <input
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Kosongkan jika tidak diubah" 
+                  placeholder="Kosongkan jika tidak diubah"
                   className="w-full px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300 pr-14"
                 />
                 <button
@@ -108,7 +114,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
             {/* Jenis Kelamin */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Jenis Kelamin</label>
-              <select 
+              <select
                 name="jenisKelamin"
                 value={formData.jenisKelamin}
                 onChange={handleChange}
@@ -123,12 +129,12 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
             {/* Alamat */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Alamat</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="alamat"
                 value={formData.alamat}
                 onChange={handleChange}
-                placeholder="Alamat" 
+                placeholder="Alamat"
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
             </div>
@@ -136,7 +142,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
             {/* Role */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Role</label>
-              <select 
+              <select
                 name="role"
                 value={formData.role.toLowerCase()}
                 onChange={handleChange}
@@ -151,8 +157,8 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
             {/* Tanggal Lahir (Date Picker) */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Tanggal Lahir</label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 name="tanggalLahir"
                 value={formData.tanggalLahir}
                 onChange={handleChange}
@@ -163,12 +169,12 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
             {/* Nomor Whatsapp */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Nomor Whatsapp</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="nomorWa"
                 value={formData.nomorWa}
                 onChange={handleChange}
-                placeholder="Nomor Whatsapp" 
+                placeholder="Nomor Whatsapp"
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
               />
             </div>
@@ -177,7 +183,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
 
           {/* FOOTER ACTION */}
           <div className="flex justify-end pt-8 border-t border-gray-100">
-            <button 
+            <button
               onClick={handleSubmit}
               className="bg-[#7CC052] text-white px-10 py-4 rounded-xl font-bold text-sm hover:bg-[#68a741] transition-all shadow-lg shadow-green-100"
             >

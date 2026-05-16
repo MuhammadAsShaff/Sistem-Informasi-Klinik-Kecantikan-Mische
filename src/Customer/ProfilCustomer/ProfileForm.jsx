@@ -65,7 +65,13 @@ const ProfileForm = () => {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        if (name === 'nomorWa') {
+            const numericValue = value.replace(/\D/g, '');
+            setFormData({ ...formData, [name]: numericValue });
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
     // Fungsi Update Profil Utama (Tanpa Password)
@@ -146,12 +152,13 @@ const ProfileForm = () => {
                 <div className="flex flex-col items-center justify-center pt-4">
                     <div className="relative w-44 h-44 aspect-square mb-6">
                         <div className="w-full h-full rounded-full bg-[#d0eef2] p-1 shadow-2xl border-4 border-white overflow-hidden flex items-center justify-center">
-                            <img src="/src/assets/ProfilCustomer.png" alt="Profile" className="w-full h-full object-cover" />
+                            <img 
+                                src={formData.jenisKelamin === 'Laki-laki' ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' : '/src/assets/ProfilCustomer.png'} 
+                                alt="Profile" 
+                                className="w-full h-full object-cover" 
+                            />
                         </div>
                     </div>
-                    <button className="w-full max-w-[200px] bg-white border-2 border-gray-100 text-gray-500 font-extrabold text-base py-3 rounded-2xl shadow-sm">
-                        Pilih Gambar
-                    </button>
                 </div>
 
                 <div className="w-full flex flex-col gap-6">
@@ -283,12 +290,13 @@ const ProfileForm = () => {
                 <div className="w-[280px] lg:w-[320px] flex flex-col items-center justify-start pt-10 shrink-0">
                     <div className="relative w-33 h-33 lg:w-64 lg:h-64 aspect-square mb-10 shrink-0">
                         <div className="w-full h-full rounded-full bg-[#d0eef2] p-1 shadow-2xl border-4 border-white overflow-hidden flex items-center justify-center">
-                            <img src="/src/assets/ProfilCustomer.png" alt="Profile" className="w-full h-full object-cover" />
+                            <img 
+                                src={formData.jenisKelamin === 'Laki-laki' ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' : '/src/assets/ProfilCustomer.png'} 
+                                alt="Profile" 
+                                className="w-full h-full object-cover" 
+                            />
                         </div>
                     </div>
-                    <button className="w-full max-w-[250px] bg-white border-2 border-gray-100 text-gray-500 font-extrabold text-lg py-4 rounded-2xl shadow-sm hover:bg-gray-50 transition-colors">
-                        Pilih Gambar
-                    </button>
                     <button onClick={handleLogout} className="w-full max-w-[180px] mt-4 bg-[#c85a53] text-white font-bold text-sm py-2.5 rounded-lg shadow-md hover:bg-[#b54a43] transition-colors">
                         Log Out
                     </button>

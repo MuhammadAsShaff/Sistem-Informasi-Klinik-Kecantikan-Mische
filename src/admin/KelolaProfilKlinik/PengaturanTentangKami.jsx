@@ -17,6 +17,7 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
     fotoPerusahaan: null
   });
   const [previewImage, setPreviewImage] = useState(null);
+  const [hasFileError, setHasFileError] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -44,7 +45,13 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
   }, [data]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'nomorCustomerService') {
+      const numericValue = value.replace(/\D/g, '');
+      setFormData({ ...formData, [name]: numericValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const fileInputRef = React.useRef(null);
@@ -55,6 +62,7 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
       if (!allowedTypes.includes(file.type)) {
         onError("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
+        setHasFileError(true);
         e.target.value = ''; // Reset input file
         return;
       }
@@ -62,9 +70,11 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
       // Validasi ukuran maksimal 4MB (sesuai backend max:4000) -> Wait, user asked for "maksimal 2mb mimes:jpeg,png,jpg"
       if (file.size > 2 * 1024 * 1024) {
         onError("Ukuran file terlalu besar! Maksimal 2MB mimes:jpeg,png,jpg.");
+        setHasFileError(true);
         e.target.value = ''; // Reset input file
         return;
       }
+      setHasFileError(false);
       setFormData({ ...formData, fotoPerusahaan: file });
       setPreviewImage(URL.createObjectURL(file));
     }
@@ -77,8 +87,8 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
       return;
     }
     
-    // Jika menambah profil baru, pastikan foto juga diupload
-    if (!data && !formData.fotoPerusahaan) {
+    // Jika foto belum ada di database (atau buat baru), wajib upload
+    if (!data?.fotoPerusahaan && !formData.fotoPerusahaan) {
       onError("Isi profile klinik sesuai dengan ketentuan inputan!");
       return;
     }
@@ -89,7 +99,7 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
   return (
     <div className="border border-black p-6 mb-6 rounded-none bg-transparent">
       <div className="mb-4">
-        <label className="block text-[13px] font-semibold text-black mb-1">Deskripsi Klinik</label>
+        <label className="block text-[13px] font-semibold text-black mb-1">Deskripsi Klinik <span className="text-red-500">*</span></label>
         <Editor
           value={formData.deskripsiPerusahaan}
           onChange={(e) => setFormData({ ...formData, deskripsiPerusahaan: e.target.value })}
@@ -98,11 +108,12 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
             className: "[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
           }}
         />
+        {!formData.deskripsiPerusahaan && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-6 mb-4">
         <div>
-          <label className="block text-[13px] font-semibold text-black mb-1">Visi Klinik</label>
+          <label className="block text-[13px] font-semibold text-black mb-1">Visi Klinik <span className="text-red-500">*</span></label>
           <Editor
             value={formData.visi}
             onChange={(e) => setFormData({ ...formData, visi: e.target.value })}
@@ -111,9 +122,10 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
               className: "[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
             }}
           />
+          {!formData.visi && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
         </div>
         <div>
-          <label className="block text-[13px] font-semibold text-black mb-1">Misi Klinik</label>
+          <label className="block text-[13px] font-semibold text-black mb-1">Misi Klinik <span className="text-red-500">*</span></label>
           <Editor
             value={formData.misi}
             onChange={(e) => setFormData({ ...formData, misi: e.target.value })}
@@ -122,13 +134,14 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
               className: "[&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
             }}
           />
+          {!formData.misi && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
         </div>
       </div>
 
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <div className="grid grid-cols-2 gap-6 mb-4">
           <div>
-            <label className="block text-[13px] font-semibold text-black mb-1">Jam Operasional Buka</label>
+            <label className="block text-[13px] font-semibold text-black mb-1">Jam Operasional Buka <span className="text-red-500">*</span></label>
             <TimePicker
               ampm={false}
               viewRenderers={{
@@ -158,9 +171,10 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
                 }
               }}
             />
+            {!formData.jamBuka && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
           </div>
           <div>
-            <label className="block text-[13px] font-semibold text-black mb-1">Jam Operasional Tutup</label>
+            <label className="block text-[13px] font-semibold text-black mb-1">Jam Operasional Tutup <span className="text-red-500">*</span></label>
             <TimePicker
               ampm={false}
               viewRenderers={{
@@ -190,13 +204,15 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
                 }
               }}
             />
+            {!formData.jamTutup && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
           </div>
         </div>
       </LocalizationProvider>
 
       <div className="mb-6">
-        <label className="block text-[13px] font-semibold text-black mb-1">Nomor Customer Service</label>
+        <label className="block text-[13px] font-semibold text-black mb-1">Nomor Customer Service <span className="text-red-500">*</span></label>
         <input name="nomorCustomerService" value={formData.nomorCustomerService} onChange={handleChange} type="text" placeholder="08xx-xxxx-xxxx" className="w-full border border-gray-400 p-2 text-sm focus:outline-none bg-white" />
+        {!formData.nomorCustomerService && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
       </div>
 
       <div className="mb-6">
@@ -215,18 +231,30 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
             onChange={handleFileChange}
             className="w-full file:bg-[#1f2937] file:text-white file:border-black file:rounded-none file:px-3 file:py-1.5 file:cursor-pointer file:text-xs file:font-medium text-xs text-black border border-black p-0"
           />
-          <span className="text-[11px] text-red-500 mt-1">* Maksimal 2MB (Format: jpeg, png, jpg)</span>
+          <span className="text-[11px] text-red-500 mt-1">* Maksimal 2MB (Format: jpeg, png, jpg){(!data?.fotoPerusahaan && !formData.fotoPerusahaan) ? ' - Wajib diisi' : ''}</span>
         </div>
       </div>
 
       <div className="flex flex-row gap-4 mt-4">
         {data ? (
           <>
-            <button onClick={handleSubmit} className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-5 py-2 text-[13px] font-medium shadow-md transition-all active:scale-95">Perbarui</button>
+            <button 
+              onClick={handleSubmit} 
+              disabled={!formData.deskripsiPerusahaan || !formData.visi || !formData.misi || !formData.jamBuka || !formData.jamTutup || !formData.nomorCustomerService || (!data?.fotoPerusahaan && !formData.fotoPerusahaan) || hasFileError}
+              className={`bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-5 py-2 text-[13px] font-medium shadow-md transition-all ${!formData.deskripsiPerusahaan || !formData.visi || !formData.misi || !formData.jamBuka || !formData.jamTutup || !formData.nomorCustomerService || (!data?.fotoPerusahaan && !formData.fotoPerusahaan) || hasFileError ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+            >
+              Perbarui
+            </button>
             <button onClick={onHapusClick} className="bg-[#d9534f] hover:bg-[#c9302c] text-white px-5 py-2 text-[13px] font-medium shadow-md transition-all active:scale-95">Hapus</button>
           </>
         ) : (
-          <button onClick={handleSubmit} className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 text-[13px] font-medium shadow-md transition-all active:scale-95">Tambah Profil</button>
+          <button 
+            onClick={handleSubmit} 
+            disabled={!formData.deskripsiPerusahaan || !formData.visi || !formData.misi || !formData.jamBuka || !formData.jamTutup || !formData.nomorCustomerService || !formData.fotoPerusahaan || hasFileError}
+            className={`bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 text-[13px] font-medium shadow-md transition-all ${!formData.deskripsiPerusahaan || !formData.visi || !formData.misi || !formData.jamBuka || !formData.jamTutup || !formData.nomorCustomerService || !formData.fotoPerusahaan || hasFileError ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+          >
+            Tambah Profil
+          </button>
         )}
       </div>
     </div>
