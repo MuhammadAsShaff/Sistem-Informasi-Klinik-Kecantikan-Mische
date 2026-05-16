@@ -64,6 +64,22 @@ class ProfilePerusahaanController extends Controller
      */
     public function createProfile(Request $request)
     {
+        $pesanEror = [
+            'visi.required' => 'Visi perusahaan wajib diisi.',
+            'misi.required' => 'Misi perusahaan wajib diisi.',
+            'fotoPerusahaan.required' => 'Foto/Logo perusahaan wajib diunggah.',
+            'fotoPerusahaan.image' => 'File harus berupa gambar.',
+            'fotoPerusahaan.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+            'fotoPerusahaan.max' => 'Ukuran gambar maksimal 4MB.',
+            'deskripsiPerusahaan.required' => 'Deskripsi perusahaan wajib diisi.',
+            'nomorCustomerService.required' => 'Nomor Customer Service wajib diisi.',
+            'nomorCustomerService.max' => 'Nomor Customer Service maksimal 16 karakter.',
+            'jamBuka.required' => 'Jam buka wajib diisi.',
+            'jamBuka.date_format' => 'Format jam buka harus HH:MM.',
+            'jamTutup.required' => 'Jam tutup wajib diisi.',
+            'jamTutup.date_format' => 'Format jam tutup harus HH:MM.',
+        ];
+
         $validator = Validator::make($request->all(), [
             'visi' => 'required|string',
             'misi' => 'required|string',
@@ -72,7 +88,7 @@ class ProfilePerusahaanController extends Controller
             'nomorCustomerService' => 'required|string|max:16',
             'jamBuka' => 'required|date_format:H:i',
             'jamTutup' => 'required|date_format:H:i',
-        ]);
+        ], $pesanEror);
 
         if ($validator->fails()) {
             return response()->json([
@@ -129,6 +145,21 @@ class ProfilePerusahaanController extends Controller
         try {
             $profilPerusahaan = ProfilPerusahaan::findOrFail($idProfile);
 
+            $pesanEror = [
+                'visi.required' => 'Visi perusahaan wajib diisi.',
+                'misi.required' => 'Misi perusahaan wajib diisi.',
+                'fotoPerusahaan.image' => 'File harus berupa gambar.',
+                'fotoPerusahaan.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+                'fotoPerusahaan.max' => 'Ukuran gambar maksimal 4MB.',
+                'deskripsiPerusahaan.required' => 'Deskripsi perusahaan wajib diisi.',
+                'nomorCustomerService.required' => 'Nomor Customer Service wajib diisi.',
+                'nomorCustomerService.max' => 'Nomor Customer Service maksimal 16 karakter.',
+                'jamBuka.required' => 'Jam buka wajib diisi.',
+                'jamBuka.date_format' => 'Format jam buka harus HH:MM.',
+                'jamTutup.required' => 'Jam tutup wajib diisi.',
+                'jamTutup.date_format' => 'Format jam tutup harus HH:MM.',
+            ];
+
             $validator = Validator::make($request->all(), [
                 'visi' => 'required|string',
                 'misi' => 'required|string',
@@ -137,7 +168,7 @@ class ProfilePerusahaanController extends Controller
                 'nomorCustomerService' => 'required|string|max:16',
                 'jamBuka' => 'required|date_format:H:i',
                 'jamTutup' => 'required|date_format:H:i',
-            ]);
+            ], $pesanEror);
 
             if ($validator->fails()) {
                 return response()->json([

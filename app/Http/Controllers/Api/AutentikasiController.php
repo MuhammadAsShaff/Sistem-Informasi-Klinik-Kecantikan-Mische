@@ -87,11 +87,17 @@ class AutentikasiController extends Controller
      */
     public function loginUser(Request $request)
     {
+        $pesanEror = [
+            'email.required' => 'Email wajib diisi untuk masuk.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Kata sandi wajib diisi.'
+        ];
+
         // Validasi Input agar tidak Crash 500 bila kosong
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string',
-        ]);
+        ], $pesanEror);
 
         if ($validator->fails()) {
             return response()->json([

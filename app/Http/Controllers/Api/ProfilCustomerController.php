@@ -44,6 +44,18 @@ class ProfilCustomerController extends Controller
         try {
             $user = auth()->user();
 
+            $pesanEror = [
+                'nama.required' => 'Nama lengkap wajib diisi.',
+                'alamat.required' => 'Alamat tidak boleh kosong.',
+                'jenisKelamin.required' => 'Jenis kelamin harus dipilih.',
+                'tanggalLahir.required' => 'Tanggal lahir wajib diisi.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Format email tidak valid.',
+                'email.unique' => 'Email ini sudah terdaftar oleh pengguna lain.',
+                'nomorWa.required' => 'Nomor WhatsApp wajib diisi.',
+                'password.min' => 'Password minimal terdiri dari 8 karakter.'
+            ];
+
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:60',
                 'alamat' => 'required|string|max:60',
@@ -52,7 +64,7 @@ class ProfilCustomerController extends Controller
                 'email' => 'required|email|max:50|unique:user,email,' . $user->idUser . ',idUser',
                 'nomorWa' => 'required|string|max:16',
                 'password' => 'nullable|min:8'
-            ]);
+            ], $pesanEror);
 
             if ($validator->fails()) {
                 return response()->json([

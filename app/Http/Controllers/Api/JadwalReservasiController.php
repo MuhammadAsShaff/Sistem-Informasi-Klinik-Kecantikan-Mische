@@ -71,10 +71,17 @@ class JadwalReservasiController extends Controller
      */
     public function createSchedule(Request $request)
     {
+        $pesanEror = [
+            'jamMulai.required' => 'Jam mulai wajib diisi.',
+            'jamMulai.date_format' => 'Format jam mulai harus HH:MM.',
+            'jamSelesai.required' => 'Jam selesai wajib diisi.',
+            'jamSelesai.date_format' => 'Format jam selesai harus HH:MM.'
+        ];
+
         $validator = Validator::make($request->all(), [
             'jamMulai' => 'required|date_format:H:i',
             'jamSelesai' => 'required|date_format:H:i'
-        ]);
+        ], $pesanEror);
 
         if ($validator->fails()) {
             return response()->json([
@@ -125,10 +132,15 @@ class JadwalReservasiController extends Controller
         try {
             $jadwal = JadwalReservasi::findOrFail($idJadwal);
 
+            $pesanEror = [
+                'jamMulai.date_format' => 'Format jam mulai harus HH:MM.',
+                'jamSelesai.date_format' => 'Format jam selesai harus HH:MM.'
+            ];
+
             $validator = Validator::make($request->all(), [
                 'jamMulai' => 'sometimes|date_format:H:i',
                 'jamSelesai' => 'sometimes|date_format:H:i'
-            ]);
+            ], $pesanEror);
 
             if ($validator->fails()) {
                 return response()->json([

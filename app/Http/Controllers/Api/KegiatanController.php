@@ -67,12 +67,23 @@ class KegiatanController extends Controller
     public function createKegiatan(Request $request)
     {
         try {
+            $pesanEror = [
+                'namaKegiatan.required' => 'Nama kegiatan wajib diisi.',
+                'namaKegiatan.max' => 'Nama kegiatan maksimal 60 karakter.',
+                'deskripsi.required' => 'Deskripsi kegiatan wajib diisi.',
+                'tanggalKegiatan.required' => 'Tanggal kegiatan wajib diisi.',
+                'tanggalKegiatan.date' => 'Format tanggal tidak valid.',
+                'foto.image' => 'File foto harus berupa gambar.',
+                'foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
+                'foto.max' => 'Ukuran foto maksimal 2MB.',
+            ];
+
             $validator = Validator::make($request->all(), [
                 'namaKegiatan' => 'required|string|max:60',
                 'deskripsi' => 'required|string',
                 'tanggalKegiatan' => 'required|date',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-            ]);
+            ], $pesanEror);
 
             if ($validator->fails()) {
                 return response()->json([
@@ -115,12 +126,23 @@ class KegiatanController extends Controller
         try {
             $kegiatan = Kegiatan::findOrFail($idKegiatan);
 
+            $pesanEror = [
+                'namaKegiatan.required' => 'Nama kegiatan wajib diisi.',
+                'namaKegiatan.max' => 'Nama kegiatan maksimal 60 karakter.',
+                'deskripsi.required' => 'Deskripsi kegiatan wajib diisi.',
+                'tanggalKegiatan.required' => 'Tanggal kegiatan wajib diisi.',
+                'tanggalKegiatan.date' => 'Format tanggal tidak valid.',
+                'foto.image' => 'File foto harus berupa gambar.',
+                'foto.mimes' => 'Format gambar harus jpeg, png, jpg, atau gif.',
+                'foto.max' => 'Ukuran foto maksimal 2MB.',
+            ];
+
             $validator = Validator::make($request->all(), [
                 'namaKegiatan' => 'sometimes|required|string|max:60',
                 'deskripsi' => 'sometimes|required|string',
                 'tanggalKegiatan' => 'sometimes|required|date',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-            ]);
+            ], $pesanEror);
 
             if ($validator->fails()) {
                 return response()->json([

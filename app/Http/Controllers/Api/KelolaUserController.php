@@ -66,16 +66,30 @@ class KelolaUserController extends Controller
      */
     public function createUser(Request $request)
     {
+        $pesanEror = [
+            'nama.required' => 'Nama lengkap wajib diisi.',
+            'alamat.required' => 'Alamat tidak boleh kosong.',
+            'jenisKelamin.required' => 'Jenis kelamin harus dipilih.',
+            'tanggalLahir.required' => 'Tanggal lahir wajib diisi.',
+            'role.required' => 'Role pengguna wajib ditentukan.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email ini sudah terdaftar sebelumnya.',
+            'nomorWa.required' => 'Nomor WhatsApp wajib diisi.',
+            'password.required' => 'Password tidak boleh kosong.',
+            'password.min' => 'Password minimal terdiri dari 8 karakter.'
+        ];
+
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:60',
             'alamat' => 'required|string|max:60',
             'jenisKelamin' => 'required|string|max:12',
             'tanggalLahir' => 'required|date',
             'role' => 'required|string|max:12',
-            'email' => 'required|email|unique:user,email|max:50', // sesuaikan dengan nama tabel if not 'user'
+            'email' => 'required|email|unique:user,email|max:50',
             'nomorWa' => 'required|string|max:16',
             'password' => 'required|min:8'
-        ]);
+        ], $pesanEror);
 
         if ($validator->fails()) {
             return response()->json([
@@ -122,6 +136,18 @@ class KelolaUserController extends Controller
         try {
             $user = User::findOrFail($idUser);
 
+            $pesanEror = [
+                'nama.required' => 'Nama lengkap wajib diisi.',
+                'alamat.required' => 'Alamat tidak boleh kosong.',
+                'jenisKelamin.required' => 'Jenis kelamin harus dipilih.',
+                'tanggalLahir.required' => 'Tanggal lahir wajib diisi.',
+                'role.required' => 'Role pengguna wajib ditentukan.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Format email tidak valid.',
+                'email.unique' => 'Email ini sudah terdaftar oleh pengguna lain.',
+                'nomorWa.required' => 'Nomor WhatsApp wajib diisi.'
+            ];
+
             $validator = Validator::make($request->all(), [
                 'nama' => 'sometimes|string|max:60',
                 'alamat' => 'sometimes|string|max:60',
@@ -130,7 +156,7 @@ class KelolaUserController extends Controller
                 'role' => 'sometimes|string|max:12',
                 'email' => 'sometimes|email|unique:user,email,' . $user->idUser . ',idUser',
                 'nomorWa' => 'sometimes|string|max:16',
-            ]);
+            ], $pesanEror);
 
             if ($validator->fails()) {
                 return response()->json([
