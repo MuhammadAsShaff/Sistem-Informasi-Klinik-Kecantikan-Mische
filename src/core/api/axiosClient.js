@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from './endpoints';
+import { getToken, clearAuth } from '@/core/utils/authStorage';
 
 /**
  * Konfigurasi Global Axios Client
@@ -24,7 +25,7 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(
   (config) => {
     // Selalu ambil token terbaru setiap kali request dilakukan
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -52,8 +53,7 @@ axiosClient.interceptors.response.use(
       if (status === 401) {
         console.warn('[Axios] Sesi berakhir atau token tidak valid. Melakukan auto-logout...');
         // Hapus data dari storage
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        clearAuth();
         
         // Arahkan user kembali ke halaman login (mencegah error beruntun)
         // Note: Gunakan cara ini agar bisa terpicu meski dari luar komponen React

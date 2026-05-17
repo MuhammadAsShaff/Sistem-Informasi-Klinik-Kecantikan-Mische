@@ -1,12 +1,17 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { NAV_LINKS } from './constants';
 
-const NavbarLinks = () => {
+/**
+ * Komponen UI murni untuk daftar link navigasi desktop.
+ * Data link diterima dari props — tidak ada logic / import constants di sini.
+ *
+ * @param {{ links: Array }} props
+ */
+const NavbarLinks = ({ links = [] }) => {
   return (
     <nav className="flex items-center gap-3 sm:gap-6 md:gap-10 lg:gap-14 xl:gap-20">
-      {NAV_LINKS.map((link) => (
+      {links.map((link) => (
         <div key={link.href} className="relative group">
           <NavLink
             to={link.href}

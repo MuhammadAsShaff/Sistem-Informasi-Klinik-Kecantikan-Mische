@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import { useFetchJadwal } from "../hooks/useFetchJadwal";
+import { useTambahJadwal } from "../hooks/useTambahJadwal";
+import { useEditJadwal } from "../hooks/useEditJadwal";
+import { useHapusJadwal } from "../hooks/useHapusJadwal";
+
 import Header from "./Header";
 import SearchBar from "./SearchBar";
 import Tabel from "./Tabel";
@@ -7,43 +11,67 @@ import Pagination from "./Pagination";
 import ModalTambahJadwal from "./ModalTambahJadwal";
 import ModalPerbaruiJadwal from "./ModalPerbaruiJadwal";
 import ModalHapusJadwal from "./ModalHapusJadwal";
-import ToastAlert from '@/view/components/ToastAlert';
+import ToastAlert from "@/view/components/ToastAlert";
 
 export default function KelolaJadwalReservasiTreatment() {
-  const [dataJadwal, setDataJadwal] = useState([]);
-  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
-  
-  // State untuk Modal
+  // State seleksi jadwal (untuk edit & hapus)
+  const [selectedJadwal, setSelectedJadwal] = useState(null);
+
+  // State visibilitas modal
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isHapusOpen, setIsHapusOpen] = useState(false);
-  const [selectedJadwal, setSelectedJadwal] = useState(null);
 
-  useEffect(() => {
-    fetchSchedules();
-  }, []);
-
-  const fetchSchedules = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://127.0.0.1:8000/api/admin/schedules', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.data.success) {
-        setDataJadwal(res.data.data);
-      }
-    } catch (error) {
-      console.error('Error fetching schedules:', error);
-      setToast({ isOpen: true, message: 'Gagal memuat jadwal.', type: 'error' });
-    }
+  // State toast notifikasi
+  const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
+  const showToast = (message, type = "success") => {
+    setToast({ isOpen: true, message, type });
   };
 
-  // Handlers
+  // ─── HOOK: READ ───────────────────────────────────────────────
+  const { dataJadwal, isLoading, fetchSchedules } = useFetchJadwal();
+
+  // ─── HOOK: CREATE ─────────────────────────────────────────────
+  const tambahJadwal = useTambahJadwal(
+    dataJadwal,
+    () => {
+      setIsTambahOpen(false);
+      fetchSchedules();
+      showToast("Jadwal berhasil ditambahkan!");
+    },
+    isTambahOpen
+  );
+
+  // ─── HOOK: UPDATE ─────────────────────────────────────────────
+  const editJadwal = useEditJadwal(
+    selectedJadwal,
+    dataJadwal,
+    () => {
+      setIsEditOpen(false);
+      fetchSchedules();
+      showToast("Jadwal berhasil diperbarui!");
+    },
+    isEditOpen
+  );
+
+  // ─── HOOK: DELETE ─────────────────────────────────────────────
+  const hapusJadwal = useHapusJadwal(
+    selectedJadwal,
+    () => {
+      setIsHapusOpen(false);
+      fetchSchedules();
+      showToast("Jadwal berhasil dihapus!");
+    },
+    showToast
+  );
+
+  // Handler buka modal edit
   const handleEdit = (jadwal) => {
     setSelectedJadwal(jadwal);
     setIsEditOpen(true);
   };
 
+  // Handler buka modal hapus
   const handleDelete = (jadwal) => {
     setSelectedJadwal(jadwal);
     setIsHapusOpen(true);
@@ -51,54 +79,49 @@ export default function KelolaJadwalReservasiTreatment() {
 
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen animate-in fade-in duration-700">
-      <ToastAlert isOpen={toast.isOpen} message={toast.message} type={toast.type} onClose={() => setToast({...toast, isOpen: false})} />
+      <ToastAlert
+        isOpen={toast.isOpen}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, isOpen: false })}
+      />
+
       <div className="max-w-7xl mx-auto flex flex-col gap-2">
         <Header />
         <SearchBar onOpenTambah={() => setIsTambahOpen(true)} />
-        
-        <Tabel 
-          data={dataJadwal}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+
+        {isLoading ? (
+          <div className="flex justify-center items-center py-20 text-gray-500 font-bold">
+            Mengambil data dari server...
+          </div>
+        ) : (
+          <Tabel
+            data={dataJadwal}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        )}
 
         <Pagination />
 
         <ModalTambahJadwal
-          isOpen={isTambahOpen} 
+          isOpen={isTambahOpen}
           onClose={() => setIsTambahOpen(false)}
-          existingSchedules={dataJadwal}
-          onSuccess={() => {
-            setIsTambahOpen(false);
-            fetchSchedules();
-            setToast({ isOpen: true, message: 'Jadwal berhasil ditambahkan!', type: 'success' });
-          }}
-        />
-        
-        <ModalPerbaruiJadwal 
-          isOpen={isEditOpen}
-          onClose={() => setIsEditOpen(false)} 
-          existingSchedules={dataJadwal}
-          jadwalData={selectedJadwal}
-          onSuccess={() => {
-            setIsEditOpen(false);
-            fetchSchedules();
-            setToast({ isOpen: true, message: 'Jadwal berhasil diperbarui!', type: 'success' });
-          }}
+          hook={tambahJadwal}
         />
 
-        <ModalHapusJadwal 
+        <ModalPerbaruiJadwal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          hook={editJadwal}
+        />
+
+        <ModalHapusJadwal
           isOpen={isHapusOpen}
           onClose={() => setIsHapusOpen(false)}
-          jadwalData={selectedJadwal}
-          onSuccess={() => {
-            setIsHapusOpen(false);
-            fetchSchedules();
-            setToast({ isOpen: true, message: 'Jadwal berhasil dihapus!', type: 'success' });
-          }}
+          hook={hapusJadwal}
         />
       </div>
     </div>
   );
 }
-

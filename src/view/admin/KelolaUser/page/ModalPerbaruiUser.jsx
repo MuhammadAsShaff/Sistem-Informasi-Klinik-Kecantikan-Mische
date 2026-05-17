@@ -1,49 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { X, Eye, EyeOff } from "lucide-react";
 
-export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit }) {
-  const [formData, setFormData] = useState({
-    nama: "",
-    email: "",
-    password: "", // Ditambahkan untuk update password
-    jenisKelamin: "",
-    alamat: "",
-    role: "",
-    tanggalLahir: "",
-    nomorWa: ""
-  });
-  const [showPassword, setShowPassword] = useState(false);
-
-  // Saat userData berubah (saat tombol Edit ditekan), masukkan datanya ke form
-  useEffect(() => {
-    if (userData) {
-      setFormData({
-        nama: userData.nama || "",
-        email: userData.email || "",
-        password: "", // Kosongkan agar hanya diisi jika ingin diubah
-        jenisKelamin: userData.jenisKelamin || userData.gender || userData.jenis_kelamin || "",
-        alamat: userData.alamat || "",
-        role: userData.role || "",
-        // Karena Laravel sudah mengembalikan format YYYY-MM-DD (contoh: 1991-04-16), kita bisa langsung pakai
-        tanggalLahir: userData.tanggalLahir || userData.birth || userData.tanggal_lahir || "",
-        nomorWa: userData.nomorWa || userData.whatsapp || userData.nomor_whatsapp || userData.no_wa || ""
-      });
-    }
-  }, [userData]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'nomorWa') {
-      const numericValue = value.replace(/\D/g, '');
-      setFormData({ ...formData, [name]: numericValue });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
-
-  const handleSubmit = () => {
-    onSubmit(formData);
-  };
+/**
+ * Modal untuk memperbarui data user.
+ * Semua logic state, populate form, & submit dikelola oleh hook `useEditUser`
+ * yang dipass lewat prop `hook`.
+ */
+export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
+  const { formData, showPassword, setShowPassword, handleChange, handleSubmit } = hook;
 
   if (!isOpen) return null;
 
@@ -154,7 +118,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, userData, onSubmit 
               </select>
             </div>
 
-            {/* Tanggal Lahir (Date Picker) */}
+            {/* Tanggal Lahir */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Tanggal Lahir</label>
               <input

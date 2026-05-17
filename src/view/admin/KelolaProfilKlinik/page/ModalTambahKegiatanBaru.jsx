@@ -1,113 +1,59 @@
-import React, { useState, useRef } from 'react';
-import { X } from 'lucide-react';
-import axios from 'axios';
+import React from "react";
+import { X } from "lucide-react";
 
-const ModalTambahKegiatanBaru = ({ isOpen, onClose, onSuccess }) => {
-  const [formData, setFormData] = useState({
-    namaKegiatan: '',
-    deskripsi: '',
-    tanggalKegiatan: '',
-    foto: null
-  });
-  const [previewImage, setPreviewImage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [hasFileError, setHasFileError] = useState(false);
-  const fileInputRef = useRef(null);
+/**
+ * Modal untuk menambah kegiatan baru — pure UI.
+ * Logic state, validasi file, dan submit dikelola oleh hook `useTambahKegiatan`
+ * via prop `hook`.
+ */
+const ModalTambahKegiatanBaru = ({ isOpen, onClose, hook }) => {
+  const {
+    formData,
+    previewImage,
+    isLoading,
+    errorMessage,
+    hasFileError,
+    fileInputRef,
+    handleChange,
+    handleFileChange,
+    handleSubmit,
+  } = hook;
 
   if (!isOpen) return null;
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-      if (!allowedTypes.includes(file.type)) {
-        setErrorMessage("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
-        setHasFileError(true);
-        e.target.value = '';
-        return;
-      }
-      if (file.size > 2 * 1024 * 1024) {
-        setErrorMessage('Maksimal ukuran gambar adalah 2MB.');
-        setHasFileError(true);
-        e.target.value = '';
-        return;
-      }
-      setErrorMessage('');
-      setHasFileError(false);
-      setFormData({ ...formData, foto: file });
-      setPreviewImage(URL.createObjectURL(file));
-    }
-  };
-
-  const handleSubmit = async () => {
-    setErrorMessage('');
-    if (!formData.namaKegiatan || !formData.deskripsi || !formData.tanggalKegiatan) {
-      setErrorMessage('Harap isi nama kegiatan, deskripsi, dan tanggal kegiatan!');
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const token = localStorage.getItem('token');
-      const payload = new FormData();
-      
-      payload.append('namaKegiatan', formData.namaKegiatan);
-      payload.append('deskripsi', formData.deskripsi);
-      payload.append('tanggalKegiatan', formData.tanggalKegiatan);
-      if (formData.foto) {
-        payload.append('foto', formData.foto);
-      }
-
-      const res = await axios.post('http://127.0.0.1:8000/api/admin/kegiatan', payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (res.data.success) {
-        setFormData({ namaKegiatan: '', deskripsi: '', tanggalKegiatan: '', foto: null });
-        setPreviewImage(null);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-        onSuccess && onSuccess();
-      }
-    } catch (error) {
-      let errorMsg = 'Gagal menambahkan kegiatan. Silakan cek inputan Anda.';
-      if (error.response?.data?.errors) {
-        errorMsg = Object.values(error.response.data.errors)[0][0];
-      } else if (error.response?.data?.message) {
-        errorMsg = error.response.data.message;
-      }
-      setErrorMessage(errorMsg);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const isDisabled =
+    isLoading ||
+    !formData.namaKegiatan ||
+    !formData.deskripsi ||
+    !formData.tanggalKegiatan ||
+    !formData.foto ||
+    hasFileError;
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white w-full max-w-[750px] rounded-[16px] shadow-2xl animate-in fade-in zoom-in duration-300 flex flex-col">
-        
+
+        {/* HEADER */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-[20px] font-bold text-black">Tambah Kegiatan Baru</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors" disabled={isLoading}>
+          <button onClick={onClose} disabled={isLoading} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={24} />
           </button>
         </div>
 
+        {/* ERROR */}
         {errorMessage && (
           <div className="mx-6 mt-6 bg-red-50 text-red-500 text-sm p-3 rounded-xl font-medium border border-red-100">
             {errorMessage}
           </div>
         )}
 
+        {/* BODY */}
         <div className="p-6 grid grid-cols-12 gap-8">
-          
+
+          {/* Kolom Foto */}
           <div className="col-span-5 flex flex-col pt-10 pl-4">
             <p className="text-[14px] text-gray-800 mb-6">Unggah Gambar Kegiatan</p>
-            
             <div className="mb-4">
               <div className="w-full h-32 border border-black flex items-center justify-center text-[13px] font-semibold mb-2 bg-gray-100 overflow-hidden">
                 {previewImage ? (
@@ -117,7 +63,6 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, onSuccess }) => {
                 )}
               </div>
             </div>
-            
             <div className="flex flex-col">
               <input
                 ref={fileInputRef}
@@ -130,54 +75,37 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
+          {/* Kolom Form */}
           <div className="col-span-7 flex flex-col pt-4">
             <div className="mb-5">
               <label className="block text-[14px] text-black mb-2">Nama Kegiatan <span className="text-red-500">*</span></label>
-              <input 
-                type="text" 
-                name="namaKegiatan"
-                value={formData.namaKegiatan}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" 
-                placeholder="Nama Kegiatan" 
-              />
+              <input type="text" name="namaKegiatan" value={formData.namaKegiatan} onChange={handleChange}
+                className="w-full border border-gray-300 rounded-md p-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white"
+                placeholder="Nama Kegiatan" />
               {!formData.namaKegiatan && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
             </div>
-
             <div className="mb-5">
               <label className="block text-[14px] text-black mb-2">Tanggal Kegiatan <span className="text-red-500">*</span></label>
-              <input 
-                type="date" 
-                name="tanggalKegiatan"
-                value={formData.tanggalKegiatan}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" 
-              />
+              <input type="date" name="tanggalKegiatan" value={formData.tanggalKegiatan} onChange={handleChange}
+                className="w-full border border-gray-300 rounded-md p-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white" />
               {!formData.tanggalKegiatan && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
             </div>
-
             <div className="mb-2">
               <label className="block text-[14px] text-black mb-2">Deskripsi Kegiatan <span className="text-red-500">*</span></label>
-              <textarea 
-                name="deskripsi"
-                value={formData.deskripsi}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white min-h-[120px] resize-none" 
-                placeholder="Deskripsi Kegiatan" 
-              ></textarea>
+              <textarea name="deskripsi" value={formData.deskripsi} onChange={handleChange}
+                className="w-full border border-gray-300 rounded-md p-2.5 text-[13px] focus:outline-none focus:ring-1 focus:ring-gray-400 bg-white min-h-[120px] resize-none"
+                placeholder="Deskripsi Kegiatan" />
               {!formData.deskripsi && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
             </div>
           </div>
 
         </div>
 
+        {/* FOOTER */}
         <div className="p-6 border-t border-gray-200 flex justify-end">
-          <button 
-            onClick={handleSubmit}
-            disabled={isLoading || !formData.namaKegiatan || !formData.deskripsi || !formData.tanggalKegiatan || !formData.foto || hasFileError}
-            className={`bg-[#55BC36] hover:bg-[#46a02b] text-white px-6 py-2.5 rounded-md font-medium text-[14px] transition-colors shadow-sm ${isLoading || !formData.namaKegiatan || !formData.deskripsi || !formData.tanggalKegiatan || !formData.foto || hasFileError ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {isLoading ? 'Menambahkan...' : 'Tambah Kegiatan'}
+          <button onClick={handleSubmit} disabled={isDisabled}
+            className={`bg-[#55BC36] hover:bg-[#46a02b] text-white px-6 py-2.5 rounded-md font-medium text-[14px] transition-colors shadow-sm ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}>
+            {isLoading ? "Menambahkan..." : "Tambah Kegiatan"}
           </button>
         </div>
 
