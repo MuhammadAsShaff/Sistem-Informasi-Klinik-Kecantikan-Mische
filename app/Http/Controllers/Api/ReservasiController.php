@@ -1,0 +1,326 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Reservasi;
+use Illuminate\Support\Facades\Validator;
+
+class ReservasiController extends Controller
+{
+    /**
+     * getAllReservations
+     * 
+     * Mengambil seluruh data reservasi. Khusus untuk Admin.
+     */
+    public function getAllReservations()
+    {
+        try {
+            // Relasi ke tabel user, dokter, dan jadwal agar datanya lengkap saat ditarik
+            $reservasi = Reservasi::with(['user', 'dokter', 'jadwal'])->latest()->paginate(10);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mengambil semua data reservasi.',
+                'data' => $reservasi
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data reservasi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * getCustomerReservations
+     * 
+     * Mengambil daftar reservasi khusus milik customer yang sedang login.
+     */
+    public function getCustomerReservations()
+    {
+        try {
+            $user = auth('api')->user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sesi Anda telah kedaluwarsa atau tidak valid. Silakan login kembali.'
+                ], 401);
+            }
+
+            $reservasi = Reservasi::with(['dokter', 'jadwal'])
+                                  ->where('idUser', $user->idUser)
+                                  ->latest()
+                                  ->paginate(10);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mengambil data reservasi Anda.',
+                'data' => $reservasi
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil data reservasi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * getDetailReservationCustomer
+     * 
+     * Menampilkan detail reservasi customer
+     */
+    public function getDetailReservationCustomer($idReservasi)
+    {
+        try {
+            $user = auth('api')->user();
+
+            $reservasi = Reservasi::with(['dokter', 'jadwal'])
+                                  ->where('idReservasi', $idReservasi)
+                                  ->where('idUser', $user->idUser)
+                                  ->first();
+
+            if (!$reservasi) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Detail reservasi tidak ditemukan atau bukan milik Anda.'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mengambil detail reservasi.',
+                'data' => $reservasi
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil detail reservasi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * createReservationCustomer
+     * 
+     * Melakukan pemesanan reservasi oleh customer.
+     */
+    public function createReservationCustomer(Request $request)
+    {
+        try {
+            $user = auth('api')->user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sesi Anda telah kedaluwarsa atau tidak valid. Silakan login kembali.'
+                ], 401);
+            }
+
+            $pesanEror = [
+                'jenisTreatment.required' => 'Jenis treatment wajib dipilih.',
+                'tanggalReservasi.required' => 'Tanggal reservasi wajib dipilih.',
+                'tanggalReservasi.date' => 'Format tanggal reservasi tidak valid.',
+                'idDokter.required' => 'Dokter wajib dipilih.',
+                'idDokter.exists' => 'Dokter yang dipilih tidak ditemukan di sistem.',
+                'idJadwal.required' => 'Jadwal waktu wajib dipilih.',
+                'idJadwal.exists' => 'Jadwal yang dipilih tidak valid.'
+            ];
+
+            $validator = Validator::make($request->all(), [
+                'jenisTreatment' => 'required|string|max:60',
+                'tanggalReservasi' => 'required|date',
+                'idDokter' => 'required|exists:profilDokter,idDokter',
+                'idJadwal' => 'required|exists:jadwalReservasi,idJadwal'
+            ], $pesanEror);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ada kesalahan pada form pemesanan reservasi.',
+                    'errors' => $validator->errors()
+                ], 400);
+            }
+
+            // Mengecek apakah di tanggal dan jadwal (waktu) tersebut, dokter tersebut sudah di-booking oleh orang lain
+            $cekBentrokan = Reservasi::where('tanggalReservasi', $request->tanggalReservasi)
+                                     ->where('idJadwal', $request->idJadwal)
+                                     ->where('idDokter', $request->idDokter)
+                                     ->whereIn('status', ['Menunggu', 'Dikonfirmasi'])
+                                     ->exists();
+
+            if ($cekBentrokan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Jadwal dokter pada waktu tersebut sudah penuh dipesan.'
+                ], 400);
+            }
+
+            $reservasi = Reservasi::create([
+                'namaCustomer' => $user->nama, // Ambil langsung dari profil
+                'nomorWa' => $user->nomorWa,   // Ambil langsung dari profil
+                'jenisTreatment' => $request->jenisTreatment,
+                'tanggalReservasi' => $request->tanggalReservasi,
+                'status' => 'Menunggu', // Default state ketika baru membuat pesanan
+                'idUser' => $user->idUser,
+                'idDokter' => $request->idDokter,
+                'idJadwal' => $request->idJadwal
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pemesanan reservasi berhasil dibuat!',
+                'data' => $reservasi
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat reservasi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * updateStatusReservationCustomer
+     * 
+     * Mengubah status reservasi (Khusus Customer, hanya untuk reservasinya sendiri)
+     */
+    public function updateStatusReservationCustomer(Request $request, $idReservasi)
+    {
+        try {
+            $user = auth('api')->user();
+
+            $pesanEror = [
+                'status.required' => 'Status wajib diisi.',
+                'status.in' => 'Status harus berupa salah satu dari: Menunggu, Dikonfirmasi, Selesai, Dibatalkan.'
+            ];
+
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|string|in:Menunggu,Dikonfirmasi,Selesai,Dibatalkan'
+            ], $pesanEror);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ada kesalahan pada form update status.',
+                    'errors' => $validator->errors()
+                ], 400);
+            }
+
+            $reservasi = Reservasi::where('idReservasi', $idReservasi)
+                                  ->where('idUser', $user->idUser)
+                                  ->first();
+
+            if (!$reservasi) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Reservasi tidak ditemukan atau bukan milik Anda.'
+                ], 404);
+            }
+
+            $reservasi->status = $request->status;
+            $reservasi->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status reservasi Anda berhasil diperbarui.',
+                'data' => $reservasi
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui status reservasi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * updateStatusReservationAdmin
+     * 
+     * Mengubah status reservasi (Admin)
+     */
+    public function updateStatusReservationAdmin(Request $request, $idReservasi)
+    {
+        try {
+            $pesanEror = [
+                'status.required' => 'Status wajib diisi.',
+                'status.in' => 'Status harus berupa salah satu dari: Menunggu, Dikonfirmasi, Selesai, Dibatalkan.'
+            ];
+
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|string|in:Menunggu,Dikonfirmasi,Selesai,Dibatalkan'
+            ], $pesanEror);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ada kesalahan pada form update status.',
+                    'errors' => $validator->errors()
+                ], 400);
+            }
+
+            $reservasi = Reservasi::findOrFail($idReservasi);
+            $reservasi->status = $request->status;
+            $reservasi->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status reservasi berhasil diperbarui.',
+                'data' => $reservasi
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Reservasi tidak ditemukan.'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui status reservasi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * deleteReservation
+     * 
+     * Menghapus data reservasi (Khusus Admin).
+     */
+    public function deleteReservation($idReservasi)
+    {
+        try {
+            $reservasi = Reservasi::findOrFail($idReservasi);
+            
+            $reservasi->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Reservasi berhasil dihapus.'
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Reservasi tidak ditemukan.'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan pada server saat menghapus.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+}

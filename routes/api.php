@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\KelolaUserController;
 use App\Http\Controllers\Api\JadwalReservasiController;
 use App\Http\Controllers\Api\ProfilAdminController;
 use App\Http\Controllers\Api\KegiatanController;
+use App\Http\Controllers\Api\ReservasiController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -46,6 +47,13 @@ Route::prefix('customer')->group(function () {
     Route::prefix('profile')->middleware(['role:customer'])->group(function () {
         Route::get('/', [ProfilCustomerController::class, 'getProfileCustomer'])->name('customer.profile');
         Route::put('/', [ProfilCustomerController::class, 'updateProfileCustomer'])->name('customer.updateProfile');
+    });
+
+    Route::prefix('reservations')->middleware(['role:customer'])->group(function () {
+        Route::get('/', [ReservasiController::class, 'getCustomerReservations'])->name('customer.reservations');
+        Route::get('/{idReservasi}', [ReservasiController::class, 'getDetailReservationCustomer'])->name('customer.detailReservation');
+        Route::post('/', [ReservasiController::class, 'createReservationCustomer'])->name('customer.createReservation');
+        Route::patch('/{idReservasi}', [ReservasiController::class, 'updateStatusReservationCustomer'])->name('customer.updateStatus');
     });
 });
 
@@ -106,5 +114,14 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::post('/', [KegiatanController::class, 'createKegiatan'])->name('admin.createActivity');
         Route::put('/{idKegiatan}', [KegiatanController::class, 'updateKegiatan'])->name('admin.updateActivity'); 
         Route::delete('/{idKegiatan}', [KegiatanController::class, 'deleteKegiatan'])->name('admin.deleteActivity');
+    });
+
+    // ----------------------------------------
+    // RUTE KELOLA RESERVASI (Admin)
+    // ----------------------------------------
+    Route::prefix('reservations')->group(function () {
+        Route::get('/', [ReservasiController::class, 'getAllReservations'])->name('admin.reservations');
+        Route::patch('/{idReservasi}', [ReservasiController::class, 'updateStatusReservationAdmin'])->name('admin.updateStatus');
+        Route::delete('/{idReservasi}', [ReservasiController::class, 'deleteReservation'])->name('admin.deleteReservation');
     });
 });

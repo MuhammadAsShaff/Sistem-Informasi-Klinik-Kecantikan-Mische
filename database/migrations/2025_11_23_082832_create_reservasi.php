@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('reservasi', function (Blueprint $table) {
             $table->increments('idReservasi');
             $table->string('namaCustomer',60);
-            $table->unsignedInteger('nomorWa');
+            $table->string('nomorWa', 16);
             $table->string('jenisTreatment',60);
             $table->date('tanggalReservasi');
             $table->string('status',60);
