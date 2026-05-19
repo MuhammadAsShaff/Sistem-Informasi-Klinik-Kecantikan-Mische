@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
-export default function JadwalSection({ timeSlots, isDoctorAvailable = true }) {
+export default function JadwalSection({ timeSlots, isDoctorAvailable = true, onSlotClick }) {
   // Tampilan jika Dokter TIDAK tersedia
   if (!isDoctorAvailable) {
     return (
@@ -25,15 +25,20 @@ export default function JadwalSection({ timeSlots, isDoctorAvailable = true }) {
           return (
             <div 
               key={index} 
+              onClick={() => {
+                if (isAvailable && onSlotClick) {
+                  onSlotClick(slot);
+                }
+              }}
               className={`relative overflow-hidden rounded-[1.5rem] p-4 flex flex-col items-center justify-center transition-all duration-300 cursor-pointer
                 ${isAvailable 
                   ? 'bg-[#56BC36] text-white shadow-lg hover:shadow-green-200 hover:-translate-y-1' 
                   : 'bg-white border-2 border-gray-100 text-gray-300 opacity-60'
                 }`}
             >
-              <span className="text-xl md:text-2xl font-black mb-1">{slot.time} WIB</span>
-              <div className={`mt-2 px-6 py-1.5 rounded-full text-[0.7rem] font-bold uppercase tracking-wider
-                ${isAvailable ? 'bg-white text-[#56BC36]' : 'bg-gray-200 text-gray-500'}`}
+              <span className="text-xl md:text-2xl font-bold mb-1">{slot.time} WIB</span>
+              <div className={`mt-2 px-6 py-1.5 rounded-full text-[0.7rem] font-medium
+                ${isAvailable ? 'bg-white text-black' : 'bg-gray-200 text-gray-500'}`}
               >
                 {slot.status}
               </div>

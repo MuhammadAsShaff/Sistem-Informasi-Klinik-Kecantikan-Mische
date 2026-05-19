@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import HeaderSection from './HeaderSection';
 import FilterSection from './FilterSection';
 import JadwalSection from './JadwalSection';
+import ModalDetailReservasi from './ModalDetailReservasi';
 
 // INI ADALAH PUSAT HALAMAN RESERVASI
 export default function ReservasiPage() {
@@ -10,6 +11,10 @@ export default function ReservasiPage() {
   const [treatment, setTreatment] = useState("Acne Treatment");
   const [doctor, setDoctor] = useState("dr. Widya");
   const [openDropdown, setOpenDropdown] = useState(null);
+  
+  // MODAL STATE
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   const dropdownRef = useRef(null);
   const dateInputRef = useRef(null);
@@ -67,7 +72,26 @@ export default function ReservasiPage() {
           getHari={getHari} formatTgl={formatTgl} 
           bukaKalender={bukaKalender} dateInputRef={dateInputRef}
         />
-        <JadwalSection timeSlots={timeSlots} isDoctorAvailable={isDoctorAvailable} />
+        <JadwalSection 
+          timeSlots={timeSlots} 
+          isDoctorAvailable={isDoctorAvailable} 
+          onSlotClick={(slot) => {
+            if (slot.status === "Kosong") {
+              setSelectedSlot(slot);
+              setIsModalOpen(true);
+            }
+          }}
+        />
+
+        <ModalDetailReservasi 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          slot={selectedSlot}
+          treatment={treatment}
+          doctor={doctor}
+          date={selectedDate}
+          formatTgl={formatTgl}
+        />
       </div>
     </div>
   );

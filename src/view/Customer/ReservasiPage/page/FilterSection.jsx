@@ -30,7 +30,7 @@ const DropdownItem = ({ label, value, options, isOpen, onToggle, onSelect }) => 
 // --- SUB-KOMPONEN UNTUK INFO KOTAK ---
 const InfoItem = ({ label, value }) => (
   <div className="bg-white rounded-full px-4 py-3 md:py-4 shadow-sm border border-gray-100 flex items-center justify-center">
-    <span className="text-gray-900 text-[10px] md:text-sm text-center font-regular">
+    <span className="text-gray-900 text-sm md:text-base text-center font-regular">
       {label} : <span className="font-bold">{value}</span>
     </span>
   </div>
@@ -64,10 +64,10 @@ export default function FilterSection({
         />
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <div className="relative group" onClick={bukaKalender}>
-          <div className="bg-white rounded-full px-4 py-3 shadow-sm border border-gray-100 flex items-center justify-center gap-2 cursor-pointer hover:border-green-500 h-full">
-            <span className="text-[10px] md:text-sm font-regular text-gray-900">
+          <div className="bg-white rounded-full px-4 py-3 md:py-4 shadow-sm border border-gray-100 flex items-center justify-center gap-2 cursor-pointer hover:border-green-500 h-full">
+            <span className="text-sm md:text-base font-regular text-gray-900">
               Tanggal : <span className="font-bold">{formatTgl(selectedDate)}</span>
             </span>
             <Calendar size={16} className="text-green-500" />
