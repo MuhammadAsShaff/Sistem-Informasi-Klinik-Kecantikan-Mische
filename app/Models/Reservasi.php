@@ -22,7 +22,8 @@ class Reservasi extends Model
         'status',
         'idUser',
         'idDokter',
-        'idJadwal'
+        'idJadwal',
+        'is_rescheduled'
     ];
 
     public function user(){

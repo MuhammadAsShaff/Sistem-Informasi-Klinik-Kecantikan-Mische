@@ -189,28 +189,36 @@ class ReservasiController extends Controller
     }
 
     /**
-     * updateStatusReservationCustomer
+     * rescheduleReservationCustomer
      * 
-     * Mengubah status reservasi (Khusus Customer, hanya untuk reservasinya sendiri)
+     * Mengubah jadwal (reschedule) reservasi (Khusus Customer). Hanya bisa dilakukan 1 kali.
      */
-    public function updateStatusReservationCustomer(Request $request, $idReservasi)
+    public function rescheduleReservationCustomer(Request $request, $idReservasi)
     {
         try {
             $user = auth('api')->user();
 
             $pesanEror = [
-                'status.required' => 'Status wajib diisi.',
-                'status.in' => 'Status harus berupa salah satu dari: Menunggu, Dikonfirmasi, Selesai, Dibatalkan.'
+                'jenisTreatment.required' => 'Jenis treatment wajib diisi.',
+                'tanggalReservasi.required' => 'Tanggal reservasi wajib diisi.',
+                'tanggalReservasi.date' => 'Format tanggal reservasi tidak valid.',
+                'idDokter.required' => 'Dokter wajib dipilih.',
+                'idDokter.exists' => 'Dokter yang dipilih tidak ditemukan.',
+                'idJadwal.required' => 'Jadwal wajib dipilih.',
+                'idJadwal.exists' => 'Jadwal yang dipilih tidak valid.'
             ];
 
             $validator = Validator::make($request->all(), [
-                'status' => 'required|string|in:Menunggu,Dikonfirmasi,Selesai,Dibatalkan'
+                'jenisTreatment' => 'required|string|max:60',
+                'tanggalReservasi' => 'required|date',
+                'idDokter' => 'required|exists:profilDokter,idDokter',
+                'idJadwal' => 'required|exists:jadwalReservasi,idJadwal'
             ], $pesanEror);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Ada kesalahan pada form update status.',
+                    'message' => 'Ada kesalahan pada form perubahan jadwal.',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -226,19 +234,63 @@ class ReservasiController extends Controller
                 ], 404);
             }
 
-            $reservasi->status = $request->status;
+            // Validasi apakah sudah pernah reschedule?
+            if ($reservasi->is_rescheduled) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Perubahan jadwal hanya bisa dilakukan maksimal 1 kali.'
+                ], 403);
+            }
+
+            // Validasi apakah status masih memungkinkan untuk diubah
+            if (!in_array($reservasi->status, ['Menunggu', 'Dikonfirmasi'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Reservasi dengan status ' . $reservasi->status . ' tidak dapat diubah jadwalnya.'
+                ], 400);
+            }
+
+            // Cek bentrokan jadwal baru
+            $cekBentrokan = Reservasi::where('tanggalReservasi', $request->tanggalReservasi)
+                                     ->where('idJadwal', $request->idJadwal)
+                                     ->where('idDokter', $request->idDokter)
+                                     ->whereIn('status', ['Menunggu', 'Dikonfirmasi', 'Menunggu Merubah Jadwal', 'Dikonfirmasi Merubah Jadwal'])
+                                     ->where('idReservasi', '!=', $idReservasi) // kecualikan diri sendiri
+                                     ->exists();
+
+            if ($cekBentrokan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Jadwal dokter pada waktu tersebut sudah penuh dipesan.'
+                ], 400);
+            }
+
+            // Update status string
+            if ($reservasi->status === 'Menunggu') {
+                $reservasi->status = 'Menunggu Merubah Jadwal';
+            } elseif ($reservasi->status === 'Dikonfirmasi') {
+                $reservasi->status = 'Dikonfirmasi Merubah Jadwal';
+            }
+
+            // Update data jadwal
+            $reservasi->jenisTreatment = $request->jenisTreatment;
+            $reservasi->tanggalReservasi = $request->tanggalReservasi;
+            $reservasi->idDokter = $request->idDokter;
+            $reservasi->idJadwal = $request->idJadwal;
+            $reservasi->is_rescheduled = true; // Tandai sudah diubah jadwalnya
+            
             $reservasi->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Status reservasi Anda berhasil diperbarui.',
+                'message' => 'Jadwal reservasi Anda berhasil diubah.',
                 'data' => $reservasi
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal memperbarui status reservasi.',
+                'message' => 'Gagal merubah jadwal reservasi.',
                 'error' => $e->getMessage()
             ], 500);
         }

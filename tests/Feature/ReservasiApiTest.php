@@ -184,7 +184,7 @@ class ReservasiApiTest extends TestCase
                  ->assertJsonPath('data.jenisTreatment', 'Laser Acne');
     }
 
-    public function test_customer_bisa_mengubah_status_reservasinya()
+    public function test_customer_bisa_merubah_jadwal_reservasi_hanya_sekali()
     {
         $customer = null;
         $token = $this->getCustomerToken($customer);
@@ -197,24 +197,42 @@ class ReservasiApiTest extends TestCase
             'nomorWa' => $customer->nomorWa,
             'jenisTreatment' => 'Laser Acne',
             'tanggalReservasi' => Carbon::now()->addDays(2)->format('Y-m-d'),
-            'status' => 'Menunggu',
+            'status' => 'Dikonfirmasi',
             'idUser' => $customer->idUser,
             'idDokter' => $dokter->idDokter,
-            'idJadwal' => $jadwal->idJadwal
+            'idJadwal' => $jadwal->idJadwal,
+            'is_rescheduled' => false
         ]);
 
-        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
-                         ->patchJson("/api/customer/reservations/{$reservasi->idReservasi}", [
-                             'status' => 'Dibatalkan'
-                         ]);
+        // Percobaan pertama merubah jadwal (Harus Berhasil)
+        $response1 = $this->withHeaders(['Authorization' => "Bearer $token"])
+                          ->putJson("/api/customer/reservations/{$reservasi->idReservasi}", [
+                              'jenisTreatment' => 'Laser Acne Update',
+                              'tanggalReservasi' => Carbon::now()->addDays(5)->format('Y-m-d'),
+                              'idDokter' => $dokter->idDokter,
+                              'idJadwal' => $jadwal->idJadwal
+                          ]);
 
-        $response->assertStatus(200)
-                 ->assertJson(['success' => true]);
+        $response1->assertStatus(200)
+                  ->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('reservasi', [
             'idReservasi' => $reservasi->idReservasi,
-            'status' => 'Dibatalkan'
+            'status' => 'Dikonfirmasi Merubah Jadwal',
+            'is_rescheduled' => 1
         ]);
+
+        // Percobaan kedua merubah jadwal (Harus Gagal)
+        $response2 = $this->withHeaders(['Authorization' => "Bearer $token"])
+                          ->putJson("/api/customer/reservations/{$reservasi->idReservasi}", [
+                              'jenisTreatment' => 'Laser Acne Edit Lagi',
+                              'tanggalReservasi' => Carbon::now()->addDays(10)->format('Y-m-d'),
+                              'idDokter' => $dokter->idDokter,
+                              'idJadwal' => $jadwal->idJadwal
+                          ]);
+
+        $response2->assertStatus(403)
+                  ->assertJson(['success' => false, 'message' => 'Perubahan jadwal hanya bisa dilakukan maksimal 1 kali.']);
     }
 
     public function test_admin_bisa_mengubah_status_reservasi()

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('jenisTreatment',60);
             $table->date('tanggalReservasi');
             $table->string('status',60);
+            $table->boolean('is_rescheduled')->default(false);
             $table->unsignedInteger('idUser');
             $table->foreign('idUser')->references('idUser')->on('user')->onDelete('cascade');
             $table->unsignedInteger('idDokter');
