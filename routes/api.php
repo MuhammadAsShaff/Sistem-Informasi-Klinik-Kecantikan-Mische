@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ProfilePerusahaanController;
 use App\Http\Controllers\Api\KelolaUserController;
 use App\Http\Controllers\Api\JadwalReservasiController;
 use App\Http\Controllers\Api\ProfilAdminController;
+use App\Http\Controllers\Api\ProfilDokterController;
 use App\Http\Controllers\Api\KegiatanController;
 use App\Http\Controllers\Api\ReservasiController;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,11 @@ Route::prefix('customer')->group(function () {
     
     Route::get('schedules', [JadwalReservasiController::class, 'getPublicSchedule'])->name('customer.schedules');
 
+    Route::prefix('doctors')->group(function () {
+        Route::get('/', [ProfilDokterController::class, 'getPublicDoctors'])->name('customer.doctors');
+        Route::get('/{idDokter}', [ProfilDokterController::class, 'getDoctorById'])->name('customer.doctorById');
+    });
+
     Route::get('kegiatan', [KegiatanController::class, 'getPublicKegiatan'])->name('customer.activities');
 
     Route::prefix('profile')->middleware(['role:customer'])->group(function () {
@@ -53,7 +59,7 @@ Route::prefix('customer')->group(function () {
         Route::get('/', [ReservasiController::class, 'getCustomerReservations'])->name('customer.reservations');
         Route::get('/{idReservasi}', [ReservasiController::class, 'getDetailReservationCustomer'])->name('customer.detailReservation');
         Route::post('/', [ReservasiController::class, 'createReservationCustomer'])->name('customer.createReservation');
-        Route::patch('/{idReservasi}', [ReservasiController::class, 'updateStatusReservationCustomer'])->name('customer.updateStatus');
+        Route::put('/{idReservasi}', [ReservasiController::class, 'rescheduleReservationCustomer'])->name('customer.rescheduleReservation');
     });
 });
 
@@ -92,6 +98,17 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::get('/', [ProfilePerusahaanController::class, 'getProfile'])->name('admin.clinic');
         Route::put('/{idProfile}', [ProfilePerusahaanController::class, 'updateProfile'])->name('admin.updateProfile');
         Route::delete('/{idProfile}', [ProfilePerusahaanController::class, 'deleteProfile'])->name('admin.deleteProfile');
+    });
+
+    // ----------------------------------------
+    // RUTE KELOLA DOKTER
+    // Prefix turunan: /api/admin/doctors/...
+    // ----------------------------------------
+    Route::prefix('doctors')->group(function () {
+        Route::get('/', [ProfilDokterController::class, 'getAllDoctors'])->name('admin.doctors');
+        Route::post('/', [ProfilDokterController::class, 'createDoctor'])->name('admin.createDoctor');
+        Route::put('/{idDokter}', [ProfilDokterController::class, 'updateDoctor'])->name('admin.updateDoctor');
+        Route::delete('/{idDokter}', [ProfilDokterController::class, 'deleteDoctor'])->name('admin.deleteDoctor');
     });
 
     // ----------------------------------------
