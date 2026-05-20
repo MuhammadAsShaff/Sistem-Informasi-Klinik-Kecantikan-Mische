@@ -16,10 +16,15 @@ const ProtectedRoute = ({ allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // 2. Jika pengguna sudah login, periksa rolenya
+  // 2. Jika pengguna sudah login, periksa rolenya (secara Case-Insensitive)
   if (allowedRoles && allowedRoles.length > 0) {
-    if (!allowedRoles.includes(user.role)) {
-      // Redirection ke home/404 jika ditolak akses
+    const userRoleNormalized = user.role ? user.role.toLowerCase().trim() : "";
+    const hasAccess = allowedRoles.some(
+      (role) => role.toLowerCase().trim() === userRoleNormalized
+    );
+    if (!hasAccess) {
+      console.warn(`[ProtectedRoute] Akses ditolak. Role "${user.role}" tidak cocok dengan role yang diizinkan:`, allowedRoles);
+      // Redirection ke home jika ditolak akses
       return <Navigate to="/" replace />;
     }
   }

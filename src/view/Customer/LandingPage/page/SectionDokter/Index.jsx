@@ -1,8 +1,9 @@
 import React from 'react';
-import { doctors } from './DoctorsData';
+import { useDokterData } from '@/view/Customer/TentangDokter/hooks/useDokterData';
 import DoctorCard from './DoctorCard';
 
 export default function DoctorSection() {
+  const { doctors } = useDokterData();
   return (
     <section className="w-full py-20 bg-white">
       <div className="max-w-7xl mx-auto px-6">

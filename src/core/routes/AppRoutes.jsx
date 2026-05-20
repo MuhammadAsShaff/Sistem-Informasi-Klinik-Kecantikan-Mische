@@ -14,6 +14,8 @@ import EventPage from "@/view/Customer/EventPage/page/eventPage";
 import LoginPage from "@/view/authentication/Login/page/Index";
 import RegistrasiPage from "@/view/authentication/Registrasi/page/Index";
 import TentangKamiPage from "@/view/Customer/TentangKami/page/Index";
+import TentangDokterDropdown from "@/view/Customer/TentangDokter/page/TentangDokterDropdown";
+import DetailDokterPage from "@/view/Customer/TentangDokter/page/DetailDokter";
 import ProfilCustomerPage from "@/view/Customer/ProfilCustomer/page/Index";
 
 // Admin Pages
@@ -26,6 +28,8 @@ import KelolaProfilAdmin from "@/view/admin/KelolaProfilAdmin/page/Index";
 
 // Core Routing & Shared Components
 import ProtectedRoute from "./ProtectedRoute";
+import KelolaProfilDokter from "@/view/admin/KelolaProfilDokter/Index";
+import KelolaPromo from "@/view/admin/KelolaPromo/Index";
 import Page404 from "@/view/components/Page404";
 
 export default function AppRoutes() {
@@ -39,6 +43,8 @@ export default function AppRoutes() {
         <Route path="reservasi" element={<ReservasiPage />} />
         <Route path="event" element={<EventPage />} />
         <Route path="tentang-kami" element={<TentangKamiPage />} />
+        <Route path="tentang-kami/dokter" element={<TentangDokterDropdown />} />
+        <Route path="dokter/:id" element={<DetailDokterPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="registrasi" element={<RegistrasiPage />} />
         
@@ -52,9 +58,12 @@ export default function AppRoutes() {
       <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="produk" element={<AdminProduk />} />
+          <Route path="promo" element={<KelolaPromo />} />
           <Route path="kelolauser" element={<KelolaUser />} />
           <Route path="jadwal" element={<KelolaJadwalReservasiTreatment />} />
+          <Route path="profildokter" element={<KelolaProfilDokter />} />
           <Route path="profilklinik" element={<KelolaProfilKlinik />} />
           <Route path="profiladmin" element={<KelolaProfilAdmin />} />
         </Route>
