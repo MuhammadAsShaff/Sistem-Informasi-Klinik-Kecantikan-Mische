@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\ProfilAdminController;
 use App\Http\Controllers\Api\ProfilDokterController;
 use App\Http\Controllers\Api\KegiatanController;
 use App\Http\Controllers\Api\ReservasiController;
+use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\PromoController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -46,6 +48,15 @@ Route::prefix('customer')->group(function () {
     Route::prefix('doctors')->group(function () {
         Route::get('/', [ProfilDokterController::class, 'getPublicDoctors'])->name('customer.doctors');
         Route::get('/{idDokter}', [ProfilDokterController::class, 'getDoctorById'])->name('customer.doctorById');
+    });
+
+    Route::prefix('event')->group(function () {
+        Route::get('/', [EventController::class, 'getPublicEvents'])->name('customer.events');
+        Route::get('/{idEvent}', [EventController::class, 'getEventById'])->name('customer.eventById');
+    });
+
+    Route::prefix('promo')->group(function () {
+        Route::get('/', [PromoController::class, 'getPublicPromos'])->name('customer.promos');
     });
 
     Route::get('kegiatan', [KegiatanController::class, 'getPublicKegiatan'])->name('customer.activities');
@@ -109,6 +120,28 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::post('/', [ProfilDokterController::class, 'createDoctor'])->name('admin.createDoctor');
         Route::put('/{idDokter}', [ProfilDokterController::class, 'updateDoctor'])->name('admin.updateDoctor');
         Route::delete('/{idDokter}', [ProfilDokterController::class, 'deleteDoctor'])->name('admin.deleteDoctor');
+    });
+
+    // ----------------------------------------
+    // RUTE KELOLA EVENT
+    // Prefix turunan: /api/admin/event/...
+    // ----------------------------------------
+    Route::prefix('event')->group(function () {
+        Route::get('/', [EventController::class, 'getAllEvents'])->name('admin.events');
+        Route::post('/', [EventController::class, 'createEvent'])->name('admin.createEvent');
+        Route::put('/{idEvent}', [EventController::class, 'updateEvent'])->name('admin.updateEvent');
+        Route::delete('/{idEvent}', [EventController::class, 'deleteEvent'])->name('admin.deleteEvent');
+    });
+
+    // ----------------------------------------
+    // RUTE KELOLA PROMO
+    // Prefix turunan: /api/admin/promo/...
+    // ----------------------------------------
+    Route::prefix('promo')->group(function () {
+        Route::get('/', [PromoController::class, 'getAllPromos'])->name('admin.promos');
+        Route::post('/', [PromoController::class, 'createPromo'])->name('admin.createPromo');
+        Route::put('/{idPromo}', [PromoController::class, 'updatePromo'])->name('admin.updatePromo');
+        Route::delete('/{idPromo}', [PromoController::class, 'deletePromo'])->name('admin.deletePromo');
     });
 
     // ----------------------------------------

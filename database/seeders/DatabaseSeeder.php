@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             ProfilePerusahaanSeeder::class,
             JadwalReservasiSeeder::class,
             KegiatanSeeder::class,
+            EventSeeder::class,
+            PromoSeeder::class,
             ReservasiSeeder::class,
         ]);
     }
