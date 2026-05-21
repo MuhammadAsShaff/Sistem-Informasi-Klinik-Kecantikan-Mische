@@ -7,6 +7,8 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Event;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class EventApiTest extends TestCase
 {
@@ -31,13 +33,14 @@ class EventApiTest extends TestCase
     public function test_admin_bisa_menambah_event_baru()
     {
         $token = $this->getAdminToken();
+        Storage::fake('public');
 
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token"
         ])->postJson('/api/admin/event', [
             'nama' => 'Event A',
             'deskripsi' => 'Deskripsi Event A',
-            'foto' => 'foto_a.jpg',
+            'foto' => UploadedFile::fake()->image('foto_a.jpg'),
             'tanggalMulai' => Carbon::now()->format('Y-m-d'),
             'tanggalSelesai' => Carbon::now()->addDays(2)->format('Y-m-d'),
             'lokasi' => 'Klinik Pusat'
@@ -74,6 +77,7 @@ class EventApiTest extends TestCase
     public function test_admin_bisa_memperbarui_event()
     {
         $token = $this->getAdminToken();
+        Storage::fake('public');
         $event = Event::create([
             'nama' => 'Event C',
             'deskripsi' => 'Deskripsi C',
@@ -88,7 +92,7 @@ class EventApiTest extends TestCase
         ])->putJson("/api/admin/event/{$event->idEvent}", [
             'nama' => 'Event C Updated',
             'deskripsi' => 'Deskripsi C',
-            'foto' => 'foto.jpg',
+            'foto' => UploadedFile::fake()->image('foto_c_updated.jpg'),
             'tanggalMulai' => Carbon::now()->format('Y-m-d'),
             'tanggalSelesai' => Carbon::now()->addDays(2)->format('Y-m-d'),
             'lokasi' => 'Klinik Pusat'

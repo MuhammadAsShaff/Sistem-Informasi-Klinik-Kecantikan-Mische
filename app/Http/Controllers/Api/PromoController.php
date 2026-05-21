@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Promo;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class PromoController extends Controller
 {
@@ -65,7 +66,7 @@ class PromoController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'gambar' => 'required|string',
+                'gambar' => 'required|image|mimes:jpeg,png,jpg|max:4000',
                 'namaPromo' => 'required|string|max:60',
                 'jenisPromo' => 'required|string|max:60',
                 'kode' => 'required|string|max:12|unique:promo,kode',
@@ -78,6 +79,10 @@ class PromoController extends Controller
                 'idKategori' => 'required|exists:kategoriProduk,idKategori',
                 'idProduk' => 'required|exists:produkKlinik,idProduk'
             ], [
+                'gambar.required' => 'Gambar promo wajib diunggah.',
+                'gambar.image' => 'File harus berupa gambar.',
+                'gambar.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+                'gambar.max' => 'Ukuran gambar maksimal 4MB.',
                 'kode.unique' => 'Kode promo sudah digunakan.',
                 'idKategori.exists' => 'Kategori produk tidak ditemukan.',
                 'idProduk.exists' => 'Produk klinik tidak ditemukan.',
@@ -92,7 +97,15 @@ class PromoController extends Controller
                 ], 400);
             }
 
-            $promo = Promo::create($request->all());
+            $dataToInsert = $request->all();
+            if ($request->hasFile('gambar')) {
+                $file = $request->file('gambar');
+                $filename = $file->hashName();
+                Storage::disk('public')->put('promo/' . $filename, file_get_contents($file->getPathname()));
+                $dataToInsert['gambar'] = 'promo/' . $filename;
+            }
+
+            $promo = Promo::create($dataToInsert);
 
             return response()->json([
                 'success' => true,
@@ -124,7 +137,7 @@ class PromoController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'gambar' => 'required|string',
+                'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
                 'namaPromo' => 'required|string|max:60',
                 'jenisPromo' => 'required|string|max:60',
                 'kode' => 'required|string|max:12|unique:promo,kode,' . $idPromo . ',idPromo',
@@ -137,6 +150,9 @@ class PromoController extends Controller
                 'idKategori' => 'required|exists:kategoriProduk,idKategori',
                 'idProduk' => 'required|exists:produkKlinik,idProduk'
             ], [
+                'gambar.image' => 'File harus berupa gambar.',
+                'gambar.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+                'gambar.max' => 'Ukuran gambar maksimal 4MB.',
                 'kode.unique' => 'Kode promo sudah digunakan.',
                 'idKategori.exists' => 'Kategori produk tidak ditemukan.',
                 'idProduk.exists' => 'Produk klinik tidak ditemukan.',
@@ -151,7 +167,18 @@ class PromoController extends Controller
                 ], 400);
             }
 
-            $promo->update($request->all());
+            $dataToUpdate = $request->except(['gambar']);
+            if ($request->hasFile('gambar')) {
+                if ($promo->gambar) {
+                    Storage::disk('public')->delete($promo->gambar);
+                }
+                $file = $request->file('gambar');
+                $filename = $file->hashName();
+                Storage::disk('public')->put('promo/' . $filename, file_get_contents($file->getPathname()));
+                $dataToUpdate['gambar'] = 'promo/' . $filename;
+            }
+
+            $promo->update($dataToUpdate);
 
             return response()->json([
                 'success' => true,
@@ -180,6 +207,9 @@ class PromoController extends Controller
                     'success' => false,
                     'message' => 'Promo tidak ditemukan.'
                 ], 404);
+            }
+            if ($promo->gambar) {
+                Storage::disk('public')->delete($promo->gambar);
             }
             $promo->delete();
             return response()->json([

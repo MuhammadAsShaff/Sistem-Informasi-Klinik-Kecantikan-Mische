@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -91,14 +92,17 @@ class EventController extends Controller
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:60',
                 'deskripsi' => 'required|string',
-                'foto' => 'required|string',
+                'foto' => 'required|image|mimes:jpeg,png,jpg|max:4000',
                 'tanggalMulai' => 'required|date',
                 'tanggalSelesai' => 'required|date|after_or_equal:tanggalMulai',
                 'lokasi' => 'required|string|max:100'
             ], [
                 'nama.required' => 'Nama event wajib diisi.',
                 'deskripsi.required' => 'Deskripsi wajib diisi.',
-                'foto.required' => 'Foto event wajib diisi.',
+                'foto.required' => 'Foto event wajib diunggah.',
+                'foto.image' => 'File harus berupa gambar.',
+                'foto.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+                'foto.max' => 'Ukuran gambar maksimal 4MB.',
                 'tanggalMulai.required' => 'Tanggal mulai wajib diisi.',
                 'tanggalSelesai.required' => 'Tanggal selesai wajib diisi.',
                 'tanggalSelesai.after_or_equal' => 'Tanggal selesai harus sama atau setelah tanggal mulai.',
@@ -113,7 +117,15 @@ class EventController extends Controller
                 ], 400);
             }
 
-            $event = Event::create($request->all());
+            $dataToInsert = $request->all();
+            if ($request->hasFile('foto')) {
+                $file = $request->file('foto');
+                $filename = $file->hashName();
+                Storage::disk('public')->put('event/' . $filename, file_get_contents($file->getPathname()));
+                $dataToInsert['foto'] = 'event/' . $filename;
+            }
+
+            $event = Event::create($dataToInsert);
 
             return response()->json([
                 'success' => true,
@@ -147,14 +159,16 @@ class EventController extends Controller
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:60',
                 'deskripsi' => 'required|string',
-                'foto' => 'required|string',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
                 'tanggalMulai' => 'required|date',
                 'tanggalSelesai' => 'required|date|after_or_equal:tanggalMulai',
                 'lokasi' => 'required|string|max:100'
             ], [
                 'nama.required' => 'Nama event wajib diisi.',
                 'deskripsi.required' => 'Deskripsi wajib diisi.',
-                'foto.required' => 'Foto event wajib diisi.',
+                'foto.image' => 'File harus berupa gambar.',
+                'foto.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+                'foto.max' => 'Ukuran gambar maksimal 4MB.',
                 'tanggalMulai.required' => 'Tanggal mulai wajib diisi.',
                 'tanggalSelesai.required' => 'Tanggal selesai wajib diisi.',
                 'tanggalSelesai.after_or_equal' => 'Tanggal selesai harus sama atau setelah tanggal mulai.',
@@ -169,7 +183,18 @@ class EventController extends Controller
                 ], 400);
             }
 
-            $event->update($request->all());
+            $dataToUpdate = $request->except(['foto']);
+            if ($request->hasFile('foto')) {
+                if ($event->foto) {
+                    Storage::disk('public')->delete($event->foto);
+                }
+                $file = $request->file('foto');
+                $filename = $file->hashName();
+                Storage::disk('public')->put('event/' . $filename, file_get_contents($file->getPathname()));
+                $dataToUpdate['foto'] = 'event/' . $filename;
+            }
+
+            $event->update($dataToUpdate);
 
             return response()->json([
                 'success' => true,
@@ -198,6 +223,9 @@ class EventController extends Controller
                     'success' => false,
                     'message' => 'Event tidak ditemukan.'
                 ], 404);
+            }
+            if ($event->foto) {
+                Storage::disk('public')->delete($event->foto);
             }
             $event->delete();
             return response()->json([

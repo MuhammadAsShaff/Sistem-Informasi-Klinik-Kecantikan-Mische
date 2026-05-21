@@ -9,6 +9,8 @@ use App\Models\Promo;
 use App\Models\KategoriProduk;
 use App\Models\ProdukKlinik;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class PromoApiTest extends TestCase
 {
@@ -51,11 +53,12 @@ class PromoApiTest extends TestCase
     {
         $token = $this->getAdminToken();
         [$kategori, $produk] = $this->createDummyDeps();
+        Storage::fake('public');
 
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token"
         ])->postJson('/api/admin/promo', [
-            'gambar' => 'promo.jpg',
+            'gambar' => UploadedFile::fake()->image('promo.jpg'),
             'namaPromo' => 'Promo A',
             'jenisPromo' => 'Diskon',
             'kode' => 'PROMO123',
@@ -109,6 +112,7 @@ class PromoApiTest extends TestCase
     {
         $token = $this->getAdminToken();
         [$kategori, $produk] = $this->createDummyDeps();
+        Storage::fake('public');
         
         $promo = Promo::create([
             'gambar' => 'promo.jpg',
@@ -128,7 +132,7 @@ class PromoApiTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token"
         ])->putJson("/api/admin/promo/{$promo->idPromo}", [
-            'gambar' => 'promo.jpg',
+            'gambar' => UploadedFile::fake()->image('promo_updated.jpg'),
             'namaPromo' => 'Promo C Updated',
             'jenisPromo' => 'Diskon',
             'kode' => 'PROMOC',
