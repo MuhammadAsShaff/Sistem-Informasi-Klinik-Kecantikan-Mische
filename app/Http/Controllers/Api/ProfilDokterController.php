@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ProfilDokter;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class ProfilDokterController extends Controller
 {
@@ -99,7 +100,10 @@ class ProfilDokterController extends Controller
             $pesanEror = [
                 'nama.required' => 'Nama dokter wajib diisi.',
                 'nama.max' => 'Nama maksimal 60 karakter.',
-                'foto.required' => 'Foto wajib diunggah/diisi.',
+                'foto.required' => 'Foto wajib diunggah.',
+                'foto.image' => 'File harus berupa gambar.',
+                'foto.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+                'foto.max' => 'Ukuran gambar maksimal 4MB.',
                 'email.required' => 'Email wajib diisi.',
                 'email.email' => 'Format email tidak valid.',
                 'email.unique' => 'Email ini sudah digunakan oleh dokter lain.',
@@ -108,7 +112,7 @@ class ProfilDokterController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:60',
-                'foto' => 'required|string', // bisa url/path, atau gunakan mimes jika file
+                'foto' => 'required|image|mimes:jpeg,png,jpg|max:4000',
                 'email' => 'required|email|unique:profilDokter,email',
                 'deskripsi' => 'required|string'
             ], $pesanEror);
@@ -121,9 +125,17 @@ class ProfilDokterController extends Controller
                 ], 400);
             }
 
+            $fotoPath = null;
+            if ($request->hasFile('foto')) {
+                $file = $request->file('foto');
+                $filename = $file->hashName();
+                Storage::disk('public')->put('profil_dokter/' . $filename, file_get_contents($file->getPathname()));
+                $fotoPath = 'profil_dokter/' . $filename;
+            }
+
             $dokter = ProfilDokter::create([
                 'nama' => $request->nama,
-                'foto' => $request->foto,
+                'foto' => $fotoPath,
                 'email' => $request->email,
                 'deskripsi' => $request->deskripsi
             ]);
@@ -163,7 +175,9 @@ class ProfilDokterController extends Controller
             $pesanEror = [
                 'nama.required' => 'Nama dokter wajib diisi.',
                 'nama.max' => 'Nama maksimal 60 karakter.',
-                'foto.required' => 'Foto wajib diunggah/diisi.',
+                'foto.image' => 'File harus berupa gambar.',
+                'foto.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+                'foto.max' => 'Ukuran gambar maksimal 4MB.',
                 'email.required' => 'Email wajib diisi.',
                 'email.email' => 'Format email tidak valid.',
                 'email.unique' => 'Email ini sudah digunakan oleh dokter lain.',
@@ -172,7 +186,7 @@ class ProfilDokterController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:60',
-                'foto' => 'required|string', 
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
                 'email' => 'required|email|unique:profilDokter,email,' . $idDokter . ',idDokter',
                 'deskripsi' => 'required|string'
             ], $pesanEror);
@@ -185,11 +199,23 @@ class ProfilDokterController extends Controller
                 ], 400);
             }
 
-            $dokter->nama = $request->nama;
-            $dokter->foto = $request->foto;
-            $dokter->email = $request->email;
-            $dokter->deskripsi = $request->deskripsi;
-            $dokter->save();
+            $dataToUpdate = [
+                'nama' => $request->nama,
+                'email' => $request->email,
+                'deskripsi' => $request->deskripsi
+            ];
+
+            if ($request->hasFile('foto')) {
+                if ($dokter->foto) {
+                    Storage::disk('public')->delete($dokter->foto);
+                }
+                $file = $request->file('foto');
+                $filename = $file->hashName();
+                Storage::disk('public')->put('profil_dokter/' . $filename, file_get_contents($file->getPathname()));
+                $dataToUpdate['foto'] = 'profil_dokter/' . $filename;
+            }
+            
+            $dokter->update($dataToUpdate);
 
             return response()->json([
                 'success' => true,
@@ -223,6 +249,9 @@ class ProfilDokterController extends Controller
                 ], 404);
             }
 
+            if ($dokter->foto) {
+                Storage::disk('public')->delete($dokter->foto);
+            }
             $dokter->delete();
 
             return response()->json([
@@ -234,6 +263,55 @@ class ProfilDokterController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menghapus data dokter.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * updateStatus
+     * 
+     * Mengubah status ketersediaan dokter (Admin)
+     */
+    public function updateStatus(Request $request, $idDokter)
+    {
+        try {
+            $dokter = ProfilDokter::find($idDokter);
+            if (!$dokter) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data dokter tidak ditemukan.'
+                ], 404);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|in:Tersedia,Tidak Tersedia'
+            ], [
+                'status.required' => 'Status wajib diisi.',
+                'status.in' => 'Status hanya boleh Tersedia atau Tidak Tersedia.'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terdapat kesalahan pada inputan Anda.',
+                    'errors' => $validator->errors()
+                ], 400);
+            }
+
+            $dokter->update([
+                'status' => $request->status
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status dokter berhasil diubah menjadi ' . $request->status,
+                'data' => $dokter
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengubah status dokter.',
                 'error' => $e->getMessage()
             ], 500);
         }

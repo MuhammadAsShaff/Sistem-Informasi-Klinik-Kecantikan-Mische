@@ -7,6 +7,8 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\ProfilDokter;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class ProfilDokterApiTest extends TestCase
 {
@@ -31,13 +33,14 @@ class ProfilDokterApiTest extends TestCase
     public function test_admin_bisa_menambah_dokter_baru()
     {
         $token = $this->getAdminToken();
+        Storage::fake('public');
 
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token"
         ])->postJson('/api/admin/doctors', [
-            'nama' => 'Dr. Dummy Baru',
-            'foto' => 'dummy_baru.jpg',
-            'email' => 'dummybaru@dokter.com',
+            'nama' => 'Dr. Budi',
+            'foto' => UploadedFile::fake()->image('foto_budi.jpg'),
+            'email' => 'budi@mische.com',
             'deskripsi' => 'Dokter spesialis kulit'
         ]);
 
@@ -45,7 +48,7 @@ class ProfilDokterApiTest extends TestCase
                  ->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('profilDokter', [
-            'email' => 'dummybaru@dokter.com'
+            'email' => 'budi@mische.com'
         ]);
     }
 
@@ -71,28 +74,29 @@ class ProfilDokterApiTest extends TestCase
     public function test_admin_bisa_memperbarui_data_dokter()
     {
         $token = $this->getAdminToken();
+        Storage::fake('public');
 
         $dokter = ProfilDokter::create([
-            'nama' => 'Dr. A',
-            'foto' => 'a.jpg',
-            'email' => 'a@dokter.com',
-            'deskripsi' => 'Dokter A'
+            'nama' => 'Dr. Cici',
+            'foto' => 'foto_cici.jpg',
+            'email' => 'cici@mische.com',
+            'deskripsi' => 'Dokter'
         ]);
 
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token"
         ])->putJson("/api/admin/doctors/{$dokter->idDokter}", [
-            'nama' => 'Dr. A Updated',
-            'foto' => 'a_updated.jpg',
-            'email' => 'a_updated@dokter.com',
-            'deskripsi' => 'Dokter A Updated'
+            'nama' => 'Dr. Cici Updated',
+            'foto' => UploadedFile::fake()->image('foto_cici_updated.jpg'),
+            'email' => 'cici_new@mische.com',
+            'deskripsi' => 'Dokter spesialis'
         ]);
 
         $response->assertStatus(200)
                  ->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('profilDokter', [
-            'nama' => 'Dr. A Updated'
+            'nama' => 'Dr. Cici Updated'
         ]);
     }
 
@@ -148,5 +152,31 @@ class ProfilDokterApiTest extends TestCase
         $response->assertStatus(200)
                  ->assertJson(['success' => true])
                  ->assertJsonPath('data.nama', 'Dr. D');
+    }
+
+    public function test_admin_bisa_memperbarui_status_dokter()
+    {
+        $token = $this->getAdminToken();
+
+        $dokter = ProfilDokter::create([
+            'nama' => 'Dr. E',
+            'foto' => 'e.jpg',
+            'email' => 'e@dokter.com',
+            'deskripsi' => 'Dokter E'
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token"
+        ])->patchJson("/api/admin/doctors/{$dokter->idDokter}/status", [
+            'status' => 'Tidak Tersedia'
+        ]);
+
+        $response->assertStatus(200)
+                 ->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('profilDokter', [
+            'idDokter' => $dokter->idDokter,
+            'status' => 'Tidak Tersedia'
+        ]);
     }
 }
