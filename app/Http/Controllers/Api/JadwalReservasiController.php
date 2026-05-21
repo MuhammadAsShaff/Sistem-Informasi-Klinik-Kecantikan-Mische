@@ -41,11 +41,28 @@ class JadwalReservasiController extends Controller
      * 
      * Mengambil daftar jadwal dokter yang aktif untuk dilihat pengunjung.
      */
-    public function getPublicSchedule()
+    public function getPublicSchedule(Request $request)
     {
         try {
-            // Bisa menambahkan filter tertentu jika diperlukan (misal yang masih tersedia)
             $jadwal = JadwalReservasi::orderBy('jamMulai', 'asc')->get();
+
+            $tanggal = $request->query('tanggal');
+            $idDokter = $request->query('idDokter');
+
+            if ($tanggal && $idDokter) {
+                // Ambil semua idJadwal yang sudah di-booking pada tanggal dan dokter tersebut
+                $bookedJadwalIds = \App\Models\Reservasi::where('tanggalReservasi', $tanggal)
+                    ->where('idDokter', $idDokter)
+                    ->whereIn('status', ['Menunggu', 'Dikonfirmasi'])
+                    ->pluck('idJadwal')
+                    ->toArray();
+
+                // Format respon jadwal dengan menyisipkan 'status'
+                $jadwal->transform(function ($item) use ($bookedJadwalIds) {
+                    $item->status = in_array($item->idJadwal, $bookedJadwalIds) ? 'Sudah Terisi' : 'Tersedia';
+                    return $item;
+                });
+            }
 
             return response()->json([
                 'success' => true,
