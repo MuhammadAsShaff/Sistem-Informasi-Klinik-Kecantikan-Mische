@@ -119,6 +119,7 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::get('/', [ProfilDokterController::class, 'getAllDoctors'])->name('admin.doctors');
         Route::post('/', [ProfilDokterController::class, 'createDoctor'])->name('admin.createDoctor');
         Route::put('/{idDokter}', [ProfilDokterController::class, 'updateDoctor'])->name('admin.updateDoctor');
+        Route::patch('/{idDokter}/status', [ProfilDokterController::class, 'updateStatus'])->name('admin.updateDoctorStatus');
         Route::delete('/{idDokter}', [ProfilDokterController::class, 'deleteDoctor'])->name('admin.deleteDoctor');
     });
 
