@@ -16,7 +16,8 @@ class ProfilDokter extends Model
         'nama',
         'foto',
         'email',
-        'deskripsi'
+        'deskripsi',
+        'status'
     ];
 
     public function reservasi(){
