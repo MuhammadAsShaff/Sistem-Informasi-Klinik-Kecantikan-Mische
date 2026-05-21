@@ -172,6 +172,7 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
     // ----------------------------------------
     Route::prefix('reservations')->group(function () {
         Route::get('/', [ReservasiController::class, 'getAllReservations'])->name('admin.reservations');
+        Route::post('/', [ReservasiController::class, 'createReservationAdmin'])->name('admin.createReservation');
         Route::patch('/{idReservasi}', [ReservasiController::class, 'updateStatusReservationAdmin'])->name('admin.updateStatus');
         Route::delete('/{idReservasi}', [ReservasiController::class, 'deleteReservation'])->name('admin.deleteReservation');
     });

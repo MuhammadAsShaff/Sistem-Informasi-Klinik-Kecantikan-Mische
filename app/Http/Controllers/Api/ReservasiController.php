@@ -35,6 +35,85 @@ class ReservasiController extends Controller
     }
 
     /**
+     * createReservationAdmin
+     * 
+     * Melakukan pembuatan reservasi oleh admin untuk customer.
+     */
+    public function createReservationAdmin(Request $request)
+    {
+        try {
+            $pesanEror = [
+                'idUser.required' => 'Customer wajib dipilih.',
+                'idUser.exists' => 'Customer tidak ditemukan di sistem.',
+                'jenisTreatment.required' => 'Jenis treatment wajib diisi.',
+                'tanggalReservasi.required' => 'Tanggal reservasi wajib diisi.',
+                'tanggalReservasi.date' => 'Format tanggal reservasi tidak valid.',
+                'idDokter.required' => 'Dokter wajib dipilih.',
+                'idDokter.exists' => 'Dokter yang dipilih tidak ditemukan di sistem.',
+                'idJadwal.required' => 'Jadwal waktu wajib dipilih.',
+                'idJadwal.exists' => 'Jadwal yang dipilih tidak valid.'
+            ];
+
+            $validator = Validator::make($request->all(), [
+                'idUser' => 'required|exists:user,idUser',
+                'jenisTreatment' => 'required|string|max:60',
+                'tanggalReservasi' => 'required|date',
+                'idDokter' => 'required|exists:profilDokter,idDokter',
+                'idJadwal' => 'required|exists:jadwalReservasi,idJadwal',
+                'status' => 'nullable|string|in:Menunggu,Dikonfirmasi,Batal,Selesai'
+            ], $pesanEror);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ada kesalahan pada form pembuatan reservasi.',
+                    'errors' => $validator->errors()
+                ], 400);
+            }
+
+            // Mengecek apakah jadwal sudah dipakai orang lain
+            $cekBentrokan = Reservasi::where('tanggalReservasi', $request->tanggalReservasi)
+                                     ->where('idJadwal', $request->idJadwal)
+                                     ->where('idDokter', $request->idDokter)
+                                     ->whereIn('status', ['Menunggu', 'Dikonfirmasi'])
+                                     ->exists();
+
+            if ($cekBentrokan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Jadwal dokter pada waktu tersebut sudah penuh dipesan.'
+                ], 400);
+            }
+
+            $user = \App\Models\User::find($request->idUser);
+
+            $reservasi = Reservasi::create([
+                'namaCustomer' => $user->nama, // Ambil dari data akun
+                'nomorWa' => $user->nomorWa,   // Ambil dari data akun
+                'jenisTreatment' => $request->jenisTreatment,
+                'tanggalReservasi' => $request->tanggalReservasi,
+                'status' => $request->status ?? 'Dikonfirmasi', // Admin biasa langsung konfirmasi
+                'idUser' => $request->idUser,
+                'idDokter' => $request->idDokter,
+                'idJadwal' => $request->idJadwal
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Reservasi berhasil dibuat oleh Admin!',
+                'data' => $reservasi
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat reservasi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * getCustomerReservations
      * 
      * Mengambil daftar reservasi khusus milik customer yang sedang login.
