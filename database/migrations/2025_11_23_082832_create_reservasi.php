@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('tanggalReservasi');
             $table->string('status',60);
             $table->boolean('is_rescheduled')->default(false);
-            $table->unsignedInteger('idUser');
+            $table->unsignedInteger('idUser')->nullable();
             $table->foreign('idUser')->references('idUser')->on('user')->onDelete('cascade');
             $table->unsignedInteger('idDokter');
             $table->foreign('idDokter')->references('idDokter')->on('profilDokter')->onDelete('cascade');

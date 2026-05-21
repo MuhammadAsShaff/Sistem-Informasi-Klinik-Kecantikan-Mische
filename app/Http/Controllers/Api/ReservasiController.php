@@ -43,8 +43,9 @@ class ReservasiController extends Controller
     {
         try {
             $pesanEror = [
-                'idUser.required' => 'Customer wajib dipilih.',
                 'idUser.exists' => 'Customer tidak ditemukan di sistem.',
+                'namaCustomer.required_without' => 'Nama customer wajib diisi jika bukan member.',
+                'nomorWa.required_without' => 'Nomor WA wajib diisi jika bukan member.',
                 'jenisTreatment.required' => 'Jenis treatment wajib diisi.',
                 'tanggalReservasi.required' => 'Tanggal reservasi wajib diisi.',
                 'tanggalReservasi.date' => 'Format tanggal reservasi tidak valid.',
@@ -55,7 +56,9 @@ class ReservasiController extends Controller
             ];
 
             $validator = Validator::make($request->all(), [
-                'idUser' => 'required|exists:user,idUser',
+                'idUser' => 'nullable|exists:user,idUser',
+                'namaCustomer' => 'required_without:idUser|string|max:60',
+                'nomorWa' => 'required_without:idUser|string|max:16',
                 'jenisTreatment' => 'required|string|max:60',
                 'tanggalReservasi' => 'required|date',
                 'idDokter' => 'required|exists:profilDokter,idDokter',
@@ -85,15 +88,22 @@ class ReservasiController extends Controller
                 ], 400);
             }
 
-            $user = \App\Models\User::find($request->idUser);
+            $namaCustomer = $request->namaCustomer;
+            $nomorWa = $request->nomorWa;
+
+            if ($request->idUser) {
+                $user = \App\Models\User::find($request->idUser);
+                $namaCustomer = $user->nama;
+                $nomorWa = $user->nomorWa;
+            }
 
             $reservasi = Reservasi::create([
-                'namaCustomer' => $user->nama, // Ambil dari data akun
-                'nomorWa' => $user->nomorWa,   // Ambil dari data akun
+                'namaCustomer' => $namaCustomer, 
+                'nomorWa' => $nomorWa,   
                 'jenisTreatment' => $request->jenisTreatment,
                 'tanggalReservasi' => $request->tanggalReservasi,
                 'status' => $request->status ?? 'Dikonfirmasi', // Admin biasa langsung konfirmasi
-                'idUser' => $request->idUser,
+                'idUser' => $request->idUser, // Akan bernilai null jika tidak diisi
                 'idDokter' => $request->idDokter,
                 'idJadwal' => $request->idJadwal
             ]);
