@@ -7,10 +7,11 @@ import AdminLayout from "@/view/admin/AdminLayout";
 
 // Customer Pages
 import LandingPage from "@/view/Customer/LandingPage/page/landingPage";
-import PromoPage from "@/view/Customer/promoPage/page/promoPage";
-import ProdukPage from "@/view/Customer/produkPage/page/produkPage";
+import HalamanPromo from "@/view/Customer/HalamanPromo/Index";
+import PromoDetail from "@/view/Customer/HalamanPromo/page/PromoDetail";
 import ReservasiPage from "@/view/Customer/ReservasiPage/page/Index";
-import EventPage from "@/view/Customer/EventPage/page/eventPage";
+import HalamanEvent from "@/view/Customer/HalamanEvent/Index";
+import EventDetail from "@/view/Customer/HalamanEvent/page/EventDetail";
 import LoginPage from "@/view/authentication/Login/page/Index";
 import RegistrasiPage from "@/view/authentication/Registrasi/page/Index";
 import TentangKamiPage from "@/view/Customer/TentangKami/page/Index";
@@ -30,6 +31,7 @@ import KelolaProfilAdmin from "@/view/admin/KelolaProfilAdmin/page/Index";
 import ProtectedRoute from "./ProtectedRoute";
 import KelolaProfilDokter from "@/view/admin/KelolaProfilDokter/Index";
 import KelolaPromo from "@/view/admin/KelolaPromo/Index";
+import KelolaEvent from "@/view/admin/KelolaEvent/Index";
 import Page404 from "@/view/components/Page404";
 
 export default function AppRoutes() {
@@ -38,10 +40,11 @@ export default function AppRoutes() {
       {/* ================= CUSTOMER ROUTES ================= */}
       <Route path="/" element={<CustomerLayout />}>
         <Route index element={<LandingPage />} /> 
-        <Route path="promo" element={<PromoPage />} />
-        <Route path="produk" element={<ProdukPage />} />
+        <Route path="promo" element={<HalamanPromo />} />
+        <Route path="promo/:id" element={<PromoDetail />} />
         <Route path="reservasi" element={<ReservasiPage />} />
-        <Route path="event" element={<EventPage />} />
+        <Route path="event" element={<HalamanEvent />} />
+        <Route path="event/:id" element={<EventDetail />} />
         <Route path="tentang-kami" element={<TentangKamiPage />} />
         <Route path="tentang-kami/dokter" element={<TentangDokterDropdown />} />
         <Route path="dokter/:id" element={<DetailDokterPage />} />
@@ -61,6 +64,7 @@ export default function AppRoutes() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="produk" element={<AdminProduk />} />
           <Route path="promo" element={<KelolaPromo />} />
+          <Route path="event" element={<KelolaEvent />} />
           <Route path="kelolauser" element={<KelolaUser />} />
           <Route path="jadwal" element={<KelolaJadwalReservasiTreatment />} />
           <Route path="profildokter" element={<KelolaProfilDokter />} />

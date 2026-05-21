@@ -21,6 +21,7 @@ export const NAV_LINKS = [
     subItems: [
       { label: "Cabang", href: "/tentang-kami/cabang" },
       { label: "Kritik & Saran", href: "/tentang-kami/kritik-saran" },
+      { label: "Tentang Dokter", href: "/tentang-kami/dokter" },
     ],
   },
 ];

@@ -103,7 +103,7 @@ export default function ModalDetailReservasi({
 
             {/* Pilih Jenis Treatment */}
             <div className="space-y-3 pt-2">
-              <label className="text-gray-800 text-sm md:text-base font-medium pl-2">Pilih Jenis Treatmen Kamu</label>
+              <label className="text-gray-800 text-sm md:text-base font-medium pl-2">Pilih Jenis Treatment Kamu</label>
               <div className="bg-white rounded-full px-6 py-4 shadow-sm border border-gray-100 text-center font-bold text-gray-900 text-sm md:text-base">
                 {treatment}
               </div>

@@ -1,23 +1,50 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import NavbarActions from './NavbarActions';
+import NavbarLogo from './NavbarLogo';
 
 /**
- * Komponen UI murni untuk drawer/slider navigasi mobile.
+ * Komponen UI murni untuk navigasi mobile (Header & Drawer Slider).
  * Semua state & data diterima dari props — tidak ada logic di sini.
  *
  * @param {{
  *   isOpen        : boolean,
+ *   onOpen        : () => void,
  *   onClose       : () => void,
  *   links         : Array,
  *   isLoggedIn    : boolean,
  *   isAdmin       : boolean,
  * }} props
  */
-const NavbarMobile = ({ isOpen, onClose, links = [], isLoggedIn, isAdmin }) => {
+const NavbarMobile = ({ isOpen, onOpen, onClose, links = [], isLoggedIn, isAdmin }) => {
   return (
-    <>
+    <div className="block md:hidden w-full">
+      {/* ================================================================== */}
+      {/* 1. HEADER MOBILE (Logo & Hamburger)                                */}
+      {/* ================================================================== */}
+      <div className="flex h-16 w-full items-center justify-between px-4 sm:h-[84px] sm:px-6">
+        
+        {/* LOGO */}
+        <div className="flex-none">
+          <NavbarLogo />
+        </div>
+
+        {/* TOMBOL HAMBURGER */}
+        <div className="flex items-center">
+          <button
+            onClick={onOpen}
+            className="p-2 text-gray-800 hover:text-[#56BC36] transition-colors"
+          >
+            <Menu className="w-8 h-8 md:w-7 md:h-7" />
+          </button>
+        </div>
+      </div>
+
+      {/* ================================================================== */}
+      {/* 2. DRAWER SLIDER MOBILE                                            */}
+      {/* ================================================================== */}
+      
       {/* Overlay (Layar Hitam Transparan) */}
       <div
         className={`fixed inset-0 bg-black/60 z-[60] transition-opacity duration-300 ${
@@ -94,7 +121,7 @@ const NavbarMobile = ({ isOpen, onClose, links = [], isLoggedIn, isAdmin }) => {
           </div>
         </nav>
       </div>
-    </>
+    </div>
   );
 };
 

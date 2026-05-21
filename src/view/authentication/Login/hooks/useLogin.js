@@ -68,26 +68,62 @@ export function useLogin(navigate) {
     try {
       const res = await axiosClient.post(endpoints.auth.login, { email, password });
 
-      if (res.data.success) {
+      // Menangani berbagai kemungkinan struktur response backend Laravel
+      const hasToken = res.data.token || res.data.access_token || res.data.data?.token;
+      const isSuccess = res.data.success !== false; // true jika success tidak eksplisit bernilai false
+
+      if (hasToken && isSuccess) {
         // Reset rate limit (login_attempts & lockout bukan bagian auth session)
         setAttempts(0);
         localStorage.removeItem("login_attempts");
         localStorage.removeItem("login_lockout_time");
 
-        const token = res.data.token;
-
-        // Ambil profil untuk menentukan role, lalu simpan sekaligus via saveAuth
-        try {
-          const profileRes = await axiosClient.get(endpoints.auth.me);
-          if (profileRes.data.success) {
-            const userData = profileRes.data.data;
-            saveAuth(token, userData); // simpan token + user + dispatch event
-            navigate(userData.role === "admin" ? "/admin" : "/");
-          }
-        } catch (profileError) {
-          console.error("Gagal mengambil profil/role:", profileError);
-          navigate("/");
+        const token = res.data.token || res.data.access_token || res.data.data?.token;
+        
+        // Mengekstrak objek user secara presisi dari berbagai kemungkinan nesting
+        let userData = null;
+        if (res.data.user && res.data.user.role) {
+          userData = res.data.user;
+        } else if (res.data.data?.user && res.data.data.user.role) {
+          userData = res.data.data.user;
+        } else if (res.data.data && res.data.data.role) {
+          userData = res.data.data;
+        } else if (res.data.role) {
+          userData = res.data;
         }
+
+        // Jika data user sudah lengkap ditemukan beserta rolenya
+        if (userData && userData.role) {
+          saveAuth(token, userData);
+          navigate(userData.role === "admin" ? "/admin" : "/");
+        } else {
+          // Simpan token ke localStorage terlebih dahulu agar request interceptor bisa menggunakannya
+          localStorage.setItem("token", token);
+
+          // Jika data user tidak dikembalikan di login, ambil via endpoint /auth/me
+          try {
+            const profileRes = await axiosClient.get(endpoints.auth.me, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+            
+            const fetchedUser = profileRes.data.data || profileRes.data.user || profileRes.data;
+            if (fetchedUser && fetchedUser.role) {
+              saveAuth(token, fetchedUser);
+              navigate(fetchedUser.role === "admin" ? "/admin" : "/");
+            } else {
+              setErrorMessage("Gagal memproses role pengguna dari server.");
+            }
+          } catch (profileError) {
+            console.error("Gagal mengambil profil/role:", profileError);
+            setErrorMessage("Koneksi berhasil, namun gagal memverifikasi data profil.");
+          }
+        }
+      } else {
+        // Jika server mengembalikan 200 OK tetapi success: false
+        const msg = res.data.message || "Email atau password yang Anda masukkan salah.";
+        setErrorMessage(msg);
       }
     } catch (error) {
       console.error("Login error:", error);

@@ -25,7 +25,7 @@ export default function AdminNavbar() {
     { name: "Kelola Promo", path: "/admin/promo", icon: <Ticket size={20} /> },
     { name: "Kelola Event", path: "/admin/event", icon: <Calendar size={20} /> },
     { name: "Data Penjualan", path: "/admin/penjualan", icon: <LineChart size={20} /> },
-    { name: "Kelola Profil Dokter", path: "/admin/profil-dokter", icon: <UserRound size={20} /> },
+    { name: "Kelola Profil Dokter", path: "/admin/profildokter", icon: <UserRound size={20} /> },
     { name: "Kelola User", path: "/admin/kelolauser", icon: <Users size={20} /> },
     { name: "Kelola Reservasi Treatment", path: "/admin/reservasi", icon: <ClipboardList size={20} /> },
     { name: "Kelola Jadwal Reservasi Treatment", path: "/admin/jadwal", icon: <Clock size={20} /> },
