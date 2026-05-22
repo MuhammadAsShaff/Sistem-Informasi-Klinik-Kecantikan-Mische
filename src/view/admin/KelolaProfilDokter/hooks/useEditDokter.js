@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import axiosClient from "@/core/api/axiosClient";
+import { endpoints, STORAGE_BASE_URL } from "@/core/api/endpoints";
 
 export function useEditDokter(selectedDokter, onSuccess, showToast) {
   const [formData, setFormData] = useState({
@@ -13,11 +15,15 @@ export function useEditDokter(selectedDokter, onSuccess, showToast) {
 
   useEffect(() => {
     if (selectedDokter) {
+      const fullImageUrl = selectedDokter.foto && !selectedDokter.foto.startsWith('http') 
+        ? `${STORAGE_BASE_URL}${selectedDokter.foto}`
+        : (selectedDokter.foto || "");
+
       setFormData({
-        name: selectedDokter.name.replace("Dr. ", ""),
-        email: selectedDokter.email || `${selectedDokter.name.toLowerCase().replace("dr. ", "").replace(/ /g, "")}@gmail.com`,
-        description: selectedDokter.description || "",
-        image: selectedDokter.image || "",
+        name: selectedDokter.nama ? selectedDokter.nama.replace("Dr. ", "") : "",
+        email: selectedDokter.email || "",
+        description: selectedDokter.deskripsi || "",
+        image: fullImageUrl,
         status: selectedDokter.status || "Tersedia",
       });
     }
@@ -39,6 +45,7 @@ export function useEditDokter(selectedDokter, onSuccess, showToast) {
         setFormData((prev) => ({
           ...prev,
           image: reader.result,
+          imageFile: file,
         }));
       };
       reader.readAsDataURL(file);
@@ -53,35 +60,35 @@ export function useEditDokter(selectedDokter, onSuccess, showToast) {
     }
 
     setIsSubmitting(true);
+    setError("");
+
     try {
-      const stored = localStorage.getItem("mische_doctors");
-      let docs = [];
-      try {
-        docs = stored ? JSON.parse(stored) : [];
-      } catch (parseErr) {
-        docs = [];
+      const data = new FormData();
+      data.append('nama', formData.name.startsWith("Dr. ") ? formData.name : `Dr. ${formData.name.toUpperCase()}`);
+      data.append('email', formData.email);
+      data.append('deskripsi', formData.description);
+      
+      if (formData.imageFile) {
+        data.append('foto', formData.imageFile);
       }
       
-      const updatedDocs = docs.map((doc) => {
-        if (doc.id.toString() === selectedDokter.id.toString()) {
-          return {
-            ...doc,
-            name: formData.name.startsWith("Dr. ") ? formData.name : `Dr. ${formData.name.toUpperCase()}`,
-            email: formData.email,
-            description: formData.description,
-            image: formData.image || doc.image,
-            status: formData.status || "Tersedia",
-          };
-        }
-        return doc;
-      });
+      // Method spoofing for Laravel PUT request with multipart/form-data
+      data.append('_method', 'PUT');
 
-      localStorage.setItem("mische_doctors", JSON.stringify(updatedDocs));
+      const docId = selectedDokter.idDokter || selectedDokter.id;
+
+      await axiosClient.post(`${endpoints.admin.doctors}/${docId}`, data);
       
       showToast("Berhasil memperbarui profil dokter!", "success");
       if (onSuccess) onSuccess();
     } catch (err) {
-      setError("Gagal memperbarui data.");
+      console.error(err);
+      if (err.response && err.response.data && err.response.data.errors) {
+        const messages = Object.values(err.response.data.errors).flat().join(" ");
+        setError(messages);
+      } else {
+        setError(err.response?.data?.message || "Gagal memperbarui data.");
+      }
       showToast("Gagal memperbarui profil dokter.", "error");
     } finally {
       setIsSubmitting(false);

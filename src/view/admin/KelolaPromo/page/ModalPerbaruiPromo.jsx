@@ -49,8 +49,8 @@ export default function ModalPerbaruiPromo({
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Nama Promo</label>
                 <input
                   type="text"
-                  name="nama"
-                  value={formData.nama}
+                  name="namaPromo"
+                  value={formData.namaPromo}
                   onChange={handleInputChange}
                   placeholder="Nama Promo"
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors"
@@ -61,16 +61,15 @@ export default function ModalPerbaruiPromo({
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Pilih Kategori Produk</label>
                 <select
-                  name="kategoriProduk"
-                  value={formData.kategoriProduk}
+                  name="idKategori"
+                  value={formData.idKategori}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors bg-white"
                 >
-                  <option value="">Pilih Kategori Produk</option>
-                  <option value="Skincare">Skincare</option>
-                  <option value="Treatment">Treatment</option>
-                  <option value="Bodycare">Bodycare</option>
-                  <option value="Haircare">Haircare</option>
+                  <option value="1">Skincare</option>
+                  <option value="2">Treatment</option>
+                  <option value="3">Bodycare</option>
+                  <option value="4">Haircare</option>
                 </select>
                 <p className="text-xs text-red-500 mt-1">*Pilih kategori produk bila promo berdasarkan kategori produk</p>
               </div>
@@ -133,17 +132,16 @@ export default function ModalPerbaruiPromo({
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Pilih Produk</label>
                 <select
-                  name="produk"
-                  value={formData.produk}
+                  name="idProduk"
+                  value={formData.idProduk}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors bg-white"
                 >
-                  <option value="">Pilih Produk</option>
-                  <option value="Facial Wash">Facial Wash</option>
-                  <option value="Serum Acne">Serum Acne</option>
-                  <option value="Day Cream">Day Cream</option>
-                  <option value="Sunscreen">Sunscreen</option>
-                  <option value="Laser Treatment">Laser Treatment</option>
+                  <option value="1">Facial Wash</option>
+                  <option value="2">Serum Acne</option>
+                  <option value="3">Day Cream</option>
+                  <option value="4">Sunscreen</option>
+                  <option value="5">Laser Treatment</option>
                 </select>
                 <p className="text-xs text-red-500 mt-1">*Pilih produk bila promo berdasarkan produk</p>
               </div>
@@ -164,8 +162,8 @@ export default function ModalPerbaruiPromo({
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Kode Promo</label>
                 <input
                   type="text"
-                  name="kodePromo"
-                  value={formData.kodePromo}
+                  name="kode"
+                  value={formData.kode}
                   onChange={handleInputChange}
                   placeholder="Kode Promo"
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors"
@@ -183,6 +181,18 @@ export default function ModalPerbaruiPromo({
                   placeholder="Diskon"
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Gambar Promo (Kosongkan jika tidak diubah)</label>
+                <input
+                  type="file"
+                  name="gambar"
+                  accept="image/jpeg, image/png, image/jpg"
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors bg-white"
+                />
+                <p className="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG. Max: 4MB.</p>
               </div>
             </div>
 

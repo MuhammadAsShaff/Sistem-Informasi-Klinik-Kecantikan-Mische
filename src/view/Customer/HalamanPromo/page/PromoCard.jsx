@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
 export default function PromoCard({ promo }) {
   const navigate = useNavigate();
-  const isActive = promo.status === "Aktif";
+  // Status dari backend mungkin integer (1/0) atau boolean atau string
+  const isActive = promo.status === "Aktif" || promo.status === 1 || promo.status === true;
 
   // Format tanggal untuk tampilan (misal: 24 Nov 2025)
   const formatTanggal = (dateString) => {
@@ -14,7 +16,7 @@ export default function PromoCard({ promo }) {
 
   return (
     <div 
-      onClick={() => navigate(`/promo/${promo.id}`)}
+      onClick={() => navigate(`/promo/${promo.idPromo || promo.id}`)}
       className="bg-white rounded-tl-[30px] rounded-br-[30px] shadow-sm hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col group relative border border-gray-100"
     >
       {/* Ribbon */}
@@ -34,16 +36,19 @@ export default function PromoCard({ promo }) {
 
       {/* Image Area */}
       <div className="w-full h-[200px] bg-gray-100 relative overflow-hidden">
-        {/* Placeholder gradient as image fallback for now */}
-        <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-green-50 flex flex-col items-center justify-center p-6 text-center">
-           <h3 className="text-4xl font-black text-green-600 mb-2 drop-shadow-sm opacity-50">{promo.diskon || "PROMO"}</h3>
-           <p className="text-green-800 font-bold opacity-70 bg-white/50 px-4 py-1 rounded-full text-sm">Mische Aesthetic Clinic</p>
-        </div>
+        {promo.gambar ? (
+          <img src={promo.gambar.startsWith('http') ? promo.gambar : `${STORAGE_BASE_URL}${promo.gambar}`} alt={promo.namaPromo} className="w-full h-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-green-50 flex flex-col items-center justify-center p-6 text-center">
+             <h3 className="text-4xl font-black text-green-600 mb-2 drop-shadow-sm opacity-50">{promo.diskon || "PROMO"}</h3>
+             <p className="text-green-800 font-bold opacity-70 bg-white/50 px-4 py-1 rounded-full text-sm">Mische Aesthetic Clinic</p>
+          </div>
+        )}
       </div>
 
       {/* Content Area */}
       <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-xl font-bold text-black mb-2 line-clamp-1">{promo.nama}</h3>
+        <h3 className="text-xl font-bold text-black mb-2 line-clamp-1">{promo.namaPromo || promo.nama}</h3>
         <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-6 flex-grow">
           {promo.deskripsi}
         </p>

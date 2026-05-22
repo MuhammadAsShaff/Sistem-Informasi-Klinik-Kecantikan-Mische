@@ -9,17 +9,20 @@ export default function ModalPerbaruiEvent({ isOpen, onClose, refetch, showToast
     lokasi: '',
     tanggalMulai: '',
     tanggalSelesai: '',
-    deskripsi: ''
+    deskripsi: '',
+    foto: null
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (event) {
       setFormData({
         nama: event.nama || '',
         lokasi: event.lokasi || '',
-        tanggalMulai: event.tanggalMulai || '',
-        tanggalSelesai: event.tanggalSelesai || '',
-        deskripsi: event.deskripsi || ''
+        tanggalMulai: event.tanggalMulai ? event.tanggalMulai.split(' ')[0] : '', // Extract date part if needed
+        tanggalSelesai: event.tanggalSelesai ? event.tanggalSelesai.split(' ')[0] : '',
+        deskripsi: event.deskripsi || '',
+        foto: null
       });
     }
   }, [event]);
@@ -27,18 +30,37 @@ export default function ModalPerbaruiEvent({ isOpen, onClose, refetch, showToast
   if (!isOpen) return null;
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      setFormData(prev => ({ ...prev, [name]: files[0] }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!event) return;
+    setIsSubmitting(true);
     
-    const result = editEvent(event.id, formData);
+    const payload = new FormData();
+    payload.append('nama', formData.nama);
+    payload.append('lokasi', formData.lokasi);
+    payload.append('tanggalMulai', formData.tanggalMulai);
+    payload.append('tanggalSelesai', formData.tanggalSelesai);
+    payload.append('deskripsi', formData.deskripsi);
+    if (formData.foto) {
+      payload.append('foto', formData.foto);
+    }
+    
+    const result = await editEvent(event.id || event.idEvent, payload);
+    setIsSubmitting(false);
+    
     if (result.success) {
       showToast(result.message);
       onClose();
+    } else {
+      showToast(result.message, "error");
     }
   };
 
@@ -138,6 +160,19 @@ export default function ModalPerbaruiEvent({ isOpen, onClose, refetch, showToast
               ></textarea>
             </div>
 
+            {/* Foto Event */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-2">Ubah Foto Event (Kosongkan jika tidak ingin mengubah)</label>
+              <input 
+                type="file" 
+                name="foto"
+                accept="image/jpeg, image/png, image/jpg"
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm bg-white"
+              />
+              <p className="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG. Max: 4MB.</p>
+            </div>
+
           </form>
         </div>
 
@@ -146,9 +181,12 @@ export default function ModalPerbaruiEvent({ isOpen, onClose, refetch, showToast
           <button 
             type="submit"
             form="edit-event-form"
-            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors"
+            disabled={isSubmitting}
+            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+              isSubmitting ? "bg-gray-400 text-white cursor-not-allowed" : "bg-[#56BC36] hover:bg-[#45a025] text-white"
+            }`}
           >
-            Simpan Perubahan
+            {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
           </button>
         </div>
       </div>

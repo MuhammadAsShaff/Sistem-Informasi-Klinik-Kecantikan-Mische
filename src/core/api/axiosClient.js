@@ -14,7 +14,6 @@ import { getToken, clearAuth } from '@/core/utils/authStorage';
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
   // timeout: 10000, // Opsional: Batas waktu timeout jika server lambat
@@ -54,7 +53,7 @@ axiosClient.interceptors.response.use(
         console.warn('[Axios] Sesi berakhir atau token tidak valid. Melakukan auto-logout...');
         // Hapus data dari storage
         clearAuth();
-        
+
         // Arahkan user kembali ke halaman login (mencegah error beruntun)
         // Note: Gunakan cara ini agar bisa terpicu meski dari luar komponen React
         if (window.location.pathname !== '/login') {
@@ -66,7 +65,7 @@ axiosClient.interceptors.response.use(
       if (status === 403) {
         console.warn('[Axios] Anda tidak memiliki hak akses untuk endpoint ini.');
       }
-      
+
       // Data Tidak Ditemukan (Not Found)
       if (status === 404) {
         console.warn('[Axios] Data atau endpoint yang diminta tidak ditemukan.');

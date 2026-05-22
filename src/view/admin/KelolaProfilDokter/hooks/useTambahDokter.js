@@ -1,4 +1,6 @@
 import { useState } from "react";
+import axiosClient from "@/core/api/axiosClient";
+import { endpoints } from "@/core/api/endpoints";
 
 export function useTambahDokter(onSuccess, showToast) {
   const [formData, setFormData] = useState({
@@ -26,7 +28,8 @@ export function useTambahDokter(onSuccess, showToast) {
       reader.onloadend = () => {
         setFormData((prev) => ({
           ...prev,
-          image: reader.result, // Mengubah image menjadi base64 string agar bisa disimpan di localStorage
+          image: reader.result, 
+          imageFile: file, // Simpan file aslinya
         }));
       };
       reader.readAsDataURL(file);
@@ -39,6 +42,7 @@ export function useTambahDokter(onSuccess, showToast) {
       email: "",
       description: "",
       image: "",
+      imageFile: null,
       status: "Tersedia",
     });
     setError("");
@@ -52,33 +56,35 @@ export function useTambahDokter(onSuccess, showToast) {
     }
 
     setIsSubmitting(true);
-    try {
-      const stored = localStorage.getItem("mische_doctors");
-      let docs = [];
-      try {
-        docs = stored ? JSON.parse(stored) : [];
-      } catch (parseErr) {
-        docs = [];
-      }
-      
-      const newDoc = {
-        id: docs.length > 0 ? Math.max(...docs.map(d => d.id)) + 1 : 1,
-        name: formData.name.startsWith("Dr. ") ? formData.name : `Dr. ${formData.name.toUpperCase()}`,
-        email: formData.email,
-        description: formData.description,
-        image: formData.image || "https://via.placeholder.com/150",
-        status: formData.status || "Tersedia",
-        experience: "Dokter dengan pengalaman di klinik Mische",
-      };
+    setError("");
 
-      const updatedDocs = [...docs, newDoc];
-      localStorage.setItem("mische_doctors", JSON.stringify(updatedDocs));
+    try {
+      const data = new FormData();
+      data.append('nama', formData.name);
+      data.append('email', formData.email);
+      data.append('deskripsi', formData.description);
+      
+      if (formData.imageFile) {
+        data.append('foto', formData.imageFile);
+      } else {
+        // Jika tidak ada file (mungkin backend perlu format tertentu atau ini akan kena validasi require gambar)
+        // Tergantung validasi di backend, tapi jika required, backend akan melempar pesan error.
+      }
+
+      await axiosClient.post(endpoints.admin.doctors, data);
       
       showToast("Berhasil menambahkan profil dokter baru!", "success");
       resetForm();
       if (onSuccess) onSuccess();
     } catch (err) {
-      setError("Gagal menyimpan data.");
+      console.error(err);
+      if (err.response && err.response.data && err.response.data.errors) {
+        // Gabungkan semua pesan error validasi
+        const messages = Object.values(err.response.data.errors).flat().join(" ");
+        setError(messages);
+      } else {
+        setError(err.response?.data?.message || "Gagal menyimpan data.");
+      }
       showToast("Gagal menambahkan profil dokter.", "error");
     } finally {
       setIsSubmitting(false);

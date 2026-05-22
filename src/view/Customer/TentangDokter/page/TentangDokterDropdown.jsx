@@ -22,13 +22,13 @@ export default function TentangDokterDropdown() {
         <div className="grid grid-cols-1 md:flex md:flex-wrap md:justify-start gap-10">
           {doctors.map((dokter) => (
             <div 
-              key={dokter.id} 
+              key={dokter.idDokter || dokter.id} 
               className="relative w-full max-w-[360px] mx-auto md:mx-0 h-[500px] rounded-tl-[60px] rounded-br-[60px] rounded-tr-2xl rounded-bl-2xl overflow-hidden shadow-2xl group transition-transform duration-300 hover:-translate-y-2"
             >
               {/* Gambar Dokter */}
               <img 
-                src={dokter.image} 
-                alt={dokter.name} 
+                src={dokter.foto} 
+                alt={dokter.nama} 
                 className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" 
               />
               
@@ -37,12 +37,12 @@ export default function TentangDokterDropdown() {
               
               {/* Konten Text */}
               <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col gap-3">
-                <h3 className="text-white text-3xl font-bold leading-tight" dangerouslySetInnerHTML={{ __html: dokter.name.replace(' ', '<br />') }}>
+                <h3 className="text-white text-3xl font-bold leading-tight" dangerouslySetInnerHTML={{ __html: dokter.nama ? dokter.nama.replace(' ', '<br />') : '' }}>
                 </h3>
-                <p className="text-white/90 text-sm md:text-base leading-relaxed mb-2">
-                  {dokter.experience}
+                <p className="text-white/90 text-sm md:text-base leading-relaxed mb-2 line-clamp-2">
+                  {dokter.deskripsi}
                 </p>
-                <Link to={`/dokter/${dokter.id}`} className="bg-[#56BC36] hover:bg-[#469A2B] text-white px-6 py-2.5 rounded-full text-sm font-bold w-fit shadow-lg transition-colors border border-white/20 hover:border-white/50 text-center">
+                <Link to={`/dokter/${dokter.idDokter || dokter.id}`} className="bg-[#56BC36] hover:bg-[#469A2B] text-white px-6 py-2.5 rounded-full text-sm font-bold w-fit shadow-lg transition-colors border border-white/20 hover:border-white/50 text-center">
                   Selengkapnya
                 </Link>
               </div>

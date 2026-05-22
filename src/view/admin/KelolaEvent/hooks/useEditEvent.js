@@ -1,22 +1,23 @@
+import axiosClient from '@/core/api/axiosClient';
+import { endpoints } from '@/core/api/endpoints';
+
 export function useEditEvent(refetch) {
-  const editEvent = (id, updatedData) => {
+  const editEvent = async (id, formData) => {
     try {
-      const stored = localStorage.getItem('mische_events');
-      if (!stored) return { success: false, message: "Data tidak ditemukan." };
-      
-      const events = JSON.parse(stored);
-      const index = events.findIndex(e => e.id === id);
-      
-      if (index === -1) return { success: false, message: "Event tidak ditemukan." };
-      
-      events[index] = { ...events[index], ...updatedData };
-      localStorage.setItem('mische_events', JSON.stringify(events));
-      
-      refetch();
-      return { success: true, message: "Event ini berhasil diperbarui!" };
+      formData.append('_method', 'PUT'); // Laravel requirement for multipart/form-data PUT
+      const res = await axiosClient.post(`${endpoints.admin.event}/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (res.data?.success) {
+        refetch();
+        return { success: true, message: res.data.message || "Event ini berhasil diperbarui!" };
+      }
+      return { success: false, message: "Gagal memperbarui event." };
     } catch (error) {
       console.error("Gagal memperbarui event:", error);
-      return { success: false, message: "Gagal memperbarui event." };
+      const errMsg = error.response?.data?.message || "Gagal memperbarui event.";
+      const errorDetails = error.response?.data?.errors ? Object.values(error.response.data.errors).flat().join(", ") : "";
+      return { success: false, message: errorDetails ? `${errMsg} (${errorDetails})` : errMsg };
     }
   };
 

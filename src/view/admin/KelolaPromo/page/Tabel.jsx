@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { PencilLine, Trash2, Send, Eye } from "lucide-react";
+import { STORAGE_BASE_URL } from "@/core/api/endpoints";
 
 export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, updateStatus }) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,6 +21,7 @@ export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, update
               <tr>
                 <th className="py-4 px-4 whitespace-nowrap">No</th>
                 <th className="py-4 px-4 whitespace-nowrap">Nama</th>
+                <th className="py-4 px-4 whitespace-nowrap text-center">Gambar</th>
                 <th className="py-4 px-4 whitespace-nowrap">Jenis Promo</th>
                 <th className="py-4 px-4 whitespace-nowrap">Kode Promo</th>
                 <th className="py-4 px-4 whitespace-nowrap">Diskon</th>
@@ -35,7 +37,20 @@ export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, update
                     <td className="py-4 px-4 align-top">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="py-4 px-4 align-top min-w-[150px]">{item.nama}</td>
+                    <td className="py-4 px-4 align-top min-w-[150px]">{item.namaPromo || item.nama}</td>
+                    <td className="py-4 px-4 align-top text-center">
+                      {item.gambar ? (
+                        <img 
+                          src={item.gambar.startsWith('http') ? item.gambar : `${STORAGE_BASE_URL}${item.gambar}`} 
+                          alt="Promo" 
+                          className="w-16 h-16 object-cover rounded-md mx-auto shadow-sm" 
+                        />
+                      ) : (
+                        <div className="w-16 h-16 bg-gray-100 rounded-md mx-auto flex items-center justify-center text-xs text-gray-400">
+                          No Img
+                        </div>
+                      )}
+                    </td>
                     <td className="py-4 px-4 align-top min-w-[120px]">{item.jenisPromo}</td>
                     <td className="py-4 px-4 align-top font-medium text-gray-800">{item.kodePromo}</td>
                     <td className="py-4 px-4 align-top">{item.diskon}</td>
@@ -90,7 +105,7 @@ export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, update
                 ))
               ) : (
                 <tr>
-                  <td colSpan="11" className="py-8 text-center text-gray-500">
+                  <td colSpan="9" className="py-8 text-center text-gray-500">
                     Tidak ada data promo.
                   </td>
                 </tr>

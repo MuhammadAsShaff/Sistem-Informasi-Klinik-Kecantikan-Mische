@@ -4,6 +4,8 @@ import logomischee from '@/assets/images/LogoMischee.png';
 export default function ModalDetailReservasi({ 
   isOpen, 
   onClose, 
+  onConfirm,
+  isSubmitting,
   slot, 
   treatment, 
   doctor, 
@@ -50,72 +52,77 @@ export default function ModalDetailReservasi({
 
         <div className="p-6 md:p-10 lg:p-12 space-y-6 md:space-y-8">
           
-          <div className="relative w-full bg-gradient-to-r from-[#56bc36] from-[55%] to-[#C6FFD1] rounded-[2rem] p-8 md:p-10 overflow-hidden shadow-sm flex items-center h-32 md:h-40">
-            <h2 className="text-2xl md:text-4xl font-bold text-white relative z-10 md:w-2/3 leading-tight">
-              Ayo Pilih Jenis <br /> Treatment Kamu!
+          <div className="relative w-full bg-gradient-to-r from-[#56bc36] to-[#75C859] rounded-3xl p-8 md:p-12 overflow-hidden shadow-lg flex flex-col justify-center min-h-[160px]">
+            {/* Dekorasi Latar Belakang */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+            <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl translate-y-1/2"></div>
+            
+            <h2 className="text-2xl md:text-4xl font-bold text-white relative z-10 leading-tight">
+              Ayo Selesaikan <br /> Reservasi Kamu!
             </h2>
-           {/* Logo Aspect */}
-                 <div className="absolute right-0 top-0 h-full w-1/3 sm:w-1/4 pointer-events-none flex items-center justify-end p-4 sm:p-12 z-10">
-                   <img
-                     src={logomischee}
-                     alt="Mische Logo"
-                     className="h-2/3 sm:h-full w-auto object-contain drop-shadow-md"
-                   />
-                 </div>
+            
+            {/* Logo Aspect (Diperbaiki agar proporsional) */}
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 h-[80%] max-h-[100px] pointer-events-none flex items-center justify-end z-10">
+              <img
+                src={logomischee}
+                alt="Mische Logo"
+                className="h-full w-auto object-contain drop-shadow-lg opacity-90"
+              />
+            </div>
           </div>
 
           {/* Form Detail */}
-          <div className="bg-white rounded-[2rem] p-6 md:p-10 shadow-sm border border-gray-100 space-y-6 md:space-y-8">
+          <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 space-y-6">
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
               {/* Jam Mulai */}
-              <div className="space-y-3">
-                <label className="text-gray-800 text-sm md:text-base font-medium pl-2">Jam Mulai Treatment</label>
-                <div className="bg-white rounded-full px-6 py-4 shadow-sm border border-gray-100 text-center font-bold text-gray-900 text-sm md:text-base">
+              <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100/80 transition-colors hover:bg-green-50/30">
+                <label className="block text-gray-500 text-xs md:text-sm font-medium mb-1">Jam Mulai</label>
+                <div className="font-bold text-gray-900 text-sm md:text-lg">
                   {slot.time} WIB
                 </div>
               </div>
 
               {/* Jam Selesai */}
-              <div className="space-y-3">
-                <label className="text-gray-800 text-sm md:text-base font-medium pl-2">Jam Selesai Treatment</label>
-                <div className="bg-white rounded-full px-6 py-4 shadow-sm border border-gray-100 text-center font-bold text-gray-900 text-sm md:text-base">
-                  {calculateJamSelesai(slot.time)} WIB
+              <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100/80 transition-colors hover:bg-green-50/30">
+                <label className="block text-gray-500 text-xs md:text-sm font-medium mb-1">Jam Selesai</label>
+                <div className="font-bold text-gray-900 text-sm md:text-lg">
+                  {slot.timeEnd || calculateJamSelesai(slot.time)} WIB
                 </div>
               </div>
 
               {/* Tanggal Treatment */}
-              <div className="space-y-3">
-                <label className="text-gray-800 text-sm md:text-base font-medium pl-2">Tanggal Treatment</label>
-                <div className="bg-white rounded-full px-6 py-4 shadow-sm border border-gray-100 text-center font-bold text-gray-900 text-sm md:text-base">
+              <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100/80 transition-colors hover:bg-green-50/30">
+                <label className="block text-gray-500 text-xs md:text-sm font-medium mb-1">Tanggal</label>
+                <div className="font-bold text-gray-900 text-sm md:text-lg">
                   {formatTgl ? formatTgl(date) : date}
                 </div>
               </div>
 
               {/* Nama Dokter */}
-              <div className="space-y-3">
-                <label className="text-gray-800 text-sm md:text-base font-medium pl-2">Nama Dokter</label>
-                <div className="bg-white rounded-full px-6 py-4 shadow-sm border border-gray-100 text-center font-bold text-gray-900 text-sm md:text-base">
+              <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100/80 transition-colors hover:bg-green-50/30">
+                <label className="block text-gray-500 text-xs md:text-sm font-medium mb-1">Dokter</label>
+                <div className="font-bold text-gray-900 text-sm md:text-lg">
                   {doctor}
                 </div>
               </div>
             </div>
 
             {/* Pilih Jenis Treatment */}
-            <div className="space-y-3 pt-2">
-              <label className="text-gray-800 text-sm md:text-base font-medium pl-2">Pilih Jenis Treatment Kamu</label>
-              <div className="bg-white rounded-full px-6 py-4 shadow-sm border border-gray-100 text-center font-bold text-gray-900 text-sm md:text-base">
+            <div className="bg-[#f0fdf4]/50 p-5 rounded-2xl border border-green-100/50">
+              <label className="block text-green-700 text-sm font-medium mb-1">Jenis Treatment</label>
+              <div className="font-bold text-green-900 text-lg md:text-xl">
                 {treatment}
               </div>
             </div>
 
             {/* Tombol Reservasi */}
-            <div className="pt-6">
+            <div className="pt-4">
               <button 
                 onClick={() => setIsConfirmOpen(true)}
-                className="w-full bg-[#75C859] hover:bg-[#56BC36] text-white font-bold py-4 rounded-full transition-all shadow-md hover:shadow-lg text-sm md:text-base transform hover:-translate-y-1"
+                className="w-full bg-gradient-to-r from-[#56BC36] to-[#65d343] hover:from-[#469e2c] hover:to-[#56BC36] text-white font-bold py-4 rounded-2xl transition-all shadow-lg hover:shadow-xl hover:shadow-green-200 text-base md:text-lg transform hover:-translate-y-1"
               >
-                Reservasi Sekarang
+                Konfirmasi Reservasi
               </button>
             </div>
 
@@ -141,14 +148,15 @@ export default function ModalDetailReservasi({
             {/* Buttons */}
             <div className="flex flex-row gap-4 w-full justify-center pt-2">
               <button 
-                onClick={() => {
-                  alert("Reservasi untuk " + treatment + " bersama " + doctor + " pada " + slot.time + " berhasil diajukan!");
-                  setIsConfirmOpen(false);
-                  onClose();
-                }}
-                className="flex-1 bg-[#56bc36] hover:bg-[#2da509] text-white font-medium py-3 px-6 rounded-xl transition-colors shadow-sm"
+                onClick={onConfirm}
+                disabled={isSubmitting}
+                className={`w-full py-4 rounded-xl text-white font-bold text-sm md:text-base transition-colors shadow-lg
+                  ${isSubmitting 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-[#56BC36] hover:bg-[#469e2c] cursor-pointer'
+                  }`}
               >
-                Ya
+                {isSubmitting ? "Memproses..." : "Pesan Sekarang"}
               </button>
               <button 
                 onClick={() => setIsConfirmOpen(false)}

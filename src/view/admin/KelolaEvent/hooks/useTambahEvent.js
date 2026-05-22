@@ -1,20 +1,22 @@
+import axiosClient from '@/core/api/axiosClient';
+import { endpoints } from '@/core/api/endpoints';
+
 export function useTambahEvent(refetch) {
-  const tambahEvent = (newEvent) => {
+  const tambahEvent = async (formData) => {
     try {
-      const stored = localStorage.getItem('mische_events');
-      const events = stored ? JSON.parse(stored) : [];
-      
-      const newId = events.length > 0 ? Math.max(...events.map(e => e.id)) + 1 : 1;
-      const eventToSave = { ...newEvent, id: newId };
-      
-      events.push(eventToSave);
-      localStorage.setItem('mische_events', JSON.stringify(events));
-      
-      refetch();
-      return { success: true, message: "Event ini berhasil ditambahkan!" };
+      const res = await axiosClient.post(endpoints.admin.event, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (res.data?.success) {
+        refetch();
+        return { success: true, message: res.data.message || "Event ini berhasil ditambahkan!" };
+      }
+      return { success: false, message: "Gagal menambahkan event." };
     } catch (error) {
       console.error("Gagal menambah event:", error);
-      return { success: false, message: "Gagal menambahkan event." };
+      const errMsg = error.response?.data?.message || "Gagal menambahkan event.";
+      const errorDetails = error.response?.data?.errors ? Object.values(error.response.data.errors).flat().join(", ") : "";
+      return { success: false, message: errorDetails ? `${errMsg} (${errorDetails})` : errMsg };
     }
   };
 

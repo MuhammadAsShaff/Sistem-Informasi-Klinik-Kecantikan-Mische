@@ -1,4 +1,5 @@
 export const API_BASE_URL = 'http://127.0.0.1:8000/api';
+export const STORAGE_BASE_URL = 'http://127.0.0.1:8000/storage/';
 
 // Sentralisasi endpoint agar tidak ada hardcode URL string di komponen atau hook
 export const endpoints = {
@@ -15,15 +16,22 @@ export const endpoints = {
     profile: '/admin/profile',
     clinic: '/admin/clinic',
     kegiatan: '/admin/kegiatan',
-    // Tambahkan endpoint admin lainnya di sini...
+    doctors: '/admin/doctors',
+    reservations: '/admin/reservations',
+    promo: '/admin/promo',
+    event: '/admin/event',
   },
   customer: {
     profile: '/customer/profile',
     booking: '/customer/booking',
     history: '/customer/history',
     clinic: '/customer/clinic',
-    dokter: '/customer/dokter',
+    dokter: '/customer/doctors',
     kegiatan: '/customer/kegiatan',
+    schedules: '/customer/schedules',
+    reservations: '/customer/reservations',
+    promo: '/customer/promo',
+    event: '/customer/event',
   },
   public: {
     products: '/products',

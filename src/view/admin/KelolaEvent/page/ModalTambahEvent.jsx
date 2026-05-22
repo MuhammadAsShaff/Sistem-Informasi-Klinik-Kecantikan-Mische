@@ -9,23 +9,45 @@ export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }
     lokasi: '',
     tanggalMulai: '',
     tanggalSelesai: '',
-    deskripsi: ''
+    deskripsi: '',
+    foto: null
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      setFormData(prev => ({ ...prev, [name]: files[0] }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = tambahEvent(formData);
+    setIsSubmitting(true);
+    
+    const payload = new FormData();
+    payload.append('nama', formData.nama);
+    payload.append('lokasi', formData.lokasi);
+    payload.append('tanggalMulai', formData.tanggalMulai);
+    payload.append('tanggalSelesai', formData.tanggalSelesai);
+    payload.append('deskripsi', formData.deskripsi);
+    if (formData.foto) {
+      payload.append('foto', formData.foto);
+    }
+    
+    const result = await tambahEvent(payload);
+    setIsSubmitting(false);
+    
     if (result.success) {
       showToast(result.message);
-      setFormData({ nama: '', lokasi: '', tanggalMulai: '', tanggalSelesai: '', deskripsi: '' });
+      setFormData({ nama: '', lokasi: '', tanggalMulai: '', tanggalSelesai: '', deskripsi: '', foto: null });
       onClose();
+    } else {
+      showToast(result.message, "error");
     }
   };
 
@@ -125,6 +147,20 @@ export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }
               ></textarea>
             </div>
 
+            {/* Foto Event */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-2">Foto Event</label>
+              <input 
+                type="file" 
+                name="foto"
+                accept="image/jpeg, image/png, image/jpg"
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm bg-white"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG. Max: 4MB.</p>
+            </div>
+
           </form>
         </div>
 
@@ -133,9 +169,12 @@ export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }
           <button 
             type="submit"
             form="tambah-event-form"
-            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors"
+            disabled={isSubmitting}
+            className={`px-6 py-2.5 rounded-lg font-medium text-sm transition-colors ${
+              isSubmitting ? "bg-gray-400 text-white cursor-not-allowed" : "bg-[#56BC36] hover:bg-[#45a025] text-white"
+            }`}
           >
-            Tambah Event
+            {isSubmitting ? "Menyimpan..." : "Tambah Event"}
           </button>
         </div>
       </div>

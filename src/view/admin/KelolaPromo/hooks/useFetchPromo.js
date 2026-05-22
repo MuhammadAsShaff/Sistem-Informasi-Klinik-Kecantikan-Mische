@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import axiosClient from "@/core/api/axiosClient";
+import { endpoints } from "@/core/api/endpoints";
 
 export function useFetchPromo() {
   const [dataPromo, setDataPromo] = useState([]);
@@ -6,40 +8,19 @@ export function useFetchPromo() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchPromo = () => {
+  const fetchPromo = async () => {
     setIsLoading(true);
-    let docs = [];
     try {
-      const stored = localStorage.getItem("mische_promos");
-      if (stored) {
-        docs = JSON.parse(stored);
-      } else {
-        // Data dummy awal jika kosong
-        docs = [
-          {
-            id: 1,
-            nama: "Promo Lebaran",
-            jenisPromo: "Diskon Persen",
-            kodePromo: "LEBARAN20",
-            diskon: "20%",
-            deskripsi: "Diskon 20% untuk semua treatment",
-            tanggalMulai: "2024-04-01",
-            tanggalSelesai: "2024-04-15",
-            minimalTransaksi: "500000",
-            status: "Aktif",
-            kategoriProduk: "",
-            produk: ""
-          }
-        ];
-        localStorage.setItem("mische_promos", JSON.stringify(docs));
+      const res = await axiosClient.get(endpoints.admin.promo);
+      if (res.data) {
+        const promoData = res.data.data?.data || res.data.data || res.data;
+        setDataPromo(Array.isArray(promoData) ? promoData : []);
       }
     } catch (e) {
-      console.error("Gagal parse data promo dari localStorage, mereset...", e);
-      docs = [];
-      localStorage.setItem("mische_promos", JSON.stringify(docs));
+      console.error("Gagal mengambil data promo:", e);
+    } finally {
+      setIsLoading(false);
     }
-    setDataPromo(docs);
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -51,9 +32,11 @@ export function useFetchPromo() {
     const query = searchQuery.toLowerCase();
     const filtered = dataPromo.filter(
       (item) =>
-        item.nama.toLowerCase().includes(query) ||
-        item.kodePromo.toLowerCase().includes(query) ||
-        item.jenisPromo.toLowerCase().includes(query)
+        item.namaPromo?.toLowerCase().includes(query) ||
+        item.kode?.toLowerCase().includes(query) ||
+        item.jenisPromo?.toLowerCase().includes(query) ||
+        item.nama?.toLowerCase().includes(query) || 
+        item.kodePromo?.toLowerCase().includes(query)
     );
     setFilteredData(filtered);
   }, [searchQuery, dataPromo]);

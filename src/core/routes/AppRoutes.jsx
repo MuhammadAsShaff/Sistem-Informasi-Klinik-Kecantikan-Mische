@@ -18,6 +18,7 @@ import TentangKamiPage from "@/view/Customer/TentangKami/page/Index";
 import TentangDokterDropdown from "@/view/Customer/TentangDokter/page/TentangDokterDropdown";
 import DetailDokterPage from "@/view/Customer/TentangDokter/page/DetailDokter";
 import ProfilCustomerPage from "@/view/Customer/ProfilCustomer/page/Index";
+import RiwayatReservasiPage from "@/view/Customer/ProfilCustomer/page/RiwayatReservasi";
 
 // Admin Pages
 import AdminDashboard from "@/view/admin/dashboard/page/dashboard";
@@ -32,6 +33,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import KelolaProfilDokter from "@/view/admin/KelolaProfilDokter/Index";
 import KelolaPromo from "@/view/admin/KelolaPromo/Index";
 import KelolaEvent from "@/view/admin/KelolaEvent/Index";
+import KelolaReservasi from "@/view/admin/KelolaReservasi/Index";
 import Page404 from "@/view/components/Page404";
 
 export default function AppRoutes() {
@@ -42,7 +44,6 @@ export default function AppRoutes() {
         <Route index element={<LandingPage />} /> 
         <Route path="promo" element={<HalamanPromo />} />
         <Route path="promo/:id" element={<PromoDetail />} />
-        <Route path="reservasi" element={<ReservasiPage />} />
         <Route path="event" element={<HalamanEvent />} />
         <Route path="event/:id" element={<EventDetail />} />
         <Route path="tentang-kami" element={<TentangKamiPage />} />
@@ -54,6 +55,8 @@ export default function AppRoutes() {
         {/* Rute Customer yang Wajib Login */}
         <Route element={<ProtectedRoute allowedRoles={['customer']} />}>
           <Route path="ProfilCustomer" element={<ProfilCustomerPage />} />
+          <Route path="ProfilCustomer/riwayat-reservasi" element={<RiwayatReservasiPage />} />
+          <Route path="reservasi" element={<ReservasiPage />} />
         </Route>
       </Route>
 
@@ -70,6 +73,7 @@ export default function AppRoutes() {
           <Route path="profildokter" element={<KelolaProfilDokter />} />
           <Route path="profilklinik" element={<KelolaProfilKlinik />} />
           <Route path="profiladmin" element={<KelolaProfilAdmin />} />
+          <Route path="reservasi" element={<KelolaReservasi />} />
         </Route>
       </Route>
 

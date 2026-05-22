@@ -1,7 +1,10 @@
 import React from 'react';
 import { ShoppingBag, BookmarkCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const HistoryTabs = () => {
+    const navigate = useNavigate();
+    
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             {/* Riwayat Pembelian Produk */}
@@ -16,7 +19,10 @@ const HistoryTabs = () => {
             </div>
 
             {/* Riwayat Melakukan Reservasi */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 cursor-pointer hover:shadow-md transition-shadow group">
+            <div 
+                onClick={() => navigate('/ProfilCustomer/riwayat-reservasi')}
+                className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 cursor-pointer hover:shadow-md transition-shadow group"
+            >
                 <div className="p-4 bg-white border-2 border-[#a3e69a] rounded-2xl shadow-sm group-hover:bg-[#f0fff4] transition-colors duration-300">
                     <div className="relative">
                         <BookmarkCheck className="w-10 h-10 text-[#74b35e]" />

@@ -1,42 +1,48 @@
-import DokterWidya from '@/assets/images/DokterWidya.jpg';
-import DokterRiefni from '@/assets/images/DokterRiefni.jpg';
-
-export const DOKTER_DATA = [
-  {
-    id: 1,
-    name: "Dr. WIDYA FINANDA",
-    description: "Dokter dengan pengalaman selama 20 tahun di dunia kecantikan, dan sudah melalang buana kemana saja. Dokter dengan pengalaman selama 20 tahun di dunia kecantikan, dan sudah melalang buana kemana saja. Dokter dengan pengalaman selama 20 tahun di dunia kecantikan, dan sudah melalang buana kemana saja...",
-    image: DokterWidya,
-    experience: "Dokter Dengan Pengalaman Selama 20 Tahun Di Dunia Kecantikan.....",
-  },
-  {
-    id: 2,
-    name: "Dr. RIEFNI SILARA DINI",
-    description: "Dokter dengan pengalaman selama 20 tahun di dunia kecantikan, dan sudah melalang buana kemana saja. Dokter dengan pengalaman selama 20 tahun di dunia kecantikan, dan sudah melalang buana kemana saja. Dokter dengan pengalaman selama 20 tahun di dunia kecantikan, dan sudah melalang buana kemana saja...",
-    image: DokterRiefni,
-    experience: "Dokter Dengan Pengalaman Selama 20 Tahun Di Dunia Kecantikan.....",
-  }
-];
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { endpoints, API_BASE_URL, STORAGE_BASE_URL } from "@/core/api/endpoints";
 
 export const useDokterData = () => {
-  // Inisialisasi localStorage jika kosong
-  if (!localStorage.getItem("mische_doctors")) {
-    localStorage.setItem("mische_doctors", JSON.stringify(DOKTER_DATA));
-  }
+  const [doctors, setDoctors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const getDoctors = () => {
+  const fetchPublicDoctors = async () => {
+    setIsLoading(true);
     try {
-      return JSON.parse(localStorage.getItem("mische_doctors") || "[]");
-    } catch (e) {
-      return DOKTER_DATA;
+      // Menggunakan axios biasa tanpa axiosClient (krn public tidak butuh token)
+      const res = await axios.get(`${API_BASE_URL}${endpoints.customer.dokter}`);
+      if (res.data?.data) {
+        const formattedDoctors = res.data.data.map(doc => ({
+          ...doc,
+          foto: doc.foto && !doc.foto.startsWith('http') ? `${STORAGE_BASE_URL}${doc.foto}` : doc.foto
+        }));
+        setDoctors(formattedDoctors);
+      } else {
+        const rawDoctors = res.data || [];
+        const formattedDoctors = rawDoctors.map(doc => ({
+          ...doc,
+          foto: doc.foto && !doc.foto.startsWith('http') ? `${STORAGE_BASE_URL}${doc.foto}` : doc.foto
+        }));
+        setDoctors(formattedDoctors);
+      }
+    } catch (error) {
+      console.error("Gagal mengambil data dokter publik:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const doctors = getDoctors();
-  const getDoctorById = (id) => doctors.find((doc) => doc.id.toString() === id.toString());
+  useEffect(() => {
+    fetchPublicDoctors();
+  }, []);
+
+  const getDoctorById = (id) => {
+    return doctors.find((doc) => doc.idDokter?.toString() === id.toString() || doc.id?.toString() === id.toString());
+  };
 
   return {
     doctors,
+    isLoading,
     getDoctorById,
   };
 };

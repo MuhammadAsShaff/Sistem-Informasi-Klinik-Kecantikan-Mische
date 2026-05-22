@@ -1,28 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, Eye, EyeOff, ShoppingBag, ArrowLeft } from 'lucide-react';
+import axiosClient from '@/core/api/axiosClient';
+import { endpoints, STORAGE_BASE_URL } from '@/core/api/endpoints';
 
 export default function PromoDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [promo, setPromo] = useState(null);
   const [showVoucher, setShowVoucher] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll to top when loaded
-    try {
-      const stored = localStorage.getItem('mische_promos');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        const found = parsed.find(p => p.id.toString() === id);
-        if (found) {
-          setPromo(found);
+    const fetchPromoDetail = async () => {
+      try {
+        const res = await axiosClient.get(endpoints.customer.promo);
+        if (res.data) {
+          const promoData = res.data.data?.data || res.data.data || res.data;
+          const promos = Array.isArray(promoData) ? promoData : [];
+          const found = promos.find(p => (p.idPromo || p.id).toString() === id);
+          if (found) {
+            setPromo(found);
+          }
         }
+      } catch (error) {
+        console.error("Gagal memuat detail promo:", error);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Gagal memuat detail promo:", error);
-    }
+    };
+    fetchPromoDetail();
   }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA]">
+        <p className="text-gray-500 font-medium">Memuat...</p>
+      </div>
+    );
+  }
 
   if (!promo) {
     return (
@@ -38,7 +55,7 @@ export default function PromoDetail() {
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
 
-  const isAktif = promo.status === "Aktif";
+  const isAktif = promo.status === "Aktif" || promo.status === 1 || promo.status === true;
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-10 pb-20">
@@ -56,13 +73,19 @@ export default function PromoDetail() {
         {/* Main Card */}
         <div className="bg-white rounded-tl-[30px] rounded-br-[30px] shadow-sm p-6 md:p-8 mb-8 border border-gray-100">
           
-          {/* Hero Banner (Placeholder for now) */}
-          <div className="w-full h-[250px] md:h-[350px] bg-gradient-to-br from-green-100 to-green-50 rounded-2xl mb-8 relative overflow-hidden flex flex-col items-center justify-center text-center px-4">
-             <h1 className="text-6xl md:text-8xl font-black text-green-600 drop-shadow-md">{promo.diskon || "PROMO"}</h1>
-             <p className="text-green-800 font-bold mt-4 bg-white/70 px-6 py-2 rounded-full shadow-sm text-lg md:text-xl">Mische Aesthetic Clinic</p>
+          {/* Hero Banner */}
+          <div className="w-full h-[250px] md:h-[350px] bg-gradient-to-br from-green-100 to-green-50 rounded-2xl mb-8 relative overflow-hidden flex flex-col items-center justify-center text-center">
+             {promo.gambar ? (
+               <img src={promo.gambar.startsWith('http') ? promo.gambar : `${STORAGE_BASE_URL}${promo.gambar}`} alt={promo.namaPromo} className="w-full h-full object-cover" />
+             ) : (
+               <>
+                 <h1 className="text-6xl md:text-8xl font-black text-green-600 drop-shadow-md">{promo.diskon || "PROMO"}</h1>
+                 <p className="text-green-800 font-bold mt-4 bg-white/70 px-6 py-2 rounded-full shadow-sm text-lg md:text-xl">Mische Aesthetic Clinic</p>
+               </>
+             )}
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-black mb-6">{promo.nama}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-black mb-6">{promo.namaPromo || promo.nama}</h1>
 
           {/* Calendar Dates */}
           <div className="flex items-center gap-4 mb-8 flex-wrap">
@@ -77,7 +100,7 @@ export default function PromoDetail() {
           </div>
 
           {/* Description */}
-          <p className="text-gray-700 text-[15px] leading-relaxed text-justify mb-2">
+          <p className="text-gray-700 text-[15px] leading-relaxed text-justify mb-2 whitespace-pre-line">
             {promo.deskripsi}
           </p>
         </div>
@@ -102,7 +125,7 @@ export default function PromoDetail() {
                
                <div className="ml-16 flex items-center">
                  <div className="border border-gray-200 rounded-l-xl px-6 py-2 font-mono text-xl tracking-widest text-black bg-gray-50 min-w-[180px] text-center">
-                   {showVoucher ? promo.kodePromo : "********"}
+                   {showVoucher ? (promo.kode || promo.kodePromo) : "********"}
                  </div>
                  <button 
                     onClick={() => setShowVoucher(!showVoucher)}
@@ -120,23 +143,14 @@ export default function PromoDetail() {
                <ShoppingBag size={24} />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-black mb-4">Kategori Produk</h2>
+              <h2 className="text-2xl font-bold text-black mb-4">Produk Promo</h2>
               <div className="space-y-2">
-                {promo.kategoriProduk && (
-                  <p className="text-gray-500 font-medium text-sm">
-                    Kategori &nbsp;&nbsp;:&nbsp;&nbsp; <span className="text-black">{promo.kategoriProduk}</span>
-                  </p>
-                )}
-                {promo.produk && (
-                  <p className="text-gray-500 font-medium text-sm">
-                    Produk &nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp; <span className="text-black">{promo.produk}</span>
-                  </p>
-                )}
-                {!promo.kategoriProduk && !promo.produk && (
-                  <p className="text-gray-500 font-medium text-sm">
-                    Kategori &nbsp;&nbsp;:&nbsp;&nbsp; <span className="text-black">Semua Produk</span>
-                  </p>
-                )}
+                <p className="text-gray-500 font-medium text-sm">
+                  Kategori &nbsp;&nbsp;:&nbsp;&nbsp; <span className="text-black">{promo.kategori?.namaKategori || 'Semua Kategori'}</span>
+                </p>
+                <p className="text-gray-500 font-medium text-sm">
+                  Produk &nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp; <span className="text-black">{promo.produk?.namaProduk || 'Semua Produk'}</span>
+                </p>
               </div>
             </div>
           </div>

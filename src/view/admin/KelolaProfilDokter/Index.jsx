@@ -35,6 +35,7 @@ export default function KelolaProfilDokter() {
     setSearchQuery,
     isLoading,
     fetchDokter,
+    startIndex,
   } = useFetchDokter();
 
   // ─── HOOK: CREATE ─────────────────────────────────────────────
@@ -105,7 +106,7 @@ export default function KelolaProfilDokter() {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onStatusChange={handleStatusChange}
-          startIndex={1}
+          startIndex={startIndex || 1}
         />
       )}
 

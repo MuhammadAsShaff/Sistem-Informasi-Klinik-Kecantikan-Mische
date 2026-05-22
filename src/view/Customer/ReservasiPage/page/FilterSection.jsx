@@ -42,10 +42,20 @@ export default function FilterSection({
   doctor, setDoctor, 
   selectedDate, setSelectedDate,
   openDropdown, setOpenDropdown,
-  getHari, formatTgl, bukaKalender, dateInputRef
+  getHari, formatTgl,
+  doctorsList = [],
+  countKosong = 0,
+  countTerisi = 0
 }) {
-  const treatments = ["Acne Treatment", "Facial Rejuvenation", "Laser Therapy"];
-  const doctors = ["dr. Widya", "dr. Riefni", "-"];
+  const treatments = ["Acne Treatment", "Facial Rejuvenation", "Laser Therapy", "Brightening Therapy"];
+  
+  // Filter dokter yang statusnya "Tersedia"
+  const availableDoctors = doctorsList.filter(d => (d.status || "Tersedia") === "Tersedia");
+  
+  // Jika ada dokter tersedia, tampilkan namanya. Jika tidak, hanya tampilkan "-"
+  const doctors = availableDoctors.length > 0 
+    ? availableDoctors.map(d => d.nama) 
+    : ["-"];
 
   return (
     <div className="space-y-6">
@@ -64,19 +74,9 @@ export default function FilterSection({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-        <div className="relative group" onClick={bukaKalender}>
-          <div className="bg-white rounded-full px-4 py-3 md:py-4 shadow-sm border border-gray-100 flex items-center justify-center gap-2 cursor-pointer hover:border-green-500 h-full">
-            <span className="text-sm md:text-base font-regular text-gray-900">
-              Tanggal : <span className="font-bold">{formatTgl(selectedDate)}</span>
-            </span>
-            <Calendar size={16} className="text-green-500" />
-            <input ref={dateInputRef} type="date" className="absolute opacity-0 pointer-events-none" onChange={(e) => setSelectedDate(e.target.value)} />
-          </div>
-        </div>
-        <InfoItem label="Hari" value={getHari(selectedDate)} />
-        <InfoItem label="Jadwal Kosong" value="7" />
-        <InfoItem label="Jadwal Terisi" value="5" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+        <InfoItem label="Jadwal Kosong" value={countKosong} />
+        <InfoItem label="Jadwal Terisi" value={countTerisi} />
       </div>
     </div>
   );

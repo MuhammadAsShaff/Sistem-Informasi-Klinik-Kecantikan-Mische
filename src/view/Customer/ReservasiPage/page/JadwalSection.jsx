@@ -36,7 +36,7 @@ export default function JadwalSection({ timeSlots, isDoctorAvailable = true, onS
                   : 'bg-white border-2 border-gray-100 text-gray-300 opacity-60'
                 }`}
             >
-              <span className="text-xl md:text-2xl font-bold mb-1">{slot.time} WIB</span>
+              <span className="text-base md:text-lg font-bold mb-1 whitespace-nowrap">{slot.timeRange || slot.time} WIB</span>
               <div className={`mt-2 px-6 py-1.5 rounded-full text-[0.7rem] font-medium
                 ${isAvailable ? 'bg-white text-black' : 'bg-gray-200 text-gray-500'}`}
               >

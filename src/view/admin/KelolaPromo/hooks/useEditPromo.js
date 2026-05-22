@@ -1,18 +1,21 @@
 import { useState, useEffect } from "react";
+import axiosClient from "@/core/api/axiosClient";
+import { endpoints } from "@/core/api/endpoints";
 
 export function useEditPromo(selectedPromo, onSuccess, showToast) {
   const [formData, setFormData] = useState({
-    nama: "",
+    namaPromo: "",
     jenisPromo: "",
-    kategoriProduk: "",
-    produk: "",
     tanggalMulai: "",
     tanggalSelesai: "",
     minimalTransaksi: "",
-    kodePromo: "",
+    kode: "",
     deskripsi: "",
     diskon: "",
-    status: "Aktif",
+    status: true,
+    gambar: null,
+    idKategori: 1,
+    idProduk: 1
   });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,63 +23,69 @@ export function useEditPromo(selectedPromo, onSuccess, showToast) {
   useEffect(() => {
     if (selectedPromo) {
       setFormData({
-        nama: selectedPromo.nama || "",
+        namaPromo: selectedPromo.namaPromo || selectedPromo.nama || "",
         jenisPromo: selectedPromo.jenisPromo || "",
-        kategoriProduk: selectedPromo.kategoriProduk || "",
-        produk: selectedPromo.produk || "",
-        tanggalMulai: selectedPromo.tanggalMulai || "",
-        tanggalSelesai: selectedPromo.tanggalSelesai || "",
+        tanggalMulai: selectedPromo.tanggalMulai ? selectedPromo.tanggalMulai.split(' ')[0] : "",
+        tanggalSelesai: selectedPromo.tanggalSelesai ? selectedPromo.tanggalSelesai.split(' ')[0] : "",
         minimalTransaksi: selectedPromo.minimalTransaksi || "",
-        kodePromo: selectedPromo.kodePromo || "",
+        kode: selectedPromo.kode || selectedPromo.kodePromo || "",
         deskripsi: selectedPromo.deskripsi || "",
         diskon: selectedPromo.diskon || "",
-        status: selectedPromo.status || "Aktif",
+        status: selectedPromo.status !== undefined ? selectedPromo.status : true,
+        gambar: null,
+        idKategori: selectedPromo.idKategori || 1,
+        idProduk: selectedPromo.idProduk || 1
       });
     }
   }, [selectedPromo]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name === "status" ? value === "true" || value === true : value,
+      }));
+    }
   };
 
   const submitEditPromo = async (e) => {
     if (e) e.preventDefault();
-    if (!formData.nama || !formData.jenisPromo || !formData.kodePromo || !formData.tanggalMulai || !formData.tanggalSelesai) {
+    if (!formData.namaPromo || !formData.jenisPromo || !formData.kode || !formData.tanggalMulai || !formData.tanggalSelesai) {
       setError("Nama, Jenis, Kode, dan Tanggal wajib diisi.");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const stored = localStorage.getItem("mische_promos");
-      let docs = [];
-      try {
-        docs = stored ? JSON.parse(stored) : [];
-      } catch (parseErr) {
-        docs = [];
-      }
-      
-      const updatedDocs = docs.map((doc) => {
-        if (doc.id.toString() === selectedPromo.id.toString()) {
-          return {
-            ...doc,
-            ...formData
-          };
+      const payload = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (formData[key] !== null && formData[key] !== undefined) {
+           payload.append(key, formData[key]);
         }
-        return doc;
       });
+      // Pastikan status adalah integer (1/0)
+      payload.set('status', formData.status ? 1 : 0);
+      payload.append('_method', 'PUT'); // untuk laravel multipart form data update
 
-      localStorage.setItem("mische_promos", JSON.stringify(updatedDocs));
+      const idPromo = selectedPromo.idPromo || selectedPromo.id;
+      const res = await axiosClient.post(`${endpoints.admin.promo}/${idPromo}`, payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       
-      showToast("Promo ini berhasil diperbarui!", "success");
-      if (onSuccess) onSuccess();
+      if (res.data?.success) {
+        showToast("Promo ini berhasil diperbarui!", "success");
+        if (onSuccess) onSuccess();
+      } else {
+        showToast("Gagal memperbarui promo.", "error");
+      }
     } catch (err) {
-      setError("Gagal memperbarui data.");
-      showToast("Gagal memperbarui promo.", "error");
+      const errMsg = err.response?.data?.message || "Gagal memperbarui data.";
+      const errorDetails = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(", ") : "";
+      setError(errorDetails ? `${errMsg} (${errorDetails})` : errMsg);
+      showToast(errorDetails ? `${errMsg} (${errorDetails})` : errMsg, "error");
     } finally {
       setIsSubmitting(false);
     }

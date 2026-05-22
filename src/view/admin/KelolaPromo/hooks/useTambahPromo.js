@@ -1,78 +1,90 @@
 import { useState } from "react";
+import axiosClient from "@/core/api/axiosClient";
+import { endpoints } from "@/core/api/endpoints";
 
 export function useTambahPromo(onSuccess, showToast) {
   const [formData, setFormData] = useState({
-    nama: "",
+    namaPromo: "",
     jenisPromo: "",
-    kategoriProduk: "",
-    produk: "",
     tanggalMulai: "",
     tanggalSelesai: "",
     minimalTransaksi: "",
-    kodePromo: "",
+    kode: "",
     deskripsi: "",
     diskon: "",
-    status: "Aktif",
+    status: true,
+    gambar: null,
+    // Add dummy values to bypass backend requirement if missing
+    idKategori: 1, 
+    idProduk: 1
   });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    const { name, value, type, files } = e.target;
+    if (type === 'file') {
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name === "status" ? value === "true" || value === true : value,
+      }));
+    }
   };
 
   const resetForm = () => {
     setFormData({
-      nama: "",
+      namaPromo: "",
       jenisPromo: "",
-      kategoriProduk: "",
-      produk: "",
       tanggalMulai: "",
       tanggalSelesai: "",
       minimalTransaksi: "",
-      kodePromo: "",
+      kode: "",
       deskripsi: "",
       diskon: "",
-      status: "Aktif",
+      status: true,
+      gambar: null,
+      idKategori: 1,
+      idProduk: 1
     });
     setError("");
   };
 
   const submitTambahPromo = async (e) => {
     if (e) e.preventDefault();
-    if (!formData.nama || !formData.jenisPromo || !formData.kodePromo || !formData.tanggalMulai || !formData.tanggalSelesai) {
+    if (!formData.namaPromo || !formData.jenisPromo || !formData.kode || !formData.tanggalMulai || !formData.tanggalSelesai) {
       setError("Nama, Jenis, Kode, dan Tanggal wajib diisi.");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const stored = localStorage.getItem("mische_promos");
-      let docs = [];
-      try {
-        docs = stored ? JSON.parse(stored) : [];
-      } catch (parseErr) {
-        docs = [];
-      }
-      
-      const newPromo = {
-        id: docs.length > 0 ? Math.max(...docs.map(d => d.id)) + 1 : 1,
-        ...formData
-      };
+      const payload = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (formData[key] !== null && formData[key] !== undefined) {
+           payload.append(key, formData[key]);
+        }
+      });
+      // Pastikan status adalah integer atau boolean string (1/0)
+      payload.set('status', formData.status ? 1 : 0);
 
-      const updatedDocs = [...docs, newPromo];
-      localStorage.setItem("mische_promos", JSON.stringify(updatedDocs));
+      const res = await axiosClient.post(endpoints.admin.promo, payload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       
-      showToast("Promo ini berhasil ditambahkan!", "success");
-      resetForm();
-      if (onSuccess) onSuccess();
+      if (res.data?.success) {
+        showToast(res.data.message || "Promo ini berhasil ditambahkan!", "success");
+        resetForm();
+        if (onSuccess) onSuccess();
+      } else {
+        showToast("Gagal menambahkan promo.", "error");
+      }
     } catch (err) {
-      setError("Gagal menyimpan data.");
-      showToast("Gagal menambahkan promo.", "error");
+      const errMsg = err.response?.data?.message || "Gagal menyimpan data.";
+      const errorDetails = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(", ") : "";
+      setError(errorDetails ? `${errMsg} (${errorDetails})` : errMsg);
+      showToast(errorDetails ? `${errMsg} (${errorDetails})` : errMsg, "error");
     } finally {
       setIsSubmitting(false);
     }

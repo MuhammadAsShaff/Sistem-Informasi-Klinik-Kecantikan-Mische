@@ -9,8 +9,8 @@ const DoctorCard = ({ doc }) => {
       {/* IMAGE CONTAINER */}
       <div className="aspect-[4/5] w-full overflow-hidden">
         <img 
-          src={doc.image} 
-          alt={doc.name} 
+          src={doc.foto} 
+          alt={doc.nama} 
           className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500"
         />
       </div>
@@ -18,12 +18,12 @@ const DoctorCard = ({ doc }) => {
       {/* OVERLAY */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#215410]/90 via-transparent to-transparent flex flex-col justify-end p-8 text-white">
         <h3 className="text-2xl font-bold mb-2 -tight uppercase">
-          {doc.name}
+          {doc.nama}
         </h3>
         <p className="text-xs md:text-sm text-gray-200 mb-6 line-clamp-3 font-medium opacity-90">
-          {doc.description}
+          {doc.deskripsi}
         </p>
-        <Link to={`/dokter/${doc.id}`} className="bg-[#56BC36] text-white px-8 py-2.5 rounded-full text-sm font-semibold w-fit hover:bg-[#2da509] transition-colors shadow-lg text-center">
+        <Link to={`/dokter/${doc.idDokter || doc.id}`} className="bg-[#56BC36] text-white px-8 py-2.5 rounded-full text-sm font-semibold w-fit hover:bg-[#2da509] transition-colors shadow-lg text-center">
           Lihat Profil
         </Link>
       </div>
