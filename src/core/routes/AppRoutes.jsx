@@ -17,8 +17,12 @@ import RegistrasiPage from "@/view/authentication/Registrasi/page/Index";
 import TentangKamiPage from "@/view/Customer/TentangKami/page/Index";
 import TentangDokterDropdown from "@/view/Customer/TentangDokter/page/TentangDokterDropdown";
 import DetailDokterPage from "@/view/Customer/TentangDokter/page/DetailDokter";
+import HalamanTestimoni from "@/view/Customer/HalamanTestimoni/page/Index";
+import DetailTestimoni from "@/view/Customer/HalamanTestimoni/page/DetailTestimoni";
 import ProfilCustomerPage from "@/view/Customer/ProfilCustomer/page/Index";
 import RiwayatReservasiPage from "@/view/Customer/ProfilCustomer/page/RiwayatReservasi";
+import HalamanProduk from "@/view/Customer/HalamanProduk/page/Index";
+import DetailProduk from "@/view/Customer/HalamanProduk/page/DetailProduk";
 
 // Admin Pages
 import AdminDashboard from "@/view/admin/dashboard/page/dashboard";
@@ -27,6 +31,8 @@ import KelolaUser from "@/view/admin/KelolaUser/page/Index";
 import KelolaJadwalReservasiTreatment from "@/view/admin/KelolaJadwalReservasiTreatment/page/Index";
 import KelolaProfilKlinik from "@/view/admin/KelolaProfilKlinik/page/Index";
 import KelolaProfilAdmin from "@/view/admin/KelolaProfilAdmin/page/Index";
+import KelolaTestimoni from "@/view/admin/KelolaTestimoni/Index";
+import KelolaProduk from "@/view/admin/KelolaProduk/Index";
 
 // Core Routing & Shared Components
 import ProtectedRoute from "./ProtectedRoute";
@@ -48,9 +54,13 @@ export default function AppRoutes() {
         <Route path="event/:id" element={<EventDetail />} />
         <Route path="tentang-kami" element={<TentangKamiPage />} />
         <Route path="tentang-kami/dokter" element={<TentangDokterDropdown />} />
+        <Route path="tentang-kami/testimoni" element={<HalamanTestimoni />} />
+        <Route path="tentang-kami/testimoni/:id" element={<DetailTestimoni />} />
         <Route path="dokter/:id" element={<DetailDokterPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="registrasi" element={<RegistrasiPage />} />
+        <Route path="produk" element={<HalamanProduk />} />
+        <Route path="produk/:id" element={<DetailProduk />} />
         
         {/* Rute Customer yang Wajib Login */}
         <Route element={<ProtectedRoute allowedRoles={['customer']} />}>
@@ -65,7 +75,6 @@ export default function AppRoutes() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="produk" element={<AdminProduk />} />
           <Route path="promo" element={<KelolaPromo />} />
           <Route path="event" element={<KelolaEvent />} />
           <Route path="kelolauser" element={<KelolaUser />} />
@@ -74,6 +83,8 @@ export default function AppRoutes() {
           <Route path="profilklinik" element={<KelolaProfilKlinik />} />
           <Route path="profiladmin" element={<KelolaProfilAdmin />} />
           <Route path="reservasi" element={<KelolaReservasi />} />
+          <Route path="testimoni" element={<KelolaTestimoni />} />
+          <Route path="produk" element={<KelolaProduk />} />
         </Route>
       </Route>
 

@@ -1,0 +1,69 @@
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useTestimoniData } from '../hooks/useTestimoniData';
+import TestimoniHeader from './TestimoniHeader';
+
+const DetailTestimoni = () => {
+  const { id } = useParams();
+  const { testimonials } = useTestimoniData();
+
+  // Find the testimonial (dummy data, normally from API)
+  const testimonial = testimonials.find(t => t.id === parseInt(id));
+
+  if (!testimonial) {
+    return (
+      <div className="min-h-screen bg-[#fafafa] py-10 px-4 md:px-8 lg:px-16 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Testimoni tidak ditemukan</h2>
+          <Link to="/tentang-kami/testimoni" className="text-[#5cb85c] underline">Kembali ke Daftar Testimoni</Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#fafafa] py-10 px-4 md:px-8 lg:px-16 font-sans">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex items-center justify-between mb-8 lg:mb-12">
+          <TestimoniHeader />
+          <Link to="/tentang-kami/testimoni" className="text-gray-500 hover:text-[#5cb85c] transition-colors font-medium">
+            &larr; Kembali
+          </Link>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-6 mb-12 items-stretch">
+          {/* Image Section */}
+          <div className="w-full lg:w-[45%] rounded-tl-[40px] rounded-br-[40px] shadow-[0_30px_60px_rgba(0,0,0,0.08)] overflow-hidden shadow-md">
+            <img
+              src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+              alt={testimonial.name}
+              className="w-full h-full object-cover min-h-[300px] lg:min-h-[400px]"
+            />
+          </div>
+
+          {/* Content Section */}
+          <div className="w-full lg:w-[55%] bg-white rounded-tl-[40px] rounded-br-[40px] shadow-[0_30px_60px_rgba(0,0,0,0.08)]  p-8 lg:p-12 shadow-md flex flex-col justify-center">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 lg:mb-6">
+              {testimonial.name} Puspita Dewi
+            </h2>
+
+            <div className="flex flex-wrap items-center gap-4 mb-6 lg:mb-8">
+              <span className="bg-[#5cb85c] text-white px-6 py-2 rounded-full text-sm font-semibold shadow-sm">
+                23 Nov 2025
+              </span>
+              <span className="text-[#5cb85c] font-bold text-lg lg:text-xl">
+                Treatment Acne
+              </span>
+            </div>
+
+            <p className="text-gray-700 leading-relaxed text-sm md:text-base text-justify">
+              Pada Tanggal 23 November 2025, {testimonial.name} Puspita Dewi Melakukan Treatment Acne Di Mische Aesthetic Clinic. Ia Menyampaikan Rasa Sangat Puas Dan Senang Dengan Hasil Perawatan Yang Diberikan. Menurutnya, Pelayanan Yang Ramah, Tenaga Profesional, Serta Hasil Yang Terasa Nyata Membuat Pengalamannya Di Klinik Ini Sangat Menyenangkan Dan Melebihi Ekspektasi.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DetailTestimoni;
