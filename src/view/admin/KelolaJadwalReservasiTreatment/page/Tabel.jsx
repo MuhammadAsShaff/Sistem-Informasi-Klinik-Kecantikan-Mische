@@ -4,12 +4,12 @@ import { Edit, Trash2 } from 'lucide-react';
 const Tabel = ({ data, onEdit, onDelete }) => (
   <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <table className="w-full text-sm text-left">
-      <thead className="bg-[#FDFDFD] text-gray-600 font-bold border-b uppercase tracking-wider text-[11px]">
+      <thead className="bg-[#FDFDFD] text-gray-600 border-b text-[11px]">
         <tr>
-          <th className="px-6 py-4 text-center">No</th>
-          <th className="px-6 py-4 text-center">Jam Mulai</th>
-          <th className="px-6 py-4 text-center">Jam Selesai</th>
-          <th className="px-6 py-4 text-center text-black">Action</th>
+          <th className="px-6 py-4 font-medium text-center">No</th>
+          <th className="px-6 py-4 font-medium text-center">Jam Mulai</th>
+          <th className="px-6 py-4 font-medium text-center">Jam Selesai</th>
+          <th className="px-6 py-4 font-bold text-center">Action</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-gray-50 text-gray-700">

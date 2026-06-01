@@ -8,8 +8,10 @@ import { getToken, saveUser } from "@/core/utils/authStorage";
 export default function App() {
   const location = useLocation();
 
-  // Cek validitas sesi ke backend pada setiap perubahan halaman
+  // Cek validitas sesi ke backend pada setiap perubahan halaman dan pastikan scroll di atas
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     const checkSession = async () => {
       const token = getToken();
       if (token) {

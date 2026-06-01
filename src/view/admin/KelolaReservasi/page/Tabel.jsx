@@ -14,28 +14,28 @@ const Tabel = ({ data, meta, page, setPage, onEditStatus, onDelete, onDetail }) 
     <div className="w-full flex flex-col items-center">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6 w-full font-poppins">
         <div className="overflow-x-auto no-scrollbar w-full">
-          <table className="w-full text-[13px] text-left whitespace-nowrap">
-            <thead className="bg-white text-gray-400 font-medium border-b border-gray-200">
+          <table className="w-full text-[13px] text-left">
+            <thead className="bg-white text-gray-500 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 font-medium">Nama Customer</th>
-                <th className="px-4 py-3 font-medium">Jenis Treatment</th>
-                <th className="px-4 py-3 font-medium">Jam</th>
-                <th className="px-4 py-3 font-medium">Tanggal</th>
-                <th className="px-4 py-3 font-medium">Dokter</th>
-                <th className="px-4 py-3 font-medium">Nomor</th>
-                <th className="px-4 py-3 font-medium text-center">Status dan Result</th>
-                <th className="px-4 py-3 font-medium text-right">Action</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Nama Customer</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Jenis Treatment</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Jam</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Tanggal</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Dokter</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap">Nomor</th>
+                <th className="px-4 py-3 font-medium whitespace-nowrap text-center">Status dan Result</th>
+                <th className="px-4 py-3 font-bold whitespace-nowrap text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 text-gray-700">
               {data && data.length > 0 ? (
                 data.map((item, index) => {
-                  
+
                   // Tentukan warna status untuk button dropdown
                   let statusBg = "bg-gray-100";
                   let statusText = "text-gray-600";
                   let statusIcon = "text-gray-400";
-                  
+
                   if (item.status === 'Konfirmasi' || item.status === 'Dikonfirmasi' || item.status === 'Selesai') {
                     statusBg = "bg-[#56BC36]";
                     statusText = "text-white";
@@ -63,31 +63,32 @@ const Tabel = ({ data, meta, page, setPage, onEditStatus, onDelete, onDetail }) 
                       <td className="px-4 py-4 text-black">{item.namaCustomer}</td>
                       <td className="px-4 py-4">{item.jenisTreatment}</td>
                       <td className="px-4 py-4">
-                        {item.jadwal ? `${item.jadwal.jamMulai.substring(0,5)} - ${item.jadwal.jamSelesai.substring(0,5)}` : "-"}
+                        {item.jadwal ? `${item.jadwal.jamMulai.substring(0, 5)} - ${item.jadwal.jamSelesai.substring(0, 5)}` : "-"}
                       </td>
                       <td className="px-4 py-4">{item.tanggalReservasi}</td>
                       <td className="px-4 py-4">{item.dokter?.nama || "-"}</td>
                       <td className="px-4 py-4">{item.nomorWa || item.nomor || "-"}</td>
+
                       <td className="px-4 py-4 text-center">
-                        <button 
+                        <button
                           onClick={() => onEditStatus(item)}
                           className={`inline-flex items-center justify-between w-32 px-3 py-1.5 rounded-full text-xs font-medium ${statusBg} ${statusText} shadow-sm transition-transform active:scale-95 mx-auto`}
                         >
                           <span className="flex-1 text-center">{displayStatus}</span>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`ml-1 ${statusIcon}`}><path d="m6 9 6 6 6-6"/></svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`ml-1 ${statusIcon}`}><path d="m6 9 6 6 6-6" /></svg>
                         </button>
                       </td>
                       <td className="px-4 py-4 text-right">
                         <div className="flex justify-end gap-3 items-center">
-                          <button 
-                            onClick={() => onEditStatus(item)} 
+                          <button
+                            onClick={() => onEditStatus(item)}
                             className="text-gray-500 hover:text-black transition-colors"
                             title="Edit"
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                           </button>
-                          <button 
-                            onClick={() => onDelete(item)} 
+                          <button
+                            onClick={() => onDelete(item)}
                             className="text-gray-500 hover:text-black transition-colors"
                             title="Hapus"
                           >
@@ -100,7 +101,7 @@ const Tabel = ({ data, meta, page, setPage, onEditStatus, onDelete, onDetail }) 
                 })
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center py-12 text-gray-500 font-medium">
+                  <td colSpan="9" className="text-center py-12 text-gray-500 font-medium">
                     Belum ada data reservasi.
                   </td>
                 </tr>
@@ -112,7 +113,7 @@ const Tabel = ({ data, meta, page, setPage, onEditStatus, onDelete, onDetail }) 
 
       {/* Pagination Footer */}
       <div className="flex w-full justify-between items-center font-poppins px-2">
-        <button 
+        <button
           onClick={handlePrev}
           disabled={page === 1}
           className={`flex items-center px-4 py-2 border rounded-lg text-sm bg-white transition-colors
@@ -121,14 +122,14 @@ const Tabel = ({ data, meta, page, setPage, onEditStatus, onDelete, onDetail }) 
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           Previous
         </button>
-        
+
         <div className="flex items-center">
           <div className="bg-[#a5eaa0] text-[#1f7318] font-bold w-8 h-8 rounded flex items-center justify-center text-sm shadow-sm">
             {page}
           </div>
         </div>
-        
-        <button 
+
+        <button
           onClick={handleNext}
           disabled={!meta || page >= meta.last_page}
           className={`flex items-center px-6 py-2 border rounded-lg text-sm bg-white transition-colors

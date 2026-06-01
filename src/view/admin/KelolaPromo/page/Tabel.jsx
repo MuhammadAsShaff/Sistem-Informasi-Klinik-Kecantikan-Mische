@@ -17,27 +17,28 @@ export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, update
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-700">
-            <thead className="bg-white text-gray-500 font-medium border-b border-gray-200">
+            <thead className="bg-white text-gray-500 border-b border-gray-200">
               <tr>
-                <th className="py-4 px-4 whitespace-nowrap">No</th>
-                <th className="py-4 px-4 whitespace-nowrap">Nama</th>
-                <th className="py-4 px-4 whitespace-nowrap text-center">Gambar</th>
-                <th className="py-4 px-4 whitespace-nowrap">Jenis Promo</th>
-                <th className="py-4 px-4 whitespace-nowrap">Kode Promo</th>
-                <th className="py-4 px-4 whitespace-nowrap">Diskon</th>
-                <th className="py-4 px-4 whitespace-nowrap">Minimal Transaksi</th>
-                <th className="py-4 px-4 whitespace-nowrap">Status</th>
-                <th className="py-4 px-4 text-center whitespace-nowrap">Action</th>
+                <th className="py-4 px-4 font-medium whitespace-nowrap">No</th>
+                <th className="py-4 px-4 font-medium whitespace-nowrap">Nama</th>
+                <th className="py-4 px-4 font-medium whitespace-nowrap">Gambar</th>
+                <th className="py-4 px-4 font-medium whitespace-nowrap">Kode Promo</th>
+                <th className="py-4 px-4 font-medium whitespace-nowrap">Diskon</th>
+                <th className="py-4 px-4 font-medium whitespace-nowrap">Minimal Transaksi</th>
+                <th className="py-4 px-4 font-medium whitespace-nowrap">Status</th>
+                <th className="py-4 px-4 font-bold whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody>
               {paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
-                  <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors whitespace-nowrap">
                     <td className="py-4 px-4 align-top">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="py-4 px-4 align-top min-w-[150px]">{item.namaPromo || item.nama}</td>
+                    <td className="py-4 px-4 align-top min-w-[150px] max-w-[200px] truncate" title={item.namaPromo || item.nama}>
+                      {item.namaPromo || item.nama}
+                    </td>
                     <td className="py-4 px-4 align-top text-center">
                       {item.gambar ? (
                         <img 
@@ -51,8 +52,7 @@ export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, update
                         </div>
                       )}
                     </td>
-                    <td className="py-4 px-4 align-top min-w-[120px]">{item.jenisPromo}</td>
-                    <td className="py-4 px-4 align-top font-medium text-gray-800">{item.kodePromo}</td>
+                    <td className="py-4 px-4 align-top font-medium text-gray-800">{item.kode}</td>
                     <td className="py-4 px-4 align-top">{item.diskon}</td>
                     <td className="py-4 px-4 align-top">
                       {item.minimalTransaksi ? `Rp ${Number(item.minimalTransaksi).toLocaleString("id-ID")}` : "-"}

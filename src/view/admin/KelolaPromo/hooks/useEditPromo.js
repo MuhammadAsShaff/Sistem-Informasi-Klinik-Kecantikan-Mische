@@ -66,7 +66,7 @@ export function useEditPromo(selectedPromo, onSuccess, showToast) {
            payload.append(key, formData[key]);
         }
       });
-      // Pastikan status adalah integer (1/0)
+      // Pastikan status adalah integer
       payload.set('status', formData.status ? 1 : 0);
       payload.append('_method', 'PUT'); // untuk laravel multipart form data update
 

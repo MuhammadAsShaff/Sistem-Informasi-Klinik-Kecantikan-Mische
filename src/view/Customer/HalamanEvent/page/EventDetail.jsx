@@ -58,9 +58,9 @@ export default function EventDetail() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-10 pb-20">
       <div className="max-w-[1000px] mx-auto px-4 md:px-6">
-        
+
         {/* Back Button */}
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-500 hover:text-[#56BC36] font-medium mb-6 transition-colors"
         >
@@ -70,21 +70,21 @@ export default function EventDetail() {
 
         {/* Main Card */}
         <div className="bg-white rounded-tl-[40px] rounded-br-[40px] shadow-[0_8px_30px_rgb(0,0,0,0.06)] p-6 md:p-10 mb-8">
-          
+
           {/* Hero Banner */}
           <div className="w-full h-[200px] md:h-[300px] bg-gray-200 rounded-2xl mb-10 overflow-hidden relative">
-             {event.foto ? (
-               <img src={event.foto.startsWith('http') ? event.foto : `${STORAGE_BASE_URL}${event.foto}`} alt={event.nama} className="w-full h-full object-cover" />
-             ) : (
-               <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${gambarEvent})` }}></div>
-             )}
+            {event.foto ? (
+              <img src={event.foto.startsWith('http') ? event.foto : `${STORAGE_BASE_URL}${event.foto}`} alt={event.nama} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${gambarEvent})` }}></div>
+            )}
           </div>
 
           <h1 className="text-3xl md:text-[40px] leading-tight font-bold text-black mb-8">{event.nama || event.title}</h1>
 
           {/* Icon Rows */}
           <div className="flex flex-col md:flex-row md:items-center gap-6 border-b border-gray-100 pb-8">
-            
+
             {/* Calendar */}
             <div className="flex items-center gap-4">
               <div className="text-[#56BC36]"><Calendar size={48} strokeWidth={1.5} /></div>
@@ -109,7 +109,7 @@ export default function EventDetail() {
                 {event.lokasi || event.location}
               </div>
             </div>
-            
+
           </div>
 
           {/* Description */}

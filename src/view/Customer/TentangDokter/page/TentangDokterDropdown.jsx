@@ -11,7 +11,7 @@ export default function TentangDokterDropdown() {
         
         {/* Title Badge */}
         <div className="mb-12 flex justify-center md:justify-start">
-          <div className="bg-white inline-block px-12 py-5 rounded-2xl md:rounded-l-2xl md:rounded-r-lg shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+          <div className="bg-white inline-block px-12 py-5 rounded-tl-[40px] rounded-br-[40px] shadow-[0_30px_60px_rgba(0,0,0,0.08)]">
             <h1 className="text-4xl md:text-5xl font-bold text-[#56BC36] tracking-wide">
               Tentang Dokter
             </h1>

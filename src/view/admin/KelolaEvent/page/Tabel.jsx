@@ -14,21 +14,21 @@ export default function Tabel({ events, onEdit, onDelete, onSend, onView }) {
     <div className="bg-white border border-gray-200 overflow-hidden text-sm">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="border-b border-gray-200 text-gray-500 font-semibold bg-[#FAFAFA]">
-            <th className="py-4 px-6 text-center w-16">No</th>
-            <th className="py-4 px-6 text-center">Gambar</th>
-            <th className="py-4 px-6">Nama</th>
+          <tr className="border-b border-gray-200 text-gray-500 bg-[#FAFAFA]">
+            <th className="py-4 px-6 font-medium whitespace-nowrap w-16">No</th>
+            <th className="py-4 px-6 font-medium whitespace-nowrap">Gambar</th>
+            <th className="py-4 px-6 font-medium whitespace-nowrap">Nama</th>
             
-            <th className="py-4 px-6">Tanggal Mulai</th>
-            <th className="py-4 px-6">Tanggal Selesai</th>
-            <th className="py-4 px-6">Lokasi</th>
-            <th className="py-4 px-6 text-center w-32">Action</th>
+            <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Mulai</th>
+            <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Selesai</th>
+            <th className="py-4 px-6 font-medium whitespace-nowrap">Lokasi</th>
+            <th className="py-4 px-6 font-bold whitespace-nowrap text-center">Action</th>
           </tr>
         </thead>
         <tbody>
           {events.length > 0 ? (
             events.map((event, index) => (
-              <tr key={event.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+              <tr key={event.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors whitespace-nowrap">
                 <td className="py-4 px-6 text-center text-gray-500">{index + 1}</td>
                 <td className="py-4 px-6 align-top text-center">
                   {event.foto ? (
@@ -43,11 +43,11 @@ export default function Tabel({ events, onEdit, onDelete, onSend, onView }) {
                     </div>
                   )}
                 </td>
-                <td className="py-4 px-6 font-medium text-gray-800 min-w-[150px]">{event.nama}</td>
+                <td className="py-4 px-6 font-medium text-gray-800 min-w-[150px] max-w-[200px] truncate" title={event.nama}>{event.nama}</td>
                
-                <td className="py-4 px-6 text-gray-500">{formatDate(event.tanggalMulai)}</td>
-                <td className="py-4 px-6 text-gray-500">{formatDate(event.tanggalSelesai)}</td>
-                <td className="py-4 px-6 text-gray-500">{event.lokasi}</td>
+                <td className="py-4 px-6 text-gray-500 ">{formatDate(event.tanggalMulai)}</td>
+                <td className="py-4 px-6 text-gray-500 ">{formatDate(event.tanggalSelesai)}</td>
+                <td className="py-4 px-6 text-gray-500 max-w-[150px] truncate" title={event.lokasi}>{event.lokasi}</td>
                 <td className="py-4 px-6">
                   <div className="flex items-center justify-center gap-3">
                     <button onClick={() => onView(event)} className="text-gray-500 hover:text-[#56BC36] transition-colors" title="Lihat Detail">

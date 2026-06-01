@@ -1,8 +1,37 @@
 import React from "react";
-import { X, Calendar, Tag, CreditCard, Box, Percent, CheckCircle, Info } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 export default function ModalDetailPromo({ isOpen, onClose, promo }) {
   if (!isOpen || !promo) return null;
+
+  const getKategoriName = (id) => {
+    switch (String(id)) {
+      case "1": return "Skincare";
+      case "2": return "Treatment";
+      case "3": return "Bodycare";
+      case "4": return "Haircare";
+      default: return id;
+    }
+  };
+
+  const getProdukName = (id) => {
+    switch (String(id)) {
+      case "1": return "Facial Wash";
+      case "2": return "Serum Acne";
+      case "3": return "Day Cream";
+      case "4": return "Sunscreen";
+      case "5": return "Laser Treatment";
+      default: return id;
+    }
+  };
+
+  // Ambil ID dari berbagai kemungkinan nama field API (camelCase / snake_case)
+  const katId = promo.idKategori || promo.id_kategori || promo.kategori_id;
+  const prodId = promo.idProduk || promo.id_produk || promo.produk_id;
+
+  // Cek apakah ada data teks (string) atau ambil nama berdasarkan ID
+  const kategori = promo.kategoriProduk || promo.kategori_produk || promo.kategori || (katId ? getKategoriName(katId) : null);
+  const produk = promo.produk || promo.namaProduk || promo.nama_produk || (prodId ? getProdukName(prodId) : null);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -13,127 +42,120 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
       ></div>
 
       {/* Modal Container */}
-      <div className="relative bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative bg-white rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50/50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-[#56BC36]">
-              <Tag size={20} />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-800">Detail Promo</h2>
-              <p className="text-sm text-gray-500 font-medium">{promo.kodePromo}</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
-          >
-            <X size={20} />
-          </button>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-black">Detail Promo</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl font-light">&times;</button>
         </div>
 
-        {/* Content */}
-        <div className="p-8 max-h-[75vh] overflow-y-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Body */}
+        <div className="p-6 max-h-[70vh] overflow-y-auto">
+          <div className="space-y-6">
             
-            {/* Kolom Kiri */}
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="mt-1 text-gray-400"><Tag size={18} /></div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Nama Promo</p>
-                  <p className="text-gray-800 font-medium text-lg">{promo.nama}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Nama Promo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Nama Promo</label>
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                  {promo.namaPromo || promo.nama || "-"}
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="mt-1 text-gray-400"><Box size={18} /></div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Jenis Promo</p>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
-                    {promo.jenisPromo}
-                  </span>
+              {/* Jenis Promo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Jenis Promo</label>
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                  {promo.jenisPromo || "-"}
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="mt-1 text-gray-400"><CreditCard size={18} /></div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Minimal Transaksi</p>
-                  <p className="text-gray-800 font-medium">
-                    {promo.minimalTransaksi ? `Rp ${Number(promo.minimalTransaksi).toLocaleString("id-ID")}` : "-"}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="mt-1 text-gray-400"><Percent size={18} /></div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Diskon</p>
-                  <p className="text-gray-800 font-medium text-lg text-[#56BC36]">{promo.diskon || "-"}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Kolom Kanan */}
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="mt-1 text-gray-400"><Calendar size={18} /></div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Periode Promo</p>
-                  <p className="text-gray-800 font-medium">
-                    {promo.tanggalMulai} <span className="text-gray-400 mx-1">s/d</span> {promo.tanggalSelesai}
-                  </p>
+              {/* Kode Promo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Kode Promo</label>
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                  {promo.kode || promo.kodePromo || "-"}
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="mt-1 text-gray-400"><CheckCircle size={18} /></div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Status</p>
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
-                    promo.status === "Aktif" 
-                      ? "bg-green-50 text-green-700 border-green-100" 
-                      : "bg-red-50 text-red-700 border-red-100"
-                  }`}>
-                    {promo.status}
-                  </span>
+              {/* Diskon */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Diskon</label>
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                  {promo.diskon || "-"}
                 </div>
               </div>
 
-              {(promo.kategoriProduk || promo.produk) && (
-                <div className="flex items-start gap-4">
-                   <div className="mt-1 text-gray-400"><Box size={18} /></div>
-                   <div className="space-y-3">
-                     {promo.kategoriProduk && (
-                       <div>
-                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Kategori Produk</p>
-                         <p className="text-gray-800 font-medium">{promo.kategoriProduk}</p>
-                       </div>
-                     )}
-                     {promo.produk && (
-                       <div>
-                         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Produk Spesifik</p>
-                         <p className="text-gray-800 font-medium">{promo.produk}</p>
-                       </div>
-                     )}
-                   </div>
+              {/* Tanggal Mulai */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Tanggal Mulai</label>
+                <div className="relative">
+                  <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm appearance-none">
+                    {promo.tanggalMulai ? new Date(promo.tanggalMulai).toLocaleDateString('id-ID') : "-"}
+                  </div>
+                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-black pointer-events-none" size={20} />
                 </div>
-              )}
+              </div>
 
-              {/* Deskripsi (Dipindah ke Kanan) */}
-              <div className="flex items-start gap-4 pt-2">
-                <div className="mt-1 text-gray-400"><Info size={18} /></div>
-                <div className="w-full">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Deskripsi Produk</p>
-                  <div className="bg-gray-50 rounded-xl p-4 text-gray-700 text-sm leading-relaxed border border-gray-100">
-                    {promo.deskripsi || <span className="text-gray-400 italic">Tidak ada deskripsi</span>}
+              {/* Tanggal Selesai */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Tanggal Selesai</label>
+                <div className="relative">
+                  <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm appearance-none">
+                    {promo.tanggalSelesai ? new Date(promo.tanggalSelesai).toLocaleDateString('id-ID') : "-"}
+                  </div>
+                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-black pointer-events-none" size={20} />
+                </div>
+              </div>
+
+              {/* Minimal Transaksi */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Minimal Transaksi</label>
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                  {promo.minimalTransaksi ? `Rp ${Number(promo.minimalTransaksi).toLocaleString("id-ID")}` : "-"}
+                </div>
+              </div>
+
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Status</label>
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                  {promo.status || "-"}
+                </div>
+              </div>
+
+              {/* Kategori / Produk Spesifik (Optional) */}
+              {(kategori || produk) && (
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-800 mb-2">Kategori / Produk Terkait</label>
+                  <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                    {kategori ? `Kategori: ${kategori}` : ''}
+                    {kategori && produk ? ' | ' : ''}
+                    {produk ? `Produk: ${produk}` : ''}
                   </div>
                 </div>
+              )}
+            </div>
+
+            {/* Deskripsi */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-2">Deskripsi Promo</label>
+              <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm whitespace-pre-wrap min-h-[100px]">
+                {promo.deskripsi || "-"}
               </div>
             </div>
+
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
+          <button 
+            onClick={onClose}
+            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors"
+          >
+            Tutup
+          </button>
         </div>
       </div>
     </div>
