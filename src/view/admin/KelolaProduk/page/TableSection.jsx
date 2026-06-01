@@ -8,6 +8,7 @@ const TableSection = ({ categories, onDeleteClick, onEditClick }) => {
         <thead className="bg-[#f9fafb] border-b border-gray-200 text-gray-700">
           <tr>
             <th className="px-6 py-4 font-medium text-center w-16">No</th>
+            <th className="px-6 py-4 font-medium text-center w-24">Gambar</th>
             <th className="px-6 py-4 font-medium text-center">Nama</th>
             <th className="px-6 py-4 font-medium text-center">Deskripsi</th>
             <th className="px-6 py-4 font-medium text-center w-40">Jumlah Produk</th>
@@ -19,6 +20,13 @@ const TableSection = ({ categories, onDeleteClick, onEditClick }) => {
             categories.map((item, index) => (
               <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 text-center">{index + 1}</td>
+                <td className="px-6 py-4 flex justify-center">
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded shadow-sm border border-gray-100" />
+                  ) : (
+                    <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-gray-400 text-xs">No Img</div>
+                  )}
+                </td>
                 <td className="px-6 py-4 text-center">{item.name}</td>
                 <td className="px-6 py-4 text-center">{item.description}</td>
                 <td className="px-6 py-4 text-center">{item.count}</td>
@@ -39,16 +47,17 @@ const TableSection = ({ categories, onDeleteClick, onEditClick }) => {
               </tr>
             ))
           ) : (
-            <tr>
-              <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
-                Data tidak ditemukan
-              </td>
-            </tr>
+              <tr>
+                <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                  Data tidak ditemukan
+                </td>
+              </tr>
           )}
           
           {categories.length < 5 && (
             Array.from({ length: 5 - categories.length }).map((_, i) => (
-              <tr key={`empty-${i}`} className="h-[61px]">
+              <tr key={`empty-${i}`} className="h-[81px]">
+                <td className="px-6 py-4"></td>
                 <td className="px-6 py-4"></td>
                 <td className="px-6 py-4"></td>
                 <td className="px-6 py-4"></td>

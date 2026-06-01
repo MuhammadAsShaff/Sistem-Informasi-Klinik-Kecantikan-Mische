@@ -4,15 +4,18 @@ import { X } from 'lucide-react';
 const ModalPerbaruiKategori = ({ isOpen, onClose, categoryData, onSave }) => {
   const [nama, setNama] = useState('');
   const [deskripsi, setDeskripsi] = useState('');
+  const [image, setImage] = useState(null);
 
   // Update input fields when modal opens or categoryData changes
   useEffect(() => {
     if (categoryData) {
       setNama(categoryData.name || '');
       setDeskripsi(categoryData.description || '');
+      setImage(categoryData.image || null);
     } else {
       setNama('');
       setDeskripsi('');
+      setImage(null);
     }
   }, [categoryData, isOpen]);
 
@@ -20,7 +23,7 @@ const ModalPerbaruiKategori = ({ isOpen, onClose, categoryData, onSave }) => {
 
   const handleSave = () => {
     if (categoryData) {
-      onSave(categoryData.id, { name: nama, description: deskripsi });
+      onSave(categoryData.id, { name: nama, description: deskripsi, image: image });
     }
   };
 
@@ -37,15 +40,30 @@ const ModalPerbaruiKategori = ({ isOpen, onClose, categoryData, onSave }) => {
 
         {/* Body */}
         <div className="p-8 flex flex-col md:flex-row gap-6">
-          <div className="flex-1 flex flex-col">
-            <label className="text-gray-800 mb-2 font-medium">Nama Kategori</label>
-            <input
-              type="text"
-              placeholder="Nama Kategori"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              className="border border-gray-300 rounded p-3 outline-none focus:border-green-500 transition-colors"
-            />
+          <div className="flex-1 flex flex-col gap-6">
+            <div className="flex flex-col">
+              <label className="text-gray-800 mb-2 font-medium">Nama Kategori</label>
+              <input
+                type="text"
+                placeholder="Nama Kategori"
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+                className="border border-gray-300 rounded p-3 outline-none focus:border-green-500 transition-colors"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-gray-800 mb-2 font-medium">Gambar Kategori</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setImage(URL.createObjectURL(e.target.files[0]));
+                  }
+                }}
+                className="border border-gray-300 rounded p-2.5 outline-none focus:border-green-500 transition-colors bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer"
+              />
+            </div>
           </div>
           <div className="flex-1 flex flex-col">
             <label className="text-gray-800 mb-2 font-medium">Deskripsi Kategori</label>
@@ -53,7 +71,7 @@ const ModalPerbaruiKategori = ({ isOpen, onClose, categoryData, onSave }) => {
               placeholder="Deskripsi Kategori"
               value={deskripsi}
               onChange={(e) => setDeskripsi(e.target.value)}
-              className="border border-gray-300 rounded p-3 h-32 outline-none focus:border-green-500 transition-colors resize-none"
+              className="border border-gray-300 rounded p-3 h-full min-h-[8rem] outline-none focus:border-green-500 transition-colors resize-none"
             />
           </div>
         </div>
