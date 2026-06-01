@@ -61,6 +61,10 @@ Route::prefix('customer')->group(function () {
 
     Route::get('kegiatan', [KegiatanController::class, 'getPublicKegiatan'])->name('customer.activities');
 
+    Route::prefix('testimonials')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\TestimoniController::class, 'getPublicTestimonials'])->name('customer.testimonials');
+    });
+
     Route::prefix('profile')->middleware(['role:customer'])->group(function () {
         Route::get('/', [ProfilCustomerController::class, 'getProfileCustomer'])->name('customer.profile');
         Route::put('/', [ProfilCustomerController::class, 'updateProfileCustomer'])->name('customer.updateProfile');
@@ -165,6 +169,18 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::post('/', [KegiatanController::class, 'createKegiatan'])->name('admin.createActivity');
         Route::put('/{idKegiatan}', [KegiatanController::class, 'updateKegiatan'])->name('admin.updateActivity'); 
         Route::delete('/{idKegiatan}', [KegiatanController::class, 'deleteKegiatan'])->name('admin.deleteActivity');
+    });
+
+    // ----------------------------------------
+    // RUTE KELOLA TESTIMONI
+    // Prefix turunan: /api/admin/testimonials/...
+    // ----------------------------------------
+    Route::prefix('testimonials')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\TestimoniController::class, 'getAllTestimonials'])->name('admin.testimonials');
+        Route::get('/{idTestimoni}', [\App\Http\Controllers\Api\TestimoniController::class, 'getTestimoniById'])->name('admin.testimoniById');
+        Route::post('/', [\App\Http\Controllers\Api\TestimoniController::class, 'createTestimoni'])->name('admin.createTestimoni');
+        Route::put('/{idTestimoni}', [\App\Http\Controllers\Api\TestimoniController::class, 'updateTestimoni'])->name('admin.updateTestimoni');
+        Route::delete('/{idTestimoni}', [\App\Http\Controllers\Api\TestimoniController::class, 'deleteTestimoni'])->name('admin.deleteTestimoni');
     });
 
     // ----------------------------------------

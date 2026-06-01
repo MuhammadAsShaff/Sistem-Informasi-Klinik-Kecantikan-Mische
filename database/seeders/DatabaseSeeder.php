@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             EventSeeder::class,
             PromoSeeder::class,
             ReservasiSeeder::class,
+            TestimoniSeeder::class,
         ]);
     }
 }
