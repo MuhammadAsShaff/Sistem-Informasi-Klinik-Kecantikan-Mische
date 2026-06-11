@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\ProfilPerusahaan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 // Perbaikan nama class menyesuaikan nama file (wajib PSR-4)
 class ProfilePerusahaanController extends Controller
@@ -103,11 +105,13 @@ class ProfilePerusahaanController extends Controller
             // Jika ada payload FILE masuk dengan nama field 'fotoPerusahaan'
             if ($request->hasFile('fotoPerusahaan')) {
                 $file = $request->file('fotoPerusahaan');
-
-                // BYPASS Windows/Laragon real_path bug
-                $filename = $file->hashName(); // Buat nama file unik acak
-                Storage::disk('public')->put('profil_perusahaan/' . $filename, file_get_contents($file->getPathname()));
-
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('profil_perusahaan/' . $filename, $webpData);
                 $fotoPath = 'profil_perusahaan/' . $filename;
             }
 
@@ -196,11 +200,13 @@ class ProfilePerusahaanController extends Controller
                 }
 
                 $file = $request->file('fotoPerusahaan');
-
-                // BYPASS Windows/Laragon real_path bug
-                $filename = $file->hashName();
-                Storage::disk('public')->put('profil_perusahaan/' . $filename, file_get_contents($file->getPathname()));
-
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('profil_perusahaan/' . $filename, $webpData);
                 $dataToUpdate['fotoPerusahaan'] = 'profil_perusahaan/' . $filename;
             }
 

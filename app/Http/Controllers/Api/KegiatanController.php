@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Kegiatan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class KegiatanController extends Controller
 {
@@ -97,8 +99,15 @@ class KegiatanController extends Controller
 
             // Proses unggah foto jika ada
             if ($request->hasFile('foto')) {
-                $fotoPath = $request->file('foto')->store('kegiatan', 'public');
-                $data['foto'] = $fotoPath;
+                $file = $request->file('foto');
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('kegiatan/' . $filename, $webpData);
+                $data['foto'] = 'kegiatan/' . $filename;
             } else {
                 $data['foto'] = 'kegiatan/default.png'; // Fallback gambar default agar tidak error NOT NULL di DB
             }
@@ -161,9 +170,15 @@ class KegiatanController extends Controller
                     Storage::disk('public')->delete($kegiatan->foto);
                 }
                 
-                // Simpan foto baru
-                $fotoPath = $request->file('foto')->store('kegiatan', 'public');
-                $updateData['foto'] = $fotoPath;
+                $file = $request->file('foto');
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('kegiatan/' . $filename, $webpData);
+                $updateData['foto'] = 'kegiatan/' . $filename;
             }
 
             $kegiatan->update($updateData);

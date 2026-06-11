@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Promo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class PromoController extends Controller
 {
@@ -100,8 +102,13 @@ class PromoController extends Controller
             $dataToInsert = $request->all();
             if ($request->hasFile('gambar')) {
                 $file = $request->file('gambar');
-                $filename = $file->hashName();
-                Storage::disk('public')->put('promo/' . $filename, file_get_contents($file->getPathname()));
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('promo/' . $filename, $webpData);
                 $dataToInsert['gambar'] = 'promo/' . $filename;
             }
 
@@ -173,8 +180,13 @@ class PromoController extends Controller
                     Storage::disk('public')->delete($promo->gambar);
                 }
                 $file = $request->file('gambar');
-                $filename = $file->hashName();
-                Storage::disk('public')->put('promo/' . $filename, file_get_contents($file->getPathname()));
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('promo/' . $filename, $webpData);
                 $dataToUpdate['gambar'] = 'promo/' . $filename;
             }
 

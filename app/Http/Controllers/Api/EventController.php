@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Event;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class EventController extends Controller
 {
@@ -120,8 +122,13 @@ class EventController extends Controller
             $dataToInsert = $request->all();
             if ($request->hasFile('foto')) {
                 $file = $request->file('foto');
-                $filename = $file->hashName();
-                Storage::disk('public')->put('event/' . $filename, file_get_contents($file->getPathname()));
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('event/' . $filename, $webpData);
                 $dataToInsert['foto'] = 'event/' . $filename;
             }
 
@@ -189,8 +196,13 @@ class EventController extends Controller
                     Storage::disk('public')->delete($event->foto);
                 }
                 $file = $request->file('foto');
-                $filename = $file->hashName();
-                Storage::disk('public')->put('event/' . $filename, file_get_contents($file->getPathname()));
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('event/' . $filename, $webpData);
                 $dataToUpdate['foto'] = 'event/' . $filename;
             }
 

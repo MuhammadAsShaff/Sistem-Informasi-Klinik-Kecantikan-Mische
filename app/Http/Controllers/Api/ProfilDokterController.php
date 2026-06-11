@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\ProfilDokter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ProfilDokterController extends Controller
 {
@@ -128,8 +130,13 @@ class ProfilDokterController extends Controller
             $fotoPath = null;
             if ($request->hasFile('foto')) {
                 $file = $request->file('foto');
-                $filename = $file->hashName();
-                Storage::disk('public')->put('profil_dokter/' . $filename, file_get_contents($file->getPathname()));
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('profil_dokter/' . $filename, $webpData);
                 $fotoPath = 'profil_dokter/' . $filename;
             }
 
@@ -210,8 +217,13 @@ class ProfilDokterController extends Controller
                     Storage::disk('public')->delete($dokter->foto);
                 }
                 $file = $request->file('foto');
-                $filename = $file->hashName();
-                Storage::disk('public')->put('profil_dokter/' . $filename, file_get_contents($file->getPathname()));
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('profil_dokter/' . $filename, $webpData);
                 $dataToUpdate['foto'] = 'profil_dokter/' . $filename;
             }
             

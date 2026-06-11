@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Testimoni;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class TestimoniController extends Controller
 {
@@ -126,8 +128,13 @@ class TestimoniController extends Controller
             $dataToInsert = $request->all();
             if ($request->hasFile('buktiFoto')) {
                 $file = $request->file('buktiFoto');
-                $filename = $file->hashName();
-                Storage::disk('public')->put('testimoni/' . $filename, file_get_contents($file->getPathname()));
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('testimoni/' . $filename, $webpData);
                 $dataToInsert['buktiFoto'] = 'testimoni/' . $filename;
             }
 
@@ -196,8 +203,13 @@ class TestimoniController extends Controller
                     Storage::disk('public')->delete($testimoni->buktiFoto);
                 }
                 $file = $request->file('buktiFoto');
-                $filename = $file->hashName();
-                Storage::disk('public')->put('testimoni/' . $filename, file_get_contents($file->getPathname()));
+                $filename = time() . '_' . uniqid() . '.webp';
+                
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($file->getPathname());
+                $webpData = $image->toWebp(80)->toString();
+                
+                Storage::disk('public')->put('testimoni/' . $filename, $webpData);
                 $dataToUpdate['buktiFoto'] = 'testimoni/' . $filename;
             }
 
