@@ -16,9 +16,16 @@ class DistribusiPromoEventController extends Controller
     /**
      * Menampilkan daftar customer untuk dipilih saat distribusi
      */
-    public function getCustomers()
+    public function getCustomers(Request $request)
     {
-        $customers = User::where('role', 'customer')->get(['idUser', 'nama', 'nomorWa', 'email']);
+        $query = User::where('role', 'customer');
+
+        // Jika ada input pencarian dari frontend
+        if ($request->has('search') && $request->search != '') {
+            $query->where('nama', 'like', '%' . $request->search . '%');
+        }
+
+        $customers = $query->get(['idUser', 'nama', 'nomorWa', 'email']);
         
         return response()->json([
             'status' => 'success',
