@@ -3,13 +3,15 @@ import { useParams, Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
 import { useProdukData } from '../hooks/useProdukData';
 import ProductGrid from './ProductGrid';
+import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
 const DetailProduk = () => {
   const { id } = useParams();
-  const { products } = useProdukData();
-  const product = products.find(p => p.id === parseInt(id));
+  const { products, isLoading } = useProdukData();
+  const product = products.find(p => (p.idProduk || p.id).toString() === id);
   const [qty, setQty] = useState(1);
 
+  if (isLoading) return <div className="text-center py-20 text-xl font-medium text-gray-500">Memuat produk...</div>;
   if (!product) return <div className="text-center py-20 text-xl font-bold">Produk tidak ditemukan</div>;
 
   return (
@@ -20,17 +22,21 @@ const DetailProduk = () => {
         <div className="bg-white rounded-[2rem] shadow-sm p-6 md:p-12 flex flex-col md:flex-row gap-10 md:gap-16 items-center mb-20 border border-gray-100">
           {/* Image Area */}
           <div className="w-full md:w-1/3 flex justify-center">
-            <img 
-              src={product.image} 
-              alt={product.name} 
-              className="w-full h-auto max-h-96 object-contain drop-shadow-xl" 
-            />
+            {product.gambar || product.image ? (
+              <img 
+                src={(product.gambar || product.image).startsWith('http') ? (product.gambar || product.image) : `${STORAGE_BASE_URL}${(product.gambar || product.image)}`} 
+                alt={product.nama || product.name} 
+                className="w-full h-auto max-h-96 object-contain drop-shadow-xl" 
+              />
+            ) : (
+              <div className="w-full h-64 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">No Image</div>
+            )}
           </div>
           
           {/* Details Area */}
           <div className="w-full md:w-2/3 flex flex-col">
-            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-2">{product.name}</h1>
-            <p className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">{product.price}</p>
+            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-2">{product.nama || product.name}</h1>
+            <p className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">{product.harga ? `Rp ${Number(product.harga).toLocaleString('id-ID')}` : product.price}</p>
             
             <div className="flex flex-wrap items-center gap-6 mb-10">
               {/* Qty Selector */}
@@ -46,9 +52,8 @@ const DetailProduk = () => {
                 Add To Cart
               </button>
             </div>
-            
             <p className="text-gray-700 leading-relaxed text-base md:text-lg text-justify md:text-left">
-              Serum Dengan Formula Aktif Yang Dirancang Untuk Membantu Meredakan Jerawat, Mengontrol Minyak Berlebih, Dan Mencegah Munculnya Jerawat Baru Tanpa Membuat Kulit Kering.
+              {product.deskripsi || product.description || 'Deskripsi tidak tersedia.'}
             </p>
           </div>
         </div>
@@ -56,8 +61,7 @@ const DetailProduk = () => {
         {/* Produk Lain */}
         <div>
           <h2 className="text-3xl font-extrabold text-gray-900 mb-2 px-4 md:px-0">Produk Lain</h2>
-          {/* Reuse the ProductGrid, passing all products for now */}
-          <ProductGrid products={products.filter(p => p.id !== product.id)} />
+          <ProductGrid products={products.filter(p => (p.idProduk || p.id).toString() !== id)} />
         </div>
 
       </div>

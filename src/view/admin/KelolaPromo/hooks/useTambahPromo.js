@@ -122,10 +122,29 @@ const convertToJPEG = (file) => {
         showToast("Gagal menambahkan promo.", "error");
       }
     } catch (err) {
-      const errMsg = err.response?.data?.message || "Gagal menyimpan data.";
-      const errorDetails = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(", ") : "";
-      setError(errorDetails ? `${errMsg} (${errorDetails})` : errMsg);
-      showToast(errorDetails ? `${errMsg} (${errorDetails})` : errMsg, "error");
+      console.error("Error submit promo:", err.response || err);
+      
+      let finalMessage = "Gagal menyimpan data.";
+      if (err.response?.data) {
+        if (typeof err.response.data === 'string') {
+          finalMessage = err.response.data; // e.g. HTML error
+        } else {
+          const errMsg = err.response.data.message || err.response.data.error || finalMessage;
+          const errors = err.response.data.errors;
+          
+          if (errors && typeof errors === 'object') {
+            const errorDetails = Object.values(errors).flat().join(", ");
+            finalMessage = errorDetails ? `${errMsg}\nDetail: ${errorDetails}` : errMsg;
+          } else {
+            finalMessage = errMsg;
+          }
+        }
+      } else if (err.message) {
+        finalMessage = err.message;
+      }
+      
+      setError(finalMessage);
+      showToast(finalMessage, "error");
     } finally {
       setIsSubmitting(false);
     }

@@ -19,6 +19,7 @@ const HalamanTestimoni = () => {
               id={testimonial.id}
               name={testimonial.name} 
               description={testimonial.description} 
+              foto={testimonial.foto}
             />
           ))}
         </div>

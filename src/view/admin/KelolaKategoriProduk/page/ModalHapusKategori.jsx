@@ -1,21 +1,21 @@
-import React, { useState } from "react";
-import { useHapusTestimoni } from "../hooks/useHapusTestimoni";
+import React, { useState } from 'react';
+import { useHapusKategori } from '../hooks/useHapusKategori';
 
-const ModalHapus = ({ isOpen, onClose, data, refetch, showToast }) => {
+const ModalHapusKategori = ({ isOpen, onClose, dataId, refetch, showToast }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { hapusTestimoni } = useHapusTestimoni(refetch);
+  const { hapusKategori } = useHapusKategori(refetch);
 
   const handleDelete = async () => {
-    if (!data) return;
+    if (!dataId) return;
     setIsDeleting(true);
-    const result = await hapusTestimoni(data.id || data.idTestimoni);
+    const result = await hapusKategori(dataId);
     setIsDeleting(false);
 
     if (result.success) {
-      showToast(result.message, "success");
+      showToast(result.message, 'success');
       onClose();
     } else {
-      showToast(result.message, "error");
+      showToast(result.message, 'error');
     }
   };
 
@@ -32,7 +32,7 @@ const ModalHapus = ({ isOpen, onClose, data, refetch, showToast }) => {
 
         {/* Title */}
         <h2 className="text-[22px] text-gray-500 font-medium mb-8">
-          Apakah Anda yakin ingin menghapus Testimoni ini?
+          Apakah Anda yakin ingin menghapus Kategori ini?
         </h2>
 
         {/* Actions */}
@@ -57,4 +57,4 @@ const ModalHapus = ({ isOpen, onClose, data, refetch, showToast }) => {
   );
 };
 
-export default ModalHapus;
+export default ModalHapusKategori;

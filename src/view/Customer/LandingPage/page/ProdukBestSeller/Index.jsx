@@ -1,8 +1,11 @@
 import React from 'react';
-import { products } from './ProductData';
 import ProductCard from './ProductCard';
+import { useProdukData } from '../../../HalamanProduk/hooks/useProdukData';
 
 export default function ProdukBestSeller() {
+  const { products, isLoading } = useProdukData();
+  const bestSellers = products ? products.slice(0, 3) : [];
+
   return (
     <section className="w-full py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -15,13 +18,17 @@ export default function ProdukBestSeller() {
             - Mobile: Flex Row + Horizontal Scroll (Slider)
             - Desktop (md): Grid 3 Kolom
         */}
-        <div className="flex flex-nowrap md:grid md:grid-cols-3 overflow-x-auto md:overflow-x-visible no-scrollbar snap-x snap-mandatory gap-8 md:gap-12 px-2 md:px-0 py-6">
-          {products.map((p) => (
-            <div key={p.id} className="snap-center shrink-0 w-[80vw] md:w-auto">
-              <ProductCard product={p} />
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center text-gray-500 py-10">Memuat produk best seller...</div>
+        ) : (
+          <div className="flex flex-nowrap md:grid md:grid-cols-3 overflow-x-auto md:overflow-x-visible no-scrollbar snap-x snap-mandatory gap-8 md:gap-12 px-2 md:px-0 py-6">
+            {bestSellers.map((p) => (
+              <div key={p.idProduk || p.id} className="snap-center shrink-0 w-[80vw] md:w-auto">
+                <ProductCard product={p} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

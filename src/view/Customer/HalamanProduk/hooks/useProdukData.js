@@ -1,43 +1,54 @@
-import { useState } from 'react';
-import gambarProduk from '@/assets/images/Gambar_Produk.png';
+import { useState, useEffect } from 'react';
+import axiosClient from '@/core/api/axiosClient';
+import { endpoints } from '@/core/api/endpoints';
 
 export const useProdukData = () => {
   const [activeCategory, setActiveCategory] = useState('semua');
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Dummy product data
-  const products = [
-    {
-      id: 1,
-      name: 'Serum Acne',
-      price: 'Rp 700.000',
-      category: 'acne',
-      image: gambarProduk
-    },
-    {
-      id: 2,
-      name: 'Serum Acne',
-      price: 'Rp 700.000',
-      category: 'acne',
-      image: gambarProduk
-    },
-    {
-      id: 3,
-      name: 'Serum Acne',
-      price: 'Rp 700.000',
-      category: 'acne',
-      image: gambarProduk
-    }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [prodRes, catRes] = await Promise.all([
+          axiosClient.get(endpoints.customer.product),
+          axiosClient.get(endpoints.admin.kategori) // Assuming customer can view all categories
+        ]);
+
+        if (prodRes.data?.status === 'success') {
+          setProducts(prodRes.data.data);
+        }
+        
+        if (catRes.data?.status === 'success') {
+          setCategories(catRes.data.data);
+        }
+      } catch (error) {
+        console.error("Gagal memuat data produk:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
   // Filter products based on active category
   const filteredProducts = activeCategory === 'semua' 
     ? products 
-    : products.filter(product => product.category === activeCategory);
+    : products.filter(product => {
+        // Handle if category is object or string/id
+        const catId = product.kategori?.idKategori || product.idKategori;
+        return catId?.toString() === activeCategory?.toString();
+      });
 
   return {
     products,
+    categories,
     activeCategory,
     setActiveCategory,
-    filteredProducts
+    filteredProducts,
+    isLoading
   };
 };

@@ -1,3 +1,3 @@
-import KelolaKategoriProduk from "./page/KelolaKategoriProduk";
+import KelolaProduk from "./page/KelolaProduk";
 
-export default KelolaKategoriProduk;
+export default KelolaProduk;

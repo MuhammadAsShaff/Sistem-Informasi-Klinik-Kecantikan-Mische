@@ -4,7 +4,7 @@ import ModalTambah from "./page/ModalTambah";
 import ModalEdit from "./page/ModalEdit";
 import ModalHapus from "./page/ModalHapus";
 import Pagination from "../components/Pagination";
-import { useTestimoni } from "./hooks/useTestimoni";
+import { useFetchTestimoni } from "./hooks/useFetchTestimoni";
 import ToastAlert from "@/view/components/ToastAlert";
 
 export default function KelolaTestimoni() {
@@ -19,14 +19,14 @@ export default function KelolaTestimoni() {
     setToast({ message, type });
   };
 
-  const {
-    searchTerm,
-    setSearchTerm,
-    filteredTestimoni,
-    handleDelete: hookHandleDelete,
-    handleEdit: hookHandleEdit,
-    handleAdd
-  } = useTestimoni();
+  const [searchTerm, setSearchTerm] = useState('');
+  const { testimoni, refetch } = useFetchTestimoni();
+
+  const filteredTestimoni = testimoni.filter(item => 
+    item.namaTester?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.deskripsi?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.jenisTestimoni?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleEdit = (item) => {
     setSelectedData(item);
@@ -38,27 +38,7 @@ export default function KelolaTestimoni() {
     setIsHapusOpen(true);
   };
 
-  const handleTambahSubmit = (formData) => {
-    handleAdd(formData);
-    setIsTambahOpen(false);
-    showToast("Berhasil menambahkan testimoni baru!", "success");
-  };
-
-  const handleEditSubmit = (formData) => {
-    if (selectedData) {
-      hookHandleEdit(selectedData.id, formData);
-    }
-    setIsEditOpen(false);
-    showToast("Berhasil memperbarui testimoni!", "success");
-  };
-
-  const handleDeleteConfirm = () => {
-    if (selectedData) {
-      hookHandleDelete(selectedData.id);
-    }
-    setIsHapusOpen(false);
-    showToast("Berhasil menghapus testimoni!", "success");
-  };
+  // Modals handle API calls internally and call refetch, so we only need to pass refetch and showToast
 
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen animate-in fade-in duration-700">
@@ -109,20 +89,24 @@ export default function KelolaTestimoni() {
         <ModalTambah
           isOpen={isTambahOpen}
           onClose={() => setIsTambahOpen(false)}
-          onSubmit={handleTambahSubmit}
+          refetch={refetch}
+          showToast={showToast}
         />
 
         <ModalEdit
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
-          onSubmit={handleEditSubmit}
           data={selectedData}
+          refetch={refetch}
+          showToast={showToast}
         />
 
         <ModalHapus
           isOpen={isHapusOpen}
           onClose={() => setIsHapusOpen(false)}
-          onDelete={handleDeleteConfirm}
+          data={selectedData}
+          refetch={refetch}
+          showToast={showToast}
         />
 
         {toast && (

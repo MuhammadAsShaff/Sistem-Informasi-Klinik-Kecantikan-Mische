@@ -1,21 +1,22 @@
-import React, { useState } from "react";
-import { useHapusTestimoni } from "../hooks/useHapusTestimoni";
+import React, { useState } from 'react';
+import { AlertCircle } from 'lucide-react';
+import { useHapusProduk } from '../hooks/useHapusProduk';
 
-const ModalHapus = ({ isOpen, onClose, data, refetch, showToast }) => {
+const ModalHapusProduk = ({ isOpen, onClose, dataId, refetch, showToast }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { hapusTestimoni } = useHapusTestimoni(refetch);
+  const { hapusProduk } = useHapusProduk(refetch);
 
   const handleDelete = async () => {
-    if (!data) return;
+    if (!dataId) return;
     setIsDeleting(true);
-    const result = await hapusTestimoni(data.id || data.idTestimoni);
+    const result = await hapusProduk(dataId);
     setIsDeleting(false);
 
     if (result.success) {
-      showToast(result.message, "success");
+      showToast(result.message, 'success');
       onClose();
     } else {
-      showToast(result.message, "error");
+      showToast(result.message, 'error');
     }
   };
 
@@ -32,7 +33,7 @@ const ModalHapus = ({ isOpen, onClose, data, refetch, showToast }) => {
 
         {/* Title */}
         <h2 className="text-[22px] text-gray-500 font-medium mb-8">
-          Apakah Anda yakin ingin menghapus Testimoni ini?
+          Apakah Anda yakin ingin menghapus produk ini?
         </h2>
 
         {/* Actions */}
@@ -57,4 +58,4 @@ const ModalHapus = ({ isOpen, onClose, data, refetch, showToast }) => {
   );
 };
 
-export default ModalHapus;
+export default ModalHapusProduk;

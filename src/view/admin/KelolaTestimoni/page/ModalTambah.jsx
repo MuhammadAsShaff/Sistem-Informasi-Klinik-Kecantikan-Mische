@@ -1,19 +1,23 @@
 import React, { useState } from "react";
+import { useTambahTestimoni } from "../hooks/useTambahTestimoni";
 
-const ModalTambah = ({ isOpen, onClose, onSubmit }) => {
+const ModalTambah = ({ isOpen, onClose, refetch, showToast }) => {
   const [fileName, setFileName] = useState("No File Choosen");
   const [formData, setFormData] = useState({
-    nama: '',
-    tanggal: '',
-    jenis: '',
+    namaTester: '',
+    tanggalTreatment: '',
+    jenisTestimoni: '',
     deskripsi: '',
-    foto: null
+    buktiFoto: null
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { tambahTestimoni } = useTambahTestimoni(refetch);
 
   React.useEffect(() => {
     if (isOpen) {
-      setFormData({ nama: '', tanggal: '', jenis: '', deskripsi: '' });
+      setFormData({ namaTester: '', tanggalTreatment: '', jenisTestimoni: '', deskripsi: '', buktiFoto: null });
       setFileName("No File Choosen");
+      setIsSubmitting(false);
     }
   }, [isOpen]);
 
@@ -22,12 +26,34 @@ const ModalTambah = ({ isOpen, onClose, onSubmit }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    // Only submit if required fields are filled
-    if (formData.nama && formData.jenis) {
-      onSubmit(formData);
+  const handleSubmit = async () => {
+    if (formData.namaTester && formData.jenisTestimoni && formData.tanggalTreatment && formData.deskripsi && formData.buktiFoto) {
+      setIsSubmitting(true);
+      const payload = new FormData();
+      payload.append('namaTester', formData.namaTester);
+      payload.append('jenisTestimoni', formData.jenisTestimoni);
+      payload.append('deskripsi', formData.deskripsi);
+      payload.append('tanggalTreatment', formData.tanggalTreatment);
+      payload.append('buktiFoto', formData.buktiFoto);
+
+      const result = await tambahTestimoni(payload);
+      setIsSubmitting(false);
+      
+      if (result.success) {
+        showToast(result.message, "success");
+        onClose();
+      } else {
+        // Build a detailed error message if there are validation errors
+        let errorDetail = result.message;
+        if (result.errors) {
+          const firstErrorKey = Object.keys(result.errors)[0];
+          errorDetail = result.errors[firstErrorKey][0];
+          console.error("Validation Errors:", result.errors);
+        }
+        showToast(errorDetail, "error");
+      }
     } else {
-      alert("Mohon isi Nama dan Jenis Testimoni!");
+      showToast("Mohon isi semua form termasuk unggah foto!", "error");
     }
   };
 
@@ -58,14 +84,10 @@ const ModalTambah = ({ isOpen, onClose, onSubmit }) => {
                       if (e.target.files && e.target.files[0]) {
                         const file = e.target.files[0];
                         setFileName(file.name);
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setFormData(prev => ({ ...prev, foto: reader.result }));
-                        };
-                        reader.readAsDataURL(file);
+                        setFormData(prev => ({ ...prev, buktiFoto: file }));
                       } else {
                         setFileName("No File Choosen");
-                        setFormData(prev => ({ ...prev, foto: null }));
+                        setFormData(prev => ({ ...prev, buktiFoto: null }));
                       }
                     }}
                     className="sr-only"
@@ -95,8 +117,8 @@ const ModalTambah = ({ isOpen, onClose, onSubmit }) => {
               <label className="block text-sm font-medium text-gray-800 mb-2">Nama Testimoni</label>
               <input 
                 type="text" 
-                name="nama"
-                value={formData.nama}
+                name="namaTester"
+                value={formData.namaTester}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded p-3 text-sm outline-none focus:border-gray-400"
                 placeholder="Nama Testimoni"
@@ -108,8 +130,8 @@ const ModalTambah = ({ isOpen, onClose, onSubmit }) => {
               <div className="relative">
                 <input 
                   type="date" 
-                  name="tanggal"
-                  value={formData.tanggal}
+                  name="tanggalTreatment"
+                  value={formData.tanggalTreatment}
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded p-3 text-sm outline-none focus:border-gray-400"
                   placeholder="dd/mm/yyyy"
@@ -120,8 +142,8 @@ const ModalTambah = ({ isOpen, onClose, onSubmit }) => {
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-2">Jenis Testimoni</label>
               <select 
-                name="jenis"
-                value={formData.jenis}
+                name="jenisTestimoni"
+                value={formData.jenisTestimoni}
                 onChange={handleChange}
                 className="w-full border border-gray-300 rounded p-3 text-sm outline-none focus:border-gray-400 bg-white"
               >
@@ -137,9 +159,10 @@ const ModalTambah = ({ isOpen, onClose, onSubmit }) => {
         <div className="p-6 border-t border-gray-200 flex justify-end">
           <button 
             onClick={handleSubmit}
-            className="bg-[#56BC36] hover:bg-[#469e2c] text-white px-6 py-2.5 rounded font-medium transition-colors"
+            disabled={isSubmitting}
+            className={`bg-[#56BC36] hover:bg-[#469e2c] text-white px-6 py-2.5 rounded font-medium transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Tambah Testimoni
+            {isSubmitting ? 'Menyimpan...' : 'Tambah Testimoni'}
           </button>
         </div>
       </div>

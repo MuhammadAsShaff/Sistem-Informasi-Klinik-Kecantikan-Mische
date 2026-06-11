@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import HeaderSection from './HeaderSection';
 import ActionSection from './ActionSection';
 import TableSection from './TableSection';
-import { useKategoriProduk } from '../hooks/useKategoriProduk';
+import { useFetchKategori } from '../hooks/useFetchKategori';
 import ModalTambahKategori from './ModalTambahKategori';
 import ModalPerbaruiKategori from './ModalPerbaruiKategori';
 import ModalHapusKategori from './ModalHapusKategori';
+import Pagination from '../../components/Pagination';
+import ToastAlert from '@/view/components/ToastAlert';
 
 const KelolaKategoriProduk = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,10 +15,21 @@ const KelolaKategoriProduk = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const { searchQuery, setSearchQuery, filteredCategories, handleDelete, handleEdit, handleAdd } = useKategoriProduk();
+  const [searchQuery, setSearchQuery] = useState('');
+  const { categories, refetch } = useFetchKategori();
+
+  const filteredCategories = categories.filter(category =>
+    category.nama?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    category.deskripsi?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
+  const showToast = (message, type = 'success') => {
+    setToast({ isOpen: true, message, type });
+  };
 
   return (
-    <div className="p-8 font-sans w-full bg-[#f8f9fa] min-h-screen relative">
+    <div className="p-8 font-sans w-full bg-[#f8f9fa] min-h-screen relative animate-in fade-in slide-in-from-bottom-4 duration-700">
       <HeaderSection />
       <ActionSection 
         searchQuery={searchQuery} 
@@ -35,14 +48,13 @@ const KelolaKategoriProduk = () => {
         }}
       />
       
-      {/* Modal Tambah */}
+      <Pagination />
+      
       <ModalTambahKategori 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
-        onSave={(newData) => {
-          handleAdd(newData);
-          setIsModalOpen(false);
-        }}
+        refetch={refetch}
+        showToast={showToast}
       />
 
       {/* Modal Perbarui */}
@@ -50,20 +62,24 @@ const KelolaKategoriProduk = () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         categoryData={selectedCategory}
-        onSave={(id, updatedData) => {
-          handleEdit(id, updatedData);
-          setIsEditModalOpen(false);
-        }}
+        refetch={refetch}
+        showToast={showToast}
       />
 
       {/* Modal Hapus */}
       <ModalHapusKategori 
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={() => {
-          handleDelete(deleteId);
-          setIsDeleteModalOpen(false);
-        }}
+        dataId={deleteId}
+        refetch={refetch}
+        showToast={showToast}
+      />
+
+      <ToastAlert 
+        isOpen={toast.isOpen}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, isOpen: false })}
       />
     </div>
   );

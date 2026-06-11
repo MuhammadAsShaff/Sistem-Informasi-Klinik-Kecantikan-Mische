@@ -1,33 +1,51 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { useTambahKategori } from '../hooks/useTambahKategori';
 
-const ModalTambahKategori = ({ isOpen, onClose, onSave }) => {
+const ModalTambahKategori = ({ isOpen, onClose, refetch, showToast }) => {
   const [nama, setNama] = useState('');
   const [deskripsi, setDeskripsi] = useState('');
-  const [image, setImage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { tambahKategori } = useTambahKategori(refetch);
 
   // Reset fields when opened
   React.useEffect(() => {
     if (isOpen) {
       setNama('');
       setDeskripsi('');
-      setImage(null);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSave = () => {
-    if (nama.trim() !== '') {
-      onSave({ name: nama, description: deskripsi, image: image });
+  const handleSave = async () => {
+    if (!nama.trim()) {
+      showToast('Nama kategori wajib diisi', 'error');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const result = await tambahKategori({ nama, deskripsi });
+    setIsSubmitting(false);
+
+    if (result.success) {
+      showToast(result.message, 'success');
+      onClose();
+    } else {
+      let errorDetail = result.message;
+      if (result.errors) {
+        const firstErrorKey = Object.keys(result.errors)[0];
+        errorDetail = result.errors[firstErrorKey][0];
+      }
+      showToast(errorDetail, 'error');
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 font-sans">
-      <div className="bg-white rounded-lg w-[700px] max-w-[95%] shadow-xl flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm font-sans transition-opacity">
+      <div className="bg-white rounded-lg w-[700px] max-w-[95%] shadow-[0_0_15px_rgba(0,0,0,0.1)] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-8 py-5 border-b border-gray-200">
+        <div className="flex justify-between items-center px-8 py-5 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">Tambah Kategori Produk</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={24} />
@@ -47,19 +65,6 @@ const ModalTambahKategori = ({ isOpen, onClose, onSave }) => {
                 className="border border-gray-300 rounded p-3 outline-none focus:border-green-500 transition-colors"
               />
             </div>
-            <div className="flex flex-col">
-              <label className="text-gray-800 mb-2 font-medium">Gambar Kategori</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setImage(URL.createObjectURL(e.target.files[0]));
-                  }
-                }}
-                className="border border-gray-300 rounded p-2.5 outline-none focus:border-green-500 transition-colors bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer"
-              />
-            </div>
           </div>
           <div className="flex-1 flex flex-col">
             <label className="text-gray-800 mb-2 font-medium">Deskripsi Kategori</label>
@@ -76,9 +81,10 @@ const ModalTambahKategori = ({ isOpen, onClose, onSave }) => {
         <div className="px-8 py-5 border-t border-gray-200 flex justify-end">
           <button 
             onClick={handleSave}
-            className="bg-[#56BC36] hover:bg-[#2da509] text-white font-medium px-6 py-2.5 rounded shadow-sm transition-colors"
+            disabled={isSubmitting}
+            className={`bg-[#56BC36] hover:bg-[#2da509] text-white font-medium px-6 py-2.5 rounded shadow-sm transition-colors ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Tambah Kategori
+            {isSubmitting ? 'Menyimpan...' : 'Tambah Kategori'}
           </button>
         </div>
       </div>

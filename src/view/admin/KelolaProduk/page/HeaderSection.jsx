@@ -3,9 +3,9 @@ import React from 'react';
 const HeaderSection = () => {
   return (
     <div className="mb-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Kategori Produk</h1>
+      <h1 className="text-[28px] font-medium text-gray-800 mb-2">Produk Yang Terdaftar Pada Sistem</h1>
       <p className="text-sm text-gray-600">
-        Halaman ini menampilkan dan mengelola daftar kategori produk yang tersedia di klinik.
+        Halaman Ini Menampilkan Informasi Produk, Termasuk Detail Produk. Anda Dapat Menambah, Memperbarui, Atau Menghapus Produk.
       </p>
     </div>
   );

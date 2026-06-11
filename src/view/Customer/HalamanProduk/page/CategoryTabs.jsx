@@ -1,17 +1,18 @@
 import React from 'react';
 
-const CategoryTabs = ({ activeCategory, setActiveCategory }) => {
-  const categories = [
+const CategoryTabs = ({ activeCategory, setActiveCategory, categories = [] }) => {
+  const allCategories = [
     { id: 'semua', label: 'SEMUA PRODUK' },
-    { id: 'acne', label: 'ACNE' },
-    { id: 'whitening', label: 'Whitening' },
-    { id: 'anti-aging', label: 'ANTI- AGING' }
+    ...categories.map(cat => ({
+      id: cat.idKategori?.toString() || cat.id?.toString(),
+      label: cat.nama ? cat.nama.toUpperCase() : 'UNKNOWN'
+    }))
   ];
 
   return (
     <div className="w-full flex justify-center py-6 px-4 overflow-x-auto no-scrollbar">
       <div className="flex space-x-6 md:space-x-12 min-w-max">
-        {categories.map((category) => (
+        {allCategories.map((category) => (
           <button
             key={category.id}
             onClick={() => setActiveCategory(category.id)}
