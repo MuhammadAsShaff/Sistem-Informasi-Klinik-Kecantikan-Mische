@@ -37,10 +37,16 @@ export function useUpdateProfilAdmin(user, showToast, onUpdated) {
     }
   }, [user]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    // Nomor WA hanya angka
-    if (name === "nomorWa") {
+  const handleChange = async (e) => {
+    const { name, value, type, files } = e.target;
+    if (type === "file") {
+      const file = files[0];
+      if (file) {
+        const { convertToJPEG } = await import("@/utils/imageConverter");
+        const convertedFile = await convertToJPEG(file);
+        setFormData((prev) => ({ ...prev, [name]: convertedFile }));
+      }
+    } else if (name === "nomorWa") {
       setFormData((prev) => ({ ...prev, [name]: value.replace(/\D/g, "") }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));

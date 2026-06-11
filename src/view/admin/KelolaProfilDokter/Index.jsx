@@ -11,6 +11,7 @@ import ModalTambahDokter from "./page/ModalTambahDokter";
 import ModalPerbaruiDokter from "./page/ModalPerbaruiDokter";
 import ModalHapusDokter from "./page/ModalHapusDokter";
 import ToastAlert from "@/view/components/ToastAlert";
+import Pagination from "../components/Pagination";
 
 export default function KelolaProfilDokter() {
   // State seleksi dokter (untuk edit & hapus)
@@ -109,6 +110,8 @@ export default function KelolaProfilDokter() {
           startIndex={startIndex || 1}
         />
       )}
+
+      <Pagination />
 
       {/* MODALS */}
       <ModalTambahDokter

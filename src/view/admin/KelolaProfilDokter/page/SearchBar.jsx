@@ -8,10 +8,10 @@ export default function SearchBar({ value, onChange, onOpenTambah }) {
       <div className="relative">
         <input 
           type="text" 
-          placeholder="Cari..." 
+          placeholder="Cari.." 
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="bg-[#F3F4F6] border-none px-6 py-2.5 rounded-md text-[13px] w-[260px] focus:ring-2 focus:ring-[#7CC052] transition-all outline-none text-[#1A1A1A] placeholder-gray-400"
+          className="bg-[#F3F4F6] border-none px-6 py-2.5 rounded-md text-sm w-[250px] focus:ring-2 focus:ring-[#7CC052] transition-all outline-none text-gray-700"
         />
       </div>
 

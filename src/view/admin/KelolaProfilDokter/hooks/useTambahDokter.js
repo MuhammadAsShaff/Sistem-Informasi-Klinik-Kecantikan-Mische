@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
+import { convertToJPEG } from "@/utils/imageConverter";
 
 export function useTambahDokter(onSuccess, showToast) {
   const [formData, setFormData] = useState({
@@ -21,18 +22,19 @@ export function useTambahDokter(onSuccess, showToast) {
     }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      const convertedFile = await convertToJPEG(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData((prev) => ({
           ...prev,
           image: reader.result, 
-          imageFile: file, // Simpan file aslinya
+          imageFile: convertedFile, // Simpan file yang sudah dikonversi
         }));
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(convertedFile);
     }
   };
 

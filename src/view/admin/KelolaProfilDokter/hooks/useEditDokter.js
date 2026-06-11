@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axiosClient from "@/core/api/axiosClient";
 import { endpoints, STORAGE_BASE_URL } from "@/core/api/endpoints";
+import { convertToJPEG } from "@/utils/imageConverter";
 
 export function useEditDokter(selectedDokter, onSuccess, showToast) {
   const [formData, setFormData] = useState({
@@ -37,18 +38,19 @@ export function useEditDokter(selectedDokter, onSuccess, showToast) {
     }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
+      const convertedFile = await convertToJPEG(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData((prev) => ({
           ...prev,
           image: reader.result,
-          imageFile: file,
+          imageFile: convertedFile,
         }));
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(convertedFile);
     }
   };
 

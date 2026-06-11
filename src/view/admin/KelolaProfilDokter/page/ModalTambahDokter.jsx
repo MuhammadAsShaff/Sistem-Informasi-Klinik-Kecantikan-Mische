@@ -95,23 +95,18 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
                   
                   {/* Premium Styled File Input */}
                   <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="bg-[#1E293B] hover:bg-[#0F172A] text-white px-5 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer"
-                    >
+                    <label className="bg-[#1E293B] hover:bg-[#0F172A] text-white px-5 py-2 rounded-md text-xs font-bold transition-colors cursor-pointer inline-block">
                       Choose File
-                    </button>
-                    <span className="text-xs text-gray-500 font-semibold truncate max-w-[200px]">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="sr-only"
+                      />
+                    </label>
+                    <span className="text-sm text-gray-500 font-medium truncate max-w-[200px]">
                       {formData.image ? "Gambar Terpilih" : "No File Chosen"}
                     </span>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
                   </div>
 
                   {formData.image && (

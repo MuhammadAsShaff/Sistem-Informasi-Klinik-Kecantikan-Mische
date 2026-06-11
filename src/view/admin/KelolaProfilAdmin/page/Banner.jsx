@@ -16,7 +16,7 @@ const Banner = ({ user }) => {
         <span className="bg-[#e1f5ec] text-[#48a176] font-semibold px-5 py-1 rounded-full text-[14px] mb-2">
           Online
         </span>
-        <h2 className="text-[22px] font-bold text-black mb-1">Hallo, {nama}!</h2>
+        <h2 className="text-[22px] font-semibold text-black mb-1">Hallo, {nama}!</h2>
         <p className="text-gray-700 text-[15px]">
           Anda dapat mengganti dan menyesuaikan dengan kebutuhan. Ayo atur profil Anda sekarang!
         </p>

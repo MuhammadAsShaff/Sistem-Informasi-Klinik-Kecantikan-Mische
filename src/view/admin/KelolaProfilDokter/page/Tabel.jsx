@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { PencilLine, Trash2, ChevronDown } from "lucide-react";
+import { PencilLine, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { STORAGE_BASE_URL } from "@/core/api/endpoints";
 
 export default function Tabel({ data, onEdit, onDelete, onStatusChange, startIndex = 1 }) {
+  const [expandedDescId, setExpandedDescId] = useState(null);
+
   const handleStatusSelect = (id, newStatus) => {
     onStatusChange(id, newStatus);
+  };
+
+  const toggleExpand = (id) => {
+    setExpandedDescId(prev => prev === id ? null : id);
   };
 
   return (
@@ -30,8 +36,8 @@ export default function Tabel({ data, onEdit, onDelete, onStatusChange, startInd
                 const docId = dokter.idDokter || dokter.id;
 
                 // Konstruksi URL gambar secara absolut
-                const imageUrl = dokter.foto && !dokter.foto.startsWith('http') 
-                  ? `${STORAGE_BASE_URL}${dokter.foto}` 
+                const imageUrl = dokter.foto && !dokter.foto.startsWith('http')
+                  ? `${STORAGE_BASE_URL}${dokter.foto}`
                   : (dokter.foto || "https://via.placeholder.com/150");
 
                 return (
@@ -44,10 +50,10 @@ export default function Tabel({ data, onEdit, onDelete, onStatusChange, startInd
                     </td>
                     <td className="px-5 py-4 text-center">
                       <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm mx-auto bg-gray-50">
-                        <img 
-                          src={imageUrl} 
-                          alt={dokter.nama} 
-                          className="w-full h-full object-cover object-top" 
+                        <img
+                          src={imageUrl}
+                          alt={dokter.nama}
+                          className="w-full h-full object-cover object-top"
                           onError={(e) => {
                             e.target.src = "https://via.placeholder.com/150";
                           }}
@@ -57,18 +63,34 @@ export default function Tabel({ data, onEdit, onDelete, onStatusChange, startInd
                     <td className="px-5 py-4 text-xs text-gray-500 font-medium">
                       {docEmail}
                     </td>
-                    <td className="px-5 py-4 text-xs text-gray-500 font-medium max-w-xs truncate">
-                      {dokter.deskripsi || "-"}
+                    <td className="px-5 py-4 text-xs text-gray-500 font-medium max-w-xs">
+                      {dokter.deskripsi ? (
+                        <div>
+                          <div className={`transition-all duration-300 ${expandedDescId === docId ? "whitespace-normal" : "line-clamp-2"}`}>
+                            {dokter.deskripsi}
+                          </div>
+                          {dokter.deskripsi.length > 60 && (
+                            <button
+                              onClick={() => toggleExpand(docId)}
+                              className="text-gray-400 hover:text-[#56BC36] mt-1.5 inline-block focus:outline-none transition-colors"
+                              title={expandedDescId === docId ? "Tutup" : "Lihat Semua"}
+                            >
+                              {expandedDescId === docId ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        "-"
+                      )}
                     </td>
                     <td className="px-5 py-4 text-center relative">
                       <select
                         value={dokter.status || "Tersedia"}
                         onChange={(e) => handleStatusSelect(docId, e.target.value)}
-                        className={`appearance-none inline-flex items-center gap-1.5 pl-4 pr-10 py-1.5 rounded-full text-xs font-bold border transition-colors cursor-pointer focus:outline-none focus:ring-0 ${
-                          isAvailable
+                        className={`appearance-none inline-flex items-center gap-1.5 pl-4 pr-10 py-1.5 rounded-full text-xs font-bold border transition-colors cursor-pointer focus:outline-none focus:ring-0 ${isAvailable
                             ? "bg-green-50 text-[#56BC36] border-[#56BC36]/30 hover:bg-green-100"
                             : "bg-red-50 text-red-500 border-red-500/30 hover:bg-red-100"
-                        }`}
+                          }`}
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='${isAvailable ? '%2356BC36' : '%23ef4444'}' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                           backgroundRepeat: 'no-repeat',
@@ -82,13 +104,13 @@ export default function Tabel({ data, onEdit, onDelete, onStatusChange, startInd
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-center gap-3">
-                        <button 
+                        <button
                           onClick={() => onEdit(dokter)}
                           className="text-gray-400 hover:text-[#56BC36] transition-colors cursor-pointer"
                         >
                           <PencilLine size={18} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => onDelete(dokter)}
                           className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                         >
