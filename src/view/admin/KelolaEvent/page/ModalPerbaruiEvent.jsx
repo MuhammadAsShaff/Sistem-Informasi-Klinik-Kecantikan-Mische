@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
 import { useEditEvent } from '../hooks/useEditEvent';
+import { convertToJPEG } from '@/utils/imageConverter';
 
 export default function ModalPerbaruiEvent({ isOpen, onClose, refetch, showToast, event }) {
   const { editEvent } = useEditEvent(refetch);
@@ -29,10 +30,14 @@ export default function ModalPerbaruiEvent({ isOpen, onClose, refetch, showToast
 
   if (!isOpen) return null;
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, type, files } = e.target;
     if (type === 'file') {
-      setFormData(prev => ({ ...prev, [name]: files[0] }));
+      const file = files[0];
+      if (file) {
+        const converted = await convertToJPEG(file);
+        setFormData(prev => ({ ...prev, [name]: converted }));
+      }
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -49,7 +54,9 @@ export default function ModalPerbaruiEvent({ isOpen, onClose, refetch, showToast
     payload.append('tanggalMulai', formData.tanggalMulai);
     payload.append('tanggalSelesai', formData.tanggalSelesai);
     payload.append('deskripsi', formData.deskripsi);
-    if (formData.foto) {
+    if (formData.fotoBaru) {
+      payload.append('foto', formData.fotoBaru);
+    } else if (formData.foto) {
       payload.append('foto', formData.foto);
     }
     
@@ -122,10 +129,9 @@ export default function ModalPerbaruiEvent({ isOpen, onClose, refetch, showToast
                     name="tanggalMulai"
                     value={formData.tanggalMulai}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm appearance-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm"
                     required
                   />
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-black pointer-events-none" size={20} />
                 </div>
               </div>
 
@@ -138,39 +144,47 @@ export default function ModalPerbaruiEvent({ isOpen, onClose, refetch, showToast
                     name="tanggalSelesai"
                     value={formData.tanggalSelesai}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm appearance-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm"
                     required
                   />
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-black pointer-events-none" size={20} />
                 </div>
               </div>
             </div>
 
-            {/* Deskripsi Event */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">Deskripsi Event</label>
-              <textarea 
-                name="deskripsi"
-                value={formData.deskripsi}
-                onChange={handleChange}
-                placeholder="Deskripsi Event"
-                rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm resize-none"
-                required
-              ></textarea>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Foto Event Baru */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Foto Event Baru (Opsional)</label>
+                <div className="flex items-center gap-3">
+                  <label className="bg-[#1E293B] hover:bg-[#0F172A] text-white px-5 py-2 rounded-md text-xs font-bold transition-colors cursor-pointer inline-block">
+                    Choose File
+                    <input 
+                      type="file" 
+                      name="fotoBaru"
+                      onChange={handleChange}
+                      className="sr-only"
+                    />
+                  </label>
+                  <span className="text-sm text-gray-500 font-medium truncate max-w-[200px]">
+                    {formData.fotoBaru ? (formData.fotoBaru.name || "Gambar Terpilih") : "No File Chosen"}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Format: Semua Format Gambar. Max: 4MB.</p>
+              </div>
 
-            {/* Foto Event */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">Ubah Foto Event (Kosongkan jika tidak ingin mengubah)</label>
-              <input 
-                type="file" 
-                name="foto"
-                accept="image/jpeg, image/png, image/jpg"
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm bg-white"
-              />
-              <p className="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG. Max: 4MB.</p>
+              {/* Deskripsi Event */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Deskripsi Event</label>
+                <textarea 
+                  name="deskripsi"
+                  value={formData.deskripsi}
+                  onChange={handleChange}
+                  placeholder="Deskripsi Event"
+                  rows="4"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm resize-none"
+                  required
+                ></textarea>
+              </div>
             </div>
 
           </form>

@@ -5,41 +5,35 @@ export default function ModalHapusPromo({ isOpen, onClose, onConfirm }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      ></div>
-
-      {/* Modal Container */}
-      <div className="relative bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl animate-in fade-in zoom-in-95 duration-200 flex flex-col items-center text-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="bg-white w-full max-w-md rounded-2xl p-8 text-center shadow-xl">
         
-        {/* Icon */}
-        <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mb-6">
-          <AlertCircle size={40} className="text-gray-500" />
+        {/* Warning Icon */}
+        <div className="mx-auto w-20 h-20 border-4 border-gray-400 rounded-full flex items-center justify-center mb-6">
+          <span className="text-gray-400 text-5xl font-bold">!</span>
         </div>
 
-        {/* Text */}
-        <h2 className="text-[22px] font-medium text-gray-600 mb-8 px-4">
+        {/* Title */}
+        <h2 className="text-[22px] text-gray-500 font-medium mb-8">
           Apakah Anda yakin ingin menghapus promo ini?
         </h2>
 
-        {/* Buttons */}
-        <div className="flex gap-4 w-full justify-center">
-          <button
+        {/* Actions */}
+        <div className="flex justify-center gap-4">
+          <button 
             onClick={onConfirm}
-            className="px-8 py-3 bg-[#56BC36] hover:bg-[#4ea830] text-white font-medium rounded-xl transition-all active:scale-95 min-w-[140px]"
+            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-8 py-3 rounded-lg font-medium transition-colors"
           >
             Ya, Hapus
           </button>
-          <button
+          <button 
             onClick={onClose}
-            className="px-8 py-3 bg-white border border-gray-200 hover:bg-gray-50 text-black font-medium rounded-xl transition-all active:scale-95 min-w-[140px]"
+            className="bg-white border border-gray-200 text-black px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
           >
             Tidak, Batalkan
           </button>
         </div>
+        
       </div>
     </div>
   );

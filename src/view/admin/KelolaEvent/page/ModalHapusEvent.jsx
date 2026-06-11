@@ -6,12 +6,15 @@ export default function ModalHapusEvent({ isOpen, onClose, refetch, showToast, e
 
   if (!isOpen) return null;
 
-  const handleHapus = () => {
+  const handleHapus = async () => {
     if (event) {
-      const result = hapusEvent(event.id);
+      const id = event.id || event.idEvent;
+      const result = await hapusEvent(id);
       if (result.success) {
         showToast(result.message);
         onClose();
+      } else {
+        showToast(result.message, "error");
       }
     }
   };

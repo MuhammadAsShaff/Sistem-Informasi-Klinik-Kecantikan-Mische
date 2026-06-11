@@ -11,6 +11,7 @@ import ModalTambahPromo from "./page/ModalTambahPromo";
 import ModalPerbaruiPromo from "./page/ModalPerbaruiPromo";
 import ModalHapusPromo from "./page/ModalHapusPromo";
 import ModalDetailPromo from "./page/ModalDetailPromo";
+import ModalDistribusiPromo from "./page/ModalDistribusiPromo";
 import ToastAlert from "@/view/components/ToastAlert";
 
 export default function KelolaPromo() {
@@ -19,6 +20,7 @@ export default function KelolaPromo() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isHapusOpen, setIsHapusOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isDistribusiOpen, setIsDistribusiOpen] = useState(false);
   const [selectedPromo, setSelectedPromo] = useState(null);
 
   // ─── STATE TOAST ──────────────────────────────────────────────────
@@ -76,12 +78,12 @@ export default function KelolaPromo() {
   };
 
   const handleSendPromo = (promo) => {
-    // Simulasi kirim promo
-    showToast("Promo ini berhasil dikirim!", "success");
+    setSelectedPromo(promo);
+    setIsDistribusiOpen(true);
   };
 
   return (
-    <div className="flex-1 w-full bg-[#F9FAFB]">
+    <div className="flex-1 w-full bg-[#F9FAFB] relative">
       <div className="max-w-[1400px] mx-auto w-full">
         <Header />
         
@@ -134,6 +136,13 @@ export default function KelolaPromo() {
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
           promo={selectedPromo}
+        />
+
+        <ModalDistribusiPromo
+          isOpen={isDistribusiOpen}
+          onClose={() => setIsDistribusiOpen(false)}
+          promo={selectedPromo}
+          showToast={showToast}
         />
 
         {/* TOAST NOTIFICATION */}

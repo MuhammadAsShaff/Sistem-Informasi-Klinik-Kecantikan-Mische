@@ -166,6 +166,7 @@ export default function ModalTambahPromo({
                   value={formData.kode}
                   onChange={handleInputChange}
                   placeholder="Kode Promo"
+                  maxLength={12}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors"
                   required
                 />
@@ -185,15 +186,22 @@ export default function ModalTambahPromo({
 
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Gambar Promo</label>
-                <input
-                  type="file"
-                  name="gambar"
-                  accept="image/jpeg, image/png, image/jpg"
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors bg-white"
-                  required
-                />
-                <p className="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG. Max: 4MB.</p>
+                <div className="flex items-center gap-3">
+                  <label className="bg-[#1E293B] hover:bg-[#0F172A] text-white px-5 py-2 rounded-md text-xs font-bold transition-colors cursor-pointer inline-block">
+                    Choose File
+                    <input
+                      type="file"
+                      name="gambar"
+                      onChange={handleInputChange}
+                      className="sr-only"
+                      required
+                    />
+                  </label>
+                  <span className="text-sm text-gray-500 font-medium truncate max-w-[200px]">
+                    {formData.gambar ? (formData.gambar.name || "Gambar Terpilih") : "No File Chosen"}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Format: Semua Format Gambar. Max: 4MB.</p>
               </div>
             </div>
 

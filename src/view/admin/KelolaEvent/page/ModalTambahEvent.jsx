@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import { useTambahEvent } from '../hooks/useTambahEvent';
+import { convertToJPEG } from '@/utils/imageConverter';
 
 export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }) {
   const { tambahEvent } = useTambahEvent(refetch);
@@ -16,10 +17,14 @@ export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }
 
   if (!isOpen) return null;
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, type, files } = e.target;
     if (type === 'file') {
-      setFormData(prev => ({ ...prev, [name]: files[0] }));
+      const file = files[0];
+      if (file) {
+        const converted = await convertToJPEG(file);
+        setFormData(prev => ({ ...prev, [name]: converted }));
+      }
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -109,10 +114,9 @@ export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }
                     name="tanggalMulai"
                     value={formData.tanggalMulai}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm appearance-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm"
                     required
                   />
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-black pointer-events-none" size={20} />
                 </div>
               </div>
 
@@ -125,41 +129,51 @@ export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }
                     name="tanggalSelesai"
                     value={formData.tanggalSelesai}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm appearance-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm"
                     required
                   />
-                  <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-black pointer-events-none" size={20} />
                 </div>
               </div>
             </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Foto Event */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Foto Event</label>
+                <div className="flex items-center gap-3">
+                  <label className="bg-[#1E293B] hover:bg-[#0F172A] text-white px-5 py-2 rounded-md text-xs font-bold transition-colors cursor-pointer inline-block">
+                    Choose File
+                    <input 
+                      type="file" 
+                      name="foto"
+                      onChange={handleChange}
+                      className="sr-only"
+                      required
+                    />
+                  </label>
+                  <span className="text-sm text-gray-500 font-medium truncate max-w-[200px]">
+                    {formData.foto ? (formData.foto.name || "Gambar Terpilih") : "No File Chosen"}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Format: Semua Format Gambar. Max: 4MB.</p>
+              </div>
 
-            {/* Deskripsi Event */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">Deskripsi Event</label>
-              <textarea 
-                name="deskripsi"
-                value={formData.deskripsi}
-                onChange={handleChange}
-                placeholder="Deskripsi Event"
-                rows="4"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm resize-none"
-                required
-              ></textarea>
+              {/* Deskripsi Event */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Deskripsi Event</label>
+                <textarea 
+                  name="deskripsi"
+                  value={formData.deskripsi}
+                  onChange={handleChange}
+                  placeholder="Deskripsi Event"
+                  rows="4"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm resize-none"
+                  required
+                ></textarea>
+              </div>
             </div>
 
-            {/* Foto Event */}
-            <div>
-              <label className="block text-sm font-medium text-gray-800 mb-2">Foto Event</label>
-              <input 
-                type="file" 
-                name="foto"
-                accept="image/jpeg, image/png, image/jpg"
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-[#56BC36] text-sm bg-white"
-                required
-              />
-              <p className="text-xs text-gray-500 mt-1">Format: JPG, JPEG, PNG. Max: 4MB.</p>
-            </div>
+            
 
           </form>
         </div>

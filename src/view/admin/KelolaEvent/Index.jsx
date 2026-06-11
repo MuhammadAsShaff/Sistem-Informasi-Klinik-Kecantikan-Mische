@@ -7,6 +7,8 @@ import ModalTambahEvent from './page/ModalTambahEvent';
 import ModalPerbaruiEvent from './page/ModalPerbaruiEvent';
 import ModalHapusEvent from './page/ModalHapusEvent';
 import ModalDetailEvent from './page/ModalDetailEvent';
+import ModalDistribusiEvent from './page/ModalDistribusiEvent';
+import ToastAlert from '@/view/components/ToastAlert';
 import { useFetchEvent } from './hooks/useFetchEvent';
 
 export default function KelolaEvent() {
@@ -18,18 +20,16 @@ export default function KelolaEvent() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isHapusOpen, setIsHapusOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isDistribusiOpen, setIsDistribusiOpen] = useState(false);
   
   // Selected Event
   const [selectedEvent, setSelectedEvent] = useState(null);
   
   // Toast Notification
-  const [toastMessage, setToastMessage] = useState('');
+  const [toast, setToast] = useState(null);
 
-  const showToast = (message) => {
-    setToastMessage(message);
-    setTimeout(() => {
-      setToastMessage('');
-    }, 3000);
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
   };
 
   // Filter Data
@@ -56,23 +56,13 @@ export default function KelolaEvent() {
   };
 
   const handleSend = (event) => {
-    // Implement push notification or email logic here if needed
-    showToast(`Notifikasi untuk event "${event.nama}" dikirim!`);
+    setSelectedEvent(event);
+    setIsDistribusiOpen(true);
   };
 
   return (
     <div className="min-h-screen bg-[#F4F7F6] p-4 md:p-8 ml-0 lg:ml-64 pt-24 lg:pt-8 transition-all duration-300">
       
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-24 right-8 z-50 bg-white border-l-4 border-[#56BC36] shadow-lg px-6 py-4 rounded-lg flex items-center gap-3 animate-fade-in">
-          <div className="bg-[#56BC36] rounded-full p-1 text-white">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-          </div>
-          <p className="text-gray-800 font-medium text-sm">{toastMessage}</p>
-        </div>
-      )}
-
       {/* Main Container */}
       <div className="max-w-6xl mx-auto">
         <Header />
@@ -133,6 +123,25 @@ export default function KelolaEvent() {
         event={selectedEvent}
       />
 
+      <ModalDistribusiEvent
+        isOpen={isDistribusiOpen}
+        onClose={() => {
+          setIsDistribusiOpen(false);
+          setSelectedEvent(null);
+        }}
+        event={selectedEvent}
+        showToast={showToast}
+      />
+
+      {/* Toast Notification */}
+      {toast && (
+        <ToastAlert
+          isOpen={true}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

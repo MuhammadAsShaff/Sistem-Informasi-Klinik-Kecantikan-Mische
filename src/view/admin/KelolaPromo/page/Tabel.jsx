@@ -117,24 +117,26 @@ export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, update
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-between items-center mt-6">
+        <div className="flex items-center justify-between mt-6 px-2">
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className={`flex items-center gap-2 px-4 py-2 border rounded-lg text-sm transition-colors shadow-sm ${
+              currentPage === 1 ? 'text-gray-500 bg-gray-100 border-gray-300 font-medium cursor-default' : 'text-gray-900 border-gray-400 bg-white hover:bg-gray-100 font-semibold cursor-pointer'
+            }`}
           >
-            <span className="text-lg">←</span> Previous
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Previous
           </button>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-1">
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${
+                className={`w-8 h-8 flex items-center justify-center rounded text-sm shadow-sm transition-all ${
                   currentPage === i + 1
-                    ? "bg-[#56BC36] text-white font-medium shadow-sm"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-[#97E779] text-black font-semibold"
+                    : "text-gray-600 hover:bg-gray-100 font-medium"
                 }`}
               >
                 {i + 1}
@@ -145,9 +147,11 @@ export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, update
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className={`flex items-center gap-2 px-4 py-2 border rounded-lg text-sm transition-colors shadow-sm ${
+              currentPage === totalPages ? 'text-gray-500 bg-gray-100 border-gray-300 font-medium cursor-default' : 'text-gray-900 border-gray-400 bg-white hover:bg-gray-100 font-semibold cursor-pointer'
+            }`}
           >
-            Next <span className="text-lg">→</span>
+            Next <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </button>
         </div>
       )}

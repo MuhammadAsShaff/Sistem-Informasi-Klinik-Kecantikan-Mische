@@ -1,36 +1,38 @@
 import React from "react";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, ChevronDown } from "lucide-react";
 
 export default function SearchBar({ searchQuery, setSearchQuery, onAddClick }) {
   return (
-    <div className="flex justify-end mb-6">
-      <div className="flex gap-2">
-        <button className="bg-gray-200 text-gray-700 px-4 py-2 flex items-center gap-2 hover:bg-gray-300 transition-colors text-sm font-medium">
-          All Promo <Filter size={16} />
-        </button>
-
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search Promo"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-4 pr-10 py-2 bg-gray-100 border-none w-[300px] focus:outline-none focus:ring-1 focus:ring-gray-300 text-sm"
-          />
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+    <div className="flex justify-end items-center gap-2 mb-6">
+      <div className="relative bg-[#F3F4F6] rounded-md h-[40px] flex items-center">
+        <select className="appearance-none bg-transparent border-none focus:ring-0 text-gray-700 py-0 pl-4 pr-8 text-sm outline-none cursor-pointer h-full">
+          <option>All Promo</option>
+        </select>
+        <div className="pointer-events-none absolute right-0 flex items-center pr-2 text-gray-500">
+          <ChevronDown size={16} />
         </div>
-
-        <button className="bg-[#56BC36] text-white p-2 hover:bg-[#4ea830] transition-colors">
-          <Search size={20} />
-        </button>
-
-        <button
-          onClick={onAddClick}
-          className="bg-[#56BC36] text-white p-2 hover:bg-[#4ea830] transition-colors"
-        >
-          <Plus size={20} />
-        </button>
       </div>
+
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Cari.."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="bg-[#F3F4F6] border-none px-6 py-2.5 rounded-md text-sm w-[250px] focus:ring-2 focus:ring-[#7CC052] transition-all outline-none text-gray-700"
+        />
+      </div>
+
+      <button className="bg-[#56BC36] text-white p-2.5 rounded-md hover:bg-[#469e2c] transition-colors shadow-sm">
+        <Search size={20} />
+      </button>
+
+      <button
+        onClick={onAddClick}
+        className="bg-[#56BC36] text-white p-2.5 rounded-md hover:bg-[#469e2c] transition-colors shadow-sm"
+      >
+        <Plus size={20} />
+      </button>
     </div>
   );
 }
