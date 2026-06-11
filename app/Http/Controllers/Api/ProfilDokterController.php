@@ -133,8 +133,8 @@ class ProfilDokterController extends Controller
                 $filename = time() . '_' . uniqid() . '.webp';
                 
                 $manager = new ImageManager(new Driver());
-                $image = $manager->read($file->getPathname());
-                $webpData = $image->toWebp(80)->toString();
+                $image = $manager->decode($file->getPathname());
+                $webpData = $image->encodeUsingFileExtension('webp', 80)->toString();
                 
                 Storage::disk('public')->put('profil_dokter/' . $filename, $webpData);
                 $fotoPath = 'profil_dokter/' . $filename;
@@ -220,8 +220,8 @@ class ProfilDokterController extends Controller
                 $filename = time() . '_' . uniqid() . '.webp';
                 
                 $manager = new ImageManager(new Driver());
-                $image = $manager->read($file->getPathname());
-                $webpData = $image->toWebp(80)->toString();
+                $image = $manager->decode($file->getPathname());
+                $webpData = $image->encodeUsingFileExtension('webp', 80)->toString();
                 
                 Storage::disk('public')->put('profil_dokter/' . $filename, $webpData);
                 $dataToUpdate['foto'] = 'profil_dokter/' . $filename;

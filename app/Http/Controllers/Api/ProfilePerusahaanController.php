@@ -108,8 +108,8 @@ class ProfilePerusahaanController extends Controller
                 $filename = time() . '_' . uniqid() . '.webp';
                 
                 $manager = new ImageManager(new Driver());
-                $image = $manager->read($file->getPathname());
-                $webpData = $image->toWebp(80)->toString();
+                $image = $manager->decode($file->getPathname());
+                $webpData = $image->encodeUsingFileExtension('webp', 80)->toString();
                 
                 Storage::disk('public')->put('profil_perusahaan/' . $filename, $webpData);
                 $fotoPath = 'profil_perusahaan/' . $filename;
@@ -203,8 +203,8 @@ class ProfilePerusahaanController extends Controller
                 $filename = time() . '_' . uniqid() . '.webp';
                 
                 $manager = new ImageManager(new Driver());
-                $image = $manager->read($file->getPathname());
-                $webpData = $image->toWebp(80)->toString();
+                $image = $manager->decode($file->getPathname());
+                $webpData = $image->encodeUsingFileExtension('webp', 80)->toString();
                 
                 Storage::disk('public')->put('profil_perusahaan/' . $filename, $webpData);
                 $dataToUpdate['fotoPerusahaan'] = 'profil_perusahaan/' . $filename;

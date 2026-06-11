@@ -103,8 +103,8 @@ class KegiatanController extends Controller
                 $filename = time() . '_' . uniqid() . '.webp';
                 
                 $manager = new ImageManager(new Driver());
-                $image = $manager->read($file->getPathname());
-                $webpData = $image->toWebp(80)->toString();
+                $image = $manager->decode($file->getPathname());
+                $webpData = $image->encodeUsingFileExtension('webp', 80)->toString();
                 
                 Storage::disk('public')->put('kegiatan/' . $filename, $webpData);
                 $data['foto'] = 'kegiatan/' . $filename;
@@ -174,8 +174,8 @@ class KegiatanController extends Controller
                 $filename = time() . '_' . uniqid() . '.webp';
                 
                 $manager = new ImageManager(new Driver());
-                $image = $manager->read($file->getPathname());
-                $webpData = $image->toWebp(80)->toString();
+                $image = $manager->decode($file->getPathname());
+                $webpData = $image->encodeUsingFileExtension('webp', 80)->toString();
                 
                 Storage::disk('public')->put('kegiatan/' . $filename, $webpData);
                 $updateData['foto'] = 'kegiatan/' . $filename;
