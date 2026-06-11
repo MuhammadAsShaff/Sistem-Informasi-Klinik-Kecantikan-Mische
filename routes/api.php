@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\ProdukKlinikController;
 use App\Http\Controllers\Api\DistribusiPromoEventController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\KeranjangController;
+use App\Http\Controllers\Api\PenjualanController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -64,6 +66,7 @@ Route::prefix('customer')->group(function () {
         Route::get('/', [PromoController::class, 'getPublicPromos'])->name('customer.promos');
     });
 
+
     // ----------------------------------------
     // RUTE PRODUK PUBLIC / CUSTOMER
     // ----------------------------------------
@@ -90,6 +93,19 @@ Route::prefix('customer')->group(function () {
         Route::get('/{idReservasi}', [ReservasiController::class, 'getDetailReservationCustomer'])->name('customer.detailReservation');
         Route::post('/', [ReservasiController::class, 'createReservationCustomer'])->name('customer.createReservation');
         Route::put('/{idReservasi}', [ReservasiController::class, 'rescheduleReservationCustomer'])->name('customer.rescheduleReservation');
+    });
+
+    // Rute Keranjang (Cart)
+    Route::prefix('card')->middleware(['role:customer'])->group(function () {
+        Route::get('/', [KeranjangController::class, 'getCart'])->name('customer.getCart');
+        Route::post('/', [KeranjangController::class, 'addToCart'])->name('customer.addToCart');
+        Route::patch('/{idKeranjang}', [KeranjangController::class, 'updateCart'])->name('customer.updateCart');
+        Route::delete('/{idKeranjang}', [KeranjangController::class, 'deleteFromCart'])->name('customer.deleteFromCart');
+    });
+
+    // Rute Penjualan Customer
+    Route::prefix('penjualan')->middleware(['role:customer'])->group(function () {
+        Route::patch('/{idPenjualan}', [PenjualanController::class, 'receiveItem'])->name('customer.receiveItem');
     });
 });
 
@@ -218,6 +234,7 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
     // RUTE KELOLA KATEGORI PRODUK
     // ----------------------------------------
     Route::prefix('kategori')->group(function () {
+        Route::get('/count-products', [KategoriProdukController::class, 'getProductCountByCategory'])->name('admin.categories.countProducts');
         Route::get('/', [KategoriProdukController::class, 'getAllCategories'])->name('admin.categories');
         Route::post('/', [KategoriProdukController::class, 'createCategory'])->name('admin.createCategory');
         Route::put('/{idKategori}', [KategoriProdukController::class, 'updateCategory'])->name('admin.updateCategory');
@@ -243,5 +260,12 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::post('/', [ReservasiController::class, 'createReservationAdmin'])->name('admin.createReservation');
         Route::patch('/{idReservasi}', [ReservasiController::class, 'updateStatusReservationAdmin'])->name('admin.updateStatus');
         Route::delete('/{idReservasi}', [ReservasiController::class, 'deleteReservation'])->name('admin.deleteReservation');
+    });
+
+    // RUTE KELOLA PENJUALAN (Admin)
+    Route::prefix('penjualan')->group(function () {
+        Route::get('/', [PenjualanController::class, 'index'])->name('admin.penjualan.index');
+        Route::patch('/{idPenjualan}', [PenjualanController::class, 'updateStatus'])->name('admin.penjualan.updateStatus');
+        Route::delete('/{idPenjualan}', [PenjualanController::class, 'destroy'])->name('admin.penjualan.destroy');
     });
 });

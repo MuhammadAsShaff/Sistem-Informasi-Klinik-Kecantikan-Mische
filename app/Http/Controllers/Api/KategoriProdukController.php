@@ -24,6 +24,36 @@ class KategoriProdukController extends Controller
     }
 
     /**
+     * Menghitung jumlah produk per kategori
+     */
+    public function getProductCountByCategory()
+    {
+        try {
+            $kategori = KategoriProduk::withCount('produkklinik')->get();
+            
+            $formattedData = $kategori->map(function ($item) {
+                return [
+                    'idKategori' => $item->idKategori,
+                    'namaKategori' => $item->nama,
+                    'jumlahProduk' => $item->produkklinik_count
+                ];
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Berhasil mengambil jumlah produk per kategori',
+                'data' => $formattedData
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan pada server',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Menambahkan data kategori
      */
     public function createCategory(Request $request)
