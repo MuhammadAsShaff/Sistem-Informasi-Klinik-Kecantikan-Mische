@@ -116,15 +116,16 @@ const Tabel = ({ data, meta, page, setPage, onEditStatus, onDelete, onDetail }) 
         <button
           onClick={handlePrev}
           disabled={page === 1}
-          className={`flex items-center px-4 py-2 border rounded-lg text-sm bg-white transition-colors
-            ${page === 1 ? 'border-gray-200 text-gray-400 cursor-not-allowed' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+          className={`flex items-center gap-2 px-4 py-2 border rounded-lg text-sm transition-colors shadow-sm ${
+            page === 1 ? 'text-gray-500 bg-gray-100 border-gray-300 font-medium cursor-default' : 'text-gray-900 border-gray-400 bg-white hover:bg-gray-100 font-semibold cursor-pointer'
+          }`}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           Previous
         </button>
 
-        <div className="flex items-center">
-          <div className="bg-[#a5eaa0] text-[#1f7318] font-bold w-8 h-8 rounded flex items-center justify-center text-sm shadow-sm">
+        <div className="flex items-center gap-1">
+          <div className="bg-[#97E779] text-black font-semibold w-8 h-8 rounded flex items-center justify-center text-sm shadow-sm">
             {page}
           </div>
         </div>
@@ -132,11 +133,12 @@ const Tabel = ({ data, meta, page, setPage, onEditStatus, onDelete, onDetail }) 
         <button
           onClick={handleNext}
           disabled={!meta || page >= meta.last_page}
-          className={`flex items-center px-6 py-2 border rounded-lg text-sm bg-white transition-colors
-            ${(!meta || page >= meta.last_page) ? 'border-gray-200 text-gray-400 cursor-not-allowed' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+          className={`flex items-center gap-2 px-4 py-2 border rounded-lg text-sm transition-colors shadow-sm ${
+            (!meta || page >= meta.last_page) ? 'text-gray-500 bg-gray-100 border-gray-300 font-medium cursor-default' : 'text-gray-900 border-gray-400 bg-white hover:bg-gray-100 font-semibold cursor-pointer'
+          }`}
         >
           Next
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </button>
       </div>
     </div>

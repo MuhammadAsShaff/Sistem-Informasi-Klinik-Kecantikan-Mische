@@ -11,38 +11,37 @@ export default function ModalHapusJadwal({ isOpen, onClose, hook }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-[500px] rounded-[30px] p-10 shadow-2xl animate-in fade-in zoom-in duration-300">
-
-        <div className="flex flex-col items-center text-center">
-          <div className="text-[#9CA3AF] mb-6">
-            <AlertCircle size={100} strokeWidth={1.5} />
-          </div>
-
-          <h2 className="text-[22px] font-medium text-[#4B5563] mb-10 leading-relaxed px-4">
-            Apakah Anda yakin ingin menghapus Jadwal ini?
-          </h2>
-
-          <div className="flex items-center gap-4 w-full">
-            <button
-              onClick={confirmDelete}
-              disabled={isLoading}
-              className={`flex-1 bg-[#7CC052] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#68a741] transition-all shadow-lg shadow-green-100 ${
-                isLoading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {isLoading ? "Menghapus..." : "Ya, Hapus"}
-            </button>
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="flex-1 bg-white border border-gray-200 text-[#1A1A1A] py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-all shadow-sm"
-            >
-              Tidak, Batalkan
-            </button>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="bg-white w-full max-w-md rounded-2xl p-8 text-center shadow-xl">
+        
+        {/* Warning Icon */}
+        <div className="mx-auto w-20 h-20 border-4 border-gray-400 rounded-full flex items-center justify-center mb-6">
+          <span className="text-gray-400 text-5xl font-bold">!</span>
         </div>
 
+        {/* Title */}
+        <h2 className="text-[22px] text-gray-500 font-medium mb-8">
+          Apakah Anda yakin ingin menghapus Jadwal ini?
+        </h2>
+
+        {/* Actions */}
+        <div className="flex justify-center gap-4">
+          <button 
+            onClick={confirmDelete}
+            disabled={isLoading}
+            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-8 py-3 rounded-lg font-medium transition-colors disabled:bg-gray-400"
+          >
+            {isLoading ? "Menghapus..." : "Ya, Hapus"}
+          </button>
+          <button 
+            onClick={onClose}
+            disabled={isLoading}
+            className="bg-white border border-gray-200 text-black px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+          >
+            Tidak, Batalkan
+          </button>
+        </div>
+        
       </div>
     </div>
   );

@@ -3,17 +3,19 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 const JadwalPagination = () => {
   return (
-    <div className="flex justify-between items-center mt-10">
-      <button className="flex items-center gap-2 px-8 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all font-medium">
-        <ArrowLeft size={20} /> Previous
+    <div className="flex items-center justify-between mt-6 px-2">
+      <button className="flex items-center gap-2 px-4 py-2 border border-gray-400 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-100 transition-colors bg-white shadow-sm cursor-pointer">
+        <ArrowLeft size={16} /> Previous
       </button>
       
-      <div className="bg-[#56BC36] text-white w-10 h-10 flex items-center justify-center rounded-md font-bold text-lg">
-        1
+      <div className="flex items-center gap-1">
+        <button className="w-8 h-8 flex items-center justify-center rounded bg-[#97E779] text-black font-semibold text-sm shadow-sm">
+          1
+        </button>
       </div>
 
-      <button className="flex items-center gap-2 px-8 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all font-medium">
-        Next <ArrowRight size={20} />
+      <button className="flex items-center gap-2 px-4 py-2 border border-gray-400 rounded-lg text-sm font-semibold text-gray-900 hover:bg-gray-100 transition-colors bg-white shadow-sm cursor-pointer">
+        Next <ArrowRight size={16} />
       </button>
     </div>
   );

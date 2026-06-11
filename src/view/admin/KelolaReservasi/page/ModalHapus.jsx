@@ -7,39 +7,37 @@ export default function ModalHapus({ isOpen, onClose, hook }) {
   const { handleDelete, isDeleting } = hook;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl w-full max-w-[420px] p-8 shadow-2xl flex flex-col items-center text-center overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="bg-white w-full max-w-md rounded-2xl p-8 text-center shadow-xl">
         
         {/* Warning Icon */}
-        <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-5 border border-slate-200">
-          <AlertCircle size={36} className="text-[#94A3B8]" />
+        <div className="mx-auto w-20 h-20 border-4 border-gray-400 rounded-full flex items-center justify-center mb-6">
+          <span className="text-gray-400 text-5xl font-bold">!</span>
         </div>
 
-        {/* Message */}
-        <h3 className="text-[#475569] text-base font-bold mb-8 max-w-[320px]">
+        {/* Title */}
+        <h2 className="text-[22px] text-gray-500 font-medium mb-8">
           Apakah Anda yakin ingin menghapus Reservasi ini?
-        </h3>
+        </h2>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3 w-full">
-          <button
+        {/* Actions */}
+        <div className="flex justify-center gap-4">
+          <button 
             onClick={handleDelete}
             disabled={isDeleting}
-            className={`flex-1 text-white py-3 px-4 rounded-xl text-xs font-bold transition-colors shadow-sm
-              ${isDeleting ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600 cursor-pointer'}`}
+            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-8 py-3 rounded-lg font-medium transition-colors disabled:bg-gray-400"
           >
             {isDeleting ? 'Menghapus...' : 'Ya, Hapus'}
           </button>
-          
-          <button
+          <button 
             onClick={onClose}
             disabled={isDeleting}
-            className="flex-1 bg-white hover:bg-gray-50 text-black border border-gray-200 py-3 px-4 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+            className="bg-white border border-gray-200 text-black px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
           >
             Tidak, Batalkan
           </button>
         </div>
-
+        
       </div>
     </div>
   );

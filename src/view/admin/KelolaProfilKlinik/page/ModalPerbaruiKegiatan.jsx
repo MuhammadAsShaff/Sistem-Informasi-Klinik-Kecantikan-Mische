@@ -61,9 +61,16 @@ const ModalEditKegiatan = ({ isOpen, onClose, hook }) => {
             </div>
             <p className="text-[13px] text-gray-800 text-center mb-4">Ubah Gambar Kegiatan</p>
             <div className="flex flex-col">
-              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange}
-                className="w-full file:bg-[#1f2937] file:text-white file:border-black file:rounded-none file:px-3 file:py-1.5 file:cursor-pointer file:text-xs file:font-medium text-xs text-black border border-black p-0 bg-white" />
-              <span className="text-[11px] text-red-500 mt-1">* Maksimal 2MB (Format: jpeg, png, jpg)</span>
+              <div className="flex items-center gap-3">
+                <label className="bg-[#1E293B] hover:bg-[#0F172A] text-white px-5 py-2 rounded-md text-xs font-bold transition-colors cursor-pointer inline-block">
+                  Choose File
+                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="sr-only" />
+                </label>
+                <span className="text-sm text-gray-500 font-medium truncate max-w-[200px]">
+                  {formData.foto ? formData.foto.name : "No File Chosen"}
+                </span>
+              </div>
+              <span className="text-[11px] text-red-500 mt-2 block">* Maksimal 2MB (Format: Semua Format Gambar)</span>
             </div>
           </div>
 

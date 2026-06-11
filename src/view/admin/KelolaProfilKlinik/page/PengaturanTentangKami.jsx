@@ -56,27 +56,23 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
 
   const fileInputRef = React.useRef(null);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-      if (!allowedTypes.includes(file.type)) {
-        onError("Format file tidak didukung! Pastikan menggunakan file gambar dengan ekstensi: jpeg, png, atau jpg.");
+      // Validate 2MB BEFORE converting, but the size check is typically on original file
+      if (file.size > 2 * 1024 * 1024) {
+        onError("Ukuran file terlalu besar! Maksimal 2MB.");
         setHasFileError(true);
-        e.target.value = ''; // Reset input file
+        e.target.value = '';
         return;
       }
       
-      // Validasi ukuran maksimal 4MB (sesuai backend max:4000) -> Wait, user asked for "maksimal 2mb mimes:jpeg,png,jpg"
-      if (file.size > 2 * 1024 * 1024) {
-        onError("Ukuran file terlalu besar! Maksimal 2MB mimes:jpeg,png,jpg.");
-        setHasFileError(true);
-        e.target.value = ''; // Reset input file
-        return;
-      }
+      const { convertToJPEG } = await import('@/utils/imageConverter');
+      const convertedFile = await convertToJPEG(file);
+      
       setHasFileError(false);
-      setFormData({ ...formData, fotoPerusahaan: file });
-      setPreviewImage(URL.createObjectURL(file));
+      setFormData({ ...formData, fotoPerusahaan: convertedFile });
+      setPreviewImage(URL.createObjectURL(convertedFile));
     }
   };
 
@@ -224,14 +220,22 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
           )}
         </div>
         <div className="flex flex-col">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="w-full file:bg-[#1f2937] file:text-white file:border-black file:rounded-none file:px-3 file:py-1.5 file:cursor-pointer file:text-xs file:font-medium text-xs text-black border border-black p-0"
-          />
-          <span className="text-[11px] text-red-500 mt-1">* Maksimal 2MB (Format: jpeg, png, jpg){(!data?.fotoPerusahaan && !formData.fotoPerusahaan) ? ' - Wajib diisi' : ''}</span>
+          <div className="flex items-center gap-3">
+            <label className="bg-[#1E293B] hover:bg-[#0F172A] text-white px-5 py-2 rounded-md text-xs font-bold transition-colors cursor-pointer inline-block">
+              Choose File
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="sr-only"
+              />
+            </label>
+            <span className="text-sm text-gray-500 font-medium truncate max-w-[200px]">
+              {formData.fotoPerusahaan ? (typeof formData.fotoPerusahaan === 'string' ? "Gambar Terpilih" : formData.fotoPerusahaan.name) : "No File Chosen"}
+            </span>
+          </div>
+          <span className="text-[11px] text-red-500 mt-2 block">* Maksimal 2MB (Format: Semua Format Gambar){(!data?.fotoPerusahaan && !formData.fotoPerusahaan) ? ' - Wajib diisi' : ''}</span>
         </div>
       </div>
 

@@ -58,25 +58,23 @@ export function useEditKegiatan(id, isOpen, onSuccess) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setErrorMessage("Format file tidak didukung! Gunakan: jpeg, png, atau jpg.");
-      setHasFileError(true);
-      e.target.value = "";
-      return;
-    }
     if (file.size > 2 * 1024 * 1024) {
       setErrorMessage("Maksimal ukuran gambar adalah 2MB.");
       setHasFileError(true);
       e.target.value = "";
       return;
     }
+    
+    const { convertToJPEG } = await import("@/utils/imageConverter");
+    const convertedFile = await convertToJPEG(file);
+    
     setErrorMessage("");
     setHasFileError(false);
-    setFormData((prev) => ({ ...prev, foto: file }));
-    setPreviewImage(URL.createObjectURL(file));
+    setFormData((prev) => ({ ...prev, foto: convertedFile }));
+    setPreviewImage(URL.createObjectURL(convertedFile));
   };
 
   const handleSubmit = async () => {

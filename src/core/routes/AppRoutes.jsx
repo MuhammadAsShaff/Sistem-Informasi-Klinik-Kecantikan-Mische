@@ -23,16 +23,17 @@ import ProfilCustomerPage from "@/view/Customer/ProfilCustomer/page/Index";
 import RiwayatReservasiPage from "@/view/Customer/ProfilCustomer/page/RiwayatReservasi";
 import HalamanProduk from "@/view/Customer/HalamanProduk/page/Index";
 import DetailProduk from "@/view/Customer/HalamanProduk/page/DetailProduk";
+import DetailKeranjang from "@/view/Customer/DetailKeranjang/Index";
 
 // Admin Pages
-import AdminDashboard from "@/view/admin/dashboard/page/dashboard";
-import AdminProduk from "@/view/admin/Produk/page/Index";
+import AdminDashboard from "@/view/admin/dashboard/page/Index";
 import KelolaUser from "@/view/admin/KelolaUser/page/Index";
 import KelolaJadwalReservasiTreatment from "@/view/admin/KelolaJadwalReservasiTreatment/page/Index";
 import KelolaProfilKlinik from "@/view/admin/KelolaProfilKlinik/page/Index";
 import KelolaProfilAdmin from "@/view/admin/KelolaProfilAdmin/page/Index";
 import KelolaTestimoni from "@/view/admin/KelolaTestimoni/Index";
 import KelolaProduk from "@/view/admin/KelolaProduk/Index";
+import KelolaPenjualan from "@/view/admin/KelolaPenjualan/Index";
 
 // Core Routing & Shared Components
 import ProtectedRoute from "./ProtectedRoute";
@@ -40,6 +41,7 @@ import KelolaProfilDokter from "@/view/admin/KelolaProfilDokter/Index";
 import KelolaPromo from "@/view/admin/KelolaPromo/Index";
 import KelolaEvent from "@/view/admin/KelolaEvent/Index";
 import KelolaReservasi from "@/view/admin/KelolaReservasi/Index";
+import KelolaKategoriProduk from "@/view/admin/KelolaKategoriProduk/Index";
 import Page404 from "@/view/components/Page404";
 
 export default function AppRoutes() {
@@ -61,6 +63,7 @@ export default function AppRoutes() {
         <Route path="registrasi" element={<RegistrasiPage />} />
         <Route path="produk" element={<HalamanProduk />} />
         <Route path="produk/:id" element={<DetailProduk />} />
+        <Route path="keranjang" element={<DetailKeranjang />} />
         
         {/* Rute Customer yang Wajib Login */}
         <Route element={<ProtectedRoute allowedRoles={['customer']} />}>
@@ -85,6 +88,8 @@ export default function AppRoutes() {
           <Route path="reservasi" element={<KelolaReservasi />} />
           <Route path="testimoni" element={<KelolaTestimoni />} />
           <Route path="produk" element={<KelolaProduk />} />
+          <Route path="kategori" element={<KelolaKategoriProduk />} />
+          <Route path="penjualan" element={<KelolaPenjualan />} />
         </Route>
       </Route>
 

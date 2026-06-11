@@ -4,38 +4,36 @@ import { AlertCircle } from "lucide-react";
 const ModalHapusPengaturan = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-[400px] rounded-[24px] p-8 shadow-2xl animate-in fade-in zoom-in duration-300">
+    return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="bg-white w-full max-w-md rounded-2xl p-8 text-center shadow-xl">
         
-        <div className="flex flex-col items-center text-center">
-          {/* ICON PERINGATAN */}
-          <div className="text-[#9DA3AE] mb-5">
-            <AlertCircle size={70} strokeWidth={2} />
-          </div>
-
-          {/* TEKS KONFIRMASI */}
-          <h2 className="text-[17px] font-medium text-[#4B5563] mb-8 leading-relaxed px-2">
-            Apakah Anda yakin ingin menghapus semua isi dari pengaturan tentang kami?
-          </h2>
-
-          {/* BUTTONS */}
-          <div className="flex items-center gap-3 w-full">
-            <button 
-              onClick={onConfirm}
-              className="flex-1 bg-[#55BC36] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#46a02b] transition-all shadow-md shadow-green-100"
-            >
-              Ya, Hapus
-            </button>
-            <button 
-              onClick={onClose}
-              className="flex-1 bg-white border border-gray-200 text-[#1A1A1A] py-3 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all shadow-sm"
-            >
-              Tidak, Batalkan
-            </button>
-          </div>
+        {/* Warning Icon */}
+        <div className="mx-auto w-20 h-20 border-4 border-gray-400 rounded-full flex items-center justify-center mb-6">
+          <span className="text-gray-400 text-5xl font-bold">!</span>
         </div>
 
+        {/* Title */}
+        <h2 className="text-[22px] text-gray-500 font-medium mb-8">
+          Apakah Anda yakin ingin menghapus semua isi dari pengaturan tentang kami?
+        </h2>
+
+        {/* Actions */}
+        <div className="flex justify-center gap-4">
+          <button 
+            onClick={onConfirm}
+            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-8 py-3 rounded-lg font-medium transition-colors"
+          >
+            Ya, Hapus
+          </button>
+          <button 
+            onClick={onClose}
+            className="bg-white border border-gray-200 text-black px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+          >
+            Tidak, Batalkan
+          </button>
+        </div>
+        
       </div>
     </div>
   );
