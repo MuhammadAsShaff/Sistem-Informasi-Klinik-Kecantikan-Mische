@@ -9,6 +9,9 @@ use App\Models\ProdukKlinik;
 use App\Models\Penjualan;
 use App\Models\DetailPenjualan;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\DB;
 
 class ProdukKlinikController extends Controller
@@ -35,7 +38,7 @@ class ProdukKlinikController extends Controller
             'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'gambar' => 'nullable|string',
+            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:4000',
             'idKategori' => 'required|exists:kategoriproduk,idKategori'
         ], [
             'nama.required' => 'Nama produk wajib diisi.',
@@ -48,7 +51,10 @@ class ProdukKlinikController extends Controller
             'stock.required' => 'Stok produk wajib diisi.',
             'stock.integer' => 'Stok produk harus berupa angka bulat.',
             'stock.min' => 'Stok produk tidak boleh kurang dari 0.',
-            'gambar.string' => 'Format gambar tidak valid.',
+            'gambar.required' => 'Gambar produk wajib diunggah.',
+            'gambar.image' => 'File harus berupa gambar.',
+            'gambar.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+            'gambar.max' => 'Ukuran gambar maksimal 4MB.',
             'idKategori.required' => 'Kategori produk wajib dipilih.',
             'idKategori.exists' => 'Kategori produk yang dipilih tidak ditemukan di database.'
         ]);
@@ -60,7 +66,21 @@ class ProdukKlinikController extends Controller
             ], 422);
         }
 
-        $produk = ProdukKlinik::create($request->all());
+        $dataToInsert = $request->except('gambar');
+
+        if ($request->hasFile('gambar')) {
+            $file = $request->file('gambar');
+            $filename = time() . '_' . uniqid() . '.webp';
+            
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file->getPathname());
+            $webpData = $image->toWebp(80)->toString();
+            
+            Storage::disk('public')->put('produk/' . $filename, $webpData);
+            $dataToInsert['gambar'] = 'produk/' . $filename;
+        }
+
+        $produk = ProdukKlinik::create($dataToInsert);
 
         return response()->json([
             'status' => 'success',
@@ -84,7 +104,7 @@ class ProdukKlinikController extends Controller
             'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'gambar' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
             'idKategori' => 'required|exists:kategoriproduk,idKategori'
         ], [
             'nama.required' => 'Nama produk wajib diisi.',
@@ -97,7 +117,9 @@ class ProdukKlinikController extends Controller
             'stock.required' => 'Stok produk wajib diisi.',
             'stock.integer' => 'Stok produk harus berupa angka bulat.',
             'stock.min' => 'Stok produk tidak boleh kurang dari 0.',
-            'gambar.string' => 'Format gambar tidak valid.',
+            'gambar.image' => 'File harus berupa gambar.',
+            'gambar.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
+            'gambar.max' => 'Ukuran gambar maksimal 4MB.',
             'idKategori.required' => 'Kategori produk wajib dipilih.',
             'idKategori.exists' => 'Kategori produk yang dipilih tidak ditemukan di database.'
         ]);
@@ -106,7 +128,24 @@ class ProdukKlinikController extends Controller
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
 
-        $produk->update($request->all());
+        $dataToUpdate = $request->except('gambar');
+
+        if ($request->hasFile('gambar')) {
+            if ($produk->gambar) {
+                Storage::disk('public')->delete($produk->gambar);
+            }
+            $file = $request->file('gambar');
+            $filename = time() . '_' . uniqid() . '.webp';
+            
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($file->getPathname());
+            $webpData = $image->toWebp(80)->toString();
+            
+            Storage::disk('public')->put('produk/' . $filename, $webpData);
+            $dataToUpdate['gambar'] = 'produk/' . $filename;
+        }
+
+        $produk->update($dataToUpdate);
 
         return response()->json([
             'status' => 'success',
@@ -154,6 +193,10 @@ class ProdukKlinikController extends Controller
         $produk = ProdukKlinik::find($idProduk);
         if (!$produk) {
             return response()->json(['status' => 'error', 'message' => 'Produk tidak ditemukan'], 404);
+        }
+
+        if ($produk->gambar) {
+            Storage::disk('public')->delete($produk->gambar);
         }
 
         $produk->delete();
