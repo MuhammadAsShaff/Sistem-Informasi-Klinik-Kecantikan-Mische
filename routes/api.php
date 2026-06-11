@@ -11,6 +11,11 @@ use App\Http\Controllers\Api\KegiatanController;
 use App\Http\Controllers\Api\ReservasiController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\PromoController;
+use App\Http\Controllers\Api\KategoriProdukController;
+use App\Http\Controllers\Api\ProdukKlinikController;
+use App\Http\Controllers\Api\DistribusiPromoEventController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ReportController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -59,6 +64,16 @@ Route::prefix('customer')->group(function () {
         Route::get('/', [PromoController::class, 'getPublicPromos'])->name('customer.promos');
     });
 
+    // ----------------------------------------
+    // RUTE PRODUK PUBLIC / CUSTOMER
+    // ----------------------------------------
+    Route::prefix('product')->group(function () {
+        Route::get('/', [ProdukKlinikController::class, 'getPublicProducts'])->name('customer.products');
+        Route::get('/{idProduk}', [ProdukKlinikController::class, 'getProductById'])->name('customer.productById');
+        // Hanya pengguna dengan role customer yang telah login yang bisa order
+        Route::post('/{idProduk}/order', [ProdukKlinikController::class, 'orderProduct'])->name('customer.orderProduct')->middleware(['role:customer']); 
+    });
+
     Route::get('kegiatan', [KegiatanController::class, 'getPublicKegiatan'])->name('customer.activities');
 
     Route::prefix('testimonials')->group(function () {
@@ -83,6 +98,13 @@ Route::prefix('customer')->group(function () {
 // Prefix: /api/admin/...
 // ============================================
 Route::prefix('admin')->middleware(['role:admin'])->group(function () {
+
+    // ----------------------------------------
+    // RUTE DASHBOARD & REPORT EXCEL
+    // ----------------------------------------
+    Route::get('/dashboard', [DashboardController::class, 'getDashboardData'])->name('admin.dashboard');
+    Route::get('/report/penjualan', [ReportController::class, 'exportReportPenjualan'])->name('admin.report.penjualan');
+    Route::get('/report/reservasi', [ReportController::class, 'exportReportReservasi'])->name('admin.report.reservasi');
 
     // ----------------------------------------
     // RUTE PROFIL ADMIN PRIBADI
@@ -181,6 +203,36 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::post('/', [\App\Http\Controllers\Api\TestimoniController::class, 'createTestimoni'])->name('admin.createTestimoni');
         Route::put('/{idTestimoni}', [\App\Http\Controllers\Api\TestimoniController::class, 'updateTestimoni'])->name('admin.updateTestimoni');
         Route::delete('/{idTestimoni}', [\App\Http\Controllers\Api\TestimoniController::class, 'deleteTestimoni'])->name('admin.deleteTestimoni');
+    });
+
+    // ----------------------------------------
+    // RUTE DISTRIBUSI PROMO & EVENT
+    // ----------------------------------------
+    Route::prefix('distribusi')->group(function () {
+        Route::get('/customers', [DistribusiPromoEventController::class, 'getCustomers'])->name('admin.distribusi.customers');
+        Route::post('/promo', [DistribusiPromoEventController::class, 'distributePromo'])->name('admin.distribusi.promo');
+        Route::post('/event', [DistribusiPromoEventController::class, 'distributeEvent'])->name('admin.distribusi.event');
+    });
+
+    // ----------------------------------------
+    // RUTE KELOLA KATEGORI PRODUK
+    // ----------------------------------------
+    Route::prefix('kategori')->group(function () {
+        Route::get('/', [KategoriProdukController::class, 'getAllCategories'])->name('admin.categories');
+        Route::post('/', [KategoriProdukController::class, 'createCategory'])->name('admin.createCategory');
+        Route::put('/{idKategori}', [KategoriProdukController::class, 'updateCategory'])->name('admin.updateCategory');
+        Route::delete('/{idKategori}', [KategoriProdukController::class, 'deleteCategory'])->name('admin.deleteCategory');
+    });
+
+    // ----------------------------------------
+    // RUTE KELOLA PRODUK
+    // ----------------------------------------
+    Route::prefix('product')->group(function () {
+        Route::get('/', [ProdukKlinikController::class, 'getAllProducts'])->name('admin.products');
+        Route::post('/', [ProdukKlinikController::class, 'createProduct'])->name('admin.createProduct');
+        Route::put('/{idProduk}', [ProdukKlinikController::class, 'updateProduct'])->name('admin.updateProduct');
+        Route::patch('/{idProduk}', [ProdukKlinikController::class, 'updateStock'])->name('admin.updateStock');
+        Route::delete('/{idProduk}', [ProdukKlinikController::class, 'deleteProduct'])->name('admin.deleteProduct');
     });
 
     // ----------------------------------------
