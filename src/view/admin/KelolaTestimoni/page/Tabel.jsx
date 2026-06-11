@@ -1,4 +1,5 @@
 import React from 'react';
+import { STORAGE_BASE_URL } from "@/core/api/endpoints";
 
 const Tabel = ({ data, onEdit, onDelete }) => {
   return (
@@ -23,11 +24,25 @@ const Tabel = ({ data, onEdit, onDelete }) => {
                   <tr key={index} className="hover:bg-gray-50 transition-colors whitespace-nowrap">
                     <td className="px-6 py-4 text-center">{index + 1}</td>
                     <td className="px-6 py-4 flex justify-center">
-                      {item.foto ? (
-                        <img src={item.foto} alt="Testimoni" className="w-10 h-10 object-cover rounded" />
-                      ) : (
-                        <div className="w-10 h-10 bg-gray-200 rounded"></div>
-                      )}
+                      <div className="w-10 h-10 rounded overflow-hidden bg-gray-200 flex items-center justify-center">
+                        {item.foto ? (
+                          <img 
+                            src={
+                              item.foto.startsWith('http') || item.foto.startsWith('blob:') || item.foto.startsWith('data:') 
+                                ? item.foto 
+                                : `${STORAGE_BASE_URL}${item.foto}`
+                            } 
+                            alt="Testimoni" 
+                            className="w-full h-full object-cover" 
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.parentElement.classList.add('bg-gray-200');
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200"></div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-center text-black max-w-[200px] truncate" title={item.nama}>{item.nama}</td>
                     <td className="px-6 py-4 text-center">{item.tanggal}</td>

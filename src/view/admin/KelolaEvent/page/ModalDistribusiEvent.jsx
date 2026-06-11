@@ -1,37 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { X, Search } from 'lucide-react';
 
-const DUMMY_CUSTOMERS = [
-  { id: 1, name: 'Muhammad As Shaff' },
-  { id: 2, name: 'Bintang Puspita Dewi' },
-];
+import axiosClient from '@/core/api/axiosClient';
+import { endpoints } from '@/core/api/endpoints';
 
 export default function ModalDistribusiEvent({ isOpen, onClose, event, showToast }) {
   const [targetType, setTargetType] = useState('Pilih Customer');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCustomers, setSelectedCustomers] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchCustomers = async (search = '') => {
+    setIsFetching(true);
+    try {
+      const url = search ? `${endpoints.admin.distribusi.customers}?search=${encodeURIComponent(search)}` : endpoints.admin.distribusi.customers;
+      const res = await axiosClient.get(url);
+      console.log('Distribusi Customers Response:', res.data); // DEBUG: Lihat struktur data
+      if (res.data?.status === 'success') {
+        setCustomers(res.data.data.map(c => ({ id: c.idUser, name: c.nama, phone: c.nomorWa })));
+      }
+    } catch (error) {
+      console.error("Gagal mengambil data customer:", error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
+      console.log('Event terpilih untuk didistribusikan:', event); // DEBUG: Lihat id nya apa
       setTargetType('Pilih Customer');
       setSearchQuery('');
       setSelectedCustomers([]);
+      fetchCustomers('');
     }
-  }, [isOpen]);
+  }, [isOpen, event]);
 
   useEffect(() => {
     if (targetType === 'Semua Customer') {
-      setSelectedCustomers(DUMMY_CUSTOMERS.map(c => c.id));
+      setSelectedCustomers(customers.map(c => c.id));
     } else {
       setSelectedCustomers([]);
     }
-  }, [targetType]);
+  }, [targetType, customers]);
 
   if (!isOpen) return null;
 
-  const filteredCustomers = DUMMY_CUSTOMERS.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Hapus filter client-side karena sekarang memanggil backend
+  const filteredCustomers = customers;
 
   const handleCheckboxChange = (id) => {
     if (targetType === 'Semua Customer') return; 
@@ -40,13 +58,34 @@ export default function ModalDistribusiEvent({ isOpen, onClose, event, showToast
     );
   };
 
-  const handleDistribute = () => {
-    if (selectedCustomers.length === 0) {
+  const handleDistribute = async () => {
+    if (targetType === 'Pilih Customer' && selectedCustomers.length === 0) {
       showToast('Pilih minimal satu customer untuk mendistribusikan event.', 'error');
       return;
     }
-    showToast(`Event "${event?.nama}" berhasil didistribusikan!`, 'success');
-    onClose();
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        idKegiatan: event?.idKegiatan || event?.idEvent || event?.id,
+        type: targetType === 'Semua Customer' ? 'all' : 'selected',
+        customer_ids: targetType === 'Semua Customer' ? [] : selectedCustomers
+      };
+      
+      console.log("Mencoba mengirim payload distribusi event:", payload);
+
+      const res = await axiosClient.post(endpoints.admin.distribusi.event, payload);
+      if (res.data?.status === 'success') {
+        const eventName = event?.namaKegiatan || event?.nama || 'ini';
+        showToast(`Event "${eventName}" berhasil didistribusikan!`, 'success');
+        onClose();
+      }
+    } catch (error) {
+      console.error("Gagal mendistribusikan event:", error);
+      showToast(error.response?.data?.message?.idKegiatan?.[0] || error.response?.data?.message || "Gagal mendistribusikan event", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -54,7 +93,9 @@ export default function ModalDistribusiEvent({ isOpen, onClose, event, showToast
       <div className="bg-white rounded-xl w-full max-w-4xl overflow-hidden shadow-xl flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-8 py-5 flex justify-between items-center border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Distribusi Event</h2>
+          <h2 className="text-xl font-bold text-gray-900">
+            Distribusi Event <span className="text-[#56BC36] text-lg block sm:inline mt-1 sm:mt-0">{event?.namaKegiatan || event?.nama || ''}</span>
+          </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={24} />
           </button>
@@ -88,7 +129,10 @@ export default function ModalDistribusiEvent({ isOpen, onClose, event, showToast
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="border border-gray-300 border-r-0 rounded-l-md px-4 py-2 text-[14px] w-full md:w-64 focus:outline-none"
               />
-              <button className="bg-[#56BC36] px-4 py-2 rounded-r-md text-white flex items-center justify-center hover:bg-[#469e2c] transition-colors">
+              <button 
+                onClick={() => fetchCustomers(searchQuery)}
+                className="bg-[#56BC36] px-4 py-2 rounded-r-md text-white flex items-center justify-center hover:bg-[#469e2c] transition-colors"
+              >
                 <Search size={18} />
               </button>
             </div>
@@ -108,7 +152,10 @@ export default function ModalDistribusiEvent({ isOpen, onClose, event, showToast
                   filteredCustomers.map((customer, index) => (
                     <tr key={customer.id} className="border-b border-gray-100 bg-white hover:bg-gray-50 transition-colors">
                       <td className="py-4 px-6 text-center text-gray-500">{index + 1}</td>
-                      <td className="py-4 px-6 text-gray-700">{customer.name}</td>
+                      <td className="py-4 px-6 text-gray-700">
+                        <div className="font-medium">{customer.name}</div>
+                        {customer.phone && <div className="text-xs text-gray-500 mt-0.5">{customer.phone}</div>}
+                      </td>
                       <td className="py-4 px-6 text-center">
                         <input 
                           type="checkbox"
@@ -136,9 +183,10 @@ export default function ModalDistribusiEvent({ isOpen, onClose, event, showToast
         <div className="px-8 py-5 border-t border-gray-200 flex justify-end bg-white">
           <button 
             onClick={handleDistribute}
-            className="bg-[#56BC36] text-white px-8 py-2.5 rounded-md font-medium hover:bg-[#469e2c] transition-colors"
+            disabled={isSubmitting || isFetching}
+            className={`bg-[#56BC36] text-white px-8 py-2.5 rounded-md font-medium transition-colors ${isSubmitting || isFetching ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[#469e2c]'}`}
           >
-            Distribusikan
+            {isSubmitting ? 'Memproses...' : 'Distribusikan'}
           </button>
         </div>
       </div>

@@ -3,6 +3,9 @@ import Tabel from "./page/Tabel";
 import ModalTambah from "./page/ModalTambah";
 import ModalEdit from "./page/ModalEdit";
 import ModalHapus from "./page/ModalHapus";
+import Pagination from "../components/Pagination";
+import { useTestimoni } from "./hooks/useTestimoni";
+import ToastAlert from "@/view/components/ToastAlert";
 
 export default function KelolaTestimoni() {
   const [isTambahOpen, setIsTambahOpen] = useState(false);
@@ -10,10 +13,20 @@ export default function KelolaTestimoni() {
   const [isHapusOpen, setIsHapusOpen] = useState(false);
   
   const [selectedData, setSelectedData] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  
+  const [toast, setToast] = useState(null);
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+  };
 
-  // State data testimoni, bisa diubah dengan data dari API nantinya
-  const [dataTestimoni, setDataTestimoni] = useState([]);
+  const {
+    searchTerm,
+    setSearchTerm,
+    filteredTestimoni,
+    handleDelete: hookHandleDelete,
+    handleEdit: hookHandleEdit,
+    handleAdd
+  } = useTestimoni();
 
   const handleEdit = (item) => {
     setSelectedData(item);
@@ -25,19 +38,26 @@ export default function KelolaTestimoni() {
     setIsHapusOpen(true);
   };
 
-  const handleTambahSubmit = () => {
-    // Logika tambah data
+  const handleTambahSubmit = (formData) => {
+    handleAdd(formData);
     setIsTambahOpen(false);
+    showToast("Berhasil menambahkan testimoni baru!", "success");
   };
 
-  const handleEditSubmit = () => {
-    // Logika edit data
+  const handleEditSubmit = (formData) => {
+    if (selectedData) {
+      hookHandleEdit(selectedData.id, formData);
+    }
     setIsEditOpen(false);
+    showToast("Berhasil memperbarui testimoni!", "success");
   };
 
   const handleDeleteConfirm = () => {
-    // Logika hapus data
+    if (selectedData) {
+      hookHandleDelete(selectedData.id);
+    }
     setIsHapusOpen(false);
+    showToast("Berhasil menghapus testimoni!", "success");
   };
 
   return (
@@ -79,10 +99,12 @@ export default function KelolaTestimoni() {
         </div>
 
         <Tabel
-          data={dataTestimoni}
+          data={filteredTestimoni}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
+
+        <Pagination />
 
         <ModalTambah
           isOpen={isTambahOpen}
@@ -102,6 +124,15 @@ export default function KelolaTestimoni() {
           onClose={() => setIsHapusOpen(false)}
           onDelete={handleDeleteConfirm}
         />
+
+        {toast && (
+          <ToastAlert
+            isOpen={true}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
       </div>
     </div>
   );
