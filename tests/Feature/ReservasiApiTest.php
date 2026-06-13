@@ -18,7 +18,7 @@ class ReservasiApiTest extends TestCase
     {
         $admin = User::create([
             'nama' => 'Admin Test',
-            'alamat' => 'Jl. Admin',
+            
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1990-01-01',
             'role' => 'admin',
@@ -33,7 +33,7 @@ class ReservasiApiTest extends TestCase
     {
         $customer = User::create([
             'nama' => 'Customer Test',
-            'alamat' => 'Jl. Customer',
+            
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1995-01-01',
             'role' => 'customer',
@@ -241,7 +241,7 @@ class ReservasiApiTest extends TestCase
 
         $customer = User::create([
             'nama' => 'Customer Test 2',
-            'alamat' => 'Jl. Customer 2',
+            
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1995-01-01',
             'role' => 'customer',
@@ -284,7 +284,7 @@ class ReservasiApiTest extends TestCase
 
         $customer = User::create([
             'nama' => 'Customer Test 3',
-            'alamat' => 'Jl. Customer 3',
+            
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1995-01-01',
             'role' => 'customer',

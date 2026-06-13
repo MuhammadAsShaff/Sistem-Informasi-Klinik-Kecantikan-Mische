@@ -17,7 +17,6 @@ class UserSeeder extends Seeder
         
         User::create([
             'nama'         => 'Admin Utama Mische',
-            'alamat'       => 'Jl. Sudirman No 1',
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1990-01-01',
             'role'         => 'admin',
@@ -28,7 +27,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Admin Operasional Mische',
-            'alamat'       => 'Jl. Sudirman No 2',
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1992-02-02',
             'role'         => 'admin',
@@ -39,7 +37,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Admin Keuangan Mische',
-            'alamat'       => 'Jl. Sudirman No 3',
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1993-03-03',
             'role'         => 'admin',
@@ -50,7 +47,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Admin Pemasaran Mische',
-            'alamat'       => 'Jl. Sudirman No 4',
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1994-04-04',
             'role'         => 'admin',
@@ -61,7 +57,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Admin IT Mische',
-            'alamat'       => 'Jl. Sudirman No 5',
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1995-05-05',
             'role'         => 'admin',
@@ -76,7 +71,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Budi Santoso',
-            'alamat'       => 'Jl. Mawar No 10',
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1995-10-10',
             'role'         => 'customer',
@@ -87,7 +81,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Siti Aminah',
-            'alamat'       => 'Jl. Melati No 11',
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1996-11-11',
             'role'         => 'customer',
@@ -98,7 +91,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Andi Wijaya',
-            'alamat'       => 'Jl. Anggrek No 12',
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1997-12-12',
             'role'         => 'customer',
@@ -109,7 +101,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Rina Rahmawati',
-            'alamat'       => 'Jl. Dahlia No 13',
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1998-01-13',
             'role'         => 'customer',
@@ -120,7 +111,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Dewi Lestari',
-            'alamat'       => 'Jl. Kamboja No 14',
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1999-02-14',
             'role'         => 'customer',
@@ -131,7 +121,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Bagus Prasetyo',
-            'alamat'       => 'Jl. Kenanga No 15',
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1990-03-15',
             'role'         => 'customer',
@@ -142,7 +131,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Nia Ramadhani',
-            'alamat'       => 'Jl. Cempaka No 16',
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1991-04-16',
             'role'         => 'customer',
@@ -153,7 +141,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Hendra Setiawan',
-            'alamat'       => 'Jl. Flamboyan No 17',
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1992-05-17',
             'role'         => 'customer',
@@ -164,7 +151,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Maya Putri',
-            'alamat'       => 'Jl. Teratai No 18',
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1993-06-18',
             'role'         => 'customer',
@@ -175,7 +161,6 @@ class UserSeeder extends Seeder
 
         User::create([
             'nama'         => 'Joko Santoso',
-            'alamat'       => 'Jl. Alamanda No 19',
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1994-07-19',
             'role'         => 'customer',

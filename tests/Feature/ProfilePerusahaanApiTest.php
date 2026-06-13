@@ -16,7 +16,7 @@ class ProfilePerusahaanApiTest extends TestCase
     private function getAdminToken()
     {
         $admin = User::create([
-            'nama' => 'Admin Klinik', 'alamat' => 'Jl. Klinik', 'jenisKelamin' => 'Perempuan',
+            'nama' => 'Admin Klinik', 'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1990-01-01', 'role' => 'admin', 'email' => 'admin.klinik@mische.com',
             'nomorWa' => '08123456789', 'password' => bcrypt('password123')
         ]);

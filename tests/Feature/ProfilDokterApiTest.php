@@ -18,7 +18,7 @@ class ProfilDokterApiTest extends TestCase
     {
         $admin = User::create([
             'nama' => 'Admin Test',
-            'alamat' => 'Jl. Admin Test',
+            
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1990-01-01',
             'role' => 'admin',

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AutentikasiController;
 use App\Http\Controllers\Api\ProfilCustomerController;
+use App\Http\Controllers\Api\AlamatCustomerController;
 use App\Http\Controllers\Api\ProfilePerusahaanController;
 use App\Http\Controllers\Api\KelolaUserController;
 use App\Http\Controllers\Api\JadwalReservasiController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\KeranjangController;
 use App\Http\Controllers\Api\PenjualanController;
+use App\Http\Controllers\Api\RajaOngkirController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -74,7 +76,7 @@ Route::prefix('customer')->group(function () {
         Route::get('/', [ProdukKlinikController::class, 'getPublicProducts'])->name('customer.products');
         Route::get('/{idProduk}', [ProdukKlinikController::class, 'getProductById'])->name('customer.productById');
         // Hanya pengguna dengan role customer yang telah login yang bisa order
-        Route::post('/{idProduk}/order', [ProdukKlinikController::class, 'orderProduct'])->name('customer.orderProduct')->middleware(['role:customer']); 
+        Route::post('/{idProduk}/order', [PenjualanController::class, 'orderProduct'])->name('customer.orderProduct')->middleware(['role:customer']); 
     });
 
     Route::get('kegiatan', [KegiatanController::class, 'getPublicKegiatan'])->name('customer.activities');
@@ -86,6 +88,13 @@ Route::prefix('customer')->group(function () {
     Route::prefix('profile')->middleware(['role:customer'])->group(function () {
         Route::get('/', [ProfilCustomerController::class, 'getProfileCustomer'])->name('customer.profile');
         Route::put('/', [ProfilCustomerController::class, 'updateProfileCustomer'])->name('customer.updateProfile');
+    });
+
+    Route::prefix('alamat')->middleware(['role:customer'])->group(function () {
+        Route::get('/', [AlamatCustomerController::class, 'getCustomerAddresses'])->name('customer.alamat.index');
+        Route::post('/', [AlamatCustomerController::class, 'createAddress'])->name('customer.alamat.create');
+        Route::put('/{id}', [AlamatCustomerController::class, 'updateAddress'])->name('customer.alamat.update');
+        Route::delete('/{id}', [AlamatCustomerController::class, 'deleteAddress'])->name('customer.alamat.delete');
     });
 
     Route::prefix('reservations')->middleware(['role:customer'])->group(function () {
@@ -106,6 +115,13 @@ Route::prefix('customer')->group(function () {
     // Rute Penjualan Customer
     Route::prefix('penjualan')->middleware(['role:customer'])->group(function () {
         Route::patch('/{idPenjualan}', [PenjualanController::class, 'receiveItem'])->name('customer.receiveItem');
+    });
+
+    // Rute RajaOngkir (Customer Cek Ongkir)
+    Route::prefix('rajaongkir')->middleware(['role:customer'])->group(function () {
+        Route::get('/provinces', [RajaOngkirController::class, 'getProvinces'])->name('customer.rajaongkir.provinces');
+        Route::get('/cities', [RajaOngkirController::class, 'getCities'])->name('customer.rajaongkir.cities');
+        Route::post('/cost', [RajaOngkirController::class, 'checkCost'])->name('customer.rajaongkir.cost');
     });
 });
 
@@ -269,3 +285,4 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::delete('/{idPenjualan}', [PenjualanController::class, 'destroy'])->name('admin.penjualan.destroy');
     });
 });
+

@@ -14,7 +14,7 @@ class ProfilAdminApiTest extends TestCase
     private function getAdminTokenAndUser()
     {
         $admin = User::create([
-            'nama' => 'Admin Ganteng', 'alamat' => 'Jl. Admin', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'Admin Ganteng', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '1990-01-01', 'role' => 'admin', 'email' => 'admin.ganteng@mische.com',
             'nomorWa' => '08123456789', 'password' => bcrypt('password123')
         ]);
@@ -41,7 +41,7 @@ class ProfilAdminApiTest extends TestCase
         $response = $this->withHeaders(['Authorization' => "Bearer $token"])
             ->putJson('/api/admin/profile', [
                 'nama' => 'Admin Update',
-                'alamat' => 'Jl. Update',
+                
                 'jenisKelamin' => 'Laki-laki',
                 'tanggalLahir' => '1990-01-01',
                 'email' => 'admin.update@mische.com',
@@ -65,7 +65,7 @@ class ProfilAdminApiTest extends TestCase
         $response = $this->withHeaders(['Authorization' => "Bearer $token"])
             ->putJson('/api/admin/profile', [
                 'nama' => 'Admin Update',
-                'alamat' => 'Jl. Update',
+                
                 'jenisKelamin' => 'Laki-laki',
                 'tanggalLahir' => '1990-01-01',
                 'email' => 'admin.update2@mische.com',

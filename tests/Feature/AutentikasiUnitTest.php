@@ -15,7 +15,7 @@ class AutentikasiUnitTest extends TestCase
     {
         $response = $this->postJson('/api/auth/register', [
             'nama' => 'John Doe',
-            'alamat' => 'Jl. Test No 123',
+            
             'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '1995-05-15',
             'email' => 'john.doe@example.com',
@@ -35,14 +35,14 @@ class AutentikasiUnitTest extends TestCase
     public function test_register_gagal_karena_email_sudah_terdaftar()
     {
         User::create([
-            'nama' => 'Jane Doe', 'alamat' => 'Jl. Lama', 'jenisKelamin' => 'Perempuan',
+            'nama' => 'Jane Doe', 'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'jane@example.com',
             'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
         ]);
 
         $response = $this->postJson('/api/auth/register', [
             'nama' => 'Jane Doe 2',
-            'alamat' => 'Jl. Baru',
+            
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1995-05-15',
             'email' => 'jane@example.com',
@@ -57,7 +57,7 @@ class AutentikasiUnitTest extends TestCase
     public function test_user_bisa_login_dengan_kredensial_benar()
     {
         User::create([
-            'nama' => 'John Login', 'alamat' => 'Jl. Test No 123', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'John Login', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'login@example.com',
             'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
         ]);
@@ -75,7 +75,7 @@ class AutentikasiUnitTest extends TestCase
     public function test_login_gagal_jika_password_salah()
     {
         User::create([
-            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'John Login', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'login2@example.com',
             'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
         ]);
@@ -92,7 +92,7 @@ class AutentikasiUnitTest extends TestCase
     public function test_user_bisa_mendapatkan_profil_saat_ini()
     {
         $user = User::create([
-            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'John Login', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'profil@example.com',
             'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
         ]);
@@ -118,7 +118,7 @@ class AutentikasiUnitTest extends TestCase
     public function test_user_bisa_reset_password()
     {
         $user = User::create([
-            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'John Login', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'reset@example.com',
             'nomorWa' => '081234567890', 'password' => Hash::make('PasswordLama123')
         ]);
@@ -146,7 +146,7 @@ class AutentikasiUnitTest extends TestCase
     public function test_reset_password_gagal_jika_password_lama_salah()
     {
         $user = User::create([
-            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'John Login', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'reset2@example.com',
             'nomorWa' => '081234567890', 'password' => Hash::make('PasswordLama123')
         ]);
@@ -166,7 +166,7 @@ class AutentikasiUnitTest extends TestCase
     public function test_user_bisa_logout_dengan_token()
     {
         $user = User::create([
-            'nama' => 'John Login', 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'John Login', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '1995-05-15', 'role' => 'customer', 'email' => 'logout@example.com',
             'nomorWa' => '081234567890', 'password' => Hash::make('Password123')
         ]);

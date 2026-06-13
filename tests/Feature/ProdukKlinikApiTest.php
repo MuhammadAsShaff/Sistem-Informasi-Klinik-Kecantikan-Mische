@@ -17,7 +17,7 @@ class ProdukKlinikApiTest extends TestCase
     {
         $admin = User::create([
             'nama' => 'Admin Test',
-            'alamat' => 'Jl. Admin Test',
+            
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1990-01-01',
             'role' => 'admin',
@@ -33,7 +33,7 @@ class ProdukKlinikApiTest extends TestCase
     {
         $customer = User::create([
             'nama' => 'Customer Test',
-            'alamat' => 'Jl. Customer Test',
+            
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1995-01-01',
             'role' => 'customer',
@@ -57,7 +57,7 @@ class ProdukKlinikApiTest extends TestCase
             'deskripsi' => 'Deskripsi Produk Baru',
             'harga' => 100000,
             'stock' => 50,
-            'gambar' => 'gambar_baru.jpg',
+            'gambar' => \Illuminate\Http\UploadedFile::fake()->image('gambar_baru.jpg'),
             'idKategori' => $kategori->idKategori
         ]);
 
@@ -148,8 +148,8 @@ class ProdukKlinikApiTest extends TestCase
 
         // Pastikan penjualan tercatat
         $this->assertDatabaseHas('penjualan', [
-            'totalHarga' => 100000,
-            'status' => 'pending'
+            'subtotal' => 100000,
+            'orderStatus' => 'pending'
         ]);
     }
 

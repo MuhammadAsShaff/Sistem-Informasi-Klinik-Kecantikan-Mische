@@ -14,7 +14,7 @@ class ProfilCustomerApiTest extends TestCase
     private function getCustomerTokenAndUser()
     {
         $customer = User::create([
-            'nama' => 'Customer Cantik', 'alamat' => 'Jl. Customer', 'jenisKelamin' => 'Perempuan',
+            'nama' => 'Customer Cantik', 'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1995-01-01', 'role' => 'customer', 'email' => 'customer.cantik@mische.com',
             'nomorWa' => '08123456789', 'password' => bcrypt('password123')
         ]);
@@ -41,7 +41,7 @@ class ProfilCustomerApiTest extends TestCase
         $response = $this->withHeaders(['Authorization' => "Bearer $token"])
             ->putJson('/api/customer/profile', [
                 'nama' => 'Customer Update',
-                'alamat' => 'Jl. Update',
+                
                 'jenisKelamin' => 'Perempuan',
                 'tanggalLahir' => '1995-01-01',
                 'email' => 'customer.update@mische.com',
@@ -65,7 +65,7 @@ class ProfilCustomerApiTest extends TestCase
         $response = $this->withHeaders(['Authorization' => "Bearer $token"])
             ->putJson('/api/customer/profile', [
                 'nama' => 'Customer Update',
-                'alamat' => 'Jl. Update',
+                
                 'jenisKelamin' => 'Perempuan',
                 'tanggalLahir' => '1995-01-01',
                 'email' => 'customer.update2@mische.com',

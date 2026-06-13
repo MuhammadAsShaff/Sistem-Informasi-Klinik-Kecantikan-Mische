@@ -33,7 +33,7 @@ class AutentikasiController extends Controller
         // Validasi batasan tipe data pada input yang dikirim Client
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:60',
-            'alamat' => 'required|string|max:60',
+            
             'jenisKelamin' => 'required|string|max:12',
             'tanggalLahir' => 'required|date',
             'email' => 'required|email|unique:user,email|max:50',

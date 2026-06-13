@@ -83,7 +83,7 @@ class KelolaUserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:60',
-            'alamat' => 'required|string|max:60',
+            
             'jenisKelamin' => 'required|string|max:12',
             'tanggalLahir' => 'required|date',
             'role' => 'required|string|max:12',
@@ -153,7 +153,7 @@ class KelolaUserController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'nama' => 'sometimes|string|max:60',
-                'alamat' => 'sometimes|string|max:60',
+                
                 'jenisKelamin' => 'sometimes|string|max:12',
                 'tanggalLahir' => 'sometimes|date',
                 'role' => 'sometimes|string|max:12',

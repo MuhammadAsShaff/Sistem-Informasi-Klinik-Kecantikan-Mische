@@ -59,7 +59,7 @@ class ProfilCustomerController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:60',
-                'alamat' => 'required|string|max:60',
+                
                 'jenisKelamin' => 'required|string|max:12',
                 'tanggalLahir' => 'required|date',
                 'email' => 'required|email|max:50|unique:user,email,' . $user->idUser . ',idUser',

@@ -14,7 +14,7 @@ class KelolaUserApiTest extends TestCase
     private function getAdminToken()
     {
         $admin = User::create([
-            'nama' => 'Admin Utama', 'alamat' => 'Jl. Pusat', 'jenisKelamin' => 'Perempuan',
+            'nama' => 'Admin Utama', 'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1990-01-01', 'role' => 'admin', 'email' => 'admin.kelola@mische.com',
             'nomorWa' => '08123456789', 'password' => bcrypt('password123')
         ]);
@@ -28,7 +28,7 @@ class KelolaUserApiTest extends TestCase
         // Buat 5 user tambahan
         for ($i = 0; $i < 5; $i++) {
             User::create([
-                'nama' => "User $i", 'alamat' => 'Jl. Test', 'jenisKelamin' => 'Laki-laki',
+                'nama' => "User $i", 'jenisKelamin' => 'Laki-laki',
                 'tanggalLahir' => '1990-01-01', 'role' => 'customer', 'email' => "user$i@example.com",
                 'nomorWa' => '08123456789', 'password' => bcrypt('password123')
             ]);
@@ -49,7 +49,7 @@ class KelolaUserApiTest extends TestCase
         $response = $this->withHeaders(['Authorization' => "Bearer $token"])
             ->postJson('/api/admin/users', [
                 'nama' => 'Pasien Baru',
-                'alamat' => 'Jl. Pasien',
+                
                 'jenisKelamin' => 'Laki-laki',
                 'tanggalLahir' => '2000-01-01',
                 'role' => 'customer',
@@ -85,7 +85,7 @@ class KelolaUserApiTest extends TestCase
     {
         $token = $this->getAdminToken();
         $user = User::create([
-            'nama' => 'User Lama', 'alamat' => 'Jl. Lama', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'User Lama', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '2000-01-01', 'role' => 'customer', 'email' => 'lama@example.com',
             'nomorWa' => '08987654321', 'password' => Hash::make('password123')
         ]);
@@ -93,7 +93,7 @@ class KelolaUserApiTest extends TestCase
         $response = $this->withHeaders(['Authorization' => "Bearer $token"])
             ->putJson('/api/admin/users/' . $user->idUser, [
                 'nama' => 'User Update',
-                'alamat' => 'Jl. Update'
+                
             ]);
 
         $response->assertStatus(200)
@@ -102,7 +102,7 @@ class KelolaUserApiTest extends TestCase
         $this->assertDatabaseHas('user', [
             'idUser' => $user->idUser,
             'nama' => 'User Update',
-            'alamat' => 'Jl. Update'
+            
         ]);
     }
 
@@ -110,13 +110,13 @@ class KelolaUserApiTest extends TestCase
     {
         $token = $this->getAdminToken();
         $user1 = User::create([
-            'nama' => 'User Satu', 'alamat' => 'Jl. Satu', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'User Satu', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '2000-01-01', 'role' => 'customer', 'email' => 'satu@example.com',
             'nomorWa' => '08987654321', 'password' => Hash::make('password123')
         ]);
         
         $user2 = User::create([
-            'nama' => 'User Dua', 'alamat' => 'Jl. Dua', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'User Dua', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '2000-01-01', 'role' => 'customer', 'email' => 'dua@example.com',
             'nomorWa' => '08987654321', 'password' => Hash::make('password123')
         ]);
@@ -135,7 +135,7 @@ class KelolaUserApiTest extends TestCase
     {
         $token = $this->getAdminToken();
         $user = User::create([
-            'nama' => 'User Hapus', 'alamat' => 'Jl. Hapus', 'jenisKelamin' => 'Laki-laki',
+            'nama' => 'User Hapus', 'jenisKelamin' => 'Laki-laki',
             'tanggalLahir' => '2000-01-01', 'role' => 'customer', 'email' => 'hapus@example.com',
             'nomorWa' => '08987654321', 'password' => Hash::make('password123')
         ]);
