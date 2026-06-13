@@ -21,7 +21,6 @@ class User extends Authenticatable implements JWTSubject
 
     protected $fillable = [
         'nama',
-        'alamat',
         'jenisKelamin',
         'tanggalLahir',
         'role',
@@ -29,6 +28,11 @@ class User extends Authenticatable implements JWTSubject
         'nomorWa',
         'password'
     ];
+
+    public function alamats()
+    {
+        return $this->hasMany(AlamatCustomer::class, 'idUser', 'idUser');
+    }
 
     public function penjualan()
     {
