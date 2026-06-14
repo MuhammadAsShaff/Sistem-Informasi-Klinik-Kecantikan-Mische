@@ -35,15 +35,20 @@ Sistem API ini merupakan fondasi utama bagi seluruh infrastruktur digital Mische
 
 ### 🛡️ Keamanan & Otentikasi
 Seluruh rute privat dalam sistem ini dilindungi oleh **Stateless JWT (JSON Web Tokens)**. 
-Untuk mengakses rute terlindungi, Anda diwajibkan untuk melakukan otentikasi melalui *endpoint* **Login** terlebih dahulu guna mendapatkan Token *Session Cookie*.
+Untuk mengakses rute terlindungi, Anda diwajibkan untuk melakukan otentikasi melalui *endpoint* **Login** terlebih dahulu guna mendapatkan Bearer Token atau Token *Session Cookie*.
 
 ### 👥 Hak Akses (Roles)
 Sistem ini membagi hak akses secara ketat ke dalam 3 level:
-- **Public / Tamu** : Dapat melihat profil perusahaan, daftar kegiatan, dan jadwal dokter secara bebas (Tanpa Login).
-- **Customer** : Membutuhkan akun *Customer* untuk mengelola profil pribadinya.
-- **Administrator** : Membutuhkan akun *Admin* untuk mengelola seluruh data operasional klinik secara mutlak (CRUD).
+- **Public / Tamu** : Dapat melihat profil perusahaan, daftar kegiatan, daftar produk, promo aktif, testimoni, dan jadwal dokter secara bebas (Tanpa Login).
+- **Customer** : Membutuhkan akun *Customer* untuk mengelola profil pribadi, alamat pengiriman (maks 3), memesan produk (Transaksi E-Commerce), dan membuat reservasi dokter.
+- **Administrator** : Membutuhkan akun *Admin* untuk mengelola seluruh data operasional klinik secara mutlak (CRUD Produk, Dokter, Promo, Laporan Penjualan, dll).
 
-*Dokumentasi interaktif ini dihasilkan secara otomatis dan mematuhi spesifikasi OpenAPI.*',
+### 🚀 Fitur Integrasi Eksternal Terkini
+1. **RajaOngkir (Shipping)**: API ini terintegrasi penuh dengan RajaOngkir untuk menghitung biaya ongkos kirim secara dinamis berdasarkan provinsi dan kota pengiriman (*Endpoint* `/api/customer/rajaongkir/*`).
+2. **Midtrans (Payment Gateway)**: Seluruh transaksi pembayaran menggunakan Midtrans Snap API. Sistem secara otomatis menerima *Webhook Notification* di latar belakang untuk memperbarui status pesanan menjadi `paid` secara *real-time* tanpa perlu aksi manual.
+3. **Fonnte (WhatsApp Gateway)**: Mendukung notifikasi WhatsApp otomatis untuk konfirmasi OTP pendaftaran dan konfirmasi reservasi/pesanan melalui Fonnte API.
+
+*Dokumentasi interaktif ini dihasilkan secara otomatis dari Source Code dan mematuhi spesifikasi OpenAPI.*',
     ],
 
     /*

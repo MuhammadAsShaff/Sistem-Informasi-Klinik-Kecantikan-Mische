@@ -4,24 +4,31 @@
 ![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT_Auth-Tymon-black?style=for-the-badge&logo=jsonwebtokens)
 ![PHPUnit](https://img.shields.io/badge/PHPUnit-Testing-3776AB?style=for-the-badge&logo=php)
+![Midtrans](https://img.shields.io/badge/Midtrans-Payment-blue?style=for-the-badge)
 
-Selamat datang di repositori resmi **Backend API Mische Beauty Clinic**. Sistem ini dibangun menggunakan arsitektur *RESTful API* berbasis Laravel yang tangguh, diamankan dengan *JSON Web Tokens (JWT)*, dan dirancang khusus untuk memenuhi kebutuhan administrasi dan layanan klinik estetika modern.
+Selamat datang di repositori resmi **Backend API Mische Beauty Clinic**. Sistem ini dibangun menggunakan arsitektur *RESTful API* berbasis Laravel yang tangguh, diamankan dengan *JSON Web Tokens (JWT)*, dan dirancang khusus untuk memenuhi kebutuhan administrasi, reservasi, serta layanan *e-commerce* klinik estetika modern.
 
-## 🚀 Fitur Utama
+## 🚀 Fitur Utama & Integrasi Eksternal
 
-- **Otentikasi JWT Berkeamanan Tinggi**: Token disimpan di dalam *Cookie* (Session Cookie) yang otomatis hancur saat *browser* ditutup, dengan masa aktif maksimal 60 menit. Dilengkapi proteksi *Brute-Force Rate Limiting*.
-- **Manajemen Hak Akses (Role-Based)**: Pemisahan rute ketat antara `Admin` dan `Customer` menggunakan *Middleware Custom*.
-- **Dokumentasi Otomatis (Scramble)**: Seluruh *endpoint* API terdokumentasi dengan rapi dan interaktif (OAS 3.0) tanpa perlu menulis anotasinya secara manual.
-- **Manajemen Berkas Terintegrasi**: Mengelola unggahan foto untuk *Profil Perusahaan* dan *Kegiatan* dengan sistem *fallback* cerdas dan auto-cleanup.
-- **Uji Kualitas Berlapis (Feature Testing)**: Sistem dilindungi oleh armada *PHPUnit Tests* yang berjalan dalam *Database In-Memory* untuk mencegah kebocoran *bug*.
+- **Otentikasi JWT Berkeamanan Tinggi**: Token disimpan di dalam *Cookie* (Session Cookie) atau diakses via *Bearer Token*, dilengkapi proteksi *Brute-Force Rate Limiting*.
+- **Integrasi Midtrans (Payment Gateway)**: Memproses transaksi pembayaran produk secara instan, lengkap dengan penerimaan *Webhook Notification* untuk *update* status otomatis.
+- **Integrasi RajaOngkir**: Menghitung tarif pengiriman ke seluruh Indonesia secara dinamis langsung dari API kurir lokal.
+- **Integrasi Fonnte (WhatsApp Gateway)**: Mengirimkan kode OTP registrasi dan notifikasi status pesanan/reservasi secara otomatis ke nomor WhatsApp pelanggan.
+- **Manajemen Hak Akses (Role-Based)**: Pemisahan rute ketat antara `Public`, `Customer`, dan `Admin` menggunakan *Middleware Custom*.
+- **Dokumentasi Otomatis (Scramble)**: Seluruh *endpoint* API terdokumentasi dengan rapi dan interaktif (OAS 3.0) tanpa perlu anotasi manual.
+- **Uji Kualitas Berlapis (Feature Testing)**: Dilindungi oleh lebih dari 100 *PHPUnit Tests* yang berjalan dalam *Database In-Memory* guna mencegah kebocoran *bug*.
 
 ## 📂 Struktur Modul
 
-1. **Autentikasi**: Register, Login, Logout, Reset Sandi, Cek Sesi.
-2. **Kelola User**: CRUD Pasien & Staff (Admin).
-3. **Profil Perusahaan**: Manajemen Visi, Misi, Deskripsi panjang (MediumText), Jam Operasional, dan Logo.
-4. **Jadwal Reservasi**: Pengelolaan slot waktu kedatangan untuk dokter/terapis.
-5. **Kegiatan Klinik**: Pengelolaan berita, seminar, dan acara promosi klinik beserta poster kegiatannya.
+1. **Autentikasi & Pengguna**: Register (dengan verifikasi OTP WhatsApp), Login, Logout, dan Manajemen Profil.
+2. **Klinik & Informasi Publik**: Manajemen Profil Perusahaan, Event/Kegiatan, Testimoni, Promo, dan Kategori Produk.
+3. **Layanan Medis**: Pengelolaan Profil Dokter dan Sistem **Reservasi Jadwal Dokter** secara waktu nyata (*real-time*).
+4. **E-Commerce (Penjualan Produk)**: 
+   - Katalog Produk dan Manajemen Stok.
+   - Manajemen Alamat Pengiriman (Maks 3 alamat per *Customer*).
+   - *Checkout* pesanan dengan integrasi tarif RajaOngkir.
+   - Sinkronisasi pembayaran dengan Midtrans.
+5. **Pelaporan (Reporting)**: Ekspor dan rekapitulasi data penjualan serta reservasi (Khusus Admin).
 
 ---
 
@@ -30,7 +37,7 @@ Selamat datang di repositori resmi **Backend API Mische Beauty Clinic**. Sistem 
 - **PHP**: `^8.2` atau lebih baru
 - **Composer**: `^2.0`
 - **Database**: MySQL / MariaDB (Untuk produksi) & SQLite (Tertanam untuk Testing otomatis)
-- **Ekstensi PHP**: `pdo_sqlite`, `fileinfo`, `mbstring`, `openssl`
+- **Ekstensi PHP**: `pdo_sqlite`, `fileinfo`, `mbstring`, `openssl`, `curl`
 
 ---
 
@@ -48,7 +55,7 @@ Selamat datang di repositori resmi **Backend API Mische Beauty Clinic**. Sistem 
    ```
 
 3. **Konfigurasi Environment**
-   Salin file konfigurasi lalu sesuaikan isi kredensial *database* Anda.
+   Salin file konfigurasi lalu sesuaikan isi kredensial *database* serta *API Keys* (RajaOngkir, Midtrans, Fonnte) Anda.
    ```bash
    cp .env.example .env
    ```
@@ -60,13 +67,12 @@ Selamat datang di repositori resmi **Backend API Mische Beauty Clinic**. Sistem 
    ```
 
 5. **Migrasi dan *Seeding* Database**
-   Perintah ini akan membangun tabel dan mengisinya dengan *Dummy Data* elegan yang sudah disiapkan khusus untuk Mische Clinic.
+   Perintah ini akan membangun tabel dan mengisinya dengan *Dummy Data* lengkap.
    ```bash
    php artisan migrate:fresh --seed
    ```
 
 6. **Tautkan Folder Penyimpanan Foto**
-   Agar foto yang diunggah dapat diakses dari URL publik.
    ```bash
    php artisan storage:link
    ```
@@ -79,9 +85,9 @@ Selamat datang di repositori resmi **Backend API Mische Beauty Clinic**. Sistem 
 
 ---
 
-## 📖 Dokumentasi API
+## 📖 Dokumentasi API (Scramble)
 
-Seluruh rute (*endpoint*) API dan format *Request/Response* dapat Anda lihat dan uji coba secara interaktif melalui antarmuka Swagger/Scramble yang tersedia di:
+Seluruh rute (*endpoint*) API, beserta parameter, skema database, dan contoh *Response* dapat Anda eksplorasi secara interaktif di:
 
 👉 **`http://127.0.0.1:8000/docs/api`**
 
@@ -89,13 +95,13 @@ Seluruh rute (*endpoint*) API dan format *Request/Response* dapat Anda lihat dan
 
 ## 🧪 Pengujian Otomatis (Testing)
 
-Proyek ini menjunjung tinggi standar kualitas. Anda dapat memverifikasi integritas seluruh *controller* API dengan mengeksekusi armada penguji:
+Proyek ini menjunjung tinggi standar kualitas. Eksekusi pengujian otomatis untuk memastikan seluruh fungsi berjalan sempurna:
 
 ```bash
 php artisan test
 ```
 
-*Seluruh pengujian berjalan secara terisolasi menggunakan SQLite In-Memory, sehingga tidak akan pernah mengotori atau menghapus data asli di Database Anda.*
+*Seluruh pengujian berjalan terisolasi di dalam SQLite In-Memory, sehingga dijamin tidak akan merusak data MySQL Anda.*
 
 ---
 *Didesain dan dikembangkan dengan ❤️ untuk Mische Beauty Clinic.*
