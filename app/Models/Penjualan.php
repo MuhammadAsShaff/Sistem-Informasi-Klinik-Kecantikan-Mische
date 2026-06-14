@@ -20,6 +20,7 @@ class Penjualan extends Model
         'shippingCost',
         'shippingCourier',
         'shippingService',
+        'nomorResi',
         'total',
         'paymentStatus',
         'orderStatus',

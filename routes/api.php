@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\KeranjangController;
 use App\Http\Controllers\Api\PenjualanController;
 use App\Http\Controllers\Api\RajaOngkirController;
+use App\Http\Controllers\Api\WebhookController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -115,6 +116,7 @@ Route::prefix('customer')->group(function () {
     // Rute Penjualan Customer
     Route::prefix('penjualan')->middleware(['role:customer'])->group(function () {
         Route::patch('/{idPenjualan}', [PenjualanController::class, 'receiveItem'])->name('customer.receiveItem');
+        Route::post('/checkout', [PenjualanController::class, 'checkoutCart'])->name('customer.checkoutCart');
     });
 
     // Rute RajaOngkir (Customer Cek Ongkir)
@@ -284,5 +286,13 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::patch('/{idPenjualan}', [PenjualanController::class, 'updateStatus'])->name('admin.penjualan.updateStatus');
         Route::delete('/{idPenjualan}', [PenjualanController::class, 'destroy'])->name('admin.penjualan.destroy');
     });
+});
+
+// ============================================
+// AREA WEBHOOK (Diakses oleh Sistem Eksternal seperti Midtrans)
+// Prefix: /api/webhook/...
+// ============================================
+Route::prefix('webhook')->group(function () {
+    Route::post('/midtrans', [WebhookController::class, 'midtransNotification'])->name('webhook.midtrans');
 });
 
