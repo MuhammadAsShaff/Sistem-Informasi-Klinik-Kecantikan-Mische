@@ -3,11 +3,14 @@
 namespace App\Exports;
 
 use App\Models\DetailPenjualan;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PenjualanExport implements FromCollection, WithHeadings, WithMapping
+class PenjualanExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
     protected $filters;
 
@@ -16,7 +19,7 @@ class PenjualanExport implements FromCollection, WithHeadings, WithMapping
         $this->filters = $filters;
     }
 
-    public function collection()
+    public function query()
     {
         $query = DetailPenjualan::with(['penjualan.user', 'produk.kategori']);
 
@@ -39,7 +42,7 @@ class PenjualanExport implements FromCollection, WithHeadings, WithMapping
             });
         }
 
-        return $query->get();
+        return $query;
     }
 
     public function headings(): array
@@ -72,6 +75,13 @@ class PenjualanExport implements FromCollection, WithHeadings, WithMapping
             $hargaSatuan,
             $subtotal,
             $detail->penjualan->status ?? '-'
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1    => ['font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']], 'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF4F81BD']]],
         ];
     }
 }

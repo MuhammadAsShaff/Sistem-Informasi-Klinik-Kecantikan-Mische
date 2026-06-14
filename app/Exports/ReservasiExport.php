@@ -3,11 +3,14 @@
 namespace App\Exports;
 
 use App\Models\Reservasi;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ReservasiExport implements FromCollection, WithHeadings, WithMapping
+class ReservasiExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
     protected $filters;
 
@@ -16,7 +19,7 @@ class ReservasiExport implements FromCollection, WithHeadings, WithMapping
         $this->filters = $filters;
     }
 
-    public function collection()
+    public function query()
     {
         $query = Reservasi::with(['user', 'dokter', 'jadwal']);
 
@@ -35,7 +38,7 @@ class ReservasiExport implements FromCollection, WithHeadings, WithMapping
             ]);
         }
 
-        return $query->get();
+        return $query;
     }
 
     public function headings(): array
@@ -63,6 +66,13 @@ class ReservasiExport implements FromCollection, WithHeadings, WithMapping
             $reservasi->dokter->nama ?? '-',
             $reservasi->jadwal->waktuMulai ?? '-',
             $reservasi->status ?? '-'
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1    => ['font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']], 'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF4F81BD']]],
         ];
     }
 }

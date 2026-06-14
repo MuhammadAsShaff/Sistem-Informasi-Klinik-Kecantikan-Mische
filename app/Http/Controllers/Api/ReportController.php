@@ -13,8 +13,10 @@ class ReportController extends Controller
 {
     /**
      * Download Excel Report untuk Penjualan
+     * 
+     * @response 200 application/octet-stream
      */
-    public function exportReportPenjualan(Request $request)
+    public function exportReportPenjualan(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         $filters = $request->only(['idProduk', 'idKategori', 'tanggalMulai', 'tanggalSelesai']);
         
@@ -25,8 +27,10 @@ class ReportController extends Controller
 
     /**
      * Download Excel Report untuk Reservasi
+     * 
+     * @response 200 application/octet-stream
      */
-    public function exportReportReservasi(Request $request)
+    public function exportReportReservasi(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         $filters = $request->only(['jenisTreatment', 'status', 'tanggalMulai', 'tanggalSelesai']);
         
