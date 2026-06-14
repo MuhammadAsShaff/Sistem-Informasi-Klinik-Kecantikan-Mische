@@ -21,16 +21,36 @@ class RajaOngkirService
     }
 
     /**
+     * Mengecek apakah ini Komerce API
+     */
+    private function isKomerce()
+    {
+        return strpos($this->baseUrl, 'komerce') !== false;
+    }
+
+    /**
      * Mendapatkan daftar provinsi
      */
     public function getProvinces()
     {
         try {
+            $endpoint = $this->isKomerce() ? '/destination/province' : '/province';
             $response = Http::withHeaders([
-                'key' => $this->apiKey
-            ])->get($this->baseUrl . '/province');
+                'key' => $this->apiKey,
+                'accept' => 'application/json'
+            ])->get($this->baseUrl . $endpoint);
 
             if ($response->successful()) {
+                if ($this->isKomerce()) {
+                    // Mapping respons Komerce agar sama persis strukturnya dengan Front-End/RajaOngkir asli
+                    $data = $response->json()['data'] ?? [];
+                    return array_map(function($item) {
+                        return [
+                            'province_id' => $item['id'],
+                            'province' => $item['name']
+                        ];
+                    }, $data);
+                }
                 return $response->json()['rajaongkir']['results'];
             }
 
@@ -48,16 +68,30 @@ class RajaOngkirService
     public function getCities($provinceId = null)
     {
         try {
-            $url = $this->baseUrl . '/city';
+            $endpoint = $this->isKomerce() ? '/destination/city' : '/city';
+            $url = $this->baseUrl . $endpoint;
             if ($provinceId) {
                 $url .= '?province=' . $provinceId;
             }
 
             $response = Http::withHeaders([
-                'key' => $this->apiKey
+                'key' => $this->apiKey,
+                'accept' => 'application/json'
             ])->get($url);
 
             if ($response->successful()) {
+                if ($this->isKomerce()) {
+                    $data = $response->json()['data'] ?? [];
+                    return array_map(function($item) {
+                        return [
+                            'city_id' => $item['id'],
+                            'province_id' => $item['province_id'] ?? null,
+                            'city_name' => $item['name'],
+                            'type' => 'Kota',
+                            'postal_code' => ''
+                        ];
+                    }, $data);
+                }
                 return $response->json()['rajaongkir']['results'];
             }
 
@@ -71,25 +105,55 @@ class RajaOngkirService
 
     /**
      * Mengecek ongkos kirim
-     * 
-     * @param int $destinationCityId ID kota tujuan
-     * @param int $weight Berat barang dalam gram
-     * @param string $courier Kode kurir (jne, pos, tiki)
      */
     public function getCost($destinationCityId, $weight, $courier)
     {
         try {
-            $response = Http::withHeaders([
-                'key' => $this->apiKey
-            ])->post($this->baseUrl . '/cost', [
-                'origin' => $this->originCityId,
-                'destination' => $destinationCityId,
-                'weight' => $weight,
-                'courier' => strtolower($courier)
-            ]);
+            if ($this->isKomerce()) {
+                // Komerce membutuhkan parameter POST di query params, bukan di body json
+                $url = $this->baseUrl . '/calculate/domestic-cost';
+                $url .= '?origin=' . $this->originCityId;
+                $url .= '&destination=' . $destinationCityId;
+                $url .= '&weight=' . $weight;
+                $url .= '&courier=' . strtolower($courier);
 
-            if ($response->successful()) {
-                return $response->json()['rajaongkir']['results'][0]['costs'] ?? [];
+                $response = Http::withHeaders([
+                    'key' => $this->apiKey,
+                    'accept' => 'application/json',
+                    'content-type' => 'application/json'
+                ])->post($url);
+
+                if ($response->successful()) {
+                    $data = $response->json()['data'] ?? [];
+                    // Memetakan balasan Komerce ke format RajaOngkir asli
+                    $mappedCosts = array_map(function($item) {
+                        return [
+                            'service' => $item['service'],
+                            'description' => $item['description'],
+                            'cost' => [
+                                [
+                                    'value' => $item['cost'],
+                                    'etd' => $item['etd'],
+                                    'note' => ''
+                                ]
+                            ]
+                        ];
+                    }, $data);
+                    return $mappedCosts;
+                }
+            } else {
+                $response = Http::withHeaders([
+                    'key' => $this->apiKey
+                ])->post($this->baseUrl . '/cost', [
+                    'origin' => $this->originCityId,
+                    'destination' => $destinationCityId,
+                    'weight' => $weight,
+                    'courier' => strtolower($courier)
+                ]);
+
+                if ($response->successful()) {
+                    return $response->json()['rajaongkir']['results'][0]['costs'] ?? [];
+                }
             }
 
             Log::error('RajaOngkir getCost error', ['response' => $response->body()]);
