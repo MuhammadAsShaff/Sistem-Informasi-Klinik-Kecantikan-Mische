@@ -20,7 +20,11 @@ class DatabaseSeeder extends Seeder
             JadwalReservasiSeeder::class,
             KegiatanSeeder::class,
             EventSeeder::class,
+            KategoriProdukSeeder::class,
+            ProdukKlinikSeeder::class,
             PromoSeeder::class,
+            KeranjangSeeder::class,
+            PenjualanSeeder::class,
             ReservasiSeeder::class,
             TestimoniSeeder::class,
         ]);

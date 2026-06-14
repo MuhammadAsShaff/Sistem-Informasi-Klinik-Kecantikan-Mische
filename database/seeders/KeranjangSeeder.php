@@ -16,24 +16,22 @@ class KeranjangSeeder extends Seeder
      */
     public function run()
     {
-        $customer = User::where('role', 'customer')->first();
-        $produk1 = ProdukKlinik::first();
-        $produk2 = ProdukKlinik::skip(1)->first();
+        $customers = User::where('role', 'customer')->get();
+        $produks = ProdukKlinik::take(3)->get();
 
-        if ($customer && $produk1) {
-            Keranjang::create([
-                'idUser' => $customer->idUser,
-                'idProduk' => $produk1->idProduk,
-                'jumlahProduk' => 2
-            ]);
-        }
-
-        if ($customer && $produk2) {
-            Keranjang::create([
-                'idUser' => $customer->idUser,
-                'idProduk' => $produk2->idProduk,
-                'jumlahProduk' => 1
-            ]);
+        if ($customers->isNotEmpty() && $produks->isNotEmpty()) {
+            foreach ($customers as $index => $customer) {
+                // Setiap customer diberikan 1-2 produk secara acak ke keranjang
+                foreach ($produks as $pIndex => $produk) {
+                    if ($pIndex == 0 || $pIndex == ($index % count($produks))) {
+                        Keranjang::create([
+                            'idUser' => $customer->idUser,
+                            'idProduk' => $produk->idProduk,
+                            'jumlahProduk' => rand(1, 3)
+                        ]);
+                    }
+                }
+            }
         }
     }
 }
