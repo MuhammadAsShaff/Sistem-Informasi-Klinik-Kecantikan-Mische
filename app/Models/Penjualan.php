@@ -14,8 +14,18 @@ class Penjualan extends Model
 
     protected $fillable = [
         'tanggal',
-        'totalHarga',
-        'status',
+        'idAlamat',
+        'invoiceNumber',
+        'subtotal',
+        'shippingCost',
+        'shippingCourier',
+        'shippingService',
+        'total',
+        'paymentStatus',
+        'orderStatus',
+        'snapToken',
+        'midtransOrderId',
+        'paidAt',
         'idUser',
         'idPromo'
     ];
@@ -23,6 +33,11 @@ class Penjualan extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'idUser');
+    }
+
+    public function alamat()
+    {
+        return $this->belongsTo(AlamatCustomer::class, 'idAlamat', 'id');
     }
 
     public function promo()

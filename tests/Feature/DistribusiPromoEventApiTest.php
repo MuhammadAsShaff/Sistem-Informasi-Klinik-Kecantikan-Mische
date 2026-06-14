@@ -19,7 +19,7 @@ class DistribusiPromoEventApiTest extends TestCase
     {
         $admin = User::create([
             'nama' => 'Admin Test',
-            'alamat' => 'Jl. Admin Test',
+            
             'jenisKelamin' => 'Laki-Laki',
             'tanggalLahir' => '1990-01-01',
             'role' => 'admin',
@@ -37,7 +37,7 @@ class DistribusiPromoEventApiTest extends TestCase
         for ($i = 1; $i <= 3; $i++) {
             $customers[] = User::create([
                 'nama' => "Customer $i",
-                'alamat' => "Jl. Customer $i",
+                
                 'jenisKelamin' => 'Perempuan',
                 'tanggalLahir' => '1995-01-01',
                 'role' => 'customer',

@@ -27,7 +27,7 @@ class KeranjangApiTest extends TestCase
             'nama' => 'Customer Test',
             'email' => 'customer' . time() . '@test.com',
             'password' => bcrypt('password123'),
-            'alamat' => 'Alamat Test',
+            
             'nomorWa' => '08123456789',
             'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1995-01-01',

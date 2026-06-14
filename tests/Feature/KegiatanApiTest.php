@@ -16,7 +16,7 @@ class KegiatanApiTest extends TestCase
     private function getAdminToken()
     {
         $admin = User::create([
-            'nama' => 'Admin Tester', 'alamat' => 'Jl. Admin', 'jenisKelamin' => 'Perempuan',
+            'nama' => 'Admin Tester', 'jenisKelamin' => 'Perempuan',
             'tanggalLahir' => '1990-01-01', 'role' => 'admin', 'email' => 'admin.kegiatan@mische.com',
             'nomorWa' => '08123456789', 'password' => bcrypt('password123')
         ]);
