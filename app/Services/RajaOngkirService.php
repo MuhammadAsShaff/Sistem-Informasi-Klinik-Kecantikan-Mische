@@ -16,8 +16,8 @@ class RajaOngkirService
         $this->apiKey = env('RAJAONGKIR_API_KEY');
         // Gunakan URL dari .env jika ada, jika tidak gunakan default Starter
         $this->baseUrl = env('RAJAONGKIR_BASE_URL', 'https://api.rajaongkir.com/starter');
-        // Misal id kota asal adalah 114 (Denpasar) atau lainnya, sesuaikan dengan lokasi klinik
-        $this->originCityId = env('RAJAONGKIR_ORIGIN_CITY_ID', 114); 
+        // ID kota asal Pekanbaru adalah 326
+        $this->originCityId = env('RAJAONGKIR_ORIGIN_CITY_ID', 326); 
     }
 
     /**
