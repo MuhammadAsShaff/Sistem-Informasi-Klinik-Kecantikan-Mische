@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useProfilCustomer } from "../hooks/useProfilCustomer";
 import { useUbahPasswordCustomer } from "../hooks/useUbahPasswordCustomer";
 import ModalUbahPassword from "./ModalUbahPassword";
+import ModalKelolaAlamat from "./ModalKelolaAlamat";
 import ToastAlert from "@/view/components/ToastAlert";
+import { useKelolaAlamat } from "../hooks/useKelolaAlamat";
 
 /**
  * Form profil customer — semi-pure UI.
@@ -15,6 +17,9 @@ const ProfileForm = () => {
   const showToast = (message, type = "success") => setToast({ isOpen: true, message, type });
 
   const [isModalPasswordOpen, setIsModalPasswordOpen] = useState(false);
+  const [isModalAlamatOpen, setIsModalAlamatOpen] = useState(false);
+
+  const hookKelolaAlamat = useKelolaAlamat(showToast);
 
   // ─── HOOK: PROFIL ─────────────────────────────────────────────
   const { formData, handleChange, handleUpdate, handleLogout } = useProfilCustomer(showToast, navigate);
@@ -31,6 +36,11 @@ const ProfileForm = () => {
       ? "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
       : "/src/assets/images/ProfilCustomer.png";
 
+  const alamatUtama = hookKelolaAlamat.alamatList.find(a => a.is_utama);
+  const teksAlamatUtama = alamatUtama 
+    ? `${alamatUtama.namaPenerima} | ${alamatUtama.nomorHp} - ${alamatUtama.detailAlamat}, ${alamatUtama.cityId}, ${alamatUtama.provinceId}`
+    : "Pilih / Kelola Alamat Pengiriman Anda";
+
   return (
     <div className="w-full">
       <ToastAlert isOpen={toast.isOpen} message={toast.message} type={toast.type}
@@ -40,6 +50,12 @@ const ProfileForm = () => {
         isOpen={isModalPasswordOpen}
         onClose={() => { passwordHook.reset(); setIsModalPasswordOpen(false); }}
         hook={passwordHook}
+      />
+
+      <ModalKelolaAlamat
+        isOpen={isModalAlamatOpen}
+        onClose={() => setIsModalAlamatOpen(false)}
+        hookKelolaAlamat={hookKelolaAlamat}
       />
 
       {/* ─── MOBILE VERSION ─────────────────────────────────────── */}
@@ -55,7 +71,6 @@ const ProfileForm = () => {
         <div className="w-full flex flex-col gap-6">
           {[
             { label: "Nama", name: "nama", type: "text" },
-            { label: "Alamat", name: "alamat", type: "text" },
             { label: "Nomor WhatsApp", name: "nomorWa", type: "text" },
             { label: "Email", name: "email", type: "email" },
           ].map((item, idx) => (
@@ -74,6 +89,18 @@ const ProfileForm = () => {
               </div>
             </div>
           ))}
+
+          <div className="grid grid-cols-[80px_15px_1fr] items-start">
+            <label className="text-gray-800 font-extrabold text-sm mt-3">Alamat</label>
+            <span className="text-gray-800 font-extrabold mt-3">:</span>
+            <div className="w-full flex flex-col items-start gap-2">
+              <button onClick={(e) => { e.preventDefault(); setIsModalAlamatOpen(true); }}
+                className="w-full flex justify-between items-center bg-white border border-gray-100 hover:border-[#74b35e] rounded-xl px-4 py-2.5 text-gray-700 text-sm shadow-sm transition-all">
+                <span className="text-left whitespace-normal break-words leading-relaxed pr-4">{teksAlamatUtama}</span>
+                <span className="text-[#74b35e] font-bold text-xs shrink-0 ml-2 bg-green-50 px-2 py-1 rounded-md border border-green-100">Ubah</span>
+              </button>
+            </div>
+          </div>
 
           <div className="grid grid-cols-[80px_15px_1fr] items-center">
             <label className="text-gray-800 font-extrabold text-sm">Jenis Kelamin</label>
@@ -106,7 +133,6 @@ const ProfileForm = () => {
 
             {[
               { label: "Nama", name: "nama", type: "text" },
-              { label: "Alamat", name: "alamat", type: "text" },
               { label: "Tanggal Lahir", name: "tanggalLahir", type: "date" },
             ].map((item) => (
               <div key={item.name} className="grid grid-cols-[180px_35px_1fr] items-center">
@@ -116,6 +142,16 @@ const ProfileForm = () => {
                   className="w-full bg-white border border-gray-100 rounded-2xl px-7 py-4 text-gray-700 font-medium shadow-[0_5px_15px_rgba(0,0,0,0.05)] focus:outline-none focus:border-[#74b35e] transition-all appearance-none" />
               </div>
             ))}
+
+            <div className="grid grid-cols-[180px_35px_1fr] items-center">
+              <label className="text-gray-800 font-extrabold text-xl">Alamat</label>
+              <span className="text-gray-800 font-extrabold text-xl text-right pr-4">:</span>
+              <button onClick={(e) => { e.preventDefault(); setIsModalAlamatOpen(true); }}
+                className="w-full flex justify-between items-center bg-white border border-gray-100 hover:border-[#74b35e] rounded-2xl px-7 py-4 text-gray-700 font-medium shadow-[0_5px_15px_rgba(0,0,0,0.05)] transition-all">
+                <span className="text-left whitespace-normal break-words leading-relaxed pr-4">{teksAlamatUtama}</span>
+                <span className="text-[#74b35e] font-bold text-sm shrink-0 ml-4 bg-[#f2faef] px-4 py-1.5 rounded-xl border border-[#cce8c3]">Ubah Alamat</span>
+              </button>
+            </div>
 
             <div className="grid grid-cols-[180px_35px_1fr] items-center">
               <label className="text-gray-800 font-extrabold text-xl">Jenis Kelamin</label>
