@@ -33,13 +33,13 @@ export function useHapusPromo(selectedPromo, onSuccess, showToast) {
       // A common way is to submit FormData.
       const payload = new FormData();
       payload.append('_method', 'PUT');
-      payload.append('status', newStatus === "Aktif" || newStatus === true ? 1 : 0);
+      payload.append('status', newStatus ? 1 : 0);
       
       const res = await axiosClient.post(`${endpoints.admin.promo}/${id}`, payload, {
          headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (res.data?.success) {
-        showToast(`Status promo berhasil diubah menjadi ${newStatus}!`, "success");
+        showToast(`Status promo berhasil diubah!`, "success");
         if (onSuccess) onSuccess();
       }
     } catch (error) {

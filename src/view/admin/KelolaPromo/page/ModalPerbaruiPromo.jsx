@@ -1,5 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
+import { useFetchKategori } from "../../KelolaKategoriProduk/hooks/useFetchKategori";
+import { useFetchProduk } from "../../KelolaProduk/hooks/useFetchProduk";
 
 export default function ModalPerbaruiPromo({
   isOpen,
@@ -10,6 +12,9 @@ export default function ModalPerbaruiPromo({
   isSubmitting,
   error,
 }) {
+  const { categories } = useFetchKategori();
+  const { products } = useFetchProduk();
+
   if (!isOpen) return null;
 
   return (
@@ -66,10 +71,12 @@ export default function ModalPerbaruiPromo({
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors bg-white"
                 >
-                  <option value="1">Skincare</option>
-                  <option value="2">Treatment</option>
-                  <option value="3">Bodycare</option>
-                  <option value="4">Haircare</option>
+                  <option value="">Pilih Kategori</option>
+                  {categories.map((cat) => (
+                    <option key={cat.idKategori || cat.id} value={cat.idKategori || cat.id}>
+                      {cat.nama}
+                    </option>
+                  ))}
                 </select>
                 <p className="text-xs text-red-500 mt-1">*Pilih kategori produk bila promo berdasarkan kategori produk</p>
               </div>
@@ -137,11 +144,12 @@ export default function ModalPerbaruiPromo({
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors bg-white"
                 >
-                  <option value="1">Facial Wash</option>
-                  <option value="2">Serum Acne</option>
-                  <option value="3">Day Cream</option>
-                  <option value="4">Sunscreen</option>
-                  <option value="5">Laser Treatment</option>
+                  <option value="">Pilih Produk</option>
+                  {products.map((p) => (
+                    <option key={p.idProduk || p.id} value={p.idProduk || p.id}>
+                      {p.nama || p.namaProduk}
+                    </option>
+                  ))}
                 </select>
                 <p className="text-xs text-red-500 mt-1">*Pilih produk bila promo berdasarkan produk</p>
               </div>

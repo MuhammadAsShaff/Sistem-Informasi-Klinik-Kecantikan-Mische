@@ -4,7 +4,7 @@ import { STORAGE_BASE_URL } from "@/core/api/endpoints";
 
 export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, updateStatus }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 6;
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
   const paginatedData = data.slice(
@@ -59,14 +59,14 @@ export default function Tabel({ data, onEdit, onDelete, onDetail, onSend, update
                     </td>
                     <td className="py-4 px-4 align-top">
                       <select
-                        value={item.status}
-                        onChange={(e) => updateStatus(item.id, e.target.value)}
+                        value={String(item.status)}
+                        onChange={(e) => updateStatus(item.idPromo || item.id, e.target.value === 'true')}
                         className={`text-sm bg-transparent font-semibold border-none cursor-pointer focus:outline-none focus:ring-0 ${
-                          item.status === "Aktif" ? "text-[#56BC36]" : "text-red-500"
+                          item.status ? "text-[#56BC36]" : "text-red-500"
                         }`}
                       >
-                        <option value="Aktif" className="text-black">Aktif</option>
-                        <option value="Tidak Aktif" className="text-black">Tidak Aktif</option>
+                        <option value="true" className="text-black">Aktif</option>
+                        <option value="false" className="text-black">Tidak Aktif</option>
                       </select>
                     </td>
                     <td className="py-4 px-4 align-top">
