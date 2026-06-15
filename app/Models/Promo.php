@@ -32,7 +32,7 @@ class Promo extends Model
 
     public function produk()
     {
-        return $this->belongsTo(ProdukKlinik::class, 'idKategori');
+        return $this->belongsTo(ProdukKlinik::class, 'idProduk');
     }
 
     public function penjualan(){

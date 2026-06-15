@@ -11,6 +11,7 @@ use App\Models\ProdukKlinik;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Keranjang;
 
 class PromoApiTest extends TestCase
 {
@@ -228,5 +229,118 @@ class PromoApiTest extends TestCase
                  ->assertJson(['success' => true])
                  ->assertJsonPath('data.0.namaPromo', 'Promo E')
                  ->assertJsonMissing(['namaPromo' => 'Promo F']);
+    }
+
+    protected function getCustomerTokenAndUser()
+    {
+        $customer = User::create([
+            'nama' => 'Customer', 'jenisKelamin' => 'Perempuan',
+            'tanggalLahir' => '1995-01-01', 'role' => 'customer', 'email' => 'cust.promo@mische.com',
+            'nomorWa' => '08123456789', 'password' => bcrypt('password123')
+        ]);
+        $token = auth('api')->login($customer);
+        return [$token, $customer];
+    }
+
+    public function test_customer_bisa_memakai_promo_jika_memenuhi_syarat()
+    {
+        [$token, $customer] = $this->getCustomerTokenAndUser();
+        [$kategori, $produk] = $this->createDummyDeps();
+
+        // Buat promo
+        Promo::create([
+            'gambar' => 'promo.jpg', 'namaPromo' => 'Promo Valid', 'jenisPromo' => 'Diskon',
+            'kode' => 'VALID123', 'diskon' => 15000, 'deskripsi' => 'Deskripsi',
+            'tanggalMulai' => Carbon::now()->subDay()->format('Y-m-d'),
+            'tanggalSelesai' => Carbon::now()->addDays(5)->format('Y-m-d'),
+            'minimalTransaksi' => 50000, 'status' => true,
+            'idKategori' => $kategori->idKategori, 'idProduk' => $produk->idProduk
+        ]);
+
+        // Isi keranjang
+        $keranjang = Keranjang::create([
+            'idUser' => $customer->idUser,
+            'idProduk' => $produk->idProduk,
+            'jumlahProduk' => 2 // total 200.000 (100.000 * 2) > 50.000
+        ]);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->postJson('/api/customer/promo/check', [
+                'kode' => 'VALID123',
+                'cart_ids' => [$keranjang->idKeranjang]
+            ]);
+
+        $response->assertStatus(200)
+                 ->assertJson(['success' => true])
+                 ->assertJsonPath('data.diskon', 15000);
+    }
+
+    public function test_customer_ditolak_jika_minimal_transaksi_tidak_terpenuhi()
+    {
+        [$token, $customer] = $this->getCustomerTokenAndUser();
+        [$kategori, $produk] = $this->createDummyDeps();
+
+        Promo::create([
+            'gambar' => 'promo.jpg', 'namaPromo' => 'Promo Min', 'jenisPromo' => 'Diskon',
+            'kode' => 'MIN123', 'diskon' => 15000, 'deskripsi' => 'Deskripsi',
+            'tanggalMulai' => Carbon::now()->subDay()->format('Y-m-d'),
+            'tanggalSelesai' => Carbon::now()->addDays(5)->format('Y-m-d'),
+            'minimalTransaksi' => 500000, // Harus 500 ribu
+            'status' => true,
+            'idKategori' => $kategori->idKategori, 'idProduk' => $produk->idProduk
+        ]);
+
+        $keranjang = Keranjang::create([
+            'idUser' => $customer->idUser,
+            'idProduk' => $produk->idProduk,
+            'jumlahProduk' => 1 // Cuma 100 ribu
+        ]);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->postJson('/api/customer/promo/check', [
+                'kode' => 'MIN123',
+                'cart_ids' => [$keranjang->idKeranjang]
+            ]);
+
+        $response->assertStatus(400)
+                 ->assertJson(['success' => false])
+                 ->assertSee('Minimal transaksi tidak terpenuhi');
+    }
+
+    public function test_customer_ditolak_jika_produk_dan_kategori_tidak_sesuai()
+    {
+        [$token, $customer] = $this->getCustomerTokenAndUser();
+        [$kategori, $produk] = $this->createDummyDeps();
+
+        $kategoriLain = KategoriProduk::create(['nama' => 'Lain', 'deskripsi' => 'Lain']);
+        $produkLain = ProdukKlinik::create([
+            'nama' => 'Beda', 'harga' => 100000, 'stock' => 10, 'gambar' => 'b.jpg', 'deskripsi' => 'd', 'idKategori' => $kategoriLain->idKategori
+        ]);
+
+        Promo::create([
+            'gambar' => 'promo.jpg', 'namaPromo' => 'Promo Beda', 'jenisPromo' => 'Diskon',
+            'kode' => 'BEDA123', 'diskon' => 15000, 'deskripsi' => 'Deskripsi',
+            'tanggalMulai' => Carbon::now()->subDay()->format('Y-m-d'),
+            'tanggalSelesai' => Carbon::now()->addDays(5)->format('Y-m-d'),
+            'minimalTransaksi' => 50000,
+            'status' => true,
+            'idKategori' => $kategoriLain->idKategori, 'idProduk' => $produkLain->idProduk // Promo ini untuk produk lain
+        ]);
+
+        $keranjang = Keranjang::create([
+            'idUser' => $customer->idUser,
+            'idProduk' => $produk->idProduk, // Beli produk A
+            'jumlahProduk' => 2
+        ]);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->postJson('/api/customer/promo/check', [
+                'kode' => 'BEDA123',
+                'cart_ids' => [$keranjang->idKeranjang]
+            ]);
+
+        $response->assertStatus(400)
+                 ->assertJson(['success' => false])
+                 ->assertSee('tidak berlaku untuk produk di keranjang Anda');
     }
 }

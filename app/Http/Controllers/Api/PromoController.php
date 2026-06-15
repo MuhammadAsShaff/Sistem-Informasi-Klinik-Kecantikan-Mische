@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use App\Models\Keranjang;
+use Carbon\Carbon;
 
 class PromoController extends Controller
 {
@@ -232,6 +234,114 @@ class PromoController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menghapus promo.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * checkPromo
+     * Memvalidasi kode promo saat checkout (Customer)
+     */
+    public function checkPromo(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'kode' => 'required|string|max:12',
+                'cart_ids' => 'required|array',
+                'cart_ids.*' => 'integer|exists:keranjang,idKeranjang'
+            ], [
+                'kode.required' => 'Kode promo wajib diisi.',
+                'cart_ids.required' => 'Daftar item keranjang wajib dikirim.',
+                'cart_ids.array' => 'Format daftar item keranjang tidak valid.'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal.',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $promo = Promo::where('kode', $request->kode)->first();
+
+            if (!$promo) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Promo tidak ditemukan.'
+                ], 404);
+            }
+
+            if (!$promo->status) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Promo sudah tidak aktif.'
+                ], 400);
+            }
+
+            $today = Carbon::now()->format('Y-m-d');
+            if ($today < $promo->tanggalMulai || $today > $promo->tanggalSelesai) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Promo sudah kedaluwarsa atau belum dimulai.'
+                ], 400);
+            }
+
+            $user = auth()->user();
+            $cartItems = Keranjang::where('idUser', $user->idUser)
+                                  ->whereIn('idKeranjang', $request->cart_ids)
+                                  ->with('produk')
+                                  ->get();
+
+            if ($cartItems->isEmpty() || count($cartItems) !== count($request->cart_ids)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Beberapa atau semua item keranjang tidak ditemukan.'
+                ], 400);
+            }
+
+            $subtotal = 0;
+            $isProductValid = false;
+
+            foreach ($cartItems as $item) {
+                $subtotal += ($item->jumlahProduk * $item->produk->harga);
+
+                // Cek apakah produk atau kategori sesuai dengan promo
+                if ($item->idProduk == $promo->idProduk || $item->produk->idKategori == $promo->idKategori) {
+                    $isProductValid = true;
+                }
+            }
+
+            if ($subtotal < $promo->minimalTransaksi) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Minimal transaksi tidak terpenuhi. Minimal belanja untuk promo ini adalah Rp ' . number_format($promo->minimalTransaksi, 0, ',', '.')
+                ], 400);
+            }
+
+            if (!$isProductValid) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Promo ini tidak berlaku untuk produk di keranjang Anda.'
+                ], 400);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Promo berhasil digunakan.',
+                'data' => [
+                    'idPromo' => $promo->idPromo,
+                    'kode' => $promo->kode,
+                    'diskon' => $promo->diskon,
+                    'namaPromo' => $promo->namaPromo
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem saat mengecek promo.',
                 'error' => $e->getMessage()
             ], 500);
         }

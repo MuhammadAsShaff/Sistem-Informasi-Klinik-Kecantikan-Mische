@@ -126,6 +126,11 @@ Route::prefix('customer')->group(function () {
         Route::get('/cities', [RajaOngkirController::class, 'getCities'])->name('customer.rajaongkir.cities');
         Route::post('/cost-by-address', [RajaOngkirController::class, 'checkCostByAddress'])->name('customer.rajaongkir.costByAddress');
     });
+
+    // Rute Promo Customer
+    Route::prefix('promo')->middleware(['role:customer'])->group(function () {
+        Route::post('/check', [PromoController::class, 'checkPromo'])->name('customer.promo.check');
+    });
 });
 
 // ============================================

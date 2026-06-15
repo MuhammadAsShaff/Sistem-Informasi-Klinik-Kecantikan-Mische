@@ -251,7 +251,9 @@ class PenjualanController extends Controller
             'shippingCourier' => 'required|string',
             'shippingService' => 'required|string',
             'shippingCost' => 'required|numeric|min:0',
-            'idPromo' => 'nullable|exists:promo,idPromo'
+            'idPromo' => 'nullable|exists:promo,idPromo',
+            'cart_ids' => 'required|array',
+            'cart_ids.*' => 'integer|exists:keranjang,idKeranjang'
         ]);
 
         if ($validator->fails()) {
@@ -266,10 +268,10 @@ class PenjualanController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Alamat tidak ditemukan atau bukan milik Anda.'], 403);
         }
 
-        // Ambil data keranjang
-        $keranjangItems = Keranjang::with('produk')->where('idUser', $idUser)->get();
-        if ($keranjangItems->isEmpty()) {
-            return response()->json(['status' => 'error', 'message' => 'Keranjang Anda kosong.'], 400);
+        // Ambil data keranjang yang dipilih saja
+        $keranjangItems = Keranjang::with('produk')->where('idUser', $idUser)->whereIn('idKeranjang', $request->cart_ids)->get();
+        if ($keranjangItems->isEmpty() || count($keranjangItems) !== count($request->cart_ids)) {
+            return response()->json(['status' => 'error', 'message' => 'Beberapa item keranjang tidak valid atau kosong.'], 400);
         }
 
         // Kalkulasi Subtotal & Stok
@@ -329,8 +331,8 @@ class PenjualanController extends Controller
                 ]);
             }
 
-            // Hapus isi keranjang setelah dipindah ke penjualan
-            Keranjang::where('idUser', $idUser)->delete();
+            // Kosongkan item keranjang yang dipilih saja
+            Keranjang::whereIn('idKeranjang', $request->cart_ids)->delete();
 
             // Set konfigurasi Midtrans
             Config::$serverKey = config('midtrans.server_key');
