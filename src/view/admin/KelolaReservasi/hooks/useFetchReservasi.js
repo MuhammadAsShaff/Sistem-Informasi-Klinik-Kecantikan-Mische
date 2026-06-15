@@ -10,7 +10,7 @@ export function useFetchReservasi(page = 1) {
   const fetchReservasi = async (currentPage = page) => {
     setIsLoading(true);
     try {
-      const res = await axiosClient.get(`${endpoints.admin.reservations}?page=${currentPage}`);
+      const res = await axiosClient.get(`${endpoints.admin.reservations}?page=${currentPage}&per_page=6`);
       if (res.data.success) {
         // Jika response dibungkus paginate() Laravel, bentuknya data.data.data dan data.data (untuk meta)
         const responseData = res.data.data;

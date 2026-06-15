@@ -1,6 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axiosClient from '@/core/api/axiosClient';
+import { endpoints } from '@/core/api/endpoints';
 
 export default function ModalExportExcel({ isOpen, onClose }) {
+  const [jenisTreatment, setJenisTreatment] = useState('semua');
+  const [tanggalMulai, setTanggalMulai] = useState('');
+  const [tanggalSelesai, setTanggalSelesai] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      
+      const response = await axiosClient.get(endpoints.admin.report.reservasi, {
+        params: {
+          jenisTreatment: jenisTreatment === 'semua' ? '' : jenisTreatment,
+          tanggalMulai,
+          tanggalSelesai
+        },
+        responseType: 'blob' // Penting untuk file biner
+      });
+
+      // Buat URL dari blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      
+      // Ekstrak nama file dari header Content-Disposition jika ada (opsional), 
+      // tapi kita set manual aja sesuai default nama file
+      const link = document.createElement('a');
+      link.href = url;
+      const dateStr = new Date().toISOString().split('T')[0];
+      link.setAttribute('download', `Laporan_Reservasi_${dateStr}.xlsx`);
+      
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      onClose(); // Tutup modal setelah export
+    } catch (error) {
+      console.error("Gagal melakukan export excel:", error);
+      alert("Terjadi kesalahan saat mengunduh file Excel.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -24,11 +70,15 @@ export default function ModalExportExcel({ isOpen, onClose }) {
               <div className="space-y-2">
                 <label className="text-sm text-black">Jenis Treatment</label>
                 <select
+                  value={jenisTreatment}
+                  onChange={(e) => setJenisTreatment(e.target.value)}
                   className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-green-500 text-sm"
                 >
                   <option value="semua">Semua Treatment</option>
                   <option value="Acne Treatment">Acne Treatment</option>
                   <option value="Facial Rejuvenation">Facial Rejuvenation</option>
+                  <option value="Laser Therapy">Laser Therapy</option>
+                  <option value="Brightening Therapy">Brightening Therapy</option>
                 </select>
               </div>
             </div>
@@ -40,6 +90,8 @@ export default function ModalExportExcel({ isOpen, onClose }) {
                 <div className="relative">
                   <input 
                     type="date"
+                    value={tanggalMulai}
+                    onChange={(e) => setTanggalMulai(e.target.value)}
                     className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-green-500 text-sm"
                   />
                 </div>
@@ -50,6 +102,8 @@ export default function ModalExportExcel({ isOpen, onClose }) {
                 <div className="relative">
                   <input 
                     type="date"
+                    value={tanggalSelesai}
+                    onChange={(e) => setTanggalSelesai(e.target.value)}
                     className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-green-500 text-sm"
                   />
                 </div>
@@ -62,9 +116,11 @@ export default function ModalExportExcel({ isOpen, onClose }) {
         <div className="px-8 py-5 border-t border-gray-300 flex justify-end mt-4">
           <button 
             type="button"
-            className="px-6 py-2.5 text-white font-medium rounded-md bg-[#56BC36] hover:bg-[#469e2c]"
+            onClick={handleExport}
+            disabled={isExporting}
+            className="px-6 py-2.5 text-white font-medium rounded-md bg-[#56BC36] hover:bg-[#469e2c] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Export To Excel
+            {isExporting ? 'Mengekspor...' : 'Export To Excel'}
           </button>
         </div>
 

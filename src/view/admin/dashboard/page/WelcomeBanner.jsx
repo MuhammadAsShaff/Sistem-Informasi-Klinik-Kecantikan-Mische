@@ -1,0 +1,20 @@
+import React from 'react';
+import IlustrasiDashboard from '../../../../assets/images/IlustrasiDashboard.png';
+
+const WelcomeBanner = () => {
+  return (
+    <div className="bg-white rounded-xl p-6 mb-6 flex items-center shadow-sm">
+      <div className="flex-1">
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome Bintang</h1>
+        <p className="text-gray-500 text-sm">
+          Kerja keras kita hari ini adalah fondasi untuk membangun klinik kecantikan Mische yang lebih baik.
+        </p>
+      </div>
+      <div className="hidden md:flex w-48 h-32 items-center justify-center">
+        <img src={IlustrasiDashboard} alt="Ilustrasi Dashboard" className="w-full h-full object-contain" />
+      </div>
+    </div>
+  );
+};
+
+export default WelcomeBanner;

@@ -39,6 +39,20 @@ export default function KelolaEvent() {
     event.deskripsi.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Pagination Logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+  const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const paginatedEvents = filteredEvents.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   // Handlers
   const handleView = (event) => {
     setSelectedEvent(event);
@@ -74,14 +88,20 @@ export default function KelolaEvent() {
         />
         
         <Tabel 
-          events={filteredEvents} 
+          events={paginatedEvents} 
           onView={handleView}
           onEdit={handleEdit} 
           onDelete={handleDelete} 
           onSend={handleSend}
+          currentPage={currentPage}
+          itemsPerPage={ITEMS_PER_PAGE}
         />
         
-        <Pagination />
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          onPageChange={setCurrentPage} 
+        />
       </div>
 
       {/* Modals */}

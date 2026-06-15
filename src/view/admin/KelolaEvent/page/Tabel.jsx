@@ -2,7 +2,7 @@ import React from 'react';
 import { Edit, Trash2, Send, Eye } from 'lucide-react';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
-export default function Tabel({ events, onEdit, onDelete, onSend, onView }) {
+export default function Tabel({ events, onEdit, onDelete, onSend, onView, currentPage = 1, itemsPerPage = 6 }) {
   // Format Tanggal
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -29,7 +29,7 @@ export default function Tabel({ events, onEdit, onDelete, onSend, onView }) {
           {events.length > 0 ? (
             events.map((event, index) => (
               <tr key={event.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors whitespace-nowrap">
-                <td className="py-4 px-6 text-center text-gray-500">{index + 1}</td>
+                <td className="py-4 px-6 text-center text-gray-500">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td className="py-4 px-6 align-top text-center">
                   {event.foto ? (
                     <img 
