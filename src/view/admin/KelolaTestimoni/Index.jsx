@@ -28,6 +28,20 @@ export default function KelolaTestimoni() {
     item.jenisTestimoni?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Pagination Logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+  const totalPages = Math.ceil(filteredTestimoni.length / ITEMS_PER_PAGE);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const paginatedTestimoni = filteredTestimoni.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   const handleEdit = (item) => {
     setSelectedData(item);
     setIsEditOpen(true);
@@ -79,12 +93,18 @@ export default function KelolaTestimoni() {
         </div>
 
         <Tabel
-          data={filteredTestimoni}
+          data={paginatedTestimoni}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          currentPage={currentPage}
+          itemsPerPage={ITEMS_PER_PAGE}
         />
 
-        <Pagination />
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          onPageChange={setCurrentPage} 
+        />
 
         <ModalTambah
           isOpen={isTambahOpen}

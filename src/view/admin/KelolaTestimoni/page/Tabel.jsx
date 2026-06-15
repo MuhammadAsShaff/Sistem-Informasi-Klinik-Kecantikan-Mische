@@ -1,7 +1,7 @@
 import React from 'react';
 import { STORAGE_BASE_URL } from "@/core/api/endpoints";
 
-const Tabel = ({ data, onEdit, onDelete }) => {
+const Tabel = ({ data, onEdit, onDelete, currentPage = 1, itemsPerPage = 6 }) => {
   return (
     <div className="w-full flex flex-col items-center">
       <div className="bg-white shadow-sm border border-gray-200 overflow-hidden mb-6 w-full font-poppins rounded">
@@ -22,7 +22,7 @@ const Tabel = ({ data, onEdit, onDelete }) => {
               {data && data.length > 0 ? (
                 data.map((item, index) => (
                   <tr key={index} className="hover:bg-gray-50 transition-colors whitespace-nowrap">
-                    <td className="px-6 py-4 text-center">{index + 1}</td>
+                    <td className="px-6 py-4 text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td className="px-6 py-4 flex justify-center">
                       <div className="w-10 h-10 rounded overflow-hidden bg-gray-200 flex items-center justify-center">
                         {item.buktiFoto ? (

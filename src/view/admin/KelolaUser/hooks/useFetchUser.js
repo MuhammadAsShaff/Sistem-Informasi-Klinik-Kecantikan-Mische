@@ -17,7 +17,7 @@ export function useFetchUser() {
   const fetchUsers = async (page = 1) => {
     setIsLoading(true);
     try {
-      const response = await axiosClient.get(`${endpoints.admin.users}?page=${page}`);
+      const response = await axiosClient.get(`${endpoints.admin.users}?page=${page}&per_page=6`);
 
       if (response.data?.data && Array.isArray(response.data.data.data)) {
         setDataUser(response.data.data.data);

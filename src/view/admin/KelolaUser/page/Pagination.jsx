@@ -11,20 +11,20 @@ export default function Pagination({ currentPage, lastPage, onPageChange }) {
       <button 
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`flex items-center gap-2 px-6 py-4 border border-gray-300 rounded-xl font-bold transition-all shadow-sm ${
+        className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium transition-colors shadow-sm ${
           currentPage === 1 
-            ? "text-gray-400 bg-gray-50 cursor-not-allowed" 
-            : "text-gray-700 hover:bg-gray-50 cursor-pointer"
+            ? "text-gray-500 bg-gray-100 border-gray-300 cursor-default" 
+            : "text-gray-900 border-gray-400 hover:bg-gray-100 cursor-pointer"
         }`}
       >
-        <ChevronLeft size={24} />
+        <ChevronLeft size={16} />
         Previous
       </button>
 
       {/* ANGKA HALAMAN */}
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-gray-500 mr-2">Halaman</span>
-        <div className="flex items-center justify-center bg-[#7CC052] text-white w-10 h-10 rounded-lg font-black shadow-md shadow-green-100">
+        <div className="flex items-center justify-center bg-[#97E779] text-black w-8 h-8 rounded font-semibold text-sm shadow-sm">
           {currentPage}
         </div>
         <span className="text-sm font-medium text-gray-500 ml-2">dari {lastPage}</span>
@@ -34,14 +34,14 @@ export default function Pagination({ currentPage, lastPage, onPageChange }) {
       <button 
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === lastPage}
-        className={`flex items-center gap-2 px-6 py-4 border border-gray-300 rounded-xl font-bold transition-all shadow-sm ${
+        className={`flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium transition-colors shadow-sm ${
           currentPage === lastPage 
-            ? "text-gray-400 bg-gray-50 cursor-not-allowed" 
-            : "text-gray-700 hover:bg-gray-50 cursor-pointer"
+            ? "text-gray-500 bg-gray-100 border-gray-300 cursor-default" 
+            : "text-gray-900 border-gray-400 hover:bg-gray-100 cursor-pointer"
         }`}
       >
         Next
-        <ChevronRight size={24} />
+        <ChevronRight size={16} />
       </button>
     </div>
   );
