@@ -90,21 +90,7 @@ class RajaOngkirApiTest extends TestCase
                  ->assertJsonStructure(['errors' => ['province']]);
     }
 
-    /** @test */
-    public function check_cost_gagal_jika_destination_adalah_nol()
-    {
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->token,
-        ])->postJson('/api/customer/rajaongkir/cost', [
-            'destination' => 0,
-            'weight' => 1000,
-            'courier' => 'jne'
-        ]);
 
-        $response->assertStatus(422)
-                 ->assertJsonPath('success', false)
-                 ->assertJsonStructure(['errors' => ['destination']]);
-    }
 
     /** @test */
     public function customer_bisa_cek_ongkir_untuk_semua_kurir_berdasarkan_alamat()

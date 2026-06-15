@@ -93,59 +93,6 @@ class RajaOngkirController extends Controller
     }
 
     /**
-     * Mengecek ongkos kirim
-     */
-    public function checkCost(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'destination' => 'required|numeric|min:1',
-                'weight' => 'required|numeric|min:1',
-                'courier' => 'required|string|in:jne,pos,tiki'
-            ], [
-                'destination.required' => 'Kota tujuan wajib diisi.',
-                'destination.min' => 'Kota tujuan tidak valid (ID Kota minimal 1).',
-                'weight.required' => 'Berat wajib diisi.',
-                'courier.required' => 'Kurir wajib diisi.',
-                'courier.in' => 'Kurir tidak valid (pilih jne, pos, atau tiki).'
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Terdapat kesalahan input',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            $cost = $this->rajaOngkirService->getCost(
-                $request->destination,
-                $request->weight,
-                $request->courier
-            );
-
-            if (empty($cost)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Gagal mengambil data ongkos kirim dari RajaOngkir'
-                ], 500);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil mengambil data ongkos kirim',
-                'data' => $cost
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Terjadi kesalahan sistem',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
      * Mengecek ongkos kirim berdasarkan alamat customer untuk semua kurir aktif
      */
     public function checkCostByAddress(Request $request)
