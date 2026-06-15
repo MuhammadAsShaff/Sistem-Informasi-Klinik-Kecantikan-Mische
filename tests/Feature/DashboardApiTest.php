@@ -96,6 +96,12 @@ class DashboardApiTest extends TestCase
             'deskripsi' => 'Dokter spesialis kecantikan'
         ]);
 
+        // 3.7 Buat Jadwal
+        $jadwal = \App\Models\JadwalReservasi::create([
+            'jamMulai' => '09:00',
+            'jamSelesai' => '10:00'
+        ]);
+
         // 4. Buat Reservasi (Bulan Ini)
         Reservasi::create([
             'namaCustomer' => 'Customer Baru',
@@ -104,7 +110,8 @@ class DashboardApiTest extends TestCase
             'tanggalReservasi' => Carbon::now(),
             'status' => 'Selesai',
             'idUser' => $customer->idUser,
-            'idDokter' => $dokter->idDokter
+            'idDokter' => $dokter->idDokter,
+            'idJadwal' => $jadwal->idJadwal
         ]);
 
         // Hit Endpoint

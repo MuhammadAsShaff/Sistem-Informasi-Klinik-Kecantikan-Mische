@@ -124,6 +124,7 @@ Route::prefix('customer')->group(function () {
         Route::get('/provinces', [RajaOngkirController::class, 'getProvinces'])->name('customer.rajaongkir.provinces');
         Route::get('/cities', [RajaOngkirController::class, 'getCities'])->name('customer.rajaongkir.cities');
         Route::post('/cost', [RajaOngkirController::class, 'checkCost'])->name('customer.rajaongkir.cost');
+        Route::post('/cost-by-address', [RajaOngkirController::class, 'checkCostByAddress'])->name('customer.rajaongkir.costByAddress');
     });
 });
 

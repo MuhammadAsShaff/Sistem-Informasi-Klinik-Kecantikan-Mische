@@ -15,7 +15,7 @@ class RajaOngkirService
     {
         $this->apiKey = env('RAJAONGKIR_API_KEY');
         // Gunakan URL dari .env jika ada, jika tidak gunakan default Starter
-        $this->baseUrl = env('RAJAONGKIR_BASE_URL', 'https://api.rajaongkir.com/starter');
+        $this->baseUrl = env('RAJAONGKIR_BASE_URL');
         // ID kota asal Pekanbaru adalah 326
         $this->originCityId = env('RAJAONGKIR_ORIGIN_CITY_ID', 326); 
     }
@@ -68,10 +68,17 @@ class RajaOngkirService
     public function getCities($provinceId = null)
     {
         try {
-            $endpoint = $this->isKomerce() ? '/destination/city' : '/city';
-            $url = $this->baseUrl . $endpoint;
-            if ($provinceId) {
-                $url .= '?province=' . $provinceId;
+            if ($this->isKomerce()) {
+                if (!$provinceId) {
+                    // Komerce membutuhkan ID Provinsi untuk mendapatkan daftar kota
+                    return [];
+                }
+                $url = $this->baseUrl . '/destination/city/' . $provinceId;
+            } else {
+                $url = $this->baseUrl . '/city';
+                if ($provinceId) {
+                    $url .= '?province=' . $provinceId;
+                }
             }
 
             $response = Http::withHeaders([

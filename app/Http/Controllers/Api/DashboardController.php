@@ -31,7 +31,7 @@ class DashboardController extends Controller
         // 2. Total penjualan pada bulan ini
         $totalSalesThisMonth = Penjualan::whereMonth('tanggal', $currentMonth)
             ->whereYear('tanggal', $currentYear)
-            ->sum('totalHarga');
+            ->sum('total');
 
         // 3. Reservasi pada bulan ini
         $reservationsThisMonth = Reservasi::whereMonth('tanggalReservasi', $currentMonth)
@@ -70,7 +70,7 @@ class DashboardController extends Controller
                 return Carbon::parse($date->tanggal)->format('m');
             })
             ->map(function ($row) {
-                return $row->sum('totalHarga');
+                return $row->sum('total');
             });
 
         // Format output array bulan 1-12 agar berurutan untuk grafik
