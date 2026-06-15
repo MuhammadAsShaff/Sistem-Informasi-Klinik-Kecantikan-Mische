@@ -2,7 +2,7 @@ import React from 'react';
 import { Edit, Trash2, Plus, Minus } from 'lucide-react';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
-const TableSection = ({ categories, onDeleteClick, onEditClick, onUpdateStock, showToast }) => {
+const TableSection = ({ categories, onDeleteClick, onEditClick, onUpdateStock, showToast, currentPage = 1, itemsPerPage = 6 }) => {
   const handleUpdateStock = async (id, newStock) => {
     const result = await onUpdateStock(id, newStock);
     if (result && !result.success) {
@@ -30,7 +30,7 @@ const TableSection = ({ categories, onDeleteClick, onEditClick, onUpdateStock, s
           {categories.length > 0 ? (
             categories.map((item, index) => (
               <tr key={item.idProduk || item.id || index} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 text-center">{index + 1}</td>
+                <td className="px-6 py-4 text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td className="px-6 py-4 align-top text-center">
                   {item.gambar ? (
                     <img 

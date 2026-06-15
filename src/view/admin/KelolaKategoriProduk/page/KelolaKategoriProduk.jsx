@@ -23,6 +23,20 @@ const KelolaKategoriProduk = () => {
     category.deskripsi?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Pagination Logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+  const totalPages = Math.ceil(filteredCategories.length / ITEMS_PER_PAGE);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const paginatedCategories = filteredCategories.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
   const showToast = (message, type = 'success') => {
     setToast({ isOpen: true, message, type });
@@ -37,7 +51,7 @@ const KelolaKategoriProduk = () => {
         onAddClick={() => setIsModalOpen(true)}
       />
       <TableSection 
-        categories={filteredCategories} 
+        categories={paginatedCategories} 
         onDeleteClick={(id) => {
           setDeleteId(id);
           setIsDeleteModalOpen(true);
@@ -46,9 +60,15 @@ const KelolaKategoriProduk = () => {
           setSelectedCategory(category);
           setIsEditModalOpen(true);
         }}
+        currentPage={currentPage}
+        itemsPerPage={ITEMS_PER_PAGE}
       />
       
-      <Pagination />
+      <Pagination 
+        currentPage={currentPage} 
+        totalPages={totalPages} 
+        onPageChange={setCurrentPage} 
+      />
       
       <ModalTambahKategori 
         isOpen={isModalOpen} 

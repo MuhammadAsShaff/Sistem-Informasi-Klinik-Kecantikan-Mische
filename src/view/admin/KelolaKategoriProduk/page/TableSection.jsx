@@ -1,7 +1,7 @@
 import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 
-const TableSection = ({ categories, onDeleteClick, onEditClick }) => {
+const TableSection = ({ categories, onDeleteClick, onEditClick, currentPage = 1, itemsPerPage = 6 }) => {
   return (
     <div className="bg-white border border-gray-200 rounded overflow-hidden">
       <table className="w-full text-left text-sm text-gray-600">
@@ -18,7 +18,7 @@ const TableSection = ({ categories, onDeleteClick, onEditClick }) => {
           {categories.length > 0 ? (
             categories.map((item, index) => (
               <tr key={item.idKategori || item.id || index} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 text-center">{index + 1}</td>
+                <td className="px-6 py-4 text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                 <td className="px-6 py-4 text-center">{item.nama || item.name}</td>
                 <td 
                   className="px-6 py-4 text-center max-w-[200px] truncate" 

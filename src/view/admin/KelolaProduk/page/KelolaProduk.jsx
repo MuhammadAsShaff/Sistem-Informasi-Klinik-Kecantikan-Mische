@@ -31,6 +31,21 @@ const KelolaProduk = () => {
     setToast({ message, type });
   };
 
+  // Pagination Logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+  const totalPages = Math.ceil(filteredCategories.length / ITEMS_PER_PAGE);
+
+  // Reset to first page when search changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const paginatedCategories = filteredCategories.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div className="p-8 font-sans w-full bg-[#f8f9fa] min-h-screen relative">
       <HeaderSection />
@@ -40,7 +55,7 @@ const KelolaProduk = () => {
         onAddClick={() => setIsModalOpen(true)}
       />
       <TableSection 
-        categories={filteredCategories} 
+        categories={paginatedCategories} 
         onDeleteClick={(id) => {
           setDeleteId(id);
           setIsDeleteModalOpen(true);
@@ -51,9 +66,15 @@ const KelolaProduk = () => {
         }}
         onUpdateStock={updateStok}
         showToast={showToast}
+        currentPage={currentPage}
+        itemsPerPage={ITEMS_PER_PAGE}
       />
       
-      <Pagination />
+      <Pagination 
+        currentPage={currentPage} 
+        totalPages={totalPages} 
+        onPageChange={setCurrentPage} 
+      />
       
       <ModalTambahProduk 
         isOpen={isModalOpen} 
