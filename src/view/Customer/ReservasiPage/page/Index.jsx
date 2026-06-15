@@ -154,6 +154,8 @@ export default function ReservasiPage() {
               if (slot.status === "Kosong") {
                 setSelectedSlot(slot);
                 setIsModalOpen(true);
+              } else if (slot.status === "Sudah Terisi") {
+                showToast("Slot sudah penuh", "error");
               }
             }}
           />

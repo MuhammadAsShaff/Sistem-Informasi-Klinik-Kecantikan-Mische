@@ -4,55 +4,80 @@ import { ShoppingCart } from 'lucide-react';
 import { useProdukData } from '../hooks/useProdukData';
 import ProductGrid from './ProductGrid';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
+import { useCartContext } from '@/core/context/CartContext';
 
 const DetailProduk = () => {
   const { id } = useParams();
   const { products, isLoading } = useProdukData();
+  const { addToCart } = useCartContext();
   const product = products.find(p => (p.idProduk || p.id).toString() === id);
   const [qty, setQty] = useState(1);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product, qty);
+      setShowSuccessModal(true);
+      setTimeout(() => setShowSuccessModal(false), 2000);
+    }
+  };
 
   if (isLoading) return <div className="text-center py-20 text-xl font-medium text-gray-500">Memuat produk...</div>;
   if (!product) return <div className="text-center py-20 text-xl font-bold">Produk tidak ditemukan</div>;
 
   return (
     <div className="bg-[#fafafa] min-h-screen py-10 font-sans">
-      <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
+      <div className="container mx-auto px-4 max-w-[820px]">
         
         {/* Detail Card */}
-        <div className="bg-white rounded-[2rem] shadow-sm p-6 md:p-12 flex flex-col md:flex-row gap-10 md:gap-16 items-center mb-20 border border-gray-100">
+        <div className="bg-white rounded-tl-[60px] rounded-br-[60px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-10 md:p-14 lg:p-20 flex flex-col md:flex-row gap-10 lg:gap-20 items-center mb-16 border border-gray-50">
           {/* Image Area */}
-          <div className="w-full md:w-1/3 flex justify-center">
-            {product.gambar || product.image ? (
-              <img 
-                src={(product.gambar || product.image).startsWith('http') ? (product.gambar || product.image) : `${STORAGE_BASE_URL}${(product.gambar || product.image)}`} 
-                alt={product.nama || product.name} 
-                className="w-full h-auto max-h-96 object-contain drop-shadow-xl" 
-              />
-            ) : (
-              <div className="w-full h-64 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">No Image</div>
-            )}
+          <div className="w-full md:w-2/5 flex justify-center">
+            {(() => {
+              const imgData = product.gambar || product.image;
+              const imageSrc = imgData?.startsWith?.('http') || imgData?.startsWith?.('data:') || imgData?.startsWith?.('/src')
+                ? imgData
+                : imgData ? `${STORAGE_BASE_URL}${imgData}` : '';
+                
+              return imageSrc ? (
+                <img 
+                  src={imageSrc}
+                  alt={product.nama || product.name} 
+                  className="w-full h-auto max-h-[350px] object-contain drop-shadow-xl" 
+                />
+              ) : (
+                <div className="w-full h-64 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400">No Image</div>
+              );
+            })()}
           </div>
           
           {/* Details Area */}
-          <div className="w-full md:w-2/3 flex flex-col">
-            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-2">{product.nama || product.name}</h1>
-            <p className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">{product.harga ? `Rp ${Number(product.harga).toLocaleString('id-ID')}` : product.price}</p>
+          <div className="w-full md:w-3/5 flex flex-col">
+            <h1 className="text-4xl font-extrabold text-black mb-2">{product.nama || product.name}</h1>
+            <p className="text-3xl font-extrabold text-black mb-8">
+              {product.harga 
+                ? `Rp ${Number(product.harga).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+                : product.price}
+            </p>
             
-            <div className="flex flex-wrap items-center gap-6 mb-10">
+            <div className="flex flex-wrap items-center gap-10 mb-8">
               {/* Qty Selector */}
-              <div className="flex items-center gap-6 text-2xl font-bold text-[#56BC36]">
+              <div className="flex items-center gap-6 text-[#69C146] font-bold text-2xl">
                 <button onClick={() => setQty(Math.max(1, qty - 1))} className="hover:text-green-700 transition-colors">-</button>
-                <span className="text-gray-800 text-xl">{qty}</span>
+                <span className="w-6 text-center">{qty}</span>
                 <button onClick={() => setQty(qty + 1)} className="hover:text-green-700 transition-colors">+</button>
               </div>
               
               {/* Add to Cart Button */}
-              <button className="bg-[#56BC36] hover:bg-[#469e2c] text-white flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-colors shadow-md ml-0 md:ml-4">
+              <button 
+                onClick={handleAddToCart}
+                className="bg-[#69C146] hover:bg-[#5aa63c] text-white flex items-center gap-3 px-8 py-3 rounded-full font-bold transition-colors shadow-sm text-sm"
+              >
                 <ShoppingCart size={20} />
                 Add To Cart
               </button>
             </div>
-            <p className="text-gray-700 leading-relaxed text-base md:text-lg text-justify md:text-left">
+            <p className="text-gray-800 leading-relaxed text-base text-justify md:pr-10">
               {product.deskripsi || product.description || 'Deskripsi tidak tersedia.'}
             </p>
           </div>
@@ -60,11 +85,26 @@ const DetailProduk = () => {
 
         {/* Produk Lain */}
         <div>
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-2 px-4 md:px-0">Produk Lain</h2>
+          <h2 className="text-3xl font-extrabold text-black mb-6 px-2">Produk Lain</h2>
           <ProductGrid products={products.filter(p => (p.idProduk || p.id).toString() !== id)} />
         </div>
 
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 flex flex-col items-center gap-4 max-w-sm mx-4 transform transition-all animate-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-[#56BC36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Berhasil!</h3>
+              <p className="text-sm text-gray-500">Produk telah ditambahkan ke keranjang belanja Anda.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -16,7 +16,9 @@ const Index = () => {
       {isLoading ? (
         <div className="flex justify-center py-20 text-gray-500">Memuat produk...</div>
       ) : (
-        <ProductGrid products={filteredProducts} />
+        <div className="container mx-auto px-10 max-w-[820px]">
+          <ProductGrid products={filteredProducts} />
+        </div>
       )}
     </div>
   );

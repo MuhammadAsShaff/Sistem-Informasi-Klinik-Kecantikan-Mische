@@ -12,17 +12,39 @@ export const useProdukData = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [prodRes, catRes] = await Promise.all([
-          axiosClient.get(endpoints.customer.product),
-          axiosClient.get(endpoints.admin.kategori) // Assuming customer can view all categories
-        ]);
-
-        if (prodRes.data?.status === 'success') {
-          setProducts(prodRes.data.data);
+        // Ambil produk
+        let productsData = [];
+        try {
+          const prodRes = await axiosClient.get(endpoints.customer.product);
+          if (prodRes.data?.status === 'success') {
+            productsData = prodRes.data.data;
+            setProducts(productsData);
+          }
+        } catch (prodErr) {
+          console.error("Gagal memuat data produk:", prodErr);
         }
-        
-        if (catRes.data?.status === 'success') {
-          setCategories(catRes.data.data);
+
+        // Ambil kategori secara terpisah, agar jika gagal (misal 401), produk tetap tampil
+        let categoryData = [];
+        try {
+          const catRes = await axiosClient.get(endpoints.admin.kategori);
+          if (catRes.data?.status === 'success') {
+            categoryData = catRes.data.data;
+            setCategories(categoryData);
+          }
+        } catch (catErr) {
+          console.warn("Gagal memuat kategori produk dari API, mengekstrak dari produk...", catErr);
+        }
+
+        // Jika kategori gagal dimuat (kosong), kita ekstrak dari produk
+        if (categoryData.length === 0 && productsData.length > 0) {
+           const uniqueCategoriesMap = new Map();
+           productsData.forEach(p => {
+             if (p.kategori) {
+               uniqueCategoriesMap.set(p.kategori.idKategori, p.kategori);
+             }
+           });
+           setCategories(Array.from(uniqueCategoriesMap.values()));
         }
       } catch (error) {
         console.error("Gagal memuat data produk:", error);
