@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\User;
+use App\Models\AlamatCustomer;
 use Illuminate\Support\Facades\Hash;
 
 class ProfilCustomerApiTest extends TestCase
@@ -94,5 +95,68 @@ class ProfilCustomerApiTest extends TestCase
         $response->assertStatus(400)
                  ->assertJson(['success' => false])
                  ->assertJsonStructure(['errors']);
+    }
+
+    public function test_customer_bisa_mengatur_alamat_utama()
+    {
+        [$token, $customer] = $this->getCustomerTokenAndUser();
+
+        $alamat = AlamatCustomer::create([
+            'idUser' => $customer->idUser,
+            'namaPenerima' => 'Test', 'nomorHp' => '123',
+            'detailAlamat' => 'Jalan Test', 'provinceId' => '1', 'cityId' => '1'
+        ]);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->patchJson('/api/customer/profile/alamat-utama', [
+                'idAlamat' => $alamat->id
+            ]);
+
+        $response->assertStatus(200)
+                 ->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('user', [
+            'idUser' => $customer->idUser,
+            'idAlamatUtama' => $alamat->id
+        ]);
+    }
+
+    public function test_customer_gagal_mengatur_alamat_utama_jika_alamat_milik_orang_lain()
+    {
+        [$token, $customer] = $this->getCustomerTokenAndUser();
+
+        $customer2 = User::create([
+            'nama' => 'Orang Lain', 'jenisKelamin' => 'Laki-laki',
+            'tanggalLahir' => '1990-01-01', 'role' => 'customer', 'email' => 'orang@lain.com',
+            'nomorWa' => '123', 'password' => bcrypt('password')
+        ]);
+
+        $alamatMilikOrangLain = AlamatCustomer::create([
+            'idUser' => $customer2->idUser,
+            'namaPenerima' => 'Test 2', 'nomorHp' => '1234',
+            'detailAlamat' => 'Jalan Lain', 'provinceId' => '2', 'cityId' => '2'
+        ]);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->patchJson('/api/customer/profile/alamat-utama', [
+                'idAlamat' => $alamatMilikOrangLain->id
+            ]);
+
+        $response->assertStatus(403)
+                 ->assertJson(['success' => false]);
+    }
+
+    public function test_customer_gagal_mengatur_alamat_utama_jika_id_alamat_tidak_ditemukan()
+    {
+        [$token, $customer] = $this->getCustomerTokenAndUser();
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->patchJson('/api/customer/profile/alamat-utama', [
+                'idAlamat' => 99999
+            ]);
+
+        $response->assertStatus(422)
+                 ->assertJson(['success' => false])
+                 ->assertJsonStructure(['errors' => ['idAlamat']]);
     }
 }

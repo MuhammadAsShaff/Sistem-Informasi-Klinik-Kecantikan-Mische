@@ -19,7 +19,7 @@ class AlamatCustomerSeeder extends Seeder
 
         if ($customer1) {
             // Alamat Utama Budi
-            AlamatCustomer::create([
+            $alamatUtamaBudi = AlamatCustomer::create([
                 'idUser'       => $customer1->idUser,
                 'namaPenerima' => 'Budi Santoso',
                 'nomorHp'      => '081111111101',
@@ -29,6 +29,9 @@ class AlamatCustomerSeeder extends Seeder
                 'districtId'   => '1605',
                 'kodePos'      => '16411'
             ]);
+
+            // Set alamat utama
+            $customer1->update(['idAlamatUtama' => $alamatUtamaBudi->id]);
 
             // Alamat Kantor Budi
             AlamatCustomer::create([
@@ -45,7 +48,7 @@ class AlamatCustomerSeeder extends Seeder
 
         if ($customer2) {
             // Alamat Utama Siti
-            AlamatCustomer::create([
+            $alamatUtamaSiti = AlamatCustomer::create([
                 'idUser'       => $customer2->idUser,
                 'namaPenerima' => 'Siti Aminah',
                 'nomorHp'      => '081111111102',
@@ -55,6 +58,9 @@ class AlamatCustomerSeeder extends Seeder
                 'districtId'   => '5391',
                 'kodePos'      => '50111'
             ]);
+
+            // Set alamat utama
+            $customer2->update(['idAlamatUtama' => $alamatUtamaSiti->id]);
         }
     }
 }

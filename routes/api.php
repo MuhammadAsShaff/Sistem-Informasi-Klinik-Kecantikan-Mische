@@ -89,6 +89,7 @@ Route::prefix('customer')->group(function () {
     Route::prefix('profile')->middleware(['role:customer'])->group(function () {
         Route::get('/', [ProfilCustomerController::class, 'getProfileCustomer'])->name('customer.profile');
         Route::put('/', [ProfilCustomerController::class, 'updateProfileCustomer'])->name('customer.updateProfile');
+        Route::patch('/alamat-utama', [ProfilCustomerController::class, 'setAlamatUtama'])->name('customer.profile.alamatUtama');
     });
 
     Route::prefix('alamat')->middleware(['role:customer'])->group(function () {

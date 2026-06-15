@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use App\Models\AlamatCustomer;
 
 class ProfilCustomerController extends Controller
 {
@@ -102,6 +103,61 @@ class ProfilCustomerController extends Controller
             return response()->json(['success' => false, 'message' => 'Profil yang mau diedit tidak ditemukan'], 404);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Gagal memperbarui data', 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Set Alamat Utama Customer
+     * 
+     * Menetapkan salah satu alamat yang sudah ada sebagai alamat utama.
+     */
+    public function setAlamatUtama(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'idAlamat' => 'required|numeric|exists:alamat_customer,id'
+            ], [
+                'idAlamat.required' => 'ID Alamat wajib diisi.',
+                'idAlamat.numeric' => 'ID Alamat harus berupa angka.',
+                'idAlamat.exists' => 'Alamat tidak ditemukan di sistem.'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terdapat kesalahan input',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $user = auth()->user();
+
+            // Pastikan alamat tersebut benar-benar milik user yang sedang login
+            $alamat = AlamatCustomer::where('id', $request->idAlamat)->where('idUser', $user->idUser)->first();
+
+            if (!$alamat) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses ditolak. Alamat ini bukan milik Anda atau tidak ditemukan.'
+                ], 403);
+            }
+
+            $user->update(['idAlamatUtama' => $alamat->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Alamat utama berhasil diperbarui',
+                'data' => [
+                    'idAlamatUtama' => $user->idAlamatUtama
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

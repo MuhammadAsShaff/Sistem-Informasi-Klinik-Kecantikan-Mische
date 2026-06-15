@@ -26,12 +26,18 @@ class User extends Authenticatable implements JWTSubject
         'role',
         'email',
         'nomorWa',
-        'password'
+        'password',
+        'idAlamatUtama'
     ];
 
     public function alamats()
     {
         return $this->hasMany(AlamatCustomer::class, 'idUser', 'idUser');
+    }
+
+    public function alamatUtama()
+    {
+        return $this->belongsTo(AlamatCustomer::class, 'idAlamatUtama', 'id');
     }
 
     public function penjualan()
