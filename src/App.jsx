@@ -4,6 +4,7 @@ import AppRoutes from "@/core/routes/AppRoutes";
 import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
 import { getToken, saveUser } from "@/core/utils/authStorage";
+import { CartProvider } from "@/core/context/CartContext";
 
 export default function App() {
   const location = useLocation();
@@ -32,5 +33,9 @@ export default function App() {
     checkSession();
   }, [location.pathname]);
 
-  return <AppRoutes />;
+  return (
+    <CartProvider>
+      <AppRoutes />
+    </CartProvider>
+  );
 }

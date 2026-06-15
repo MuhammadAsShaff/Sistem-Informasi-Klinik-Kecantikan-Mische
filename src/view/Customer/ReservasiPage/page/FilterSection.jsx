@@ -58,8 +58,9 @@ export default function FilterSection({
     : ["-"];
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+    <div className="space-y-4">
+      {/* Baris 1: Jenis Treatment & Dokter */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <DropdownItem 
           label="Jenis Treatment" value={treatment} options={treatments}
           isOpen={openDropdown === 't'}
@@ -74,8 +75,22 @@ export default function FilterSection({
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+      {/* Baris 2: Tanggal, Hari, Jadwal Kosong, Jadwal Terisi */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Tanggal (Static but looks like dropdown) */}
+        <div className="bg-white rounded-full px-4 py-3 shadow-sm border border-gray-100 flex items-center justify-center gap-2">
+          <span className="text-gray-900 text-xs md:text-sm lg:text-base font-regular">
+            Tanggal : <span className="font-bold">{formatTgl(selectedDate)}</span>
+          </span>
+        </div>
+
+        {/* Hari */}
+        <InfoItem label="Hari" value={getHari(selectedDate)} />
+        
+        {/* Jadwal Kosong */}
         <InfoItem label="Jadwal Kosong" value={countKosong} />
+        
+        {/* Jadwal Terisi */}
         <InfoItem label="Jadwal Terisi" value={countTerisi} />
       </div>
     </div>

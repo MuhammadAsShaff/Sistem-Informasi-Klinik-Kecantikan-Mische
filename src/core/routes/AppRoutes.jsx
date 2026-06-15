@@ -47,6 +47,10 @@ import Page404 from "@/view/components/Page404";
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* ================= AUTH ROUTES ================= */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/registrasi" element={<RegistrasiPage />} />
+
       {/* ================= CUSTOMER ROUTES ================= */}
       <Route path="/" element={<CustomerLayout />}>
         <Route index element={<LandingPage />} /> 
@@ -59,8 +63,6 @@ export default function AppRoutes() {
         <Route path="tentang-kami/testimoni" element={<HalamanTestimoni />} />
         <Route path="tentang-kami/testimoni/:id" element={<DetailTestimoni />} />
         <Route path="dokter/:id" element={<DetailDokterPage />} />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="registrasi" element={<RegistrasiPage />} />
         <Route path="produk" element={<HalamanProduk />} />
         <Route path="produk/:id" element={<DetailProduk />} />
         <Route path="keranjang" element={<DetailKeranjang />} />

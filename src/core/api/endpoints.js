@@ -12,7 +12,9 @@ export const endpoints = {
   admin: {
     users: '/admin/users',
     schedules: '/admin/schedules',
-    products: '/admin/products',
+    products: '/admin/product',
+    kategori: '/admin/kategori',
+    kategoriCount: '/admin/kategori/count-products',
     profile: '/admin/profile',
     clinic: '/admin/clinic',
     kegiatan: '/admin/kegiatan',
@@ -20,6 +22,16 @@ export const endpoints = {
     reservations: '/admin/reservations',
     promo: '/admin/promo',
     event: '/admin/event',
+    distribusi: {
+      customers: '/admin/distribusi/customers',
+      promo: '/admin/distribusi/promo',
+      event: '/admin/distribusi/event',
+    },
+    testimonials: '/admin/testimonials',
+    report: {
+      reservasi: '/admin/report/reservasi',
+    },
+    dashboard: '/admin/dashboard',
   },
   customer: {
     profile: '/customer/profile',
@@ -31,7 +43,15 @@ export const endpoints = {
     schedules: '/customer/schedules',
     reservations: '/customer/reservations',
     promo: '/customer/promo',
+    promoCheck: '/customer/promo/check',
     event: '/customer/event',
+    testimonials: '/testimonials',
+    product: '/customer/product',
+    cart: '/customer/card', // Menggunakan 'card' sesuai prefix di route PHP
+    alamat: '/customer/alamat',
+    setAlamatUtama: '/customer/profile/alamat-utama',
+    rajaongkirCost: '/customer/rajaongkir/cost',
+    checkout: '/customer/penjualan/checkout',
   },
   public: {
     products: '/products',
