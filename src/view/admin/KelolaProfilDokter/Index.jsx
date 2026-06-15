@@ -84,6 +84,20 @@ export default function KelolaProfilDokter() {
     updateStatusDokter(id, newStatus);
   };
 
+  // Pagination Logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+  const totalPages = Math.ceil(dataDokter.length / ITEMS_PER_PAGE);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const paginatedDokter = dataDokter.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* HEADER DAN SEARCH */}
@@ -103,15 +117,20 @@ export default function KelolaProfilDokter() {
         </div>
       ) : (
         <Tabel
-          data={dataDokter}
+          data={paginatedDokter}
           onEdit={handleEdit}
           onDelete={handleDelete}
           onStatusChange={handleStatusChange}
-          startIndex={startIndex || 1}
+          currentPage={currentPage}
+          itemsPerPage={ITEMS_PER_PAGE}
         />
       )}
 
-      <Pagination />
+      <Pagination 
+        currentPage={currentPage} 
+        totalPages={totalPages} 
+        onPageChange={setCurrentPage} 
+      />
 
       {/* MODALS */}
       <ModalTambahDokter

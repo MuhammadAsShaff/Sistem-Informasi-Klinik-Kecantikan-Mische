@@ -21,10 +21,11 @@ const ModalHapusKegiatan = ({ isOpen, onClose, hook }) => {
         {/* Actions */}
         <div className="flex justify-center gap-4">
           <button 
-            onClick={onConfirm}
-            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-8 py-3 rounded-lg font-medium transition-colors"
+            onClick={handleDelete}
+            disabled={isLoading}
+            className={`bg-[#56BC36] hover:bg-[#45a025] text-white px-8 py-3 rounded-lg font-medium transition-colors ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Ya, Hapus
+            {isLoading ? "Menghapus..." : "Ya, Hapus"}
           </button>
           <button 
             onClick={onClose}

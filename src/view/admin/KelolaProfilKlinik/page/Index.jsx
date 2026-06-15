@@ -15,6 +15,7 @@ import ModalTambahKegiatanBaru from "./ModalTambahKegiatanBaru";
 import ModalEditKegiatan from "./ModalPerbaruiKegiatan";
 import ModalHapusKegiatan from "./ModalHapusKegiatan";
 import ToastAlert from "@/view/components/ToastAlert";
+import Pagination from "../../components/Pagination";
 
 const KelolaProfilKlinik = () => {
   // State modal
@@ -61,6 +62,16 @@ const KelolaProfilKlinik = () => {
     showToast
   );
 
+  // Pagination Logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+  const totalPages = Math.ceil(kegiatanList.length / ITEMS_PER_PAGE);
+
+  const paginatedKegiatan = kegiatanList.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div className="p-8 bg-[#f4f6f9] min-h-screen font-sans">
       <ToastAlert
@@ -79,11 +90,19 @@ const KelolaProfilKlinik = () => {
       />
 
       <GaleriKegiatan
-        data={kegiatanList}
+        data={paginatedKegiatan}
         onTambahClick={() => setIsModalTambahKegiatanOpen(true)}
         onPerbaruiClick={(id) => setIsModalEditKegiatanOpen(id)}
         onHapusClick={(id) => setIsModalHapusKegiatanOpen(id)}
       />
+      
+      <div className="mt-6">
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          onPageChange={setCurrentPage} 
+        />
+      </div>
 
       <ModalHapusPengaturan
         isOpen={isModalHapusPengaturanOpen}
