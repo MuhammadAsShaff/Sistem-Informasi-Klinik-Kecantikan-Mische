@@ -1,7 +1,7 @@
 import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 
-const Tabel = ({ data, onEdit, onDelete }) => (
+const Tabel = ({ data, onEdit, onDelete, currentPage = 1, itemsPerPage = 6 }) => (
   <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <table className="w-full text-sm text-left">
       <thead className="bg-[#FDFDFD] text-gray-600 border-b text-[11px]">
@@ -15,7 +15,7 @@ const Tabel = ({ data, onEdit, onDelete }) => (
       <tbody className="divide-y divide-gray-50 text-gray-700">
         {data.map((item, index) => (
           <tr key={index} className="hover:bg-gray-50 transition-colors">
-            <td className="px-6 py-4 text-center">{index + 1}</td>
+            <td className="px-6 py-4 text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
             <td className="px-6 py-4 text-center h-16">{item.jamMulai ? item.jamMulai.substring(0,5) : ''}</td>
             <td className="px-6 py-4 text-center">{item.jamSelesai ? item.jamSelesai.substring(0,5) : ''}</td>
             <td className="px-6 py-4">

@@ -77,6 +77,16 @@ export default function KelolaJadwalReservasiTreatment() {
     setIsHapusOpen(true);
   };
 
+  // Pagination Logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+  const totalPages = Math.ceil(dataJadwal.length / ITEMS_PER_PAGE);
+
+  const paginatedJadwal = dataJadwal.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen animate-in fade-in duration-700">
       <ToastAlert
@@ -96,13 +106,19 @@ export default function KelolaJadwalReservasiTreatment() {
           </div>
         ) : (
           <Tabel
-            data={dataJadwal}
+            data={paginatedJadwal}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            currentPage={currentPage}
+            itemsPerPage={ITEMS_PER_PAGE}
           />
         )}
 
-        <Pagination />
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          onPageChange={setCurrentPage} 
+        />
 
         <ModalTambahJadwal
           isOpen={isTambahOpen}
