@@ -330,15 +330,25 @@ class PenjualanController extends Controller
             $subtotal += $item->jumlahProduk * $item->produk->harga;
         }
 
-        // Kalkulasi Promo (Diskon)
+        // Kalkulasi Promo (Diskon) & Bonus
         $diskon = 0;
+        $idProdukBonus = null;
         if ($request->idPromo) {
             $promo = Promo::find($request->idPromo);
             if ($subtotal >= $promo->minimalTransaksi) {
-                if (strtolower($promo->jenisPromo) === 'persen' || strtolower($promo->jenisPromo) === 'persentase') {
+                $jenisPromoLower = strtolower($promo->jenisPromo);
+                if ($jenisPromoLower === 'diskon persen' || $jenisPromoLower === 'persen' || $jenisPromoLower === 'persentase') {
                     $diskon = $subtotal * ($promo->diskon / 100);
+                } elseif ($jenisPromoLower === 'potongan harga' || $jenisPromoLower === 'nominal') {
+                    $diskon = $promo->diskon;
+                } elseif ($jenisPromoLower === 'gratis produk') {
+                    if (is_null($promo->idProduk)) {
+                        return response()->json(['status' => 'error', 'message' => 'Konfigurasi promo tidak valid.'], 400);
+                    }
+                    $idProdukBonus = $promo->idProduk;
+                    $diskon = 0; // Tidak memotong total bayar
                 } else {
-                    $diskon = $promo->diskon; // nominal
+                    $diskon = $promo->diskon; // Fallback
                 }
             } else {
                 return response()->json(['status' => 'error', 'message' => 'Subtotal tidak memenuhi minimal transaksi promo ini.'], 400);
@@ -376,6 +386,19 @@ class PenjualanController extends Controller
                     'idPenjualan' => $penjualan->idPenjualan,
                     'idProduk' => $item->idProduk
                 ]);
+            }
+
+            // Tambahkan produk bonus jika promo Gratis Produk berlaku
+            if ($idProdukBonus) {
+                $produkBonus = App\Models\ProdukKlinik::find($idProdukBonus);
+                if ($produkBonus && $produkBonus->stock >= 1) {
+                    $produkBonus->decrement('stock', 1);
+                    DetailPenjualan::create([
+                        'jumlahProduk' => 1,
+                        'idPenjualan' => $penjualan->idPenjualan,
+                        'idProduk' => $idProdukBonus
+                    ]);
+                }
             }
 
             // Kosongkan item keranjang yang dipilih saja

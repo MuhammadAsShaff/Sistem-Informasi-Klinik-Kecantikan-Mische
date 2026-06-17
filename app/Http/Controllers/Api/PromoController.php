@@ -385,14 +385,36 @@ class PromoController extends Controller
                 ], 400);
             }
 
+            // Hitung nilai diskon sebenarnya untuk ditampilkan di frontend
+            $nilaiDiskon = 0;
+            $jenisPromoLower = strtolower($promo->jenisPromo);
+            if ($jenisPromoLower === 'diskon persen' || $jenisPromoLower === 'persen' || $jenisPromoLower === 'persentase') {
+                $nilaiDiskon = $subtotal * ($promo->diskon / 100);
+            } elseif ($jenisPromoLower === 'potongan harga' || $jenisPromoLower === 'nominal') {
+                $nilaiDiskon = $promo->diskon;
+            } elseif ($jenisPromoLower === 'gratis produk') {
+                if (is_null($promo->idProduk)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Konfigurasi promo tidak valid: Promo Gratis Produk harus memiliki produk bonus (idProduk).'
+                    ], 400);
+                }
+                $nilaiDiskon = 0; // Diskon nominal 0, karena bonus berupa barang fisik
+            } else {
+                $nilaiDiskon = $promo->diskon; // Fallback
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Promo berhasil digunakan.',
                 'data' => [
                     'idPromo' => $promo->idPromo,
                     'kode' => $promo->kode,
-                    'diskon' => $promo->diskon,
-                    'namaPromo' => $promo->namaPromo
+                    'jenisPromo' => $promo->jenisPromo,
+                    'diskon_nominal' => $nilaiDiskon,
+                    'diskon_raw' => $promo->diskon,
+                    'namaPromo' => $promo->namaPromo,
+                    'idProdukBonus' => $jenisPromoLower === 'gratis produk' ? $promo->idProduk : null
                 ]
             ], 200);
 
