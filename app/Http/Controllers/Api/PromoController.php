@@ -69,6 +69,14 @@ class PromoController extends Controller
     public function createPromo(Request $request)
     {
         try {
+            // Bersihkan inputan dari frontend (FormData JavaScript sering mengirim string "null")
+            if (in_array($request->input('idKategori'), ['null', 'undefined', ''])) {
+                $request->merge(['idKategori' => null]);
+            }
+            if (in_array($request->input('idProduk'), ['null', 'undefined', ''])) {
+                $request->merge(['idProduk' => null]);
+            }
+
             $validator = Validator::make($request->all(), [
                 'gambar' => 'required|image|mimes:jpeg,png,jpg|max:4000',
                 'namaPromo' => 'required|string|max:60',
@@ -98,6 +106,18 @@ class PromoController extends Controller
                     'success' => false,
                     'message' => 'Terdapat kesalahan pada inputan Anda.',
                     'errors' => $validator->errors()
+                ], 400);
+            }
+
+            // Aturan Bisnis: Tidak bisa memilih Kategori dan Produk secara bersamaan
+            if (!is_null($request->input('idKategori')) && !is_null($request->input('idProduk'))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terdapat kesalahan pada inputan Anda.',
+                    'errors' => [
+                        'idKategori' => ['Tidak bisa memilih Kategori dan Produk secara bersamaan. Pilih salah satu, atau kosongkan keduanya.'],
+                        'idProduk' => ['Tidak bisa memilih Kategori dan Produk secara bersamaan.']
+                    ]
                 ], 400);
             }
 
@@ -145,6 +165,14 @@ class PromoController extends Controller
                 ], 404);
             }
 
+            // Bersihkan inputan dari frontend (FormData JavaScript sering mengirim string "null")
+            if ($request->has('idKategori') && in_array($request->input('idKategori'), ['null', 'undefined', ''])) {
+                $request->merge(['idKategori' => null]);
+            }
+            if ($request->has('idProduk') && in_array($request->input('idProduk'), ['null', 'undefined', ''])) {
+                $request->merge(['idProduk' => null]);
+            }
+
             $rules = [
                 'namaPromo' => 'required|string|max:60',
                 'jenisPromo' => 'required|string|max:60',
@@ -178,6 +206,18 @@ class PromoController extends Controller
                     'success' => false,
                     'message' => 'Terdapat kesalahan pada inputan Anda.',
                     'errors' => $validator->errors()
+                ], 400);
+            }
+
+            // Aturan Bisnis: Tidak bisa memilih Kategori dan Produk secara bersamaan
+            if (!is_null($request->input('idKategori')) && !is_null($request->input('idProduk'))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terdapat kesalahan pada inputan Anda.',
+                    'errors' => [
+                        'idKategori' => ['Tidak bisa memilih Kategori dan Produk secara bersamaan. Pilih salah satu, atau kosongkan keduanya.'],
+                        'idProduk' => ['Tidak bisa memilih Kategori dan Produk secara bersamaan.']
+                    ]
                 ], 400);
             }
 
