@@ -1,23 +1,16 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
+return new class extends Migration {
+    public function up(): void {
         Schema::create('reservasi', function (Blueprint $table) {
             $table->increments('idReservasi');
-            $table->string('namaCustomer',60);
+            $table->string('namaCustomer', 60);
             $table->string('nomorWa', 16);
-            $table->string('jenisTreatment',60);
+            $table->string('jenisTreatment', 60);
             $table->date('tanggalReservasi');
-            $table->string('status',60);
+            $table->string('status', 60);
             $table->boolean('is_rescheduled')->default(false);
             $table->unsignedInteger('idUser')->nullable();
             $table->foreign('idUser')->references('idUser')->on('user')->onDelete('cascade');
@@ -28,12 +21,7 @@ return new class extends Migration
             $table->timestamps();
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
+    public function down(): void {
         Schema::dropIfExists('reservasi');
     }
 };

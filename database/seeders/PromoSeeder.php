@@ -43,7 +43,7 @@ class PromoSeeder extends Seeder
                 'minimalTransaksi' => 100000,
                 'status' => true,
                 'idKategori' => $kategori->idKategori,
-                'idProduk' => $produk->idProduk
+                'idProduk' => null
             ],
             [
                 'gambar' => 'promo_new_year.jpg',
@@ -56,7 +56,7 @@ class PromoSeeder extends Seeder
                 'tanggalSelesai' => Carbon::now()->subDays(1)->format('Y-m-d'), // Expired
                 'minimalTransaksi' => 150000,
                 'status' => false,
-                'idKategori' => $kategori->idKategori,
+                'idKategori' => null,
                 'idProduk' => $produk->idProduk
             ],
             [

@@ -70,7 +70,7 @@ class PromoApiTest extends TestCase
             'minimalTransaksi' => 50000,
             'status' => true,
             'idKategori' => $kategori->idKategori,
-            'idProduk' => $produk->idProduk
+            'idProduk' => null
         ]);
 
         $response->assertStatus(201)
@@ -98,7 +98,7 @@ class PromoApiTest extends TestCase
             'minimalTransaksi' => 50000,
             'status' => true,
             'idKategori' => $kategori->idKategori,
-            'idProduk' => $produk->idProduk
+            'idProduk' => null
         ]);
 
         $response = $this->withHeaders([
@@ -127,7 +127,7 @@ class PromoApiTest extends TestCase
             'minimalTransaksi' => 50000,
             'status' => true,
             'idKategori' => $kategori->idKategori,
-            'idProduk' => $produk->idProduk
+            'idProduk' => null
         ]);
 
         $response = $this->withHeaders([
@@ -144,7 +144,7 @@ class PromoApiTest extends TestCase
             'minimalTransaksi' => 50000,
             'status' => true,
             'idKategori' => $kategori->idKategori,
-            'idProduk' => $produk->idProduk
+            'idProduk' => null
         ]);
 
         $response->assertStatus(200)
@@ -172,7 +172,7 @@ class PromoApiTest extends TestCase
             'minimalTransaksi' => 50000,
             'status' => true,
             'idKategori' => $kategori->idKategori,
-            'idProduk' => $produk->idProduk
+            'idProduk' => null
         ]);
 
         $response = $this->withHeaders([
@@ -204,7 +204,7 @@ class PromoApiTest extends TestCase
             'minimalTransaksi' => 50000,
             'status' => true, // Aktif
             'idKategori' => $kategori->idKategori,
-            'idProduk' => $produk->idProduk
+            'idProduk' => null
         ]);
 
         // Promo Tidak Aktif
@@ -220,7 +220,7 @@ class PromoApiTest extends TestCase
             'minimalTransaksi' => 50000,
             'status' => false, // Tidak Aktif
             'idKategori' => $kategori->idKategori,
-            'idProduk' => $produk->idProduk
+            'idProduk' => null
         ]);
 
         $response = $this->getJson('/api/customer/promo');
@@ -254,7 +254,7 @@ class PromoApiTest extends TestCase
             'tanggalMulai' => Carbon::now()->subDay()->format('Y-m-d'),
             'tanggalSelesai' => Carbon::now()->addDays(5)->format('Y-m-d'),
             'minimalTransaksi' => 50000, 'status' => true,
-            'idKategori' => $kategori->idKategori, 'idProduk' => $produk->idProduk
+            'idKategori' => $kategori->idKategori, 'idProduk' => null
         ]);
 
         // Isi keranjang
@@ -287,7 +287,7 @@ class PromoApiTest extends TestCase
             'tanggalSelesai' => Carbon::now()->addDays(5)->format('Y-m-d'),
             'minimalTransaksi' => 500000, // Harus 500 ribu
             'status' => true,
-            'idKategori' => $kategori->idKategori, 'idProduk' => $produk->idProduk
+            'idKategori' => $kategori->idKategori, 'idProduk' => null
         ]);
 
         $keranjang = Keranjang::create([
@@ -324,7 +324,7 @@ class PromoApiTest extends TestCase
             'tanggalSelesai' => Carbon::now()->addDays(5)->format('Y-m-d'),
             'minimalTransaksi' => 50000,
             'status' => true,
-            'idKategori' => $kategoriLain->idKategori, 'idProduk' => $produkLain->idProduk // Promo ini untuk produk lain
+            'idKategori' => null, 'idProduk' => $produkLain->idProduk // Promo ini untuk produk lain
         ]);
 
         $keranjang = Keranjang::create([

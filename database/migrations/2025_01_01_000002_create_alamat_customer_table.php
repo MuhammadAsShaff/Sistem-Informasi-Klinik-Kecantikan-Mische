@@ -1,16 +1,9 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
+return new class extends Migration {
+    public function up(): void {
         Schema::create('alamat_customer', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('idUser');
@@ -24,13 +17,15 @@ return new class extends Migration
             $table->string('kodePos')->nullable();
             $table->timestamps();
         });
-    }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
+        Schema::table('user', function (Blueprint $table) {
+            $table->foreign('idAlamatUtama')->references('id')->on('alamat_customer')->onDelete('set null');
+        });
+    }
+    public function down(): void {
+        Schema::table('user', function (Blueprint $table) {
+            $table->dropForeign(['idAlamatUtama']);
+        });
         Schema::dropIfExists('alamat_customer');
     }
 };
