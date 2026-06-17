@@ -205,7 +205,7 @@ class PenjualanController extends Controller
             $totalHarga = $produk->harga * $jumlah;
             $penjualan = Penjualan::create([
                 'tanggal' => now(),
-                'invoiceNumber' => 'INV-' . time() . '-' . rand(100, 999),
+                'invoiceNumber' => $this->generateInvoiceNumber(),
                 'subtotal' => $totalHarga,
                 'shippingCost' => 0,
                 'shippingCourier' => null,
@@ -303,7 +303,7 @@ class PenjualanController extends Controller
 
         DB::beginTransaction();
         try {
-            $invoiceNumber = 'INV-' . time() . '-' . rand(100, 999);
+            $invoiceNumber = $this->generateInvoiceNumber();
             
             // Simpan ke tabel penjualan
             $penjualan = Penjualan::create([
@@ -377,5 +377,21 @@ class PenjualanController extends Controller
                 'message' => 'Terjadi kesalahan saat checkout: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Helper untuk membuat nomor invoice unik dengan format INV-YYYYMMDD-0001
+     */
+    private function generateInvoiceNumber()
+    {
+        $todayDate = now()->format('Ymd');
+        $lastPenjualan = Penjualan::whereDate('tanggal', now()->toDateString())->latest('idPenjualan')->first();
+        
+        $sequence = 1;
+        if ($lastPenjualan && preg_match('/INV-' . $todayDate . '-(\d+)/', $lastPenjualan->invoiceNumber, $matches)) {
+            $sequence = intval($matches[1]) + 1;
+        }
+        
+        return 'INV-' . $todayDate . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
     }
 }
