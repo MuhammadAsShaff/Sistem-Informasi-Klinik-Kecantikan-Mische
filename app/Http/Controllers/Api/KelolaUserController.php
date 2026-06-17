@@ -20,8 +20,8 @@ class KelolaUserController extends Controller
     public function getAllUsers()
     {
         try {
-            // Mengambil semua data user dengan paginasi 
-            $users = User::latest()->paginate(10);
+            // Mengambil semua data user beserta relasi alamatnya dengan paginasi 
+            $users = User::with(['alamats', 'alamatUtama'])->latest()->paginate(10);
 
             return response()->json([
                 'success' => true,
@@ -45,8 +45,8 @@ class KelolaUserController extends Controller
     public function getUserById($idUser)
     {
         try {
-            // Mencari user langsung ke intinya berdasarkan ID (findOrFail)
-            $user = User::findOrFail($idUser);
+            // Mencari user beserta relasi alamatnya berdasarkan ID (findOrFail)
+            $user = User::with(['alamats', 'alamatUtama'])->findOrFail($idUser);
 
             return response()->json([
                 'success' => true,
