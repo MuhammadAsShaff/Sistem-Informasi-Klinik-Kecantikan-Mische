@@ -343,4 +343,35 @@ class PromoApiTest extends TestCase
                  ->assertJson(['success' => false])
                  ->assertSee('tidak berlaku untuk produk di keranjang Anda');
     }
+
+    public function test_customer_bisa_memakai_promo_global()
+    {
+        [$token, $customer] = $this->getCustomerTokenAndUser();
+        [$kategori, $produk] = $this->createDummyDeps();
+
+        Promo::create([
+            'gambar' => 'promo.jpg', 'namaPromo' => 'Promo Global', 'jenisPromo' => 'Diskon',
+            'kode' => 'GLOBAL123', 'diskon' => 10000, 'deskripsi' => 'Deskripsi',
+            'tanggalMulai' => Carbon::now()->subDay()->format('Y-m-d'),
+            'tanggalSelesai' => Carbon::now()->addDays(5)->format('Y-m-d'),
+            'minimalTransaksi' => 50000, 'status' => true,
+            'idKategori' => null, 'idProduk' => null // Nullable untuk global
+        ]);
+
+        $keranjang = Keranjang::create([
+            'idUser' => $customer->idUser,
+            'idProduk' => $produk->idProduk, 
+            'jumlahProduk' => 1 // 100.000 > 50.000
+        ]);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+            ->postJson('/api/customer/promo/check', [
+                'kode' => 'GLOBAL123',
+                'cart_ids' => [$keranjang->idKeranjang]
+            ]);
+
+        $response->assertStatus(200)
+                 ->assertJson(['success' => true])
+                 ->assertJsonPath('data.diskon', 10000);
+    }
 }

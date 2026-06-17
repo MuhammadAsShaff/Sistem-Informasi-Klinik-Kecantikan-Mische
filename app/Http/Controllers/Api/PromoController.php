@@ -80,8 +80,8 @@ class PromoController extends Controller
                 'tanggalSelesai' => 'required|date|after_or_equal:tanggalMulai',
                 'minimalTransaksi' => 'required|integer|min:0',
                 'status' => 'required|boolean',
-                'idKategori' => 'required|exists:kategoriProduk,idKategori',
-                'idProduk' => 'required|exists:produkKlinik,idProduk'
+                'idKategori' => 'nullable|exists:kategoriProduk,idKategori',
+                'idProduk' => 'nullable|exists:produkKlinik,idProduk'
             ], [
                 'gambar.required' => 'Gambar promo wajib diunggah.',
                 'gambar.image' => 'File harus berupa gambar.',
@@ -155,8 +155,8 @@ class PromoController extends Controller
                 'tanggalSelesai' => 'required|date|after_or_equal:tanggalMulai',
                 'minimalTransaksi' => 'required|integer|min:0',
                 'status' => 'required|boolean',
-                'idKategori' => 'required|exists:kategoriProduk,idKategori',
-                'idProduk' => 'required|exists:produkKlinik,idProduk'
+                'idKategori' => 'nullable|exists:kategoriProduk,idKategori',
+                'idProduk' => 'nullable|exists:produkKlinik,idProduk'
             ];
 
             if ($request->hasFile('gambar')) {
@@ -355,11 +355,18 @@ class PromoController extends Controller
             $subtotal = 0;
             $isProductValid = false;
 
+            // Jika idProduk dan idKategori promo null, promo berlaku untuk semua produk
+            $isGlobalPromo = is_null($promo->idProduk) && is_null($promo->idKategori);
+
             foreach ($cartItems as $item) {
                 $subtotal += ($item->jumlahProduk * $item->produk->harga);
 
                 // Cek apakah produk atau kategori sesuai dengan promo
-                if ($item->idProduk == $promo->idProduk || $item->produk->idKategori == $promo->idKategori) {
+                if ($isGlobalPromo) {
+                    $isProductValid = true;
+                } elseif (!is_null($promo->idProduk) && $item->idProduk == $promo->idProduk) {
+                    $isProductValid = true;
+                } elseif (!is_null($promo->idKategori) && $item->produk->idKategori == $promo->idKategori) {
                     $isProductValid = true;
                 }
             }

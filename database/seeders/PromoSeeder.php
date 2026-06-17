@@ -58,6 +58,20 @@ class PromoSeeder extends Seeder
                 'status' => false,
                 'idKategori' => $kategori->idKategori,
                 'idProduk' => $produk->idProduk
+            ],
+            [
+                'gambar' => 'promo_global.jpg',
+                'namaPromo' => 'Promo Bebas Belanja',
+                'jenisPromo' => 'Diskon Semua',
+                'kode' => 'BEBAS10K',
+                'diskon' => 10000,
+                'deskripsi' => 'Diskon 10 ribu untuk semua produk dan kategori.',
+                'tanggalMulai' => Carbon::now()->format('Y-m-d'),
+                'tanggalSelesai' => Carbon::now()->addDays(30)->format('Y-m-d'),
+                'minimalTransaksi' => 50000,
+                'status' => true,
+                'idKategori' => null,
+                'idProduk' => null
             ]
         ];
 
