@@ -72,9 +72,6 @@ class PenjualanController extends Controller
             }
 
             $updateData = ['orderStatus' => $request->orderStatus];
-            if ($request->has('nomorResi') && $request->orderStatus === 'dikirim') {
-                $updateData['nomorResi'] = $request->nomorResi;
-            }
 
             $penjualan->update($updateData);
 
@@ -88,6 +85,56 @@ class PenjualanController extends Controller
                 'success' => false,
                 'message' => 'Gagal memperbarui status penjualan.',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Memasukkan atau mengubah nomor resi pesanan
+     */
+    public function inputResi(Request $request, $idPenjualan)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'nomorResi' => 'required|string|max:100'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors'  => $validator->errors()
+                ], 400);
+            }
+
+            $penjualan = Penjualan::find($idPenjualan);
+
+            if (!$penjualan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Penjualan tidak ditemukan'
+                ], 404);
+            }
+
+            // Update nomor resi, otomatis set status ke dikirim jika belum dikirim atau selesai
+            $updateData = ['nomorResi' => $request->nomorResi];
+            if ($penjualan->orderStatus !== 'selesai') {
+                $updateData['orderStatus'] = 'dikirim';
+            }
+
+            $penjualan->update($updateData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Nomor resi berhasil disimpan',
+                'data'    => $penjualan
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan resi',
+                'error'   => $e->getMessage()
             ], 500);
         }
     }

@@ -38,6 +38,7 @@ class ProdukKlinikController extends Controller
             'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'berat' => 'required|integer|min:1',
             'gambar' => 'required|image|mimes:jpeg,png,jpg|max:4000',
             'idKategori' => 'required|exists:kategoriproduk,idKategori'
         ], [
@@ -51,6 +52,9 @@ class ProdukKlinikController extends Controller
             'stock.required' => 'Stok produk wajib diisi.',
             'stock.integer' => 'Stok produk harus berupa angka bulat.',
             'stock.min' => 'Stok produk tidak boleh kurang dari 0.',
+            'berat.required' => 'Berat produk wajib diisi.',
+            'berat.integer' => 'Berat produk harus berupa angka bulat.',
+            'berat.min' => 'Berat produk minimal 1 gram.',
             'gambar.required' => 'Gambar produk wajib diunggah.',
             'gambar.image' => 'File harus berupa gambar.',
             'gambar.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
@@ -104,6 +108,7 @@ class ProdukKlinikController extends Controller
             'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'berat' => 'required|integer|min:1',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
             'idKategori' => 'required|exists:kategoriproduk,idKategori'
         ], [
@@ -117,6 +122,9 @@ class ProdukKlinikController extends Controller
             'stock.required' => 'Stok produk wajib diisi.',
             'stock.integer' => 'Stok produk harus berupa angka bulat.',
             'stock.min' => 'Stok produk tidak boleh kurang dari 0.',
+            'berat.required' => 'Berat produk wajib diisi.',
+            'berat.integer' => 'Berat produk harus berupa angka bulat.',
+            'berat.min' => 'Berat produk minimal 1 gram.',
             'gambar.image' => 'File harus berupa gambar.',
             'gambar.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
             'gambar.max' => 'Ukuran gambar maksimal 4MB.',

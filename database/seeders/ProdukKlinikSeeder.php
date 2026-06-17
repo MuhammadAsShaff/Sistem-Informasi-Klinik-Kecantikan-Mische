@@ -30,6 +30,7 @@ class ProdukKlinikSeeder extends Seeder
                 'deskripsi' => 'Sabun cuci muka khusus untuk kulit berjerawat.',
                 'harga' => 75000,
                 'stock' => 50,
+                'berat' => 150,
                 'gambar' => 'facial_wash.jpg',
                 'idKategori' => $kategori->idKategori
             ],
@@ -38,6 +39,7 @@ class ProdukKlinikSeeder extends Seeder
                 'deskripsi' => 'Serum untuk mencerahkan wajah dengan ekstrak vitamin C.',
                 'harga' => 150000,
                 'stock' => 30,
+                'berat' => 100,
                 'gambar' => 'serum.jpg',
                 'idKategori' => $kategori->idKategori
             ],
@@ -46,6 +48,7 @@ class ProdukKlinikSeeder extends Seeder
                 'deskripsi' => 'Krim malam untuk meremajakan kulit dan mengurangi kerutan.',
                 'harga' => 200000,
                 'stock' => 20,
+                'berat' => 250,
                 'gambar' => 'night_cream.jpg',
                 'idKategori' => $kategori->idKategori
             ],
@@ -54,6 +57,7 @@ class ProdukKlinikSeeder extends Seeder
                 'deskripsi' => 'Tabir surya dengan perlindungan maksimal SPF 50.',
                 'harga' => 90000,
                 'stock' => 100,
+                'berat' => 100,
                 'gambar' => 'sunblock.jpg',
                 'idKategori' => $kategori->idKategori
             ],
@@ -62,6 +66,7 @@ class ProdukKlinikSeeder extends Seeder
                 'deskripsi' => 'Toner pelembap wajah yang menyegarkan.',
                 'harga' => 60000,
                 'stock' => 75,
+                'berat' => 200,
                 'gambar' => 'toner.jpg',
                 'idKategori' => $kategori->idKategori
             ]

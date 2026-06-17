@@ -55,7 +55,19 @@ class KelolaUserApiTest extends TestCase
                 'role' => 'customer',
                 'email' => 'pasien@example.com',
                 'nomorWa' => '08987654321',
-                'password' => 'Password123'
+                'password' => 'Password123',
+                'alamat_lengkap' => [
+                    [
+                        'namaPenerima' => 'Bapak Pasien',
+                        'nomorHp' => '08987654321',
+                        'provinceId' => 11,
+                        'cityId' => 254,
+                        'districtId' => 3500,
+                        'kodePos' => '60281',
+                        'detailAlamat' => 'Jalan Kenangan No 1',
+                        'is_utama' => true
+                    ]
+                ]
             ]);
 
         $response->assertStatus(201)
@@ -64,6 +76,11 @@ class KelolaUserApiTest extends TestCase
         $this->assertDatabaseHas('user', [
             'email' => 'pasien@example.com',
             'nama' => 'Pasien Baru'
+        ]);
+
+        $this->assertDatabaseHas('alamat_customer', [
+            'namaPenerima' => 'Bapak Pasien',
+            'detailAlamat' => 'Jalan Kenangan No 1'
         ]);
     }
 
@@ -93,7 +110,18 @@ class KelolaUserApiTest extends TestCase
         $response = $this->withHeaders(['Authorization' => "Bearer $token"])
             ->putJson('/api/admin/users/' . $user->idUser, [
                 'nama' => 'User Update',
-                
+                'alamat_lengkap' => [
+                    [
+                        'namaPenerima' => 'Penerima Update',
+                        'nomorHp' => '08987654321',
+                        'provinceId' => 11,
+                        'cityId' => 254,
+                        'districtId' => 3500,
+                        'kodePos' => '60281',
+                        'detailAlamat' => 'Jalan Update No 2',
+                        'is_utama' => true
+                    ]
+                ]
             ]);
 
         $response->assertStatus(200)
@@ -102,7 +130,11 @@ class KelolaUserApiTest extends TestCase
         $this->assertDatabaseHas('user', [
             'idUser' => $user->idUser,
             'nama' => 'User Update',
-            
+        ]);
+
+        $this->assertDatabaseHas('alamat_customer', [
+            'idUser' => $user->idUser,
+            'namaPenerima' => 'Penerima Update'
         ]);
     }
 

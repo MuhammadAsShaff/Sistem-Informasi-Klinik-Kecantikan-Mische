@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\RajaOngkirService;
 use Illuminate\Support\Facades\Validator;
 use App\Models\AlamatCustomer;
+use App\Models\Keranjang;
 
 class RajaOngkirController extends Controller
 {
@@ -100,12 +101,13 @@ class RajaOngkirController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'idAlamat' => 'required|numeric|exists:alamat_customer,id',
-                'weight' => 'nullable|numeric|min:1'
+                'cart_ids' => 'required|array',
+                'cart_ids.*' => 'integer|exists:keranjang,idKeranjang'
             ], [
                 'idAlamat.required' => 'ID Alamat wajib diisi.',
                 'idAlamat.exists' => 'Alamat tidak ditemukan.',
-                'weight.numeric' => 'Berat harus berupa angka.',
-                'weight.min' => 'Berat minimal 1 gram.'
+                'cart_ids.required' => 'Daftar item keranjang wajib dikirim.',
+                'cart_ids.array' => 'Format keranjang tidak valid.'
             ]);
 
             if ($validator->fails()) {
@@ -128,7 +130,26 @@ class RajaOngkirController extends Controller
             }
 
             $destinationCityId = $alamat->cityId;
-            $weight = $request->input('weight', 1000); // default 1 kg / 1000 gram
+
+            // Kalkulasi berat total keranjang
+            $keranjangItems = Keranjang::with('produk')->where('idUser', $idUser)->whereIn('idKeranjang', $request->cart_ids)->get();
+            if ($keranjangItems->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Keranjang kosong atau tidak valid.'
+                ], 400);
+            }
+
+            $weight = 0;
+            foreach ($keranjangItems as $item) {
+                // Asumsi berat kolom adalah 'berat' (gram)
+                $beratSatuan = $item->produk->berat ?? 500; // default 500g jika kosong
+                $weight += ($beratSatuan * $item->jumlahProduk);
+            }
+
+            if ($weight < 1) {
+                $weight = 1000; // fallback jika ada kesalahan data
+            }
 
             // Ambil daftar kurir yang didukung dari config
             $couriers = config('rajaongkir.supported_couriers', ['jne', 'pos', 'tiki']);

@@ -290,6 +290,7 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
     Route::prefix('penjualan')->group(function () {
         Route::get('/', [PenjualanController::class, 'index'])->name('admin.penjualan.index');
         Route::patch('/{idPenjualan}', [PenjualanController::class, 'updateStatus'])->name('admin.penjualan.updateStatus');
+        Route::patch('/{idPenjualan}/resi', [PenjualanController::class, 'inputResi'])->name('admin.penjualan.inputResi');
         Route::delete('/{idPenjualan}', [PenjualanController::class, 'destroy'])->name('admin.penjualan.destroy');
     });
 });

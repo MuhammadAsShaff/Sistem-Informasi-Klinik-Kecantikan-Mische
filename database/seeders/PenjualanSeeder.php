@@ -57,6 +57,7 @@ class PenjualanSeeder extends Seeder
                     'total' => ($produk->harga * 1) + 20000,
                     'paymentStatus' => 'paid',
                     'orderStatus' => 'selesai',
+                    'nomorResi' => 'POS123456789',
                     'paidAt' => now()->subDays(2),
                     'idUser' => $customer->idUser,
                     'idPromo' => null,

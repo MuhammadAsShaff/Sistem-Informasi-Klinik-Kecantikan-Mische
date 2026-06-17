@@ -57,6 +57,7 @@ class ProdukKlinikApiTest extends TestCase
             'deskripsi' => 'Deskripsi Produk Baru',
             'harga' => 100000,
             'stock' => 50,
+            'berat' => 200,
             'gambar' => \Illuminate\Http\UploadedFile::fake()->image('gambar_baru.jpg'),
             'idKategori' => $kategori->idKategori
         ]);
@@ -66,7 +67,8 @@ class ProdukKlinikApiTest extends TestCase
 
         $this->assertDatabaseHas('produkklinik', [
             'nama' => 'Produk Baru',
-            'stock' => 50
+            'stock' => 50,
+            'berat' => 200
         ]);
     }
 
@@ -79,6 +81,7 @@ class ProdukKlinikApiTest extends TestCase
             'deskripsi' => 'Deskripsi Lama',
             'harga' => 50000,
             'stock' => 10,
+            'berat' => 100,
             'gambar' => 'gambar_lama.jpg',
             'idKategori' => $kategori->idKategori
         ]);
@@ -107,6 +110,7 @@ class ProdukKlinikApiTest extends TestCase
             'deskripsi' => 'Deskripsi Order',
             'harga' => 50000,
             'stock' => 10,
+            'berat' => 100,
             'gambar' => 'gambar_order.jpg',
             'idKategori' => $kategori->idKategori
         ]);
@@ -161,6 +165,7 @@ class ProdukKlinikApiTest extends TestCase
             'deskripsi' => 'Deskripsi Publik',
             'harga' => 50000,
             'stock' => 10,
+            'berat' => 150,
             'gambar' => 'gambar_publik.jpg',
             'idKategori' => $kategori->idKategori
         ]);

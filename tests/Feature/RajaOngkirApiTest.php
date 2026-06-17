@@ -6,6 +6,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\AlamatCustomer;
+use App\Models\ProdukKlinik;
+use App\Models\KategoriProduk;
+use App\Models\Keranjang;
 use Illuminate\Support\Facades\Http;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -107,6 +110,25 @@ class RajaOngkirApiTest extends TestCase
             'kodePos' => '11520'
         ]);
 
+        // Buat Kategori & Produk
+        $kategori = KategoriProduk::create(['nama' => 'Test Kat', 'deskripsi' => 'test']);
+        $produk = ProdukKlinik::create([
+            'nama' => 'Test Prod',
+            'deskripsi' => 'test',
+            'harga' => 10000,
+            'stock' => 10,
+            'berat' => 500, // 500 gram
+            'gambar' => 'test.jpg',
+            'idKategori' => $kategori->idKategori
+        ]);
+
+        // Buat item keranjang (2 item = 1000 gram)
+        $keranjang = Keranjang::create([
+            'idUser' => $this->customer->idUser,
+            'idProduk' => $produk->idProduk,
+            'jumlahProduk' => 2
+        ]);
+
         // Mock response Komerce untuk JNE, POS, TIKI, J&T
         Http::fake([
             'rajaongkir.komerce.id/api/v1/calculate/domestic-cost?origin=326&destination=152&weight=1000&courier=jne' => Http::response([
@@ -139,7 +161,7 @@ class RajaOngkirApiTest extends TestCase
             'Authorization' => 'Bearer ' . $this->token,
         ])->postJson('/api/customer/rajaongkir/cost-by-address', [
             'idAlamat' => $alamat->id,
-            'weight' => 1000
+            'cart_ids' => [$keranjang->idKeranjang]
         ]);
 
         $response->assertStatus(200)

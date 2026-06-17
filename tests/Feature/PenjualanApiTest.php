@@ -11,6 +11,8 @@ use App\Models\DetailPenjualan;
 use App\Models\Promo;
 use App\Models\KategoriProduk;
 use App\Models\ProdukKlinik;
+use App\Models\AlamatCustomer;
+use App\Models\Keranjang;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class PenjualanApiTest extends TestCase
@@ -136,6 +138,35 @@ class PenjualanApiTest extends TestCase
     }
 
     /** @test */
+    public function admin_bisa_menginput_nomor_resi_secara_terpisah()
+    {
+        $penjualan = Penjualan::create([
+            'tanggal' => now(),
+            'invoiceNumber' => 'INV-' . time() . '-8',
+            'subtotal' => 50000,
+            'shippingCost' => 0,
+            'shippingCourier' => 'jne',
+            'shippingService' => 'REG',
+            'total' => 50000,
+            'paymentStatus' => 'paid',
+            'orderStatus' => 'diproses',
+            'idUser' => $this->customer->idUser,
+            'idPromo' => $this->promo->idPromo
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->tokenAdmin,
+        ])->patchJson('/api/admin/penjualan/' . $penjualan->idPenjualan . '/resi', [
+            'nomorResi' => 'JNT12345678'
+        ]);
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('success', true)
+                 ->assertJsonPath('data.orderStatus', 'dikirim')
+                 ->assertJsonPath('data.nomorResi', 'JNT12345678');
+    }
+
+    /** @test */
     public function admin_bisa_hapus_penjualan()
     {
         $penjualan = Penjualan::create([
@@ -184,5 +215,53 @@ class PenjualanApiTest extends TestCase
         $response->assertStatus(200)
                  ->assertJsonPath('success', true)
                  ->assertJsonPath('data.orderStatus', 'selesai');
+    }
+
+    /** @test */
+    public function customer_bisa_melakukan_checkout()
+    {
+        // Buat Alamat Customer
+        $alamat = AlamatCustomer::create([
+            'idUser' => $this->customer->idUser,
+            'namaPenerima' => 'Penerima Test',
+            'nomorHp' => '08123456789',
+            'detailAlamat' => 'Jalan Kebangsaan No. 12',
+            'provinceId' => 1,
+            'cityId' => 152,
+            'districtId' => 2100,
+            'kodePos' => '11520'
+        ]);
+
+        $produk = ProdukKlinik::first();
+
+        // Buat item keranjang
+        $keranjang = Keranjang::create([
+            'idUser' => $this->customer->idUser,
+            'idProduk' => $produk->idProduk,
+            'jumlahProduk' => 1
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->tokenCustomer,
+        ])->postJson('/api/customer/penjualan/checkout', [
+            'idAlamat' => $alamat->id,
+            'shippingCourier' => 'jne',
+            'shippingService' => 'REG',
+            'shippingCost' => 10000,
+            'cart_ids' => [$keranjang->idKeranjang]
+        ]);
+
+        $response->assertStatus(201)
+                 ->assertJsonPath('status', 'success');
+
+        $this->assertDatabaseHas('penjualan', [
+            'idUser' => $this->customer->idUser,
+            'shippingCourier' => 'jne',
+            'orderStatus' => 'pending'
+        ]);
+
+        // Verifikasi bahwa format invoice sesuai dengan aturan baru: INV-YYYYMMDD-XXXX
+        $penjualan = Penjualan::where('idUser', $this->customer->idUser)->first();
+        $this->assertMatchesRegularExpression('/^INV-\d{8}-\d{4}$/', $penjualan->invoiceNumber);
     }
 }
