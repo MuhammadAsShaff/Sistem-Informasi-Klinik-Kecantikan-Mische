@@ -208,6 +208,7 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
         Route::get('/', [PromoController::class, 'getAllPromos'])->name('admin.promos');
         Route::post('/', [PromoController::class, 'createPromo'])->name('admin.createPromo');
         Route::put('/{idPromo}', [PromoController::class, 'updatePromo'])->name('admin.updatePromo');
+        Route::post('/{idPromo}', [PromoController::class, 'updatePromo']); // Fallback untuk form-data
         Route::delete('/{idPromo}', [PromoController::class, 'deletePromo'])->name('admin.deletePromo');
     });
 

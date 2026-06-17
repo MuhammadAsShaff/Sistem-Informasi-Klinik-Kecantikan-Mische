@@ -145,8 +145,7 @@ class PromoController extends Controller
                 ], 404);
             }
 
-            $validator = Validator::make($request->all(), [
-                'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
+            $rules = [
                 'namaPromo' => 'required|string|max:60',
                 'jenisPromo' => 'required|string|max:60',
                 'kode' => 'required|string|max:12|unique:promo,kode,' . $idPromo . ',idPromo',
@@ -158,7 +157,13 @@ class PromoController extends Controller
                 'status' => 'required|boolean',
                 'idKategori' => 'required|exists:kategoriProduk,idKategori',
                 'idProduk' => 'required|exists:produkKlinik,idProduk'
-            ], [
+            ];
+
+            if ($request->hasFile('gambar')) {
+                $rules['gambar'] = 'image|mimes:jpeg,png,jpg|max:4000';
+            }
+
+            $validator = Validator::make($request->all(), $rules, [
                 'gambar.image' => 'File harus berupa gambar.',
                 'gambar.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
                 'gambar.max' => 'Ukuran gambar maksimal 4MB.',
