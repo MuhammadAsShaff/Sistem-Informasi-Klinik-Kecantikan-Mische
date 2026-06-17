@@ -214,6 +214,52 @@ class PromoController extends Controller
     }
 
     /**
+     * updateStatus
+     * Memperbarui hanya status aktif/tidak aktif promo (Admin)
+     */
+    public function updateStatus(Request $request, $idPromo)
+    {
+        try {
+            $promo = Promo::find($idPromo);
+            if (!$promo) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Promo tidak ditemukan.'
+                ], 404);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|boolean'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal.',
+                    'errors' => $validator->errors()
+                ], 400);
+            }
+
+            $promo->update([
+                'status' => $request->status
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status promo berhasil diperbarui.',
+                'data' => $promo
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui status promo.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * deletePromo
      * Menghapus promo (Admin)
      */
