@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use App\Models\AlamatCustomer;
 
 class KelolaUserController extends Controller
 {
@@ -68,7 +70,6 @@ class KelolaUserController extends Controller
     {
         $pesanEror = [
             'nama.required' => 'Nama lengkap wajib diisi.',
-            'alamat.required' => 'Alamat tidak boleh kosong.',
             'jenisKelamin.required' => 'Jenis kelamin harus dipilih.',
             'tanggalLahir.required' => 'Tanggal lahir wajib diisi.',
             'role.required' => 'Role pengguna wajib ditentukan.',
@@ -83,7 +84,6 @@ class KelolaUserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:60',
-            
             'jenisKelamin' => 'required|string|max:12',
             'tanggalLahir' => 'required|date',
             'role' => 'required|string|max:12',
@@ -100,11 +100,11 @@ class KelolaUserController extends Controller
             ], 400);
         }
 
+        DB::beginTransaction();
         try {
             // Menghemat kueri dan sangat aman (Mass Assignment)
             $user = User::create([
                 'nama' => $request->nama,
-                'alamat' => $request->alamat,
                 'jenisKelamin' => $request->jenisKelamin,
                 'tanggalLahir' => $request->tanggalLahir,
                 'role' => $request->role,
@@ -113,12 +113,32 @@ class KelolaUserController extends Controller
                 'password' => Hash::make($request->password)
             ]);
 
+            // Jika role customer dan terdapat input alamat
+            if ($user->role === 'customer' && $request->filled('provinceId')) {
+                $alamat = AlamatCustomer::create([
+                    'idUser' => $user->idUser,
+                    'namaPenerima' => $user->nama,
+                    'nomorHp' => $user->nomorWa,
+                    'provinceId' => $request->provinceId,
+                    'cityId' => $request->cityId,
+                    'districtId' => $request->kecamatan, // map dari request->kecamatan
+                    'kodePos' => $request->kodePos,
+                    'detailAlamat' => $request->detailAlamat
+                ]);
+
+                // Set alamat ini sebagai alamat utama
+                $user->update(['idAlamatUtama' => $alamat->id]);
+            }
+
+            DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Akun userr baru berhasil ditambahkan',
-                'data' => $user
+                'data' => $user->load('alamatUtama')
             ], 201);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan sistem saat mendaftarkan user',
@@ -134,12 +154,12 @@ class KelolaUserController extends Controller
      */
     public function updateUser(Request $request, $idUser)
     {
+        DB::beginTransaction();
         try {
             $user = User::findOrFail($idUser);
 
             $pesanEror = [
                 'nama.required' => 'Nama lengkap wajib diisi.',
-                'alamat.required' => 'Alamat tidak boleh kosong.',
                 'jenisKelamin.required' => 'Jenis kelamin harus dipilih.',
                 'tanggalLahir.required' => 'Tanggal lahir wajib diisi.',
                 'role.required' => 'Role pengguna wajib ditentukan.',
@@ -153,7 +173,6 @@ class KelolaUserController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'nama' => 'sometimes|string|max:60',
-                
                 'jenisKelamin' => 'sometimes|string|max:12',
                 'tanggalLahir' => 'sometimes|date',
                 'role' => 'sometimes|string|max:12',
@@ -171,7 +190,7 @@ class KelolaUserController extends Controller
             }
 
             // Pisahkan password dari data regular
-            $dataToUpdate = $request->except('password');
+            $dataToUpdate = $request->except(['password', 'alamat_lengkap']);
 
             // Re-hash sandi jika ternyata diganti
             if ($request->filled('password')) {
@@ -180,15 +199,87 @@ class KelolaUserController extends Controller
 
             $user->update($dataToUpdate);
 
+            // Jika ada payload alamat_lengkap untuk disinkronisasi
+            if ($user->role === 'customer' && $request->has('alamat_lengkap')) {
+                $payloadAlamat = $request->alamat_lengkap;
+                
+                // Ambil ID yang dianggap data lama/asli (di bawah 1 juta)
+                $realIds = collect($payloadAlamat)
+                    ->pluck('id')
+                    ->filter(function ($id) {
+                        return $id && $id < 1000000;
+                    })->toArray();
+
+                // Hapus alamat lama milik user ini yang TIDAK dikirim lagi dari frontend
+                AlamatCustomer::where('idUser', $user->idUser)
+                    ->whereNotIn('id', $realIds)
+                    ->delete();
+
+                $idUtamaBaru = null;
+
+                // Looping untuk Insert / Update
+                foreach ($payloadAlamat as $item) {
+                    $isNew = (!isset($item['id']) || $item['id'] > 1000000);
+
+                    if ($isNew) {
+                        // Insert Alamat Baru
+                        $alamatBaru = AlamatCustomer::create([
+                            'idUser' => $user->idUser,
+                            'namaPenerima' => $item['namaPenerima'] ?? $user->nama,
+                            'nomorHp' => $item['nomorHp'] ?? $user->nomorWa,
+                            'provinceId' => $item['provinceId'] ?? null,
+                            'cityId' => $item['cityId'] ?? null,
+                            'districtId' => $item['kecamatan'] ?? null,
+                            'kodePos' => $item['kodePos'] ?? null,
+                            'detailAlamat' => $item['detailAlamat'] ?? null
+                        ]);
+
+                        if (isset($item['is_utama']) && $item['is_utama']) {
+                            $idUtamaBaru = $alamatBaru->id;
+                        }
+                    } else {
+                        // Update Alamat Lama
+                        $alamatLama = AlamatCustomer::find($item['id']);
+                        if ($alamatLama && $alamatLama->idUser == $user->idUser) {
+                            $alamatLama->update([
+                                'namaPenerima' => $item['namaPenerima'] ?? $alamatLama->namaPenerima,
+                                'nomorHp' => $item['nomorHp'] ?? $alamatLama->nomorHp,
+                                'provinceId' => $item['provinceId'] ?? $alamatLama->provinceId,
+                                'cityId' => $item['cityId'] ?? $alamatLama->cityId,
+                                'districtId' => $item['kecamatan'] ?? $alamatLama->districtId,
+                                'kodePos' => $item['kodePos'] ?? $alamatLama->kodePos,
+                                'detailAlamat' => $item['detailAlamat'] ?? $alamatLama->detailAlamat
+                            ]);
+
+                            if (isset($item['is_utama']) && $item['is_utama']) {
+                                $idUtamaBaru = $alamatLama->id;
+                            }
+                        }
+                    }
+                }
+
+                // Update idAlamatUtama di tabel user
+                if ($idUtamaBaru) {
+                    $user->update(['idAlamatUtama' => $idUtamaBaru]);
+                } else if ($request->has('alamat_lengkap') && empty($request->alamat_lengkap)) {
+                    // Jika semua dihapus
+                    $user->update(['idAlamatUtama' => null]);
+                }
+            }
+
+            DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Data user sukses diperbarui',
-                'data' => $user
+                'data' => $user->load('alamats')
             ], 200);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
             return response()->json(['success' => false, 'message' => 'User yang mau diedit tidak ditemukan'], 404);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json(['success' => false, 'message' => 'Gagal memperbarui data', 'error' => $e->getMessage()], 500);
         }
     }
