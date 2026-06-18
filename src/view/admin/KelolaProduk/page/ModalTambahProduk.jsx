@@ -7,6 +7,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
   const [nama, setNama] = useState('');
   const [harga, setHarga] = useState('');
   const [stock, setStock] = useState('');
+  const [berat, setBerat] = useState('');
   const [kategori, setKategori] = useState('');
   const [deskripsi, setDeskripsi] = useState('');
   const [gambar, setGambar] = useState(null);
@@ -22,6 +23,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
       setNama('');
       setHarga('');
       setStock('');
+      setBerat('');
       setKategori('');
       setDeskripsi('');
       setGambar(null);
@@ -41,7 +43,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
   };
 
   const handleSave = async () => {
-    if (!nama || !harga || !stock || !kategori) {
+    if (!nama || !harga || !stock || !berat || !kategori) {
       showToast('Mohon isi semua field yang wajib', 'error');
       return;
     }
@@ -51,6 +53,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
     formData.append('nama', nama);
     formData.append('harga', harga);
     formData.append('stock', stock);
+    formData.append('berat', berat);
     formData.append('idKategori', kategori);
     if (deskripsi) formData.append('deskripsi', deskripsi);
     if (gambar) formData.append('gambar', gambar);
@@ -59,7 +62,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
     setIsSubmitting(false);
 
     if (result.success) {
-      showToast(result.message, 'success');
+      showToast("Berhasil menambahkan produk", 'success');
       onClose();
     } else {
       let errorDetail = result.message;
@@ -104,6 +107,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
               onChange={(e) => setHarga(e.target.value)}
               className="border border-gray-300 rounded p-3 text-sm outline-none focus:border-green-500 transition-colors"
             />
+            <p className="text-[11px] text-red-500 italic mt-0.5">* Hanya angka, tidak boleh negatif</p>
           </div>
 
           {/* Row 2 */}
@@ -116,7 +120,21 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
               onChange={(e) => setStock(e.target.value)}
               className="border border-gray-300 rounded p-3 text-sm outline-none focus:border-green-500 transition-colors"
             />
+            <p className="text-[11px] text-red-500 italic mt-0.5">* Hanya angka</p>
           </div>
+          <div className="flex flex-col">
+            <label className="text-gray-900 mb-2">Berat Produk (gram)</label>
+            <input
+              type="text"
+              placeholder="Berat (gram)"
+              value={berat}
+              onChange={(e) => setBerat(e.target.value)}
+              className="border border-gray-300 rounded p-3 text-sm outline-none focus:border-green-500 transition-colors"
+            />
+            <p className="text-[11px] text-red-500 italic mt-0.5">* Hanya angka dalam satuan gram</p>
+          </div>
+
+          {/* Row 3 */}
           <div className="flex flex-col">
             <label className="text-gray-900 mb-2">Kategori</label>
             <select
@@ -132,9 +150,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
               ))}
             </select>
           </div>
-
-          {/* Row 3 */}
-          <div className="flex flex-col col-span-1">
+          <div className="flex flex-col">
             <label className="text-gray-900 mb-2">Deskripsi Produk</label>
             <textarea
               placeholder="Deskripsi Produk"
@@ -143,7 +159,9 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
               className="border border-gray-300 rounded p-3 text-sm h-[130px] outline-none focus:border-green-500 transition-colors resize-none"
             />
           </div>
-          <div className="flex flex-col col-span-1">
+
+          {/* Row 4 */}
+          <div className="flex flex-col col-span-2 lg:col-span-1">
             <label className="text-gray-900 mb-2">Gambar Produk (Opsional)</label>
             <label className="border-2 border-dashed border-gray-300 rounded p-4 text-sm flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 h-[130px] transition-colors overflow-hidden relative">
               {preview ? (
@@ -156,6 +174,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
               )}
               <input type="file" accept="image/jpeg,image/png,image/jpg" className="hidden" onChange={handleImageChange} />
             </label>
+            <p className="text-[11px] text-red-500 italic mt-0.5">* Format: JPG/PNG/JPEG. Maks 2MB</p>
           </div>
         </div>
 

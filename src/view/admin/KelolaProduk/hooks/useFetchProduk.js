@@ -1,24 +1,20 @@
 import { useState, useEffect } from 'react';
-import axiosClient from '@/core/api/axiosClient';
 import { endpoints } from '@/core/api/endpoints';
+import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
 export function useFetchProduk() {
+  const { data, isLoading: isCacheLoading, mutate } = useFetchWithCache(endpoints.admin.products);
   const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const isLoading = isCacheLoading;
+
+  useEffect(() => {
+    if (data) {
+      setProducts(Array.isArray(data) ? data : []);
+    }
+  }, [data]);
 
   const fetchProducts = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axiosClient.get(endpoints.admin.products);
-      if (res.data?.status === 'success') {
-        const data = res.data.data;
-        setProducts(Array.isArray(data) ? data : []);
-      }
-    } catch (error) {
-      console.error("Gagal memuat produk:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    mutate();
   };
 
   const updateLocalStock = (id, newStock) => {
@@ -30,10 +26,6 @@ export function useFetchProduk() {
       return p;
     }));
   };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
   return { products, isLoading, refetch: fetchProducts, updateLocalStock };
 }

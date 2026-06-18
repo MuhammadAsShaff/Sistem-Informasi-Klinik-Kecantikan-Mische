@@ -6,7 +6,7 @@ export function useTambahProduk(refetch) {
     try {
       const res = await axiosClient.post(endpoints.admin.products, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          
         },
       });
       if (res.data?.status === 'success' || res.data?.success) {

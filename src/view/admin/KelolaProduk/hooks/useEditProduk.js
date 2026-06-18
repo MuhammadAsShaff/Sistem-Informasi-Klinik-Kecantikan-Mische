@@ -7,7 +7,7 @@ export function useEditProduk(refetch) {
       formData.append('_method', 'PUT'); // Spoofing PUT for multipart/form-data
       const res = await axiosClient.post(`${endpoints.admin.products}/${id}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          
         },
       });
       if (res.data?.status === 'success' || res.data?.success) {

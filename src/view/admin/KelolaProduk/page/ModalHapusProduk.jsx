@@ -13,7 +13,7 @@ const ModalHapusProduk = ({ isOpen, onClose, dataId, refetch, showToast }) => {
     setIsDeleting(false);
 
     if (result.success) {
-      showToast(result.message, 'success');
+      showToast("Berhasil menghapus produk", 'success');
       onClose();
     } else {
       showToast(result.message, 'error');
