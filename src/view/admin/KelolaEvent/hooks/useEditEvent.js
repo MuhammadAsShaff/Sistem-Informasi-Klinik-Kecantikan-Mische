@@ -5,9 +5,7 @@ export function useEditEvent(refetch) {
   const editEvent = async (id, formData) => {
     try {
       formData.append('_method', 'PUT'); // Laravel requirement for multipart/form-data PUT
-      const res = await axiosClient.post(`${endpoints.admin.event}/${id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axiosClient.post(`${endpoints.admin.event}/${id}`, formData);
       if (res.data?.success) {
         refetch();
         return { success: true, message: res.data.message || "Event ini berhasil diperbarui!" };

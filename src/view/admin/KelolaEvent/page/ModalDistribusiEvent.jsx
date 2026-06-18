@@ -67,7 +67,7 @@ export default function ModalDistribusiEvent({ isOpen, onClose, event, showToast
     setIsSubmitting(true);
     try {
       const payload = {
-        idKegiatan: event?.idKegiatan || event?.idEvent || event?.id,
+        idEvent: event?.idEvent || event?.idKegiatan || event?.id,
         type: targetType === 'Semua Customer' ? 'all' : 'selected',
         customer_ids: targetType === 'Semua Customer' ? [] : selectedCustomers
       };

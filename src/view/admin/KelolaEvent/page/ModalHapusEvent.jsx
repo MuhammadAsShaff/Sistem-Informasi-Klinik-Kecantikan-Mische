@@ -11,7 +11,7 @@ export default function ModalHapusEvent({ isOpen, onClose, refetch, showToast, e
       const id = event.id || event.idEvent;
       const result = await hapusEvent(id);
       if (result.success) {
-        showToast(result.message);
+        showToast("Berhasil menghapus event");
         onClose();
       } else {
         showToast(result.message, "error");

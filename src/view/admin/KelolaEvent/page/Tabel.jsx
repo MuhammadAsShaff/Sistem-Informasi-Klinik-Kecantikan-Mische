@@ -1,8 +1,9 @@
 import React from 'react';
 import { Edit, Trash2, Send, Eye } from 'lucide-react';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
+import Table from '../../components/Table';
 
-export default function Tabel({ events, onEdit, onDelete, onSend, onView, currentPage = 1, itemsPerPage = 6 }) {
+export default function Tabel({ isLoading, events, onEdit, onDelete, onSend, onView, currentPage = 1, itemsPerPage = 6 }) {
   // Format Tanggal
   const formatDate = (dateString) => {
     if (!dateString) return "-";
@@ -10,71 +11,68 @@ export default function Tabel({ events, onEdit, onDelete, onSend, onView, curren
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
 
+  const columns = [
+    { label: 'No', render: (item, index) => index, className: 'w-16 text-center', cellClassName: 'text-center text-gray-500' },
+    { 
+      label: 'Gambar', 
+      render: (item) => (
+        item.foto ? (
+          <img 
+            src={item.foto.startsWith('http') ? item.foto : `${STORAGE_BASE_URL}${String(item.foto).replace(/^(?:public\/|storage\/|\/)+/, '')}`} 
+            alt="Event" 
+            className="w-16 h-16 object-cover rounded-md mx-auto shadow-sm" 
+          />
+        ) : (
+          <div className="w-16 h-16 bg-gray-100 rounded-md mx-auto flex items-center justify-center text-xs text-gray-400">
+            No Img
+          </div>
+        )
+      ),
+      className: 'text-center',
+      cellClassName: 'align-top text-center'
+    },
+    { 
+      label: 'Nama', 
+      key: 'nama', 
+      render: (item) => (
+        <div className="min-w-[150px] max-w-[200px] truncate font-medium text-gray-800" title={item.nama}>
+          {item.nama}
+        </div>
+      ), 
+      className: '', 
+      cellClassName: '' 
+    },
+    { label: 'Tanggal Mulai', render: (item) => formatDate(item.tanggalMulai), className: '', cellClassName: 'text-gray-500' },
+    { label: 'Tanggal Selesai', render: (item) => formatDate(item.tanggalSelesai), className: '', cellClassName: 'text-gray-500' },
+    { 
+      label: 'Action', 
+      render: (item) => (
+        <div className="flex items-center justify-center gap-3">
+          <button onClick={() => onView(item)} className="text-gray-500 hover:text-[#56BC36] transition-colors" title="Lihat Detail">
+            <Eye size={18} />
+          </button>
+          <button onClick={() => onEdit(item)} className="text-gray-500 hover:text-blue-600 transition-colors" title="Edit Event">
+            <Edit size={18} />
+          </button>
+          <button onClick={() => onDelete(item)} className="text-gray-500 hover:text-red-600 transition-colors" title="Hapus Event">
+            <Trash2 size={18} />
+          </button>
+          <button onClick={() => onSend(item)} className="text-gray-500 hover:text-green-600 transition-colors" title="Kirim Notifikasi">
+            <Send size={18} />
+          </button>
+        </div>
+      ),
+      className: 'text-center font-bold', 
+      cellClassName: ''
+    }
+  ];
+
   return (
-    <div className="bg-white border border-gray-200 overflow-hidden text-sm">
-      <table className="w-full text-left border-collapse">
-        <thead>
-          <tr className="border-b border-gray-200 text-gray-500 bg-[#FAFAFA]">
-            <th className="py-4 px-6 font-medium whitespace-nowrap w-16">No</th>
-            <th className="py-4 px-6 font-medium whitespace-nowrap">Gambar</th>
-            <th className="py-4 px-6 font-medium whitespace-nowrap">Nama</th>
-            
-            <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Mulai</th>
-            <th className="py-4 px-6 font-medium whitespace-nowrap">Tanggal Selesai</th>
-            <th className="py-4 px-6 font-medium whitespace-nowrap">Lokasi</th>
-            <th className="py-4 px-6 font-bold whitespace-nowrap text-center">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {events.length > 0 ? (
-            events.map((event, index) => (
-              <tr key={event.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors whitespace-nowrap">
-                <td className="py-4 px-6 text-center text-gray-500">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-                <td className="py-4 px-6 align-top text-center">
-                  {event.foto ? (
-                    <img 
-                      src={event.foto.startsWith('http') ? event.foto : `${STORAGE_BASE_URL}${event.foto}`} 
-                      alt="Event" 
-                      className="w-16 h-16 object-cover rounded-md mx-auto shadow-sm" 
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-gray-100 rounded-md mx-auto flex items-center justify-center text-xs text-gray-400">
-                      No Img
-                    </div>
-                  )}
-                </td>
-                <td className="py-4 px-6 font-medium text-gray-800 min-w-[150px] max-w-[200px] truncate" title={event.nama}>{event.nama}</td>
-               
-                <td className="py-4 px-6 text-gray-500 ">{formatDate(event.tanggalMulai)}</td>
-                <td className="py-4 px-6 text-gray-500 ">{formatDate(event.tanggalSelesai)}</td>
-                <td className="py-4 px-6 text-gray-500 max-w-[150px] truncate" title={event.lokasi}>{event.lokasi}</td>
-                <td className="py-4 px-6">
-                  <div className="flex items-center justify-center gap-3">
-                    <button onClick={() => onView(event)} className="text-gray-500 hover:text-[#56BC36] transition-colors" title="Lihat Detail">
-                      <Eye size={18} />
-                    </button>
-                    <button onClick={() => onEdit(event)} className="text-gray-500 hover:text-blue-600 transition-colors" title="Edit Event">
-                      <Edit size={18} />
-                    </button>
-                    <button onClick={() => onDelete(event)} className="text-gray-500 hover:text-red-600 transition-colors" title="Hapus Event">
-                      <Trash2 size={18} />
-                    </button>
-                    <button onClick={() => onSend(event)} className="text-gray-500 hover:text-green-600 transition-colors" title="Kirim Notifikasi">
-                      <Send size={18} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="8" className="py-10 text-center text-gray-500">
-                Tidak ada data event.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+    <Table isLoading={isLoading} 
+      columns={columns} 
+      data={events} 
+      emptyStateText="Tidak ada data event."
+      startIndex={(currentPage - 1) * itemsPerPage + 1}
+    />
   );
 }

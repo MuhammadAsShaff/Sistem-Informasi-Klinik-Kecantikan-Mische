@@ -48,7 +48,7 @@ export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }
     setIsSubmitting(false);
     
     if (result.success) {
-      showToast(result.message);
+      showToast("Berhasil menambahkan event");
       setFormData({ nama: '', lokasi: '', tanggalMulai: '', tanggalSelesai: '', deskripsi: '', foto: null });
       onClose();
     } else {
@@ -133,6 +133,7 @@ export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }
                     required
                   />
                 </div>
+                <p className="text-[11px] text-red-500 italic mt-0.5">* Pastikan tanggal selesai &ge; tanggal mulai</p>
               </div>
             </div>
             
@@ -155,7 +156,7 @@ export default function ModalTambahEvent({ isOpen, onClose, refetch, showToast }
                     {formData.foto ? (formData.foto.name || "Gambar Terpilih") : "No File Chosen"}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Format: Semua Format Gambar. Max: 4MB.</p>
+                <p className="text-[11px] text-red-500 italic mt-2">* Format: JPG/PNG/JPEG. Ukuran maksimal 2MB.</p>
               </div>
 
               {/* Deskripsi Event */}

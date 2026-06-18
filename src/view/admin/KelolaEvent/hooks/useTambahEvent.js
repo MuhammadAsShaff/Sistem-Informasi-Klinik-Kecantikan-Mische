@@ -4,9 +4,7 @@ import { endpoints } from '@/core/api/endpoints';
 export function useTambahEvent(refetch) {
   const tambahEvent = async (formData) => {
     try {
-      const res = await axiosClient.post(endpoints.admin.event, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axiosClient.post(endpoints.admin.event, formData);
       if (res.data?.success) {
         refetch();
         return { success: true, message: res.data.message || "Event ini berhasil ditambahkan!" };
