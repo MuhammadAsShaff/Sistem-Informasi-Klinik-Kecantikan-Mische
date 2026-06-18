@@ -6,8 +6,8 @@ export function useHapusTestimoni(refetch) {
     try {
       const res = await axiosClient.delete(`${endpoints.admin.testimonials}/${id}`);
       if (res.data?.success) {
-        if (refetch) refetch();
-        return { success: true, message: res.data.message };
+        if (refetch) await refetch();
+        return { success: true, message: res.data.message || 'Testimoni berhasil dihapus' };
       }
       return { success: false, message: 'Gagal menghapus testimoni' };
     } catch (error) {

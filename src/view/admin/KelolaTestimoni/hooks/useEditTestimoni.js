@@ -7,13 +7,13 @@ export function useEditTestimoni(refetch) {
       formData.append('_method', 'PUT'); // Spoofing for Laravel
       const res = await axiosClient.post(`${endpoints.admin.testimonials}/${id}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          
         },
       });
 
       if (res.data?.success) {
-        if (refetch) refetch();
-        return { success: true, message: res.data.message };
+        if (refetch) await refetch();
+        return { success: true, message: res.data.message || 'Testimoni berhasil diperbarui' };
       }
       return { success: false, message: 'Gagal memperbarui testimoni' };
     } catch (error) {

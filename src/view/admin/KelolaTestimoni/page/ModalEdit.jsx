@@ -51,7 +51,7 @@ const ModalEdit = ({ isOpen, onClose, data, refetch, showToast }) => {
       setIsSubmitting(false);
 
       if (result.success) {
-        showToast(result.message, "success");
+        showToast("Berhasil memperbarui testimoni", "success");
         onClose();
       } else {
         let errorDetail = result.message;
@@ -107,6 +107,7 @@ const ModalEdit = ({ isOpen, onClose, data, refetch, showToast }) => {
                   {fileName}
                 </span>
               </div>
+              <p className="text-[11px] text-red-500 italic mt-2">* Format: JPG/PNG/JPEG. Ukuran maksimal 2MB.</p>
             </div>
 
             <div>

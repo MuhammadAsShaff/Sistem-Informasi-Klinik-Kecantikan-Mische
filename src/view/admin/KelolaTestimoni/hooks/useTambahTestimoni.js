@@ -6,13 +6,13 @@ export function useTambahTestimoni(refetch) {
     try {
       const res = await axiosClient.post(endpoints.admin.testimonials, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          
         },
       });
 
       if (res.data?.success) {
-        if (refetch) refetch();
-        return { success: true, message: res.data.message };
+        if (refetch) await refetch();
+        return { success: true, message: res.data.message || 'Testimoni berhasil ditambahkan' };
       }
       return { success: false, message: 'Gagal menambahkan testimoni' };
     } catch (error) {

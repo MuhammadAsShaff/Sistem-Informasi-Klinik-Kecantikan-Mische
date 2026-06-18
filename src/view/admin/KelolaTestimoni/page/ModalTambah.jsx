@@ -40,7 +40,7 @@ const ModalTambah = ({ isOpen, onClose, refetch, showToast }) => {
       setIsSubmitting(false);
       
       if (result.success) {
-        showToast(result.message, "success");
+        showToast("Berhasil menambahkan testimoni", "success");
         onClose();
       } else {
         // Build a detailed error message if there are validation errors
@@ -97,6 +97,7 @@ const ModalTambah = ({ isOpen, onClose, refetch, showToast }) => {
                   {fileName}
                 </span>
               </div>
+              <p className="text-[11px] text-red-500 italic mt-2">* Format: JPG/PNG/JPEG. Ukuran maksimal 2MB.</p>
             </div>
 
             <div>

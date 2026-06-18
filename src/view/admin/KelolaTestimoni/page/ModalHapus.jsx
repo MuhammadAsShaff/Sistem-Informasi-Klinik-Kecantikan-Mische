@@ -12,7 +12,7 @@ const ModalHapus = ({ isOpen, onClose, data, refetch, showToast }) => {
     setIsDeleting(false);
 
     if (result.success) {
-      showToast(result.message, "success");
+      showToast("Berhasil menghapus testimoni", "success");
       onClose();
     } else {
       showToast(result.message, "error");
