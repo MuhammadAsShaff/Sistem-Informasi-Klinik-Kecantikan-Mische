@@ -1,41 +1,27 @@
-import { useState, useEffect } from "react";
-import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
+import { useFetchWithCache } from "@/core/hooks/useFetchWithCache";
 
 export function useFetchPublicJadwal(tanggal, idDokter) {
-  const [dataJadwal, setDataJadwal] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const params = new URLSearchParams();
+  if (tanggal) params.append("tanggal", tanggal);
+  if (idDokter) params.append("idDokter", idDokter);
+  const queryString = params.toString() ? `?${params.toString()}` : "";
+  
+  const url = `${endpoints.customer.schedules}${queryString}`;
 
-  const fetchJadwal = async () => {
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (tanggal) params.append("tanggal", tanggal);
-      if (idDokter) params.append("idDokter", idDokter);
-      const queryString = params.toString() ? `?${params.toString()}` : "";
+  // Use short TTL for schedules since they can change frequently
+  const { data, isLoading, mutate } = useFetchWithCache(url);
 
-      const res = await axiosClient.get(`${endpoints.customer.schedules}${queryString}`);
-      if (res.data?.success) {
-        setDataJadwal(res.data.data?.data || res.data.data); // Support for paginated or direct array
-      } else if (Array.isArray(res.data)) {
-        setDataJadwal(res.data);
-      } else if (res.data?.data && Array.isArray(res.data.data)) {
-        setDataJadwal(res.data.data);
-      }
-    } catch (error) {
-      console.error("Gagal mengambil data jadwal publik:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchJadwal();
-  }, [tanggal, idDokter]);
+  let dataJadwal = [];
+  if (data) {
+     // Handle both paginated and flat array responses
+     dataJadwal = data.data || data;
+     if (!Array.isArray(dataJadwal)) dataJadwal = [];
+  }
 
   return {
     dataJadwal,
     isLoading,
-    fetchJadwal,
+    fetchJadwal: mutate, // provide mutate as fetchJadwal for backwards compatibility
   };
 }

@@ -8,6 +8,7 @@ import { useDokterData } from '@/view/Customer/TentangDokter/hooks/useDokterData
 import { useFetchPublicJadwal } from '../hooks/useFetchPublicJadwal';
 import { useCreateReservasi } from '../hooks/useCreateReservasi';
 import ToastAlert from '@/view/components/ToastAlert';
+import CustomerLoading from '../../components/CustomerLoading';
 
 export default function ReservasiPage() {
   const navigate = useNavigate();
@@ -145,7 +146,7 @@ export default function ReservasiPage() {
         />
         
         {isDoctorsLoading || isJadwalLoading ? (
-           <div className="text-center py-10 font-medium text-gray-500">Memuat jadwal dan dokter...</div>
+           <CustomerLoading text="Memuat jadwal dan dokter..." />
         ) : (
           <JadwalSection 
             timeSlots={timeSlots} 

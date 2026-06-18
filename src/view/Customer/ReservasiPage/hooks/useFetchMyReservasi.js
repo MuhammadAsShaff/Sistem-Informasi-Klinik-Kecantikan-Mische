@@ -1,28 +1,21 @@
 import { useState, useEffect } from "react";
-import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
+import { useFetchWithCache } from "@/core/hooks/useFetchWithCache";
 
 export function useFetchMyReservasi() {
+  const { data, isLoading: isCacheLoading, mutate } = useFetchWithCache(endpoints.customer.reservations);
   const [myReservasi, setMyReservasi] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchReservasi = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axiosClient.get(endpoints.customer.reservations);
-      if (res.data?.success) {
-        setMyReservasi(res.data.data?.data || res.data.data || []);
-      }
-    } catch (error) {
-      console.error("Gagal mengambil data reservasi customer:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const isLoading = isCacheLoading;
 
   useEffect(() => {
-    fetchReservasi();
-  }, []);
+    if (data) {
+      setMyReservasi(data.data?.data || data.data || []);
+    }
+  }, [data]);
+
+  const fetchReservasi = async () => {
+    mutate();
+  };
 
   return {
     myReservasi,
