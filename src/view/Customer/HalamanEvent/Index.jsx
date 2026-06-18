@@ -4,9 +4,10 @@ import { useEventData } from './hooks/useEventData';
 import EventCard from './page/EventCard';
 import logomischee from '@/assets/images/logomischee.png'
 import bgEvent from '@/assets/images/gambar event yang berlangsung.png'
+import CustomerLoading from '../components/CustomerLoading';
 
 export default function HalamanEvent() {
-  const { events, searchQuery, setSearchQuery, activeFilter, setActiveFilter, summary } = useEventData();
+  const { events, searchQuery, setSearchQuery, activeFilter, setActiveFilter, summary, isLoading } = useEventData();
 
   const filters = ['Akan Berlangsung', 'Sudah Selesai', 'Sedang Berlangsung'];
 
@@ -73,7 +74,9 @@ export default function HalamanEvent() {
           
           {/* Main Grid (Left Side) */}
           <div className="lg:col-span-2">
-            {events.length > 0 ? (
+            {isLoading ? (
+              <CustomerLoading text="Memuat daftar event..." />
+            ) : events.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {events.map(event => (
                   <EventCard key={event.id} event={event} />

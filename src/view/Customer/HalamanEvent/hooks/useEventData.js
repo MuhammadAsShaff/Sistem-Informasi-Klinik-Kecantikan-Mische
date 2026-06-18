@@ -1,48 +1,38 @@
 import { useState, useEffect } from 'react';
 import axiosClient from '@/core/api/axiosClient';
 import { endpoints } from '@/core/api/endpoints';
+import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
 export function useEventData() {
   const [events, setEvents] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('Semua'); // 'Semua', 'Akan Berlangsung', 'Sedang Berlangsung', 'Sudah Selesai'
-  const [isLoading, setIsLoading] = useState(false);
+  const { data: cacheData, isLoading } = useFetchWithCache(endpoints.customer.event);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      setIsLoading(true);
-      try {
-        const res = await axiosClient.get(endpoints.customer.event);
-        if (res.data) {
-          const rawData = res.data.data?.data || res.data.data || res.data;
-          const rawEvents = Array.isArray(rawData) ? rawData : [];
-          const now = new Date();
-          now.setHours(0,0,0,0);
+    if (cacheData) {
+      const rawData = cacheData.data?.data || cacheData.data || cacheData;
+      const rawEvents = Array.isArray(rawData) ? rawData : [];
+      const now = new Date();
+      now.setHours(0,0,0,0);
 
-          const eventsWithStatus = rawEvents.map(event => {
-            let status = 'Akan Berlangsung';
-            const startDate = new Date(event.tanggalMulai);
-            startDate.setHours(0,0,0,0);
-            const endDate = new Date(event.tanggalSelesai);
-            endDate.setHours(0,0,0,0);
+      const eventsWithStatus = rawEvents.map(event => {
+        let status = 'Akan Berlangsung';
+        const startDate = new Date(event.tanggalMulai);
+        startDate.setHours(0,0,0,0);
+        const endDate = new Date(event.tanggalSelesai);
+        endDate.setHours(0,0,0,0);
 
-            if (now > endDate) {
-              status = 'Sudah Selesai';
-            } else if (now >= startDate && now <= endDate) {
-              status = 'Sedang Berlangsung';
-            }
-            return { ...event, status };
-          });
-          setEvents(eventsWithStatus);
+        if (now > endDate) {
+          status = 'Sudah Selesai';
+        } else if (now >= startDate && now <= endDate) {
+          status = 'Sedang Berlangsung';
         }
-      } catch (error) {
-        console.error("Gagal memuat event:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchEvents();
-  }, []);
+        return { ...event, status };
+      });
+      setEvents(eventsWithStatus);
+    }
+  }, [cacheData]);
 
   const filteredEvents = events.filter(event => {
     const titleMatch = event.nama?.toLowerCase().includes(searchQuery.toLowerCase()) || event.title?.toLowerCase().includes(searchQuery.toLowerCase()) || "";

@@ -1,37 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, ArrowLeft } from 'lucide-react';
 import gambarEvent from '@/assets/images/gambar event.png';
-import axiosClient from '@/core/api/axiosClient';
 import { endpoints, STORAGE_BASE_URL } from '@/core/api/endpoints';
+import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
 export default function EventDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [event, setEvent] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const fetchEventDetail = async () => {
-      try {
-        const res = await axiosClient.get(endpoints.customer.event);
-        if (res.data) {
-          const eventData = res.data.data?.data || res.data.data || res.data;
-          const events = Array.isArray(eventData) ? eventData : [];
-          const found = events.find(e => (e.idEvent || e.id).toString() === id);
-          if (found) {
-            setEvent(found);
-          }
-        }
-      } catch (error) {
-        console.error("Gagal memuat detail event:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchEventDetail();
-  }, [id]);
+  }, []);
+
+  const { data: rawEvent, isLoading } = useFetchWithCache(endpoints.customer.event, { ttl: 15000, revalidateOnMount: false });
+
+  const event = useMemo(() => {
+    if (!rawEvent) return null;
+    const eventData = rawEvent?.data?.data || rawEvent?.data || rawEvent;
+    const events = Array.isArray(eventData) ? eventData : [];
+    return events.find(e => (e.idEvent || e.id).toString() === id) || null;
+  }, [rawEvent, id]);
 
   if (isLoading) {
     return (
@@ -74,7 +63,7 @@ export default function EventDetail() {
           {/* Hero Banner */}
           <div className="w-full h-[200px] md:h-[300px] bg-gray-200 rounded-2xl mb-10 overflow-hidden relative">
             {event.foto ? (
-              <img src={event.foto.startsWith('http') ? event.foto : `${STORAGE_BASE_URL}${event.foto}`} alt={event.nama} className="w-full h-full object-cover" />
+              <img src={event.foto.startsWith('http') ? event.foto : `${STORAGE_BASE_URL}${String(event.foto).replace(/^(?:public\/|storage\/|\/)+/, '')}`} alt={event.nama} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${gambarEvent})` }}></div>
             )}
