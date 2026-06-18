@@ -1,46 +1,37 @@
 import { useState, useEffect } from 'react';
-import axiosClient from '@/core/api/axiosClient';
 import { endpoints } from '@/core/api/endpoints';
+import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
 export function useFetchKategori() {
   const [categories, setCategories] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const { data: catRes, isLoading: catLoading, mutate: mutateCat } = useFetchWithCache(endpoints.admin.kategori);
+  const { data: countRes, isLoading: countLoading, mutate: mutateCount } = useFetchWithCache(endpoints.admin.kategoriCount);
 
-  const fetchCategories = async () => {
-    setIsLoading(true);
-    try {
-      const [catRes, countRes] = await Promise.all([
-        axiosClient.get(endpoints.admin.kategori),
-        axiosClient.get(endpoints.admin.kategoriCount).catch(() => null) // Fallback if fails
-      ]);
-
-      if (catRes.data?.status === 'success') {
-        const catData = Array.isArray(catRes.data.data) ? catRes.data.data : [];
-        const countData = countRes?.data?.status === 'success' && Array.isArray(countRes.data.data) 
-                          ? countRes.data.data 
-                          : [];
-
-        // Merge count into category
-        const merged = catData.map(cat => {
-          const matchedCount = countData.find(c => c.idKategori === cat.idKategori);
-          return {
-            ...cat,
-            count: matchedCount ? matchedCount.jumlahProduk : 0
-          };
-        });
-
-        setCategories(merged);
-      }
-    } catch (error) {
-      console.error("Gagal memuat kategori:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const isLoading = catLoading || countLoading;
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (catRes) {
+      const catData = Array.isArray(catRes.data) ? catRes.data : (Array.isArray(catRes) ? catRes : []);
+      const countData = Array.isArray(countRes?.data) ? countRes.data : (Array.isArray(countRes) ? countRes : []);
+
+      // Merge count into category
+      const merged = catData.map(cat => {
+        const matchedCount = countData.find(c => c.idKategori === cat.idKategori);
+        return {
+          ...cat,
+          count: matchedCount ? matchedCount.jumlahProduk : 0
+        };
+      });
+
+      setCategories(merged);
+    }
+  }, [catRes, countRes]);
+
+  const fetchCategories = async () => {
+    mutateCat();
+    mutateCount();
+  };
 
   return { categories, isLoading, refetch: fetchCategories };
 }

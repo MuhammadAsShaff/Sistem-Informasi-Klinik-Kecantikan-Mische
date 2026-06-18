@@ -12,7 +12,7 @@ const ModalHapusKategori = ({ isOpen, onClose, dataId, refetch, showToast }) => 
     setIsDeleting(false);
 
     if (result.success) {
-      showToast(result.message, 'success');
+      showToast("Berhasil menghapus kategori produk", 'success');
       onClose();
     } else {
       showToast(result.message, 'error');

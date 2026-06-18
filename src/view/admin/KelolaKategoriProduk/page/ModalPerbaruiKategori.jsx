@@ -31,7 +31,7 @@ const ModalPerbaruiKategori = ({ isOpen, onClose, categoryData, refetch, showToa
       setIsSubmitting(false);
 
       if (result.success) {
-        showToast(result.message, 'success');
+        showToast("Berhasil memperbarui kategori produk", 'success');
         onClose();
       } else {
         let errorDetail = result.message;

@@ -29,7 +29,7 @@ const ModalTambahKategori = ({ isOpen, onClose, refetch, showToast }) => {
     setIsSubmitting(false);
 
     if (result.success) {
-      showToast(result.message, 'success');
+      showToast("Berhasil menambahkan kategori produk", 'success');
       onClose();
     } else {
       let errorDetail = result.message;
