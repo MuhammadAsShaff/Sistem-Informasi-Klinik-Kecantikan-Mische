@@ -4,6 +4,7 @@ import CartHeader from './page/CartHeader';
 import CartItem from './page/CartItem';
 import OrderSummary from './page/OrderSummary';
 import ModalCheckout from './page/ModalCheckout';
+import CustomerLoading from '../components/CustomerLoading';
 
 const DetailKeranjang = () => {
   const {
@@ -20,6 +21,7 @@ const DetailKeranjang = () => {
     formatRupiah,
     appliedVoucher,
     voucherError,
+    isCartLoading,
   } = useCart();
 
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
@@ -35,21 +37,27 @@ const DetailKeranjang = () => {
           
           {/* Left Column: Product List */}
           <div className="lg:col-span-2 space-y-4">
-            {cartItems.map((item) => (
-              <CartItem
-                key={item.id}
-                item={item}
-                onQuantityChange={handleQuantityChange}
-                onToggleSelect={handleToggleSelect}
-                onRemove={removeFromCart}
-                formatRupiah={formatRupiah}
-              />
-            ))}
-            
-            {cartItems.length === 0 && (
-              <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
-                <p className="text-gray-500 text-lg">Keranjang belanjamu masih kosong.</p>
-              </div>
+            {isCartLoading ? (
+              <CustomerLoading text="Memuat keranjang belanjamu..." />
+            ) : (
+              <>
+                {cartItems.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    item={item}
+                    onQuantityChange={handleQuantityChange}
+                    onToggleSelect={handleToggleSelect}
+                    onRemove={removeFromCart}
+                    formatRupiah={formatRupiah}
+                  />
+                ))}
+                
+                {cartItems.length === 0 && (
+                  <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
+                    <p className="text-gray-500 text-lg">Keranjang belanjamu masih kosong.</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

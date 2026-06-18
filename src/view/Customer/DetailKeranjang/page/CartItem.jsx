@@ -22,7 +22,7 @@ const CartItem = ({ item, onQuantityChange, onToggleSelect, onRemove, formatRupi
 
   const imageSrc = item.image?.startsWith?.('http') || item.image?.startsWith?.('data:') 
     ? item.image 
-    : item.image ? `${STORAGE_BASE_URL}${item.image}` : '';
+    : item.image ? `${STORAGE_BASE_URL}${String(item.image).replace(/^(?:public\/|storage\/|\/)+/, '')}` : '';
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4 flex items-center justify-between">
