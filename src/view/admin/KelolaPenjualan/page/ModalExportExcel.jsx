@@ -1,6 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useFetchProduk } from '../../KelolaProduk/hooks/useFetchProduk';
 
 export default function ModalExportExcel({ isOpen, onClose, onExport }) {
+  const { products } = useFetchProduk();
+  
+  const [filters, setFilters] = useState({
+    idProduk: 'semua',
+    tanggalMulai: '',
+    tanggalSelesai: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleExport = () => {
+    onExport(filters);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -20,30 +38,19 @@ export default function ModalExportExcel({ isOpen, onClose, onExport }) {
           <div className="space-y-6">
             
             {/* ROW 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 gap-8">
               <div className="space-y-2">
-                <label className="text-sm text-black">Jenis Produk</label>
+                <label className="text-sm text-black">Produk</label>
                 <select
+                  name="idProduk"
+                  value={filters.idProduk}
+                  onChange={handleChange}
                   className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-green-500 text-sm text-gray-700"
                 >
                   <option value="semua">Semua Produk</option>
-                  <option value="Cream">Cream</option>
-                  <option value="Serum">Serum</option>
-                  <option value="Toner">Toner</option>
-                  <option value="Facial Wash">Facial Wash</option>
-                  <option value="Masker">Masker</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm text-black">Jenis Kategori</label>
-                <select
-                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-green-500 text-sm text-gray-700"
-                >
-                  <option value="semua">Semua Kategori</option>
-                  <option value="Acne">Acne</option>
-                  <option value="Whitening">Whitening</option>
-                  <option value="Anti Aging">Anti Aging</option>
+                  {products?.map((p) => (
+                    <option key={p.idProduk || p.id} value={p.idProduk || p.id}>{p.nama || p.namaProduk}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -55,6 +62,9 @@ export default function ModalExportExcel({ isOpen, onClose, onExport }) {
                 <div className="relative">
                   <input 
                     type="date"
+                    name="tanggalMulai"
+                    value={filters.tanggalMulai}
+                    onChange={handleChange}
                     className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-green-500 text-sm"
                   />
                 </div>
@@ -65,6 +75,9 @@ export default function ModalExportExcel({ isOpen, onClose, onExport }) {
                 <div className="relative">
                   <input 
                     type="date"
+                    name="tanggalSelesai"
+                    value={filters.tanggalSelesai}
+                    onChange={handleChange}
                     className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-green-500 text-sm"
                   />
                 </div>
@@ -77,7 +90,7 @@ export default function ModalExportExcel({ isOpen, onClose, onExport }) {
         <div className="px-8 py-5 border-t border-gray-300 flex justify-end mt-4">
           <button 
             type="button"
-            onClick={onExport}
+            onClick={handleExport}
             className="px-6 py-2.5 text-white font-medium rounded-md bg-[#56BC36] hover:bg-[#469e2c]"
           >
             Export To Excel
