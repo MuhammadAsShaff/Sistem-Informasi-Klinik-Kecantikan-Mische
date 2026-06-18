@@ -46,14 +46,16 @@ const TreatmentPieChart = ({ data }) => {
                 labelLine={false}
                 label={renderCustomizedLabel}
                 outerRadius={100}
-                fill="#8884d8"
                 dataKey="value"
               >
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="#ffffff" strokeWidth={2} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                itemStyle={{ color: '#374151', fontWeight: 500 }}
+              />
             </PieChart>
           </ResponsiveContainer>
         ) : (

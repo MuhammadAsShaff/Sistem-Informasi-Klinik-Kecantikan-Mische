@@ -1,11 +1,15 @@
 import React from 'react';
 import IlustrasiDashboard from '../../../../assets/images/IlustrasiDashboard.png';
+import { getUser } from '@/core/utils/authStorage';
 
 const WelcomeBanner = () => {
+  const user = getUser() || {};
+  const namaUser = user.nama || user.name || 'Admin';
+
   return (
     <div className="bg-white rounded-xl p-6 mb-6 flex items-center shadow-sm">
       <div className="flex-1">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome Bintang</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome {namaUser}</h1>
         <p className="text-gray-500 text-sm">
           Kerja keras kita hari ini adalah fondasi untuk membangun klinik kecantikan Mische yang lebih baik.
         </p>

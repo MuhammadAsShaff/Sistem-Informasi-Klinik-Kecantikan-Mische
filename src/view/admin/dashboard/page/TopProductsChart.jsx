@@ -20,13 +20,22 @@ const TopProductsChart = ({ data }) => {
             <BarChart
               layout="vertical"
               data={chartData}
-              margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
+              margin={{ top: 10, right: 40, left: 20, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+              <defs>
+                <linearGradient id="colorProduct" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="5%" stopColor="#1AA367" stopOpacity={0.7}/>
+                  <stop offset="95%" stopColor="#1AA367" stopOpacity={1}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
               <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} />
-              <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} width={80} />
-              <Tooltip cursor={{fill: '#f3f4f6'}} />
-              <Bar dataKey="value" fill="#1AA367" radius={[0, 4, 4, 0]} barSize={16} label={{ position: 'right', fill: '#6B7280', fontSize: 12 }} />
+              <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280', fontWeight: 500 }} width={90} />
+              <Tooltip 
+                cursor={{ fill: '#f3f4f6' }}
+                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+              />
+              <Bar dataKey="value" fill="url(#colorProduct)" radius={[0, 4, 4, 0]} barSize={18} label={{ position: 'right', fill: '#1AA367', fontSize: 12, fontWeight: 'bold' }} />
             </BarChart>
           </ResponsiveContainer>
         ) : (

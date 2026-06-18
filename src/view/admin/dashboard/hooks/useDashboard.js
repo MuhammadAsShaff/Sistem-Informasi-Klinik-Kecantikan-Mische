@@ -1,34 +1,29 @@
 import { useState, useEffect } from 'react';
-import axiosClient from '@/core/api/axiosClient';
 import { endpoints } from '@/core/api/endpoints';
+import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
 export const useDashboard = () => {
+  const { data, isLoading: isCacheLoading, error: cacheError, mutate } = useFetchWithCache(endpoints.admin.dashboard);
   const [dashboardData, setDashboardData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await axiosClient.get(endpoints.admin.dashboard);
-      
-      if (response.data && response.data.status === 'success') {
-        setDashboardData(response.data.data);
-      } else {
-        setError('Gagal mengambil data dashboard');
-      }
-    } catch (err) {
-      console.error('Error fetching dashboard data:', err);
-      setError(err.response?.data?.message || 'Terjadi kesalahan sistem');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loading = isCacheLoading;
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (cacheError) {
+      setError(cacheError.response?.data?.message || 'Terjadi kesalahan sistem');
+    }
+  }, [cacheError]);
+
+  useEffect(() => {
+    if (data) {
+      setDashboardData(data.data || data);
+      setError(null);
+    }
+  }, [data]);
+
+  const fetchDashboardData = async () => {
+    mutate();
+  };
 
   return { dashboardData, loading, error, refetch: fetchDashboardData };
 };
