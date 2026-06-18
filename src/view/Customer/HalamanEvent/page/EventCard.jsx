@@ -23,7 +23,7 @@ export default function EventCard({ event }) {
         {/* Placeholder image representation */}
         <div className="absolute inset-0 flex items-center justify-center mix-blend-multiply bg-gray-200">
           {event.foto ? (
-             <img src={event.foto.startsWith('http') ? event.foto : `${STORAGE_BASE_URL}${event.foto}`} alt={event.nama} className="w-full h-full object-cover" />
+             <img src={event.foto.startsWith('http') ? event.foto : `${STORAGE_BASE_URL}${String(event.foto).replace(/^(?:public\/|storage\/|\/)+/, '')}`} alt={event.nama} className="w-full h-full object-cover" />
           ) : (
              <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${gambarEvent})` }}></div>
           )}
