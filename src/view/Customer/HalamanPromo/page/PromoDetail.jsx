@@ -1,75 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Eye, EyeOff, ShoppingBag, ArrowLeft } from 'lucide-react';
-import axiosClient from '@/core/api/axiosClient';
+import { Calendar, Eye, EyeOff, ShoppingBag, ArrowLeft, Percent, Gift, Banknote } from 'lucide-react';
 import { endpoints, STORAGE_BASE_URL } from '@/core/api/endpoints';
+import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
 export default function PromoDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [promo, setPromo] = useState(null);
   const [showVoucher, setShowVoucher] = useState(false);
-  const [dinamisNamaProduk, setDinamisNamaProduk] = useState(null);
-  const [dinamisNamaKategori, setDinamisNamaKategori] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll to top when loaded
-    const fetchPromoDetail = async () => {
-      try {
-        // Tarik data promo dan semua produk secara paralel
-        const [promoRes, prodRes] = await Promise.all([
-          axiosClient.get(endpoints.customer.promo),
-          axiosClient.get(endpoints.customer.product).catch(() => ({ data: { data: [] } }))
-        ]);
-        
-        if (promoRes.data) {
-          const promoData = promoRes.data.data?.data || promoRes.data.data || promoRes.data;
-          const promos = Array.isArray(promoData) ? promoData : [];
-          const found = promos.find(p => (p.idPromo || p.id).toString() === id);
-          
-          if (found) {
-            setPromo(found);
+  }, []);
 
-            // Coba ambil nama asli dari endpoint produk
-            const productsData = prodRes.data?.data?.data || prodRes.data?.data || [];
-            const products = Array.isArray(productsData) ? productsData : [];
-            
-            const prodId = found.idProduk || found.id_produk || found.produk_id;
-            const katId = found.idKategori || found.id_kategori || found.kategori_id;
+  const { data: rawPromo, isLoading: isPromoLoading } = useFetchWithCache(endpoints.customer.promo, { ttl: 15000, revalidateOnMount: false });
+  const { data: rawProduct, isLoading: isProdLoading } = useFetchWithCache(endpoints.customer.product, { ttl: 15000, revalidateOnMount: false });
 
-            let fetchedProdName = null;
-            let fetchedKatName = null;
+  const promoDataObj = useMemo(() => {
+    if (!rawPromo) return null;
+    const promoData = rawPromo?.data?.data || rawPromo?.data || rawPromo;
+    const promos = Array.isArray(promoData) ? promoData : [];
+    const found = promos.find(p => (p.idPromo || p.id).toString() === id);
+    
+    if (!found) return null;
 
-            if (prodId) {
-               const matchedProd = products.find(p => String(p.idProduk || p.id) === String(prodId));
-               if (matchedProd) {
-                  fetchedProdName = matchedProd.nama || matchedProd.namaProduk;
-                  if (matchedProd.kategori) {
-                     fetchedKatName = matchedProd.kategori.nama || matchedProd.kategori.namaKategori;
-                  }
-               }
+    let fetchedProdName = null;
+    let fetchedKatName = null;
+
+    if (rawProduct) {
+      const productsData = rawProduct?.data?.data || rawProduct?.data || [];
+      const products = Array.isArray(productsData) ? productsData : [];
+      
+      const prodId = found.idProduk || found.id_produk || found.produk_id;
+      const katId = found.idKategori || found.id_kategori || found.kategori_id;
+
+      if (prodId) {
+         const matchedProd = products.find(p => String(p.idProduk || p.id) === String(prodId));
+         if (matchedProd) {
+            fetchedProdName = matchedProd.nama || matchedProd.namaProduk;
+            if (matchedProd.kategori) {
+               fetchedKatName = matchedProd.kategori.nama || matchedProd.kategori.namaKategori;
             }
-
-            if (katId && !fetchedKatName) {
-               const prodWithCat = products.find(p => String(p.idKategori || p.kategori_id) === String(katId));
-               if (prodWithCat && prodWithCat.kategori) {
-                  fetchedKatName = prodWithCat.kategori.nama || prodWithCat.kategori.namaKategori;
-               }
-            }
-
-            setDinamisNamaProduk(fetchedProdName);
-            setDinamisNamaKategori(fetchedKatName);
-          }
-        }
-      } catch (error) {
-        console.error("Gagal memuat detail promo:", error);
-      } finally {
-        setIsLoading(false);
+         }
       }
+
+      if (katId && !fetchedKatName) {
+         const prodWithCat = products.find(p => String(p.idKategori || p.kategori_id) === String(katId));
+         if (prodWithCat && prodWithCat.kategori) {
+            fetchedKatName = prodWithCat.kategori.nama || prodWithCat.kategori.namaKategori;
+         }
+      }
+    }
+
+    return {
+      promo: found,
+      dinamisNamaProduk: fetchedProdName,
+      dinamisNamaKategori: fetchedKatName
     };
-    fetchPromoDetail();
-  }, [id]);
+  }, [rawPromo, rawProduct, id]);
+
+  const isLoading = isPromoLoading || isProdLoading;
+  const promo = promoDataObj?.promo;
+  const dinamisNamaProduk = promoDataObj?.dinamisNamaProduk;
+  const dinamisNamaKategori = promoDataObj?.dinamisNamaKategori;
 
   if (isLoading) {
     return (
@@ -128,6 +121,43 @@ export default function PromoDetail() {
                      extractName(promo.nama_produk) || 
                      (prodId ? `Produk ID: ${prodId}` : 'Semua Produk');
 
+  const getPromoText = (promo) => {
+    const jenis = String(promo.jenisPromo || promo.jenis_promo || "").toLowerCase();
+    const isGratis = jenis.includes("gratis") || promo.diskon == 0;
+    const isPersen = jenis.includes("persen") || (jenis === "diskon" && promo.diskon <= 100) || (!jenis && promo.diskon > 0 && promo.diskon <= 100);
+    const isPotongan = jenis.includes("potongan") || jenis.includes("nominal") || (jenis === "diskon" && promo.diskon > 100) || (!jenis && promo.diskon > 100);
+
+    if (isGratis) {
+      if (produkTeks && !produkTeks.toLowerCase().includes("semua produk")) {
+        return `GRATIS ${String(produkTeks).toUpperCase()}`;
+      }
+      return "GRATIS PRODUK SPESIAL";
+    }
+    if (isPersen) return `DISKON ${promo.diskon}%`;
+    if (isPotongan) return `POTONGAN Rp ${Number(promo.diskon).toLocaleString('id-ID')}`;
+    return "PROMO SPESIAL";
+  };
+
+  const getPromoIcon = () => {
+    const jenis = String(promo.jenisPromo || promo.jenis_promo || "").toLowerCase();
+    const isGratis = jenis.includes("gratis") || promo.diskon == 0;
+    const isPotongan = jenis.includes("potongan") || jenis.includes("nominal") || (jenis === "diskon" && promo.diskon > 100) || (!jenis && promo.diskon > 100);
+
+    if (isGratis) return <Gift size={24} strokeWidth={2.5} />;
+    if (isPotongan) return <Banknote size={24} strokeWidth={2.5} />;
+    return <Percent size={24} strokeWidth={2.5} />;
+  };
+
+  const getPromoTitleText = () => {
+    const jenis = String(promo.jenisPromo || promo.jenis_promo || "").toLowerCase();
+    const isGratis = jenis.includes("gratis") || promo.diskon == 0;
+    const isPotongan = jenis.includes("potongan") || jenis.includes("nominal") || (jenis === "diskon" && promo.diskon > 100) || (!jenis && promo.diskon > 100);
+
+    if (isGratis) return "Kode Gratis Produk";
+    if (isPotongan) return "Kode Potongan Harga";
+    return "Kode Voucher Diskon";
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-10 pb-20">
       <div className="max-w-[900px] mx-auto px-4 md:px-6">
@@ -147,16 +177,21 @@ export default function PromoDetail() {
           {/* Hero Banner */}
           <div className="w-full h-[250px] md:h-[350px] bg-gradient-to-br from-green-100 to-green-50 rounded-2xl mb-8 relative overflow-hidden flex flex-col items-center justify-center text-center">
              {typeof promo.gambar === 'string' && promo.gambar.trim() !== '' ? (
-               <img src={promo.gambar.startsWith('http') ? promo.gambar : `${STORAGE_BASE_URL}${promo.gambar}`} alt={safeRender(promo.namaPromo || promo.nama)} className="w-full h-full object-cover" />
+               <img src={promo.gambar.startsWith('http') ? promo.gambar : `${STORAGE_BASE_URL}${String(promo.gambar).replace(/^(?:public\/|storage\/|\/)+/, '')}`} alt={safeRender(promo.namaPromo || promo.nama)} className="w-full h-full object-cover" />
              ) : (
                <>
-                 <h1 className="text-6xl md:text-8xl font-black text-green-600 drop-shadow-md">{safeRender(promo.diskon, "PROMO")}</h1>
+                 <h1 className="text-4xl md:text-6xl font-black text-green-600 drop-shadow-md">{getPromoText(promo)}</h1>
                  <p className="text-green-800 font-bold mt-4 bg-white/70 px-6 py-2 rounded-full shadow-sm text-lg md:text-xl">Mische Aesthetic Clinic</p>
                </>
              )}
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-black mb-6">{safeRender(promo.namaPromo || promo.nama)}</h1>
+          <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold text-black">{safeRender(promo.namaPromo || promo.nama)}</h1>
+            <div className="inline-flex items-center px-4 py-1.5 bg-[#56BC36]/10 text-[#56BC36] rounded-full text-sm font-bold w-fit shadow-sm border border-[#56BC36]/20">
+              {getPromoText(promo)}
+            </div>
+          </div>
 
           {/* Calendar Dates */}
           <div className="flex items-center gap-4 mb-8 flex-wrap">
@@ -179,14 +214,15 @@ export default function PromoDetail() {
         {/* Bottom Cards Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
+
           {/* Code Voucher */}
           <div className="bg-white rounded-tl-[30px] rounded-br-[30px] shadow-sm p-6 md:p-8 flex items-center justify-between border border-gray-100">
             <div>
                <div className="flex items-center gap-4 mb-2">
                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-[#56BC36]">
-                    <span className="font-bold text-2xl">%</span>
+                    {getPromoIcon()}
                  </div>
-                 <h2 className="text-2xl font-bold text-black">Code Voucher</h2>
+                 <h2 className="text-2xl font-bold text-black">{getPromoTitleText()}</h2>
                </div>
                <div className="ml-16 mb-4">
                  <p className="text-gray-500 font-medium text-sm">

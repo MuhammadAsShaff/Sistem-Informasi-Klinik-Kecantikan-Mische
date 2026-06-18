@@ -14,6 +14,33 @@ export default function PromoCard({ promo }) {
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
 
+  const extractName = (field) => {
+    if (!field) return null;
+    if (typeof field === 'string' || typeof field === 'number') return String(field);
+    if (typeof field === 'object') {
+      return field.nama || field.namaProduk || field.namaKategori || field.nama_produk || field.nama_kategori || null;
+    }
+    return null;
+  };
+
+  const getPromoText = (promo) => {
+    const jenis = String(promo.jenisPromo || promo.jenis_promo || "").toLowerCase();
+    const isGratis = jenis.includes("gratis") || promo.diskon == 0;
+    const isPersen = jenis.includes("persen") || (jenis === "diskon" && promo.diskon <= 100) || (!jenis && promo.diskon > 0 && promo.diskon <= 100);
+    const isPotongan = jenis.includes("potongan") || jenis.includes("nominal") || (jenis === "diskon" && promo.diskon > 100) || (!jenis && promo.diskon > 100);
+
+    if (isGratis) {
+      const produkTeks = extractName(promo.produk) || extractName(promo.namaProduk) || extractName(promo.nama_produk);
+      if (produkTeks && !produkTeks.toLowerCase().includes("semua produk")) {
+        return `GRATIS ${String(produkTeks).toUpperCase()}`;
+      }
+      return "GRATIS PRODUK SPESIAL";
+    }
+    if (isPersen) return `DISKON ${promo.diskon}%`;
+    if (isPotongan) return `POTONGAN Rp ${Number(promo.diskon).toLocaleString('id-ID')}`;
+    return "PROMO SPESIAL";
+  };
+
   return (
     <div 
       onClick={() => navigate(`/promo/${promo.idPromo || promo.id}`)}
@@ -34,13 +61,14 @@ export default function PromoCard({ promo }) {
         </div>
       </div>
 
+
       {/* Image Area */}
       <div className="w-full h-[200px] bg-gray-100 relative overflow-hidden">
         {promo.gambar ? (
-          <img src={promo.gambar.startsWith('http') ? promo.gambar : `${STORAGE_BASE_URL}${promo.gambar}`} alt={promo.namaPromo} className="w-full h-full object-cover" />
+          <img src={promo.gambar.startsWith('http') ? promo.gambar : `${STORAGE_BASE_URL}${String(promo.gambar).replace(/^(?:public\/|storage\/|\/)+/, '')}`} alt={promo.namaPromo} className="w-full h-full object-cover" />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-green-50 flex flex-col items-center justify-center p-6 text-center">
-             <h3 className="text-4xl font-black text-green-600 mb-2 drop-shadow-sm opacity-50">{promo.diskon || "PROMO"}</h3>
+             <h3 className="text-2xl font-black text-green-600 mb-2 drop-shadow-sm opacity-50">{getPromoText(promo)}</h3>
              <p className="text-green-800 font-bold opacity-70 bg-white/50 px-4 py-1 rounded-full text-sm">Mische Aesthetic Clinic</p>
           </div>
         )}
@@ -49,6 +77,11 @@ export default function PromoCard({ promo }) {
       {/* Content Area */}
       <div className="p-6 flex flex-col flex-grow">
         <h3 className="text-xl font-bold text-black mb-2 line-clamp-1">{promo.namaPromo || promo.nama}</h3>
+        <div className="mb-3">
+          <span className="inline-block px-3 py-1 bg-[#56BC36]/10 text-[#56BC36] rounded-full text-xs font-bold shadow-sm border border-[#56BC36]/20">
+            {getPromoText(promo)}
+          </span>
+        </div>
         <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-6 flex-grow">
           {promo.deskripsi}
         </p>

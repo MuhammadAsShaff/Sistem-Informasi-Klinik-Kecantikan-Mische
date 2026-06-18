@@ -1,10 +1,21 @@
 import React from 'react';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { usePromoData } from './hooks/usePromoData';
 import PromoCard from './page/PromoCard';
+import FilterPromo from './page/FilterPromo';
+import CustomerLoading from '../components/CustomerLoading';
 
 export default function HalamanPromo() {
-  const { promos, searchQuery, setSearchQuery } = usePromoData();
+  const { 
+    promos, 
+    searchQuery, 
+    setSearchQuery, 
+    filterJenis, 
+    setFilterJenis, 
+    filterStatus, 
+    setFilterStatus,
+    isLoading
+  } = usePromoData();
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-10 pb-20">
@@ -26,15 +37,19 @@ export default function HalamanPromo() {
             />
           </div>
 
-          {/* Filter Button */}
-          <button className="flex items-center gap-3 px-8 py-3 bg-white rounded-full shadow-sm hover:shadow-md transition-all shrink-0">
-            <SlidersHorizontal className="h-5 w-5 text-black" />
-            <span className="font-semibold text-black">Filter</span>
-          </button>
+          {/* Filter Component */}
+          <FilterPromo 
+            selectedJenis={filterJenis}
+            setSelectedJenis={setFilterJenis}
+            selectedStatus={filterStatus}
+            setSelectedStatus={setFilterStatus}
+          />
         </div>
 
         {/* Grid Promo */}
-        {promos.length > 0 ? (
+        {isLoading ? (
+          <CustomerLoading text="Memuat daftar promo terbaru..." />
+        ) : promos.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {promos.map((promo) => (
               <PromoCard key={promo.id} promo={promo} />
