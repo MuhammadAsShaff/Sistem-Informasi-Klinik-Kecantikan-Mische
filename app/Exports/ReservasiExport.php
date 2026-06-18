@@ -3,23 +3,24 @@
 namespace App\Exports;
 
 use App\Models\Reservasi;
-use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Carbon\Carbon;
 
-class ReservasiExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
+class ReservasiExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
 {
     protected $filters;
+    protected $totalRowCounter = 0;
 
     public function __construct($filters)
     {
         $this->filters = $filters;
     }
 
-    public function query()
+    public function array(): array
     {
         $query = Reservasi::with(['user', 'dokter', 'jadwal']);
 
@@ -38,41 +39,107 @@ class ReservasiExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
             ]);
         }
 
-        return $query;
+        // Urutkan dari yang terbaru (berdasarkan tanggal treatment)
+        $reservasis = $query->orderBy('tanggalReservasi', 'desc')->get();
+
+        $rows = [];
+        $totalReservasi = 0;
+        $totalSelesai = 0;
+        $totalDibatalkan = 0;
+        $totalReschedule = 0;
+
+        foreach ($reservasis as $reservasi) {
+            $totalReservasi++;
+
+            // Agregasi Status
+            $statusLower = strtolower($reservasi->status);
+            if (in_array($statusLower, ['selesai', 'disetujui'])) {
+                $totalSelesai++;
+            } elseif (in_array($statusLower, ['ditolak', 'dibatalkan'])) {
+                $totalDibatalkan++;
+            }
+
+            if ($reservasi->is_rescheduled) {
+                $totalReschedule++;
+            }
+
+            // Waktu & Jadwal
+            $waktuJadwal = '-';
+            if ($reservasi->jadwal) {
+                $waktuJadwal = $reservasi->jadwal->jamMulai . ' - ' . $reservasi->jadwal->jamSelesai;
+            }
+
+            $rows[] = [
+                $reservasi->idReservasi,
+                Carbon::parse($reservasi->created_at)->format('Y-m-d H:i:s'),
+                $reservasi->tanggalReservasi,
+                $waktuJadwal,
+                $reservasi->namaCustomer ?? ($reservasi->user->nama ?? '-'),
+                $reservasi->nomorWa ?? '-',
+                $reservasi->jenisTreatment ?? '-',
+                $reservasi->dokter->nama ?? '-',
+                $reservasi->is_rescheduled ? 'Ya' : 'Tidak',
+                $reservasi->status ?? '-'
+            ];
+        }
+
+        $this->totalRowCounter = count($rows) + 1; // +1 untuk baris Header utama
+
+        // Tambahkan spasi
+        $rows[] = ['', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['', '', '', '', '', '', '', '', '', ''];
+
+        // Tambahkan Baris Kesimpulan
+        $rows[] = ['KESIMPULAN LAPORAN', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Seluruh Reservasi', $totalReservasi . ' Reservasi', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Reservasi Sukses (Selesai/Disetujui)', $totalSelesai . ' Reservasi', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Reservasi Dibatalkan/Ditolak', $totalDibatalkan . ' Reservasi', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Pasien Reschedule', $totalReschedule . ' Pasien', '', '', '', '', '', '', '', ''];
+
+        return $rows;
     }
 
     public function headings(): array
     {
         return [
             'ID Reservasi',
-            'Tanggal Reservasi',
+            'Tanggal Pendaftaran',
+            'Tanggal Treatment',
+            'Jadwal / Waktu',
             'Nama Customer',
             'Nomor WA',
             'Jenis Treatment',
-            'Dokter',
-            'Jadwal',
+            'Nama Dokter',
+            'Status Reschedule',
             'Status Reservasi'
-        ];
-    }
-
-    public function map($reservasi): array
-    {
-        return [
-            $reservasi->idReservasi,
-            $reservasi->tanggalReservasi,
-            $reservasi->namaCustomer ?? ($reservasi->user->nama ?? '-'),
-            $reservasi->nomorWa ?? '-',
-            $reservasi->jenisTreatment ?? '-',
-            $reservasi->dokter->nama ?? '-',
-            $reservasi->jadwal->waktuMulai ?? '-',
-            $reservasi->status ?? '-'
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
-        return [
-            1    => ['font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']], 'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF4F81BD']]],
+        $styles = [
+            // Styling Header
+            1 => [
+                'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
+                'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF4F81BD']]
+            ]
         ];
+
+        // Baris mulai kesimpulan
+        $summaryStartRow = $this->totalRowCounter + 3;
+
+        // Styling Header Kesimpulan
+        $styles[$summaryStartRow] = [
+            'font' => ['bold' => true, 'size' => 12],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFF2F2F2']]
+        ];
+
+        // Styling Value Kesimpulan
+        $styles[$summaryStartRow + 1] = ['font' => ['bold' => true]];
+        $styles[$summaryStartRow + 2] = ['font' => ['bold' => true, 'color' => ['argb' => 'FF00B050']]]; // Hijau untuk Sukses
+        $styles[$summaryStartRow + 3] = ['font' => ['bold' => true, 'color' => ['argb' => 'FFFF0000']]]; // Merah untuk Batal
+        $styles[$summaryStartRow + 4] = ['font' => ['bold' => true, 'color' => ['argb' => 'FFFFC000']]]; // Orange untuk Reschedule
+
+        return $styles;
     }
 }

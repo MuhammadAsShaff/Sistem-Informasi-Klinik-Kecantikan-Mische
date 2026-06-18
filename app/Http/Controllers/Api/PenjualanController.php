@@ -474,49 +474,6 @@ class PenjualanController extends Controller
         }
     }
 
-    /**
-     * Mengubah status pesanan menjadi Diterima (selesai) oleh customer
-     */
-    public function receiveItem($idPenjualan)
-    {
-        try {
-            $user = auth('api')->user();
-
-            $penjualan = Penjualan::where('idPenjualan', $idPenjualan)
-                ->where('idUser', $user->idUser)
-                ->first();
-
-            if (!$penjualan) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Data pesanan tidak ditemukan.'
-                ], 404);
-            }
-
-            if ($penjualan->orderStatus !== 'dikirim') {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Pesanan tidak bisa diterima karena statusnya saat ini adalah: ' . $penjualan->orderStatus
-                ], 400);
-            }
-
-            $penjualan->update([
-                'orderStatus' => 'selesai'
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Berhasil mengonfirmasi pesanan telah diterima.',
-                'data' => $penjualan
-            ], 200);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal mengonfirmasi penerimaan: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 
     /**
      * Helper untuk membuat nomor invoice unik dengan format INV-YYYYMMDD-0001
