@@ -18,7 +18,7 @@ class ReportController extends Controller
      */
     public function exportReportPenjualan(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $filters = $request->only(['idProduk', 'idKategori', 'tanggalMulai', 'tanggalSelesai']);
+        $filters = $request->only(['idProduk', 'tanggalMulai', 'tanggalSelesai']);
         
         $filename = 'Laporan_Penjualan_' . date('Y-m-d_H-i-s') . '.xlsx';
         
