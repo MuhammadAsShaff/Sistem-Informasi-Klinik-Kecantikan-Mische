@@ -45,7 +45,13 @@ export default function AdminNavbar() {
       {/* USER PROFILE */}
       <Link to="/admin/profiladmin" className="flex flex-col items-center mb-10 px-6 cursor-pointer hover:opacity-80 transition-opacity">
         <div className="w-28 h-28 rounded-full bg-gray-200 shadow-inner mb-4 flex items-center justify-center overflow-hidden border-2 border-white shadow-md">
-          <div className="w-full h-full bg-gray-300"></div>
+          <img 
+            src={user?.fotoProfil ? 
+                  (user.fotoProfil.startsWith('http') ? user.fotoProfil : `${import.meta.env.VITE_STORAGE_BASE_URL || 'http://localhost:8000/storage/'}${String(user.fotoProfil).replace(/^(?:public\/|storage\/|\/)+/, '')}`) 
+                  : (user?.jenisKelamin === 'Laki-laki' ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' : '/src/assets/images/ProfilCustomer.png')} 
+            alt="Profile" 
+            className="w-full h-full object-cover" 
+          />
         </div>
         <h3 className="text-lg font-black tracking-wider uppercase text-[#1A1A1A] text-center">{user.nama}</h3>
         <p className="text-xs text-gray-500 font-medium text-center mt-1">{user.email}</p>
