@@ -1,48 +1,40 @@
 import { useState, useEffect } from "react";
-import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
+import { useFetchWithCache } from "@/core/hooks/useFetchWithCache";
 
 export function useFetchDokter() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const url = `${endpoints.admin.doctors}?page=${currentPage}`;
+  const { data, isLoading: isCacheLoading, mutate } = useFetchWithCache(url);
+
   const [dataDokter, setDataDokter] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = isCacheLoading;
 
-  // Jika perlu paginasi
-  const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [startIndex, setStartIndex] = useState(1);
 
-  const fetchDokter = async (page = 1) => {
-    setIsLoading(true);
-    try {
-      const response = await axiosClient.get(`${endpoints.admin.doctors}?page=${page}`);
-      
-      // Menyesuaikan dengan response: `response.data.data` (paginated object)
-      if (response.data?.data && Array.isArray(response.data.data.data)) {
-        setDataDokter(response.data.data.data);
-        setCurrentPage(response.data.data.current_page || 1);
-        setLastPage(response.data.data.last_page || 1);
-        setStartIndex(response.data.data.from || 1);
-      } else if (response.data && Array.isArray(response.data.data)) {
-        setDataDokter(response.data.data);
-      } else if (Array.isArray(response.data)) {
-        setDataDokter(response.data);
+  useEffect(() => {
+    if (data) {
+      if (data.data && Array.isArray(data.data)) {
+        setDataDokter(data.data);
+        setCurrentPage(data.current_page || 1);
+        setLastPage(data.last_page || 1);
+        setStartIndex(data.from || 1);
+      } else if (Array.isArray(data)) {
+        setDataDokter(data);
       } else {
         setDataDokter([]);
       }
-    } catch (error) {
-      console.error("Gagal mengambil data dokter:", error);
-    } finally {
-      setIsLoading(false);
     }
+  }, [data]);
+
+  const fetchDokter = async (page = 1) => {
+    setCurrentPage(page);
+    mutate();
   };
 
-  useEffect(() => {
-    fetchDokter(currentPage);
-  }, [currentPage]);
-
-  // Filter berdasarkan pencarian
   useEffect(() => {
     const query = searchQuery.toLowerCase();
     const filtered = dataDokter.filter(
@@ -61,7 +53,7 @@ export function useFetchDokter() {
   };
 
   return {
-    dataDokter: filteredData, // kembalikan data yang sudah di-filter
+    dataDokter: filteredData,
     searchQuery,
     setSearchQuery,
     isLoading,

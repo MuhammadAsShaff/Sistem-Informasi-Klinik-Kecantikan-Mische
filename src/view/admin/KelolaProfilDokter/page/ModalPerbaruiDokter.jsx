@@ -86,6 +86,7 @@ export default function ModalPerbaruiDokter({ isOpen, onClose, hook }) {
                     placeholder="Email"
                     className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#7CC052] focus:border-transparent transition-all placeholder-gray-400"
                   />
+                  <p className="text-[11px] text-red-500 italic mt-0.5">* Pastikan format email valid (@gmail.com)</p>
                 </div>
 
                 <div className="flex-1 flex flex-col justify-start">
@@ -108,6 +109,7 @@ export default function ModalPerbaruiDokter({ isOpen, onClose, hook }) {
                       {formData.image ? "Gambar Terpilih" : "No File Chosen"}
                     </span>
                   </div>
+                  <p className="text-[11px] text-red-500 italic mt-2">* Format: JPG/PNG/JPEG. Ukuran maksimal 2MB.</p>
 
                   {formData.image && (
                     <div className="mt-4 w-28 h-28 rounded-lg overflow-hidden border border-gray-100 shadow-sm bg-gray-50">

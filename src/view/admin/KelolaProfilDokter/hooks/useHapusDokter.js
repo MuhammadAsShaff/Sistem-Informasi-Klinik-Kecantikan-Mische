@@ -8,11 +8,12 @@ export function useHapusDokter(selectedDokter, onSuccess, showToast) {
     try {
       const docId = selectedDokter.idDokter || selectedDokter.id;
       
-      await axiosClient.delete(`${endpoints.admin.doctors}/${docId}`);
-      
-      showToast("Berhasil menghapus profil dokter!", "success");
-      if (closeModal) closeModal();
-      if (onSuccess) onSuccess();
+      const res = await axiosClient.delete(`${endpoints.admin.doctors}/${docId}`);
+      if (res.data?.success) {
+        showToast("Berhasil menghapus profil dokter", "success");
+        if (closeModal) closeModal();
+        if (onSuccess) onSuccess();
+      }
     } catch (error) {
       console.error("Gagal menghapus dokter:", error);
       showToast("Gagal menghapus profil dokter.", "error");

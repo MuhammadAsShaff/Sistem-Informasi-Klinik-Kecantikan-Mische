@@ -17,7 +17,7 @@ export function useEditDokter(selectedDokter, onSuccess, showToast) {
   useEffect(() => {
     if (selectedDokter) {
       const fullImageUrl = selectedDokter.foto && !selectedDokter.foto.startsWith('http') 
-        ? `${STORAGE_BASE_URL}${selectedDokter.foto}`
+        ? `${STORAGE_BASE_URL}${String(selectedDokter.foto).replace(/^(?:public\/|storage\/|\/)+/, '')}`
         : (selectedDokter.foto || "");
 
       setFormData({
@@ -79,10 +79,11 @@ export function useEditDokter(selectedDokter, onSuccess, showToast) {
 
       const docId = selectedDokter.idDokter || selectedDokter.id;
 
-      await axiosClient.post(`${endpoints.admin.doctors}/${docId}`, data);
-      
-      showToast("Berhasil memperbarui profil dokter!", "success");
-      if (onSuccess) onSuccess();
+      const res = await axiosClient.post(`${endpoints.admin.doctors}/${docId}`, data);
+      if (res.data?.success) {
+        showToast("Berhasil memperbarui profil dokter", "success");
+        if (onSuccess) onSuccess();
+      }
     } catch (err) {
       console.error(err);
       if (err.response && err.response.data && err.response.data.errors) {

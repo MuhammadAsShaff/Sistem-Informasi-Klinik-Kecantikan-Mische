@@ -73,11 +73,12 @@ export function useTambahDokter(onSuccess, showToast) {
         // Tergantung validasi di backend, tapi jika required, backend akan melempar pesan error.
       }
 
-      await axiosClient.post(endpoints.admin.doctors, data);
-      
-      showToast("Berhasil menambahkan profil dokter baru!", "success");
-      resetForm();
-      if (onSuccess) onSuccess();
+      const res = await axiosClient.post(endpoints.admin.doctors, data);
+      if (res.data?.success) {
+        showToast("Berhasil menambahkan profil dokter", "success");
+        resetForm();
+        if (onSuccess) onSuccess();
+      }
     } catch (err) {
       console.error(err);
       if (err.response && err.response.data && err.response.data.errors) {
