@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const TreatmentCard = ({ item }) => {
   return (
@@ -24,9 +25,12 @@ const TreatmentCard = ({ item }) => {
 
         {/* TOMBOL */}
         <div className="mt-auto">
-          <button className="bg-[#56BC36] text-white px-8 py-4 rounded-full text-sm font-bold hover:bg-[#2da509] transition-colors w-full shadow-md">
+          <Link 
+            to={`/perawatan/${item.id}`}
+            className="bg-[#56BC36] text-white px-8 py-4 rounded-full text-sm font-bold hover:bg-[#2da509] transition-colors w-full shadow-md flex justify-center items-center"
+          >
             Lihat Selengkapnya
-          </button>
+          </Link>
         </div>
       </div>
     </div>
