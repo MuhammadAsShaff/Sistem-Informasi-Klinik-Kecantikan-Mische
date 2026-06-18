@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDokterData } from '../hooks/useDokterData';
+import CustomerLoading from '@/view/Customer/components/CustomerLoading';
 
 export default function TentangDokterDropdown() {
-  const { doctors } = useDokterData();
+  const { doctors, isLoading } = useDokterData();
 
   return (
     <div className="min-h-screen bg-gray-50/50 pt-8 pb-20">
@@ -19,8 +20,11 @@ export default function TentangDokterDropdown() {
         </div>
 
         {/* Grid Dokter */}
-        <div className="grid grid-cols-1 md:flex md:flex-wrap md:justify-start gap-10">
-          {doctors.map((dokter) => (
+        {isLoading ? (
+          <CustomerLoading text="Memuat data dokter..." />
+        ) : (
+          <div className="grid grid-cols-1 md:flex md:flex-wrap md:justify-start gap-10">
+            {doctors.map((dokter) => (
             <div 
               key={dokter.idDokter || dokter.id} 
               className="relative w-full max-w-[360px] mx-auto md:mx-0 h-[500px] rounded-tl-[60px] rounded-br-[60px] rounded-tr-2xl rounded-bl-2xl overflow-hidden shadow-2xl group transition-transform duration-300 hover:-translate-y-2"
@@ -48,7 +52,8 @@ export default function TentangDokterDropdown() {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
 
       </div>
     </div>

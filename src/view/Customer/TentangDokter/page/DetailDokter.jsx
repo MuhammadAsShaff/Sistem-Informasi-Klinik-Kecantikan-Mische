@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useDokterData } from '../hooks/useDokterData';
 import EmailIcon from '../../../../assets/icons/ic_round-email.png';
+import CustomerLoading from '../../components/CustomerLoading';
 
 export default function DetailDokterPage() {
   const { id } = useParams();
@@ -9,7 +10,7 @@ export default function DetailDokterPage() {
   const doctor = getDoctorById(id);
 
   if (isLoading) {
-    return <div className="min-h-screen pt-32 text-center text-gray-500 font-bold">Memuat data dokter...</div>;
+    return <CustomerLoading text="Memuat profil dokter..." />;
   }
 
   if (!doctor) {
