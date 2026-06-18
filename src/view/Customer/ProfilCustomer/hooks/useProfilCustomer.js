@@ -2,15 +2,12 @@ import { useState, useEffect } from "react";
 import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
 import { getUser, saveUser, clearAuth } from "@/core/utils/authStorage";
+import { useFetchWithCache, invalidateCache } from "@/core/hooks/useFetchWithCache";
 
 /**
  * Hook untuk mengambil & memperbarui profil customer (READ + UPDATE + LOGOUT).
  * Menggunakan authStorage sebagai cache awal agar UI tidak blank saat loading.
- *
- * Tidak ada lagi akses langsung ke localStorage — semua via authStorage.
- *
- * @param {Function} showToast  - Fungsi untuk menampilkan notifikasi
- * @param {Function} navigate   - React Router navigate (untuk redirect logout)
+ * Ditambah useFetchWithCache untuk SWR pattern.
  */
 export function useProfilCustomer(showToast, navigate) {
   // Init dari authStorage agar langsung tampil tanpa flash kosong
@@ -25,34 +22,33 @@ export function useProfilCustomer(showToast, navigate) {
     jenisKelamin:  savedUser.jenisKelamin  || "Perempuan",
   });
 
-  // Background refresh dari server
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await axiosClient.get(endpoints.customer.profile);
-        if (res.data.success) {
-          const data = res.data.data;
-          setFormData({
-            nama:         data.nama         || "",
-            alamat:       data.alamat        || "",
-            nomorWa:      data.nomorWa       || "",
-            email:        data.email         || "",
-            tanggalLahir: data.tanggalLahir  ? data.tanggalLahir.split(" ")[0] : "",
-            jenisKelamin: data.jenisKelamin  || "Perempuan",
-          });
-        } else {
-          showToast(res.data.message || "Gagal mengambil profil", "error");
-        }
-      } catch (error) {
-        console.error("Gagal mengambil profil customer:", error);
-        const errMsg = error.response
-          ? `Error ${error.response.status}: ${error.response.data?.message || "Gagal"}`
-          : "Gagal memuat profil. Pastikan API berjalan dan Anda sudah login.";
-        showToast(errMsg, "error");
+  // Background refresh dari server menggunakan SWR dengan TTL pendek
+  const { error } = useFetchWithCache(endpoints.customer.profile, {
+    onSuccess: (data) => {
+      setFormData({
+        nama:         data.nama         || "",
+        alamat:       data.alamat        || "",
+        nomorWa:      data.nomorWa       || "",
+        email:        data.email         || "",
+        tanggalLahir: data.tanggalLahir  ? data.tanggalLahir.split(" ")[0] : "",
+        jenisKelamin: data.jenisKelamin  || "Perempuan",
+      });
+      // Sync authStorage if there are server updates
+      if (data.nama && data.email) {
+        saveUser(data); 
       }
-    };
-    fetchProfile();
-  }, []);
+    }
+  });
+
+  useEffect(() => {
+    if (error) {
+      console.error("Gagal mengambil profil customer:", error);
+      const errMsg = error.response
+        ? `Error ${error.response.status}: ${error.response.data?.message || "Gagal"}`
+        : "Gagal memuat profil. Pastikan API berjalan dan Anda sudah login.";
+      showToast(errMsg, "error");
+    }
+  }, [error, showToast]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,6 +66,7 @@ export function useProfilCustomer(showToast, navigate) {
       if (res.data.success) {
         showToast("Profil berhasil diperbarui!", "success");
         saveUser(res.data.data); // simpan & dispatch event reaktivitas otomatis
+        invalidateCache(endpoints.customer.profile); // invalidate SWR cache
       }
     } catch (error) {
       let errorMsg = "Gagal memperbarui profil.";
@@ -89,6 +86,7 @@ export function useProfilCustomer(showToast, navigate) {
       console.error("Gagal logout dari server:", error);
     } finally {
       clearAuth();
+      invalidateCache(''); // Clear all caches on logout
       navigate("/login");
     }
   };

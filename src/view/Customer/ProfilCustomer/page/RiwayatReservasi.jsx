@@ -1,11 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Clock, Calendar, Hash, Stethoscope, Eye } from 'lucide-react';
+import ModalDetailReservasi from './ModalDetailReservasi';
 import { useFetchMyReservasi } from '../../ReservasiPage/hooks/useFetchMyReservasi';
-import { ArrowLeft, Clock, Calendar, Hash, Stethoscope } from 'lucide-react';
 
 export default function RiwayatReservasi() {
   const navigate = useNavigate();
   const { myReservasi, isLoading } = useFetchMyReservasi();
+  const [selectedReservasi, setSelectedReservasi] = React.useState(null);
+  const [isModalDetailOpen, setIsModalDetailOpen] = React.useState(false);
 
   const getStatusColor = (status) => {
     switch(status) {
@@ -23,6 +26,11 @@ export default function RiwayatReservasi() {
       default:
         return 'bg-gray-100 text-gray-700';
     }
+  };
+
+  const handleOpenDetail = (reservasi) => {
+    setSelectedReservasi(reservasi);
+    setIsModalDetailOpen(true);
   };
 
   return (
@@ -58,7 +66,8 @@ export default function RiwayatReservasi() {
                     <th className="px-6 py-4 font-medium"><div className="flex items-center gap-2"><Stethoscope className="w-4 h-4"/> Jenis Treatment</div></th>
                     <th className="px-6 py-4 font-medium"><div className="flex items-center gap-2"><Calendar className="w-4 h-4"/> Tanggal</div></th>
                     <th className="px-6 py-4 font-medium"><div className="flex items-center gap-2"><Clock className="w-4 h-4"/> Jam</div></th>
-                    <th className="px-6 py-4 font-medium rounded-tr-xl">Status</th>
+                    <th className="px-6 py-4 font-medium">Status</th>
+                    <th className="px-6 py-4 font-medium rounded-tr-xl text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -80,6 +89,15 @@ export default function RiwayatReservasi() {
                         <span className={`px-4 py-1.5 rounded-full text-xs font-bold ${getStatusColor(item.status)}`}>
                           {item.status}
                         </span>
+                      </td>
+                      <td className="px-6 py-5 text-center">
+                        <button 
+                          onClick={() => handleOpenDetail(item)}
+                          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-white border border-gray-200 hover:border-green-500 hover:text-green-600 rounded-xl text-sm font-semibold text-gray-600 transition-colors shadow-sm"
+                        >
+                          <Eye className="w-4 h-4" />
+                          Detail
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -106,6 +124,12 @@ export default function RiwayatReservasi() {
         </div>
 
       </div>
+      
+      <ModalDetailReservasi 
+        isOpen={isModalDetailOpen} 
+        onClose={() => setIsModalDetailOpen(false)} 
+        selectedReservasi={selectedReservasi} 
+      />
     </div>
   );
 }

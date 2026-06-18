@@ -97,7 +97,7 @@ const ModalKelolaAlamat = ({ isOpen, onClose, hookKelolaAlamat }) => {
                         </div>
                         <p className="text-gray-600 text-sm leading-relaxed mb-1">{alamat.detailAlamat}</p>
                         <p className="text-gray-500 text-sm">
-                          {alamat.districtId ? `${alamat.districtId}, ` : ''}{alamat.cityId}, {alamat.provinceId} {alamat.kodePos}
+                          {(alamat.kecamatan || alamat.districtId) ? `${alamat.kecamatan || alamat.districtId}, ` : ''}{alamat.cityId}, {alamat.provinceId} {alamat.kodePos}
                         </p>
                       </div>
 

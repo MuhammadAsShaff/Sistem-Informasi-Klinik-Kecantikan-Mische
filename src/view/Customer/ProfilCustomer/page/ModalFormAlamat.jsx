@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import ToastAlert from '@/view/components/ToastAlert';
 
 const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCities }) => {
   const [formData, setFormData] = useState({
@@ -7,12 +8,13 @@ const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCiti
     nomorHp: '',
     provinceId: '',
     cityId: '',
-    districtId: '',
+    kecamatan: '',
     kodePos: '',
     detailAlamat: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
 
   useEffect(() => {
     if (isOpen) {
@@ -21,7 +23,7 @@ const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCiti
         nomorHp: '',
         provinceId: '',
         cityId: '',
-        districtId: '',
+        kecamatan: '',
         kodePos: '',
         detailAlamat: ''
       });
@@ -44,8 +46,8 @@ const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCiti
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.namaPenerima || !formData.nomorHp || !formData.provinceId || !formData.cityId || !formData.districtId || !formData.kodePos || !formData.detailAlamat) {
-      alert("Harap lengkapi semua field bertanda *");
+    if (!formData.namaPenerima || !formData.nomorHp || !formData.provinceId || !formData.cityId || !formData.kecamatan || !formData.kodePos || !formData.detailAlamat) {
+      setToast({ isOpen: true, message: "Harap lengkapi semua field bertanda *", type: "warning" });
       return;
     }
 
@@ -88,6 +90,7 @@ const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCiti
               <input type="text" name="nomorHp" value={formData.nomorHp} onChange={handleChange}
                 placeholder="08..."
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-500" />
+              <p className="text-[11px] text-red-500 italic mt-0.5">* Hanya angka (contoh: 08123456789)</p>
             </div>
 
             <div className="flex flex-col gap-2.5">
@@ -114,7 +117,7 @@ const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCiti
 
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-medium text-[#1A1A1A]">Kecamatan*</label>
-              <input type="text" name="districtId" value={formData.districtId} onChange={handleChange}
+              <input type="text" name="kecamatan" value={formData.kecamatan} onChange={handleChange}
                 placeholder="Kecamatan (Opsional)"
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-500" />
             </div>
@@ -131,6 +134,7 @@ const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCiti
               <textarea name="detailAlamat" value={formData.detailAlamat} onChange={handleChange} rows="3"
                 placeholder="Masukkan detail alamat lengkap"
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-500 resize-none"></textarea>
+              <p className="text-[11px] text-red-500 italic mt-0.5">* Isi dengan lengkap (Jalan, RT/RW, Patokan)</p>
             </div>
             
           </form>
@@ -148,6 +152,13 @@ const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCiti
         </div>
 
       </div>
+      
+      <ToastAlert 
+        isOpen={toast.isOpen} 
+        message={toast.message} 
+        type={toast.type} 
+        onClose={() => setToast({ ...toast, isOpen: false })} 
+      />
     </div>
   );
 };

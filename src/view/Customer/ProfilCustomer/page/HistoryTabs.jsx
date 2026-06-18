@@ -8,7 +8,10 @@ const HistoryTabs = () => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             {/* Riwayat Pembelian Produk */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 cursor-pointer hover:shadow-md transition-shadow group">
+            <div 
+                onClick={() => navigate('/ProfilCustomer/riwayat-pembelian')}
+                className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 cursor-pointer hover:shadow-md transition-shadow group"
+            >
                 <div className="p-4 bg-gradient-to-br from-[#74b35e] via-[#9ade97] to-[#a3e69a] rounded-2xl shadow-inner group-hover:scale-105 transition-transform duration-300">
                     <ShoppingBag className="w-8 h-8 text-white" />
                 </div>
