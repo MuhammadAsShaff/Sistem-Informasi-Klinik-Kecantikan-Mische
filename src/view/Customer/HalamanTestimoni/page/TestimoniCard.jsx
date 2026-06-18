@@ -11,7 +11,7 @@ const TestimoniCard = ({ id, name, description, foto }) => {
           foto 
             ? (foto.startsWith('http') || foto.startsWith('blob:') || foto.startsWith('data:') 
               ? foto 
-              : `${STORAGE_BASE_URL}${foto}`)
+              : `${STORAGE_BASE_URL}${String(foto).replace(/^(?:public\/|storage\/|\/)+/, '')}`)
             : "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
         }
         alt={name} 
