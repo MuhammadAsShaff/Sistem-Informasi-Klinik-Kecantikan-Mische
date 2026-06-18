@@ -5,9 +5,10 @@ import { useEditJadwal } from "../hooks/useEditJadwal";
 import { useHapusJadwal } from "../hooks/useHapusJadwal";
 
 import Header from "./Header";
-import SearchBar from "./SearchBar";
+import SearchBar from "../../components/SearchBar";
+import { Plus } from "lucide-react";
 import Tabel from "./Tabel";
-import Pagination from "./Pagination";
+import Pagination from "../../components/Pagination";
 import ModalTambahJadwal from "./ModalTambahJadwal";
 import ModalPerbaruiJadwal from "./ModalPerbaruiJadwal";
 import ModalHapusJadwal from "./ModalHapusJadwal";
@@ -89,23 +90,34 @@ export default function KelolaJadwalReservasiTreatment() {
 
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen animate-in fade-in duration-700">
-      <ToastAlert
-        isOpen={toast.isOpen}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ ...toast, isOpen: false })}
-      />
+      {toast && (
+        <ToastAlert
+          isOpen={true}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
 
       <div className="max-w-7xl mx-auto flex flex-col gap-2">
         <Header />
-        <SearchBar onOpenTambah={() => setIsTambahOpen(true)} />
+        <SearchBar 
+          rightComponents={
+            <button 
+              onClick={() => setIsTambahOpen(true)}
+              className="bg-[#56BC36] text-white p-2.5 rounded-md hover:bg-[#469e2c] transition-colors shadow-sm cursor-pointer"
+            >
+              <Plus size={20} />
+            </button>
+          }
+        />
 
         {isLoading ? (
           <div className="flex justify-center items-center py-20 text-gray-500 font-bold">
             Mengambil data dari server...
           </div>
         ) : (
-          <Tabel
+          <Tabel isLoading={isLoading}
             data={paginatedJadwal}
             onEdit={handleEdit}
             onDelete={handleDelete}

@@ -1,44 +1,43 @@
 import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
+import Table from '../../components/Table';
 
-const Tabel = ({ data, onEdit, onDelete, currentPage = 1, itemsPerPage = 6 }) => (
-  <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-    <table className="w-full text-sm text-left">
-      <thead className="bg-[#FDFDFD] text-gray-600 border-b text-[11px]">
-        <tr>
-          <th className="px-6 py-4 font-medium text-center">No</th>
-          <th className="px-6 py-4 font-medium text-center">Jam Mulai</th>
-          <th className="px-6 py-4 font-medium text-center">Jam Selesai</th>
-          <th className="px-6 py-4 font-bold text-center">Action</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-50 text-gray-700">
-        {data.map((item, index) => (
-          <tr key={index} className="hover:bg-gray-50 transition-colors">
-            <td className="px-6 py-4 text-center">{(currentPage - 1) * itemsPerPage + index + 1}</td>
-            <td className="px-6 py-4 text-center h-16">{item.jamMulai ? item.jamMulai.substring(0,5) : ''}</td>
-            <td className="px-6 py-4 text-center">{item.jamSelesai ? item.jamSelesai.substring(0,5) : ''}</td>
-            <td className="px-6 py-4">
-              <div className="flex justify-center gap-6">
-                <button 
-                  onClick={() => onEdit(item)} 
-                  className="text-gray-400 hover:text-blue-500 transition-colors"
-                >
-                  <Edit size={20}/>
-                </button>
-                <button 
-                  onClick={() => onDelete(item)} 
-                  className="text-gray-400 hover:text-red-500 transition-colors"
-                >
-                  <Trash2 size={20}/>
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
+const Tabel = ({ isLoading, data, onEdit, onDelete, currentPage = 1, itemsPerPage = 6 }) => {
+  const columns = [
+    { label: 'No', render: (item, index) => index, className: 'w-16 text-center', cellClassName: 'text-center' },
+    { label: 'Jam Mulai', render: (item) => item.jamMulai ? item.jamMulai.substring(0,5) : '', className: 'text-center', cellClassName: 'text-center h-16' },
+    { label: 'Jam Selesai', render: (item) => item.jamSelesai ? item.jamSelesai.substring(0,5) : '', className: 'text-center', cellClassName: 'text-center' },
+    { 
+      label: 'Action', 
+      render: (item) => (
+        <div className="flex justify-center gap-6">
+          <button 
+            onClick={() => onEdit(item)} 
+            className="text-gray-400 hover:text-blue-500 transition-colors"
+          >
+            <Edit size={20}/>
+          </button>
+          <button 
+            onClick={() => onDelete(item)} 
+            className="text-gray-400 hover:text-red-500 transition-colors"
+          >
+            <Trash2 size={20}/>
+          </button>
+        </div>
+      ),
+      className: 'text-center font-bold', 
+      cellClassName: ''
+    }
+  ];
+
+  return (
+    <Table isLoading={isLoading} 
+      columns={columns} 
+      data={data} 
+      emptyStateText="Tidak ada jadwal."
+      startIndex={(currentPage - 1) * itemsPerPage + 1}
+    />
+  );
+};
 
 export default Tabel;

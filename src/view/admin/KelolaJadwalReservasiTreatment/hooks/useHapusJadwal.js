@@ -21,11 +21,9 @@ export function useHapusJadwal(jadwalData, onSuccess, showToast) {
     } catch (error) {
       console.error("Gagal menghapus jadwal:", error);
       const msg = error.response?.data?.message || "Gagal menghapus jadwal.";
-      // Gunakan toast jika tersedia, fallback ke alert
+      // Gunakan toast jika tersedia
       if (showToast) {
         showToast(msg, "error");
-      } else {
-        alert(msg);
       }
     } finally {
       setIsLoading(false);
