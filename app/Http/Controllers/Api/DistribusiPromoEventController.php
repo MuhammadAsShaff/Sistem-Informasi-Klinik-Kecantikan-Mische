@@ -59,32 +59,49 @@ class DistribusiPromoEventController extends Controller
 
         $promo = Promo::find($request->idPromo);
         
-        // Dapatkan nomor WA target
-        $targetNumbers = $this->getTargetNumbers($request);
+        // Dapatkan data target (nomor WA & Nama)
+        $targets = $this->getTargetData($request);
 
-        if (empty($targetNumbers)) {
+        if (empty($targets)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Tidak ada nomor WhatsApp tujuan yang valid.'
             ], 400);
         }
 
-        // Susun pesan Promo
-        $message = "Halo Sahabat Mische!\n\n";
-        $message .= "🎉 *Info Promo Menarik: {$promo->namaPromo}* 🎉\n\n";
-        $message .= "{$promo->deskripsi}\n\n";
+        // Format target Fonnte (nomor|nama)
+        $formattedTargets = [];
+        foreach ($targets as $t) {
+            $formattedTargets[] = $t['nomorWa'] . '|' . $t['nama'];
+        }
+        $targetString = implode(',', $formattedTargets);
+
+        // Susun pesan Promo dengan Personalisasi {name}
+        $message = "Halo {name}! 🌟\n\n";
+        $message .= "Ada kabar gembira nih untuk kamu dari Mische Clinic!\n";
+        $message .= "🎉 *{$promo->namaPromo}* 🎉\n\n";
+        $message .= "_{$promo->deskripsi}_\n\n";
         
+        $message .= "📌 *Detail Promo:*\n";
+        $message .= "🔸 Jenis Promo: {$promo->jenisPromo}\n";
         if ($promo->kode) {
-            $message .= "Gunakan Kode: *{$promo->kode}*\n";
+            $message .= "🔸 Kode Promo: *{$promo->kode}*\n";
         }
         if ($promo->diskon) {
-            $message .= "Diskon: Rp " . number_format($promo->diskon, 0, ',', '.') . "\n";
+            $message .= "🔸 Diskon: Rp " . number_format($promo->diskon, 0, ',', '.') . "\n";
         }
-        $message .= "Periode: {$promo->tanggalMulai} s/d {$promo->tanggalSelesai}\n\n";
-        $message .= "Yuk buruan klaim promonya sebelum kehabisan! Hubungi kami untuk informasi lebih lanjut.";
+        if ($promo->minimalTransaksi) {
+            $message .= "🔸 Min. Transaksi: Rp " . number_format($promo->minimalTransaksi, 0, ',', '.') . "\n";
+        }
+        
+        $statusPromo = $promo->status ? 'Aktif' : 'Tidak Aktif';
+        $message .= "🔸 Status: {$statusPromo}\n";
+        $message .= "🔸 Periode: {$promo->tanggalMulai} s/d {$promo->tanggalSelesai}\n\n";
+        
+        $message .= "Tunggu apa lagi? Yuk buruan klaim promonya sebelum kehabisan! 🥰\n\n";
+        $message .= "Salam Hangat,\n*Mische Clinic*";
 
-        // Kirim menggunakan Fonnte (bisa multiple targets dipisah koma)
-        $targetString = implode(',', $targetNumbers);
+        // Kirim menggunakan Fonnte
         $result = $fonnte->sendMessage($targetString, $message);
 
         return response()->json([
@@ -120,25 +137,37 @@ class DistribusiPromoEventController extends Controller
 
         $kegiatan = Kegiatan::find($request->idKegiatan);
         
-        // Dapatkan nomor WA target
-        $targetNumbers = $this->getTargetNumbers($request);
+        // Dapatkan data target (nomor WA & Nama)
+        $targets = $this->getTargetData($request);
 
-        if (empty($targetNumbers)) {
+        if (empty($targets)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Tidak ada nomor WhatsApp tujuan yang valid.'
             ], 400);
         }
 
-        // Susun pesan Event
-        $message = "Halo Sahabat Mische!\n\n";
-        $message .= "✨ *Info Event Terkini: {$kegiatan->namaKegiatan}* ✨\n\n";
-        $message .= "{$kegiatan->deskripsi}\n\n";
-        $message .= "Tanggal Pelaksanaan: {$kegiatan->tanggalKegiatan}\n\n";
-        $message .= "Jangan lewatkan event seru ini! Kami tunggu kehadiranmu ya.";
+        // Format target Fonnte (nomor|nama)
+        $formattedTargets = [];
+        foreach ($targets as $t) {
+            $formattedTargets[] = $t['nomorWa'] . '|' . $t['nama'];
+        }
+        $targetString = implode(',', $formattedTargets);
+
+        // Susun pesan Event dengan Personalisasi {name}
+        $message = "Halo {name}! ✨\n\n";
+        $message .= "Mische Clinic punya acara spesial nih, dan kami sangat ingin kamu hadir!\n\n";
+        $message .= "🎟️ *{$kegiatan->namaKegiatan}* 🎟️\n\n";
+        $message .= "_{$kegiatan->deskripsi}_\n\n";
+        
+        $message .= "📌 *Detail Acara:*\n";
+        $message .= "📅 Tanggal: {$kegiatan->tanggalKegiatan}\n";
+        $message .= "📍 Lokasi: Klinik Mische (Atau lokasi yang ditentukan)\n\n";
+        
+        $message .= "Jangan sampai kelewatan ya, pastikan kamu catat tanggalnya! Sampai jumpa di sana! 👋\n\n";
+        $message .= "Salam Hangat,\n*Mische Clinic*";
 
         // Kirim menggunakan Fonnte
-        $targetString = implode(',', $targetNumbers);
         $result = $fonnte->sendMessage($targetString, $message);
 
         return response()->json([
@@ -149,16 +178,18 @@ class DistribusiPromoEventController extends Controller
     }
 
     /**
-     * Helper untuk mengambil nomor WA berdasarkan tipe distribusi
+     * Helper untuk mengambil data target (WA & Nama) berdasarkan tipe distribusi
      */
-    private function getTargetNumbers(Request $request)
+    private function getTargetData(Request $request)
     {
-        $query = User::where('role', 'customer')->whereNotNull('nomorWa')->where('nomorWa', '!=', '');
+        $query = User::where('role', 'customer')
+                     ->whereNotNull('nomorWa')
+                     ->where('nomorWa', '!=', '');
 
         if ($request->type === 'selected' && $request->has('customer_ids')) {
             $query->whereIn('idUser', $request->customer_ids);
         }
 
-        return $query->pluck('nomorWa')->toArray();
+        return $query->get(['nomorWa', 'nama'])->toArray();
     }
 }
