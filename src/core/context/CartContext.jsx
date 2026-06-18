@@ -12,11 +12,25 @@ export const CartProvider = ({ children }) => {
   const [voucherCode, setVoucherCode] = useState('');
   const [appliedVoucher, setAppliedVoucher] = useState(null);
   const [voucherError, setVoucherError] = useState('');
+  const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'success', message: '' });
+
+  const showModal = useCallback((type, message) => {
+    setModalConfig({ isOpen: true, type, message });
+    setTimeout(() => {
+      setModalConfig(prev => ({ ...prev, isOpen: false }));
+    }, 2000);
+  }, []);
+
+  const [isCartLoading, setIsCartLoading] = useState(true);
 
   const fetchCart = useCallback(async () => {
     // Cek token secara aman (opsional, axios interceptor biasanya handle, tapi mencegah hit API jika belum login)
-    if (!localStorage.getItem('token') && !sessionStorage.getItem('token')) return;
+    if (!localStorage.getItem('token') && !sessionStorage.getItem('token')) {
+      setIsCartLoading(false);
+      return;
+    }
     
+    setIsCartLoading(true);
     try {
       const res = await axiosClient.get(endpoints.customer.cart);
       if (res.data.success) {
@@ -39,6 +53,8 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Gagal mengambil keranjang', error);
+    } finally {
+      setIsCartLoading(false);
     }
   }, []);
 
@@ -54,11 +70,11 @@ export const CartProvider = ({ children }) => {
         jumlahProduk: qty
       });
       if (res.data.success) {
-        alert('Produk berhasil ditambahkan ke keranjang');
+        showModal('success', 'Produk berhasil ditambahkan ke keranjang');
         fetchCart();
       }
     } catch (error) {
-      alert(error.response?.data?.message || 'Gagal menambahkan ke keranjang');
+      showModal('error', error.response?.data?.message || 'Gagal menambahkan ke keranjang');
     }
   };
 
@@ -69,7 +85,7 @@ export const CartProvider = ({ children }) => {
         fetchCart();
       }
     } catch (error) {
-      alert(error.response?.data?.message || 'Gagal menghapus produk dari keranjang');
+      showModal('error', error.response?.data?.message || 'Gagal menghapus produk dari keranjang');
     }
   };
 
@@ -95,7 +111,7 @@ export const CartProvider = ({ children }) => {
         fetchCart(); // Revert on failure
       }
     } catch (error) {
-      alert(error.response?.data?.message || 'Gagal mengubah jumlah produk');
+      showModal('error', error.response?.data?.message || 'Gagal mengubah jumlah produk');
       fetchCart(); // Revert on failure
     }
   };
@@ -193,7 +209,38 @@ export const CartProvider = ({ children }) => {
     appliedVoucher,
     setAppliedVoucher,
     voucherError,
+    isCartLoading,
   };
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      {/* Global Cart Modal */}
+      {modalConfig.isOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-[100] animate-in fade-in duration-200" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
+          <div className="bg-white rounded-2xl shadow-2xl p-6 flex flex-col items-center gap-4 max-w-sm mx-4 transform transition-all animate-in zoom-in-95 duration-200">
+            {modalConfig.type === 'success' ? (
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-[#56BC36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            ) : (
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+            )}
+            <div className="text-center">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
+                {modalConfig.type === 'success' ? 'Berhasil!' : 'Oops!'}
+              </h3>
+              <p className="text-sm text-gray-500">{modalConfig.message}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </CartContext.Provider>
+  );
 };

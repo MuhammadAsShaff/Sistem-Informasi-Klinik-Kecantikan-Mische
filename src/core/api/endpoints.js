@@ -28,8 +28,10 @@ export const endpoints = {
       event: '/admin/distribusi/event',
     },
     testimonials: '/admin/testimonials',
+    penjualan: '/admin/penjualan',
     report: {
       reservasi: '/admin/report/reservasi',
+      penjualan: '/admin/report/penjualan',
     },
     dashboard: '/admin/dashboard',
   },
@@ -50,8 +52,10 @@ export const endpoints = {
     cart: '/customer/card', // Menggunakan 'card' sesuai prefix di route PHP
     alamat: '/customer/alamat',
     setAlamatUtama: '/customer/profile/alamat-utama',
-    rajaongkirCost: '/customer/rajaongkir/cost',
+    rajaongkirCostByAddress: '/customer/rajaongkir/cost-by-address',
     checkout: '/customer/penjualan/checkout',
+    riwayatPembelian: '/customer/penjualan', // NEW
+    konfirmasiDiterima: '/customer/penjualan', // NEW
   },
   public: {
     products: '/products',
