@@ -1,66 +1,34 @@
-import { useState, useEffect } from 'react';
-import axiosClient from '@/core/api/axiosClient';
+import { useState } from 'react';
 import { endpoints } from '@/core/api/endpoints';
+import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
 export const useProdukData = () => {
   const [activeCategory, setActiveCategory] = useState('semua');
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        // Ambil produk
-        let productsData = [];
-        try {
-          const prodRes = await axiosClient.get(endpoints.customer.product);
-          if (prodRes.data?.status === 'success') {
-            productsData = prodRes.data.data;
-            setProducts(productsData);
-          }
-        } catch (prodErr) {
-          console.error("Gagal memuat data produk:", prodErr);
-        }
+  // Fetch using SWR-like cache with global TTL
+  const { data: productsData, isLoading: isProdLoading } = useFetchWithCache(endpoints.customer.product);
+  const { data: categoriesData, isLoading: isCatLoading } = useFetchWithCache(endpoints.admin.kategori);
 
-        // Ambil kategori secara terpisah, agar jika gagal (misal 401), produk tetap tampil
-        let categoryData = [];
-        try {
-          const catRes = await axiosClient.get(endpoints.admin.kategori);
-          if (catRes.data?.status === 'success') {
-            categoryData = catRes.data.data;
-            setCategories(categoryData);
-          }
-        } catch (catErr) {
-          console.warn("Gagal memuat kategori produk dari API, mengekstrak dari produk...", catErr);
-        }
+  const products = productsData || [];
+  let categories = categoriesData || [];
 
-        // Jika kategori gagal dimuat (kosong), kita ekstrak dari produk
-        if (categoryData.length === 0 && productsData.length > 0) {
-           const uniqueCategoriesMap = new Map();
-           productsData.forEach(p => {
-             if (p.kategori) {
-               uniqueCategoriesMap.set(p.kategori.idKategori, p.kategori);
-             }
-           });
-           setCategories(Array.from(uniqueCategoriesMap.values()));
-        }
-      } catch (error) {
-        console.error("Gagal memuat data produk:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchData();
-  }, []);
+  // Fallback category extraction if API fails
+  if (categories.length === 0 && products.length > 0) {
+     const uniqueCategoriesMap = new Map();
+     products.forEach(p => {
+       if (p.kategori) {
+         uniqueCategoriesMap.set(p.kategori.idKategori, p.kategori);
+       }
+     });
+     categories = Array.from(uniqueCategoriesMap.values());
+  }
+
+  const isLoading = isProdLoading || (isCatLoading && categories.length === 0);
 
   // Filter products based on active category
   const filteredProducts = activeCategory === 'semua' 
     ? products 
     : products.filter(product => {
-        // Handle if category is object or string/id
         const catId = product.kategori?.idKategori || product.idKategori;
         return catId?.toString() === activeCategory?.toString();
       });

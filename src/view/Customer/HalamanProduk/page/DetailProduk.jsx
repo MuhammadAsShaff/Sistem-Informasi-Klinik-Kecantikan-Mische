@@ -12,13 +12,10 @@ const DetailProduk = () => {
   const { addToCart } = useCartContext();
   const product = products.find(p => (p.idProduk || p.id).toString() === id);
   const [qty, setQty] = useState(1);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleAddToCart = () => {
     if (product) {
       addToCart(product, qty);
-      setShowSuccessModal(true);
-      setTimeout(() => setShowSuccessModal(false), 2000);
     }
   };
 
@@ -37,7 +34,7 @@ const DetailProduk = () => {
               const imgData = product.gambar || product.image;
               const imageSrc = imgData?.startsWith?.('http') || imgData?.startsWith?.('data:') || imgData?.startsWith?.('/src')
                 ? imgData
-                : imgData ? `${STORAGE_BASE_URL}${imgData}` : '';
+                : imgData ? `${STORAGE_BASE_URL}${String(imgData).replace(/^(?:public\/|storage\/|\/)+/, '')}` : '';
                 
               return imageSrc ? (
                 <img 
@@ -91,20 +88,6 @@ const DetailProduk = () => {
 
       </div>
 
-      {/* Success Modal */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl p-6 flex flex-col items-center gap-4 max-w-sm mx-4 transform transition-all animate-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-[#56BC36]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-            </div>
-            <div className="text-center">
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Berhasil!</h3>
-              <p className="text-sm text-gray-500">Produk telah ditambahkan ke keranjang belanja Anda.</p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

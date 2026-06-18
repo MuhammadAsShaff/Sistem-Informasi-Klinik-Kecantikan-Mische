@@ -9,7 +9,7 @@ const ProductCard = ({ product }) => {
       <div className="bg-white flex justify-center items-center h-64 overflow-hidden relative p-4">
         {product.gambar || product.image ? (
           <img 
-            src={(product.gambar || product.image)?.startsWith?.('http') ? (product.gambar || product.image) : `${STORAGE_BASE_URL}${(product.gambar || product.image)}`} 
+            src={(product.gambar || product.image)?.startsWith?.('http') ? (product.gambar || product.image) : `${STORAGE_BASE_URL}${String(product.gambar || product.image).replace(/^(?:public\/|storage\/|\/)+/, '')}`} 
             alt={product.nama || product.name} 
             className="w-1/2 h-full object-contain mx-auto hover:scale-105 transition-transform duration-300 drop-shadow-md"
           />

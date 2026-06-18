@@ -4,6 +4,7 @@ import DescriptionSection from './DescriptionSection';
 import CategoryTabs from './CategoryTabs';
 import ProductGrid from './ProductGrid';
 import { useProdukData } from '../hooks/useProdukData';
+import CustomerLoading from '../../components/CustomerLoading';
 
 const Index = () => {
   const { activeCategory, setActiveCategory, filteredProducts, categories, isLoading } = useProdukData();
@@ -14,7 +15,7 @@ const Index = () => {
       <DescriptionSection />
       <CategoryTabs activeCategory={activeCategory} setActiveCategory={setActiveCategory} categories={categories} />
       {isLoading ? (
-        <div className="flex justify-center py-20 text-gray-500">Memuat produk...</div>
+        <CustomerLoading text="Memuat daftar produk..." />
       ) : (
         <div className="container mx-auto px-10 max-w-[820px]">
           <ProductGrid products={filteredProducts} />
