@@ -7,7 +7,9 @@ const Banner = ({ user }) => {
     <div className="w-full border border-gray-300 p-6 flex flex-row items-center gap-6 mb-12 bg-white rounded-md">
       <div className="w-[100px] h-[100px] rounded-full bg-[#d2d6dd] flex-shrink-0 flex items-center justify-center overflow-hidden border-4 border-white shadow-md">
          <img 
-            src={user?.jenisKelamin === 'Laki-laki' ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' : '/src/assets/images/ProfilCustomer.png'} 
+            src={user?.fotoProfil ? 
+                  (user.fotoProfil.startsWith('http') ? user.fotoProfil : `${import.meta.env.VITE_STORAGE_BASE_URL || 'http://localhost:8000/storage/'}${String(user.fotoProfil).replace(/^(?:public\/|storage\/|\/)+/, '')}`) 
+                  : (user?.jenisKelamin === 'Laki-laki' ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' : '/src/assets/images/ProfilCustomer.png')} 
             alt="Profile" 
             className="w-full h-full object-cover" 
          />

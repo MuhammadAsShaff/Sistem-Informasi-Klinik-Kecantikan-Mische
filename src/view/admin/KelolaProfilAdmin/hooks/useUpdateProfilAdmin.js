@@ -55,11 +55,24 @@ export function useUpdateProfilAdmin(user, showToast, onUpdated) {
 
   const handleSimpan = async () => {
     try {
-      const payload = { ...formData };
-      // Hapus password dari payload profil — password dihandle hook terpisah
-      delete payload.password;
+      const payload = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (formData[key] !== null && formData[key] !== undefined && key !== "password") {
+          // If fotoProfil is a string (e.g. existing URL), don't send it. Only send File objects.
+          if (key === "fotoProfil" && typeof formData[key] === "string") {
+            return;
+          }
+          payload.append(key, formData[key]);
+          if (key === "fotoProfil") {
+            payload.append("foto_profil", formData[key]);
+            payload.append("foto", formData[key]); // Just in case it expects 'foto'
+          }
+        }
+      });
+      payload.append("_method", "PUT");
 
-      const res = await axiosClient.put(endpoints.admin.profile, payload);
+      const res = await axiosClient.post(endpoints.admin.profile, payload);
+
       if (res.data.success) {
         const updatedUser = res.data.data;
         showToast("Profil berhasil diperbarui!", "success");

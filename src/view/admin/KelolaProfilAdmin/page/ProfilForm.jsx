@@ -98,19 +98,6 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
           />
         </div>
 
-        {/* ALAMAT */}
-        <div className="flex flex-col gap-2">
-          <label className="text-black font-medium text-lg">Alamat</label>
-          <input
-            type="text"
-            name="alamat"
-            value={formData.alamat}
-            onChange={handleChange}
-            placeholder="Jl.Mangkubumi"
-            className="w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:border-[#55BC36] text-black placeholder:text-gray-600"
-          />
-        </div>
-
         {/* PASSWORD */}
         <div className="flex flex-col gap-2 items-start">
           <label className="text-black font-medium text-lg">Password</label>

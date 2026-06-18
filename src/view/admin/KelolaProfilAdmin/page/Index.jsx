@@ -15,7 +15,7 @@ export default function KelolaProfilAdmin() {
   };
 
   // ─── HOOK: READ ───────────────────────────────────────────────
-  const { userData, setUserData } = useFetchProfilAdmin();
+  const { userData, setUserData, isLoading } = useFetchProfilAdmin();
 
   // ─── HOOK: UPDATE ─────────────────────────────────────────────
   const profilHook = useUpdateProfilAdmin(
@@ -26,12 +26,14 @@ export default function KelolaProfilAdmin() {
 
   return (
     <div className="w-full bg-white p-6 md:p-10">
-      <ToastAlert
-        isOpen={toast.isOpen}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ ...toast, isOpen: false })}
-      />
+      {toast && (
+        <ToastAlert
+          isOpen={true}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <div className="max-w-5xl mx-auto">
         <Header />
         <Banner user={userData} />
