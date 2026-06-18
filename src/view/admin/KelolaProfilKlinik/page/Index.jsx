@@ -29,7 +29,7 @@ const KelolaProfilKlinik = () => {
   const showToast = (message, type = "success") => setToast({ isOpen: true, message, type });
 
   // ─── HOOK: PROFIL KLINIK ──────────────────────────────────────
-  const { profileData, setProfileData, fetchProfile } = useFetchProfilKlinik();
+  const { profileData, setProfileData, fetchProfile, isLoading } = useFetchProfilKlinik();
   const { handleUpdateProfile } = useUpdateProfilKlinik(profileData, showToast, fetchProfile);
   const { handleDeleteProfile } = useHapusProfilKlinik(profileData, showToast, setProfileData);
 
@@ -39,7 +39,7 @@ const KelolaProfilKlinik = () => {
   const tambahKegiatan = useTambahKegiatan(() => {
     setIsModalTambahKegiatanOpen(false);
     fetchKegiatan();
-    showToast("Kegiatan berhasil ditambahkan!");
+    showToast("Berhasil menambahkan kegiatan klinik");
   });
 
   const editKegiatan = useEditKegiatan(
@@ -48,7 +48,7 @@ const KelolaProfilKlinik = () => {
     () => {
       setIsModalEditKegiatanOpen(false);
       fetchKegiatan();
-      showToast("Kegiatan berhasil diperbarui!");
+      showToast("Berhasil memperbarui kegiatan klinik");
     }
   );
 
@@ -57,7 +57,7 @@ const KelolaProfilKlinik = () => {
     () => {
       setIsModalHapusKegiatanOpen(false);
       fetchKegiatan();
-      showToast("Kegiatan berhasil dihapus!");
+      showToast("Berhasil menghapus kegiatan klinik");
     },
     showToast
   );

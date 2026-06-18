@@ -1,34 +1,26 @@
 import { useState, useEffect } from "react";
-import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
+import { useFetchWithCache } from "@/core/hooks/useFetchWithCache";
 
 /**
  * Hook untuk mengambil data profil klinik (READ).
  */
 export function useFetchProfilKlinik() {
+  const { data, mutate } = useFetchWithCache(endpoints.admin.clinic);
   const [profileData, setProfileData] = useState(null);
 
-  const fetchProfile = async () => {
-    try {
-      const res = await axiosClient.get(endpoints.admin.clinic);
-      if (res.data.success && res.data.data) {
-        // Antisipasi API mengembalikan Array atau Object
-        const clinicData = Array.isArray(res.data.data)
-          ? res.data.data[0]
-          : res.data.data;
-        setProfileData(clinicData && Object.keys(clinicData).length > 0 ? clinicData : null);
-      } else {
-        setProfileData(null);
-      }
-    } catch (error) {
-      console.error("Gagal mengambil data klinik:", error.response?.data || error.message);
-      setProfileData(null);
-    }
-  };
-
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    if (data) {
+      const clinicData = Array.isArray(data.data || data)
+        ? (data.data || data)[0]
+        : (data.data || data);
+      setProfileData(clinicData && Object.keys(clinicData).length > 0 ? clinicData : null);
+    }
+  }, [data]);
+
+  const fetchProfile = async () => {
+    mutate();
+  };
 
   return { profileData, setProfileData, fetchProfile };
 }

@@ -19,10 +19,13 @@ export function useHapusProfilKlinik(profileData, showToast, setProfileData) {
     if (!id) return;
 
     try {
-      await axiosClient.delete(`${endpoints.admin.clinic}/${id}`);
-      showToast("Profil Klinik berhasil dihapus!", "success");
-      setProfileData(null);
-      onClose && onClose();
+      const res = await axiosClient.delete(`${endpoints.admin.clinic}/${id}`);
+      if (res.data?.success) {
+        showToast("Berhasil menghapus profil klinik", "success");
+        if (onSuccess) onSuccess();
+        setProfileData(null);
+        onClose && onClose();
+      }
     } catch (error) {
       console.error("Hapus profil klinik gagal:", error);
       showToast("Gagal menghapus profil klinik.", "error");

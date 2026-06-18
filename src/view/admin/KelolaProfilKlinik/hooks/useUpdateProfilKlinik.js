@@ -31,9 +31,9 @@ export function useUpdateProfilKlinik(profileData, showToast, onSuccess) {
         res = await axiosClient.post(endpoints.admin.clinic, payload);
       }
 
-      if (res.data.success) {
-        showToast("Profil Klinik berhasil diperbarui!", "success");
-        onSuccess && onSuccess();
+      if (res.data?.success) {
+        showToast("Berhasil memperbarui profil klinik", "success");
+        if (onSuccess) onSuccess();
       }
     } catch (error) {
       console.error("Update Profile Error:", error.response?.data || error.message);

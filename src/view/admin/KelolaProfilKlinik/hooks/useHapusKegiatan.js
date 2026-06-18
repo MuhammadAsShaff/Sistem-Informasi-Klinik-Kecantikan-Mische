@@ -24,8 +24,6 @@ export function useHapusKegiatan(id, onSuccess, showToast) {
       const msg = error.response?.data?.message || "Gagal menghapus kegiatan.";
       if (showToast) {
         showToast(msg, "error");
-      } else {
-        alert(msg);
       }
     } finally {
       setIsLoading(false);

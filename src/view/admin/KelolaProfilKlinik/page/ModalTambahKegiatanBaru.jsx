@@ -79,7 +79,7 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, hook }) => {
                   {formData.foto ? formData.foto.name : "No File Chosen"}
                 </span>
               </div>
-              <span className="text-[11px] text-red-500 mt-2 block">* Maksimal 2MB (Format: Semua Format Gambar)</span>
+              <span className="text-[11px] text-red-500 italic mt-2">* Format: JPG/PNG/JPEG. Ukuran maksimal 2MB.</span>
             </div>
           </div>
 
