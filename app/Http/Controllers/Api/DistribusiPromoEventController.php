@@ -117,13 +117,13 @@ class DistribusiPromoEventController extends Controller
     public function distributeEvent(Request $request, FonnteService $fonnte)
     {
         $validator = Validator::make($request->all(), [
-            'idKegiatan' => 'required|exists:kegiatan,idKegiatan',
+            'idEvent' => 'required|exists:event,idEvent',
             'type' => 'required|in:all,selected',
             'customer_ids' => 'required_if:type,selected|array',
             'customer_ids.*' => 'exists:user,idUser'
         ], [
-            'idKegiatan.required' => 'Event/Kegiatan wajib dipilih.',
-            'idKegiatan.exists' => 'Event/Kegiatan tidak valid.',
+            'idEvent.required' => 'Event wajib dipilih.',
+            'idEvent.exists' => 'Event tidak valid.',
             'type.required' => 'Tipe distribusi wajib diisi (all/selected).',
             'customer_ids.required_if' => 'Customer wajib dipilih jika tipe distribusi adalah selected.'
         ]);
@@ -135,7 +135,7 @@ class DistribusiPromoEventController extends Controller
             ], 422);
         }
 
-        $kegiatan = Kegiatan::find($request->idKegiatan);
+        $event = \App\Models\Event::find($request->idEvent);
         
         // Dapatkan data target (nomor WA & Nama)
         $targets = $this->getTargetData($request);
@@ -157,12 +157,16 @@ class DistribusiPromoEventController extends Controller
         // Susun pesan Event dengan Personalisasi {name}
         $message = "Halo {name}! ✨\n\n";
         $message .= "Mische Clinic punya acara spesial nih, dan kami sangat ingin kamu hadir!\n\n";
-        $message .= "🎟️ *{$kegiatan->namaKegiatan}* 🎟️\n\n";
-        $message .= "_{$kegiatan->deskripsi}_\n\n";
+        $message .= "🎟️ *{$event->nama}* 🎟️\n\n";
+        $message .= "_{$event->deskripsi}_\n\n";
         
         $message .= "📌 *Detail Acara:*\n";
-        $message .= "📅 Tanggal: {$kegiatan->tanggalKegiatan}\n";
-        $message .= "📍 Lokasi: Klinik Mische (Atau lokasi yang ditentukan)\n\n";
+        if ($event->tanggalMulai == $event->tanggalSelesai) {
+            $message .= "📅 Tanggal: {$event->tanggalMulai}\n";
+        } else {
+            $message .= "📅 Tanggal: {$event->tanggalMulai} s/d {$event->tanggalSelesai}\n";
+        }
+        $message .= "📍 Lokasi: {$event->lokasi}\n\n";
         
         $message .= "Jangan sampai kelewatan ya, pastikan kamu catat tanggalnya! Sampai jumpa di sana! 👋\n\n";
         $message .= "Salam Hangat,\n*Mische Clinic*";

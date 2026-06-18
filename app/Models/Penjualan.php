@@ -28,7 +28,8 @@ class Penjualan extends Model
         'midtransOrderId',
         'paidAt',
         'idUser',
-        'idPromo'
+        'idPromo',
+        'paymentMethod'
     ];
 
     public function user()

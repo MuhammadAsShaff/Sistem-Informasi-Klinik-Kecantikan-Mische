@@ -92,6 +92,7 @@ class PenjualanExport implements FromArray, WithHeadings, ShouldAutoSize, WithSt
                 $subtotalProduk,
                 $penjualan->total ?? 0,
                 $penjualan->paymentStatus ?? '-',
+                $penjualan->paymentMethod ?? '-',
                 $penjualan->orderStatus ?? '-'
             ];
         }
@@ -111,16 +112,16 @@ class PenjualanExport implements FromArray, WithHeadings, ShouldAutoSize, WithSt
         }
 
         // Tambahkan spasi kosong
-        $rows[] = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
-        $rows[] = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
 
         // Tambahkan Header Kesimpulan
-        $rows[] = ['KESIMPULAN LAPORAN (Hanya transaksi PAID / SELESAI)', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['KESIMPULAN LAPORAN (Hanya transaksi PAID / SELESAI)', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
         
-        $rows[] = ['Total Transaksi Berhasil', $totalTransaksiBerhasil . ' Transaksi', '', '', '', '', '', '', '', '', '', '', '', '', ''];
-        $rows[] = ['Total Produk Terjual', $totalProdukTerjual . ' Item', '', '', '', '', '', '', '', '', '', '', '', '', ''];
-        $rows[] = ['Total Diskon Diberikan', 'Rp ' . number_format($totalDiskonSum, 0, ',', '.'), '', '', '', '', '', '', '', '', '', '', '', '', ''];
-        $rows[] = ['Total Pendapatan Bersih', 'Rp ' . number_format($totalPendapatanBersih, 0, ',', '.'), '', '', '', '', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Transaksi Berhasil', $totalTransaksiBerhasil . ' Transaksi', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Produk Terjual', $totalProdukTerjual . ' Item', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Diskon Diberikan', 'Rp ' . number_format($totalDiskonSum, 0, ',', '.'), '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Pendapatan Bersih', 'Rp ' . number_format($totalPendapatanBersih, 0, ',', '.'), '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
 
         return $rows;
     }
@@ -142,6 +143,7 @@ class PenjualanExport implements FromArray, WithHeadings, ShouldAutoSize, WithSt
             'Subtotal Produk',
             'Total Bayar Invoice',
             'Status Bayar',
+            'Metode Pembayaran',
             'Status Pesanan'
         ];
     }

@@ -44,6 +44,7 @@ class WebhookController extends Controller
             if ($fraudStatus == 'accept') {
                 $penjualan->update([
                     'paymentStatus' => 'paid',
+                    'paymentMethod' => $paymentType,
                     'orderStatus' => 'diproses',
                     'paidAt' => now()
                 ]);
@@ -51,6 +52,7 @@ class WebhookController extends Controller
         } else if ($transactionStatus == 'settlement') {
             $penjualan->update([
                 'paymentStatus' => 'paid',
+                'paymentMethod' => $paymentType,
                 'orderStatus' => 'diproses',
                 'paidAt' => now()
             ]);

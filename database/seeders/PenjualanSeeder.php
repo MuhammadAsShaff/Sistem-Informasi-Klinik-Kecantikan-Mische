@@ -56,6 +56,7 @@ class PenjualanSeeder extends Seeder
                     'shippingService' => 'Kilat',
                     'total' => ($produk->harga * 1) + 20000,
                     'paymentStatus' => 'paid',
+                    'paymentMethod' => 'bank_transfer',
                     'orderStatus' => 'selesai',
                     'nomorResi' => 'POS123456789',
                     'paidAt' => now()->subDays(2),

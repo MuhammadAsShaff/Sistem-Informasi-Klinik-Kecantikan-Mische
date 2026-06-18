@@ -41,8 +41,13 @@ class WebhookApiTest extends TestCase
         $payload = [
             'transaction_status' => 'settlement',
             'order_id' => $penjualan->invoiceNumber,
-            'fraud_status' => 'accept'
+            'fraud_status' => 'accept',
+            'status_code' => '200',
+            'gross_amount' => '60000.00',
+            'payment_type' => 'qris'
         ];
+
+        $payload['signature_key'] = hash('sha512', $payload['order_id'] . $payload['status_code'] . $payload['gross_amount'] . config('midtrans.server_key'));
 
         // Midtrans mengirim POST ke webhook endpoint
         $response = $this->postJson('/api/webhook/midtrans', $payload);
@@ -51,7 +56,8 @@ class WebhookApiTest extends TestCase
 
         $this->assertDatabaseHas('penjualan', [
             'invoiceNumber' => 'INV-20260617-0001',
-            'paymentStatus' => 'paid'
+            'paymentStatus' => 'paid',
+            'paymentMethod' => 'qris'
         ]);
     }
 }

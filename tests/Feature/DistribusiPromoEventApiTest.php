@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Promo;
-use App\Models\Kegiatan;
+use App\Models\Event;
 use App\Models\KategoriProduk;
 use App\Models\ProdukKlinik;
 
@@ -178,17 +178,19 @@ class DistribusiPromoEventApiTest extends TestCase
         $token = $this->getAdminToken();
         $this->createCustomers();
 
-        $kegiatan = Kegiatan::create([
-            'namaKegiatan' => 'Beauty Seminar',
+        $event = Event::create([
+            'nama' => 'Beauty Seminar',
             'deskripsi' => 'Seminar kecantikan untuk kulit sehat',
             'foto' => 'seminar.jpg',
-            'tanggalKegiatan' => '2026-10-10'
+            'tanggalMulai' => '2026-10-10',
+            'tanggalSelesai' => '2026-10-10',
+            'lokasi' => 'Klinik Mische'
         ]);
 
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token"
         ])->postJson('/api/admin/distribusi/event', [
-            'idKegiatan' => $kegiatan->idKegiatan,
+            'idEvent' => $event->idEvent,
             'type' => 'all'
         ]);
 
