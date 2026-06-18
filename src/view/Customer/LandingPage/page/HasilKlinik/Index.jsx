@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { results } from './HasilKlinikData';
 import HasilKlinikCard from './HasilKlinikCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -46,9 +47,9 @@ export default function HasilKlinik() {
 
         {/* Tombol Reservasi Utama */}
         <div className="flex justify-center">
-          <button className="bg-[#85C583] text-white px-14 py-5 rounded-full text-xl md:text-2xl font-regular shadow-2xl hover:bg-[#2da509] hover:text-white transition-all transform hover:scale-105">
+          <Link to="/reservasi" className="bg-[#85C583] text-white px-14 py-5 rounded-full text-xl md:text-2xl font-regular shadow-2xl hover:bg-[#2da509] hover:text-white transition-all transform hover:scale-105 inline-block text-center">
             Reservasi Sekarang
-          </button>
+          </Link>
         </div>
       </div>
 
