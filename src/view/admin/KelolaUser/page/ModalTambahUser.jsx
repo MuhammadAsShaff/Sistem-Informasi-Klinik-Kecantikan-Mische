@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { X, Eye, EyeOff } from "lucide-react";
+import { PROVINCES, CITIES } from "@/core/utils/rajaOngkirData";
 
 /**
  * Modal untuk menambah user baru.
@@ -7,16 +8,27 @@ import { X, Eye, EyeOff } from "lucide-react";
  * yang dipass lewat prop `hook`.
  */
 export default function ModalTambahUser({ isOpen, onClose, hook }) {
-  const { formData, showPassword, setShowPassword, handleChange, handleSubmit } = hook;
+  const { formData, setFormData, showPassword, setShowPassword, handleChange, handleSubmit } = hook;
+
+  const [localCities, setLocalCities] = useState([]);
+
+  const fetchCities = (provinceId) => {
+    if (!provinceId) {
+      setLocalCities([]);
+      return;
+    }
+    setLocalCities(CITIES[provinceId] || []);
+  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white w-full max-w-[900px] rounded-[24px] overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-300">
+    <>
+      <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-[900px] rounded-[24px] shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col">
 
         {/* HEADER MODAL */}
-        <div className="px-10 py-8 flex items-center justify-between border-b border-gray-100">
+        <div className="px-10 py-6 flex items-center justify-between border-b border-gray-100 shrink-0">
           <h2 className="text-2xl font-semibold text-[#1A1A1A]">Tambah User</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors">
             <X size={28} />
@@ -24,7 +36,7 @@ export default function ModalTambahUser({ isOpen, onClose, hook }) {
         </div>
 
         {/* FORM BODY */}
-        <div className="px-10 py-8">
+        <div className="px-10 py-8 overflow-y-auto custom-scrollbar">
           <div className="grid grid-cols-2 gap-x-12 gap-y-8 mb-10">
 
             {/* Nama User */}
@@ -51,6 +63,7 @@ export default function ModalTambahUser({ isOpen, onClose, hook }) {
                 placeholder="Email"
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-500"
               />
+              <p className="text-[11px] text-red-500 italic mt-0.5">* Pastikan format email valid (@gmail.com)</p>
             </div>
 
             {/* Password */}
@@ -73,6 +86,7 @@ export default function ModalTambahUser({ isOpen, onClose, hook }) {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
+              <p className="text-[11px] text-red-500 italic mt-0.5">* Minimal 8 karakter, mengandung huruf BESAR dan kecil</p>
             </div>
 
             {/* Jenis Kelamin */}
@@ -90,18 +104,7 @@ export default function ModalTambahUser({ isOpen, onClose, hook }) {
               </select>
             </div>
 
-            {/* Alamat */}
-            <div className="flex flex-col gap-2.5">
-              <label className="text-sm font-medium text-[#1A1A1A]">Alamat</label>
-              <input
-                type="text"
-                name="alamat"
-                value={formData.alamat}
-                onChange={handleChange}
-                placeholder="Alamat"
-                className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-500"
-              />
-            </div>
+            {/* Removed Alamat Button */}
 
             {/* Role */}
             <div className="flex flex-col gap-2.5">
@@ -141,21 +144,107 @@ export default function ModalTambahUser({ isOpen, onClose, hook }) {
                 placeholder="Nomor Whatsapp"
                 className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-500"
               />
+              <p className="text-[11px] text-red-500 italic mt-0.5">* Hanya angka (contoh: 08123456789)</p>
             </div>
 
-          </div>
+            {/* Inline Address Fields (Only for Customer) */}
+            {formData.role === 'customer' && (
+              <div className="col-span-2 grid grid-cols-2 gap-x-12 gap-y-8 mt-4 border-t border-gray-100 pt-6">
+                <div className="col-span-2">
+                  <h3 className="text-lg font-bold text-[#1A1A1A]">Detail Alamat Lengkap</h3>
+                  <p className="text-sm text-gray-500">Silakan lengkapi alamat detail untuk customer.</p>
+                </div>
 
-          {/* FOOTER ACTION */}
-          <div className="flex justify-end pt-8 border-t border-gray-100">
-            <button
-              onClick={handleSubmit}
-              className="bg-[#7CC052] text-white px-10 py-4 rounded-xl font-bold text-sm hover:bg-[#68a741] transition-all shadow-lg shadow-green-100"
-            >
-              Tambah User
-            </button>
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-sm font-bold text-[#1A1A1A]">Provinsi</label>
+                  <select
+                    name="provinceId"
+                    value={formData.provinceId}
+                    onChange={(e) => {
+                       handleChange(e);
+                       fetchCities(e.target.value);
+                    }}
+                    className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-700"
+                  >
+                    <option value="">Pilih Provinsi</option>
+                    {PROVINCES.map(prov => (
+                      <option key={prov.province_id} value={prov.province_id}>
+                        {prov.province}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-sm font-bold text-[#1A1A1A]">Kota/Kabupaten</label>
+                  <select
+                    name="cityId"
+                    value={formData.cityId}
+                    onChange={handleChange}
+                    disabled={!formData.provinceId}
+                    className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all text-gray-700 disabled:bg-gray-50 disabled:text-gray-400"
+                  >
+                    <option value="">Pilih Kota/Kabupaten</option>
+                    {localCities.map(city => (
+                      <option key={city.city_id} value={city.city_id}>
+                        {city.type} {city.city_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-sm font-bold text-[#1A1A1A]">Kecamatan</label>
+                  <input
+                    type="text"
+                    name="kecamatan"
+                    value={formData.kecamatan}
+                    onChange={handleChange}
+                    placeholder="Contoh: Gubeng"
+                    className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2.5">
+                  <label className="text-sm font-bold text-[#1A1A1A]">Kode Pos</label>
+                  <input
+                    type="text"
+                    name="kodePos"
+                    value={formData.kodePos}
+                    onChange={handleChange}
+                    placeholder="Contoh: 60281"
+                    className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2.5 col-span-2">
+                  <label className="text-sm font-bold text-[#1A1A1A]">Detail Alamat Lengkap</label>
+                  <textarea
+                    name="detailAlamat"
+                    value={formData.detailAlamat}
+                    onChange={handleChange}
+                    rows="3"
+                    placeholder="Nama Jalan, Gedung, No. Rumah, dll."
+                    className="px-6 py-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#7CC052] outline-none transition-all placeholder:text-gray-300 resize-none"
+                  ></textarea>
+                </div>
+              </div>
+            )}
+
           </div>
+        </div>
+
+        {/* FOOTER ACTION */}
+        <div className="px-10 py-6 flex justify-end border-t border-gray-100 shrink-0 bg-white">
+          <button
+            onClick={handleSubmit}
+            className="bg-[#7CC052] text-white px-10 py-4 rounded-xl font-bold text-sm hover:bg-[#68a741] transition-all shadow-lg shadow-green-100"
+          >
+            Tambah User
+          </button>
         </div>
       </div>
     </div>
+    </>
   );
 }

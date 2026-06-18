@@ -5,12 +5,14 @@ import { useEditUser } from "../hooks/useEditUser";
 import { useHapusUser } from "../hooks/useHapusUser";
 
 import Header from "./Header";
-import SearchBar from "./SearchBar";
+import SearchBar from "../../components/SearchBar";
+import { Plus } from "lucide-react";
 import Tabel from "./Tabel";
-import Pagination from "./Pagination";
+import Pagination from "../../components/Pagination";
 import ModalTambahUser from "./ModalTambahUser";
 import ModalPerbaruiUser from "./ModalPerbaruiUser";
 import ModalHapusUser from "./ModalHapusUser";
+import ModalDetailUser from "./ModalDetailUser";
 import ToastAlert from "@/view/components/ToastAlert";
 
 export default function KelolaUser() {
@@ -21,6 +23,7 @@ export default function KelolaUser() {
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isHapusOpen, setIsHapusOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   // State toast notifikasi
   const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
@@ -69,6 +72,12 @@ export default function KelolaUser() {
     setIsEditOpen(true);
   };
 
+  // Handler buka modal detail
+  const handleDetail = (user) => {
+    setSelectedUser(user);
+    setIsDetailOpen(true);
+  };
+
   // Handler buka modal hapus
   const handleDelete = (user) => {
     setSelectedUser(user);
@@ -80,7 +89,16 @@ export default function KelolaUser() {
       {/* HEADER DAN SEARCH */}
       <div className="flex flex-col gap-2">
         <Header />
-        <SearchBar onOpenTambah={() => setIsTambahOpen(true)} />
+        <SearchBar 
+          rightComponents={
+            <button 
+              onClick={() => setIsTambahOpen(true)}
+              className="bg-[#56BC36] text-white p-2.5 rounded-md hover:bg-[#469e2c] transition-colors shadow-sm cursor-pointer"
+            >
+              <Plus size={20} />
+            </button>
+          }
+        />
       </div>
 
       {/* TABLE DATA */}
@@ -89,31 +107,40 @@ export default function KelolaUser() {
           Mengambil data dari server...
         </div>
       ) : (
-        <Tabel
-          data={dataUser}
+        <Tabel isLoading={isLoading} 
+          data={dataUser} 
+          onEdit={handleEdit} 
+          onDelete={handleDelete} 
+          onDetail={handleDetail}
           startIndex={startIndex}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
         />
       )}
 
-      {/* PAGINATION */}
-      <Pagination
-        currentPage={currentPage}
-        lastPage={lastPage}
-        onPageChange={handlePageChange}
-      />
+      {/* COMPONENT PAGINATION */}
+      {dataUser.length > 0 && (
+        <Pagination 
+          currentPage={currentPage} 
+          totalPages={lastPage} 
+          onPageChange={handlePageChange} 
+        />
+      )}
 
       {/* MODALS */}
-      <ModalTambahUser
-        isOpen={isTambahOpen}
-        onClose={() => setIsTambahOpen(false)}
+      <ModalTambahUser 
+        isOpen={isTambahOpen} 
+        onClose={() => setIsTambahOpen(false)} 
         hook={tambahUser}
       />
+      
+      <ModalDetailUser
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+        user={selectedUser}
+      />
 
-      <ModalPerbaruiUser
-        isOpen={isEditOpen}
-        onClose={() => setIsEditOpen(false)}
+      <ModalPerbaruiUser 
+        isOpen={isEditOpen} 
+        onClose={() => setIsEditOpen(false)} 
         hook={editUser}
       />
 

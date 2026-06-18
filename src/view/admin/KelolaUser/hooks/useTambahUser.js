@@ -11,6 +11,11 @@ const INITIAL_FORM = {
   role: "",
   tanggalLahir: "",
   nomorWa: "",
+  provinceId: "",
+  cityId: "",
+  kecamatan: "",
+  kodePos: "",
+  detailAlamat: "",
 };
 
 /**
@@ -35,7 +40,7 @@ export function useTambahUser(onSuccess, showToast) {
   const handleSubmit = async () => {
     try {
       await axiosClient.post(endpoints.admin.users, formData);
-      showToast("User berhasil ditambahkan!");
+      showToast("Berhasil menambahkan user", "success");
       setFormData(INITIAL_FORM); // Reset form setelah sukses
       onSuccess();
     } catch (error) {
@@ -56,5 +61,6 @@ export function useTambahUser(onSuccess, showToast) {
     setShowPassword,
     handleChange,
     handleSubmit,
+    setFormData,
   };
 }

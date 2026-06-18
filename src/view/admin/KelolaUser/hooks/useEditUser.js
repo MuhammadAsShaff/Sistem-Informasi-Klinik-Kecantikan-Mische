@@ -18,6 +18,7 @@ export function useEditUser(userData, onSuccess, showToast) {
     role: "",
     tanggalLahir: "",
     nomorWa: "",
+    alamat_lengkap: [],
   });
   const [showPassword, setShowPassword] = useState(false);
 
@@ -46,6 +47,7 @@ export function useEditUser(userData, onSuccess, showToast) {
           userData.nomor_whatsapp ||
           userData.no_wa ||
           "",
+        alamat_lengkap: userData.alamat_lengkap || userData.alamats || [],
       });
     }
   }, [userData]);
@@ -65,7 +67,7 @@ export function useEditUser(userData, onSuccess, showToast) {
     try {
       const idUser = userData.idUser || userData.id;
       await axiosClient.put(`${endpoints.admin.users}/${idUser}`, formData);
-      showToast("Data user berhasil diperbarui!");
+      showToast("Berhasil memperbarui user", "success");
       onSuccess();
     } catch (error) {
       console.error("Gagal memperbarui user:", error);
@@ -85,5 +87,6 @@ export function useEditUser(userData, onSuccess, showToast) {
     setShowPassword,
     handleChange,
     handleSubmit,
+    setFormData,
   };
 }

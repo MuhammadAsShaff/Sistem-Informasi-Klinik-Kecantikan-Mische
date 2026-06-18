@@ -1,81 +1,64 @@
 import React from "react";
-import { PencilLine, Trash2 } from "lucide-react";
+import { PencilLine, Trash2, Eye } from "lucide-react";
+import { formatDate } from "@/core/utils/formatDate";
+import Table from "../../components/Table";
 
-export default function Tabel({ data, onEdit, onDelete, startIndex = 1 }) {
+export default function Tabel({ isLoading, data, onEdit, onDelete, onDetail, startIndex = 1 }) {
+  const columns = [
+    { label: 'No', render: (item, index) => index, className: 'w-12 text-center', cellClassName: 'text-xs font-medium text-gray-500 text-center' },
+    { label: 'Nama', key: 'nama', render: (item) => item.nama || item.name || "-", className: '', cellClassName: 'text-xs font-bold text-[#1A1A1A] whitespace-nowrap' },
+    { 
+      label: 'Role', 
+      render: (item) => (
+        <span className={`px-2 py-1 rounded-md capitalize ${(item.role || '').toLowerCase() === 'admin' ? 'bg-orange-50 text-orange-600' :
+          (item.role || '').toLowerCase() === 'staff' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-600'
+          }`}>
+          {item.role || "-"}
+        </span>
+      ),
+      className: 'text-center', 
+      cellClassName: 'text-xs font-bold text-center' 
+    },
+    { label: 'Email', render: (item) => item.email || "-", className: '', cellClassName: 'text-xs text-gray-500 font-medium' },
+    { label: 'Nomor Whatsapp', render: (item) => item.nomorWa || item.whatsapp || item.nomor_whatsapp || item.no_wa || "-", className: '', cellClassName: 'text-xs text-gray-500 font-medium whitespace-nowrap' },
+    { 
+      label: 'Action', 
+      render: (item) => (
+        <div className="flex items-center justify-center gap-3">
+          <button
+            onClick={() => onDetail(item)}
+            className="text-gray-400 hover:text-blue-500 transition-colors"
+            title="Lihat Detail User"
+          >
+            <Eye size={18} />
+          </button>
+          <button
+            onClick={() => onEdit(item)}
+            className="text-gray-400 hover:text-[#56BC36] transition-colors"
+            title="Perbarui User"
+          >
+            <PencilLine size={18} />
+          </button>
+          <button
+            onClick={() => onDelete(item)}
+            className="text-gray-400 hover:text-red-500 transition-colors"
+            title="Hapus User"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      ),
+      className: 'text-center font-bold text-black', 
+      cellClassName: ''
+    }
+  ];
+
   return (
-    <div className="bg-white rounded-[20px] overflow-hidden border border-gray-100 shadow-sm">
-      <div className="overflow-x-auto no-scrollbar">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-gray-100 bg-[#F9FAFB]/50">
-              <th className="px-3 py-4 text-[11px] font-medium text-gray-600 text-center">No</th>
-              <th className="px-3 py-4 text-[11px] font-medium text-gray-600">Nama</th>
-              <th className="px-3 py-4 text-[11px] font-medium text-gray-600">Alamat</th>
-              <th className="px-3 py-4 text-[11px] font-medium text-gray-600">Jenis Kelamin</th>
-              <th className="px-3 py-4 text-[11px] font-medium text-gray-600">Tanggal Lahir</th>
-              <th className="px-3 py-4 text-[11px] font-medium text-gray-600 text-center">Role</th>
-              <th className="px-3 py-4 text-[11px] font-medium text-gray-600">Email</th>
-              <th className="px-3 py-4 text-[11px] font-medium text-gray-600">Nomor Whatsapp</th>
-              <th className="px-3 py-4 text-[11px] font-bold text-black text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {data && data.length > 0 ? (
-              data.map((user, index) => (
-                <tr key={user.idUser || index} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-3 py-3.5 text-xs font-medium text-gray-500 text-center">{startIndex + index}</td>
-                  {/* Membaca field 'nama' atau 'name' dari database */}
-                  <td className="px-3 py-3.5 text-xs font-bold text-[#1A1A1A] whitespace-nowrap">{user.nama || user.name || "-"}</td>
-
-                  {/* Membaca field 'alamat' dari database */}
-                  <td className="px-3 py-3.5 text-xs text-gray-500 font-medium max-w-[150px] truncate">{user.alamat || "-"}</td>
-
-                  {/* Membaca field 'jenisKelamin' dari JSON Laravel */}
-                  <td className="px-3 py-3.5 text-xs text-gray-500 font-medium text-center">{user.jenisKelamin || user.gender || user.jenis_kelamin || "-"}</td>
-
-                  {/* Membaca field 'tanggalLahir' dari JSON Laravel */}
-                  <td className="px-3 py-3.5 text-xs text-gray-500 font-medium whitespace-nowrap">{user.tanggalLahir || user.birth || user.tanggal_lahir || "-"}</td>
-
-                  {/* Menyesuaikan huruf besar/kecil dari role */}
-                  <td className="px-3 py-3.5 text-xs font-bold text-center">
-                    <span className={`px-2 py-1 rounded-md capitalize ${(user.role || '').toLowerCase() === 'admin' ? 'bg-orange-50 text-orange-600' :
-                      (user.role || '').toLowerCase() === 'staff' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-600'
-                      }`}>
-                      {user.role || "-"}
-                    </span>
-                  </td>
-
-                  <td className="px-3 py-3.5 text-xs text-gray-500 font-medium">{user.email || "-"}</td>
-
-                  {/* Membaca field 'nomorWa' dari JSON Laravel */}
-                  <td className="px-3 py-3.5 text-xs text-gray-500 font-medium whitespace-nowrap">{user.nomorWa || user.whatsapp || user.nomor_whatsapp || user.no_wa || "-"}</td>
-
-                  <td className="px-3 py-3.5">
-                    <div className="flex items-center justify-center gap-3">
-                      <button
-                        onClick={() => onEdit(user)}
-                        className="text-gray-400 hover:text-[#56BC36] transition-colors"
-                      >
-                        <PencilLine size={18} />
-                      </button>
-                      <button
-                        onClick={() => onDelete(user)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-center py-10 text-gray-500 font-medium">Belum ada data user.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <Table isLoading={isLoading} 
+      columns={columns} 
+      data={data} 
+      emptyStateText="Belum ada data user."
+      startIndex={startIndex}
+    />
   );
 }

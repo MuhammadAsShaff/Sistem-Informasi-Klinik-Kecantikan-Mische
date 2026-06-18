@@ -18,13 +18,13 @@ export function useHapusUser(
   setCurrentPage,
   showToast
 ) {
-  const confirmDelete = async (onClose) => {
+  const confirmDelete = async (onClose, onSuccess) => {
     if (!selectedUser) return;
     try {
       const idUser = selectedUser.idUser || selectedUser.id;
       await axiosClient.delete(`${endpoints.admin.users}/${idUser}`);
-      showToast("User berhasil dihapus!");
-      onClose();
+      showToast("Berhasil menghapus user", "success");
+      if (onSuccess) onSuccess();
 
       // Jika halaman terakhir hanya punya 1 data, kembali ke halaman sebelumnya
       if (dataLength === 1 && currentPage > 1) {
@@ -32,6 +32,7 @@ export function useHapusUser(
       } else {
         fetchUsers(currentPage);
       }
+      onClose();
     } catch (error) {
       console.error("Gagal menghapus user:", error);
       let errorMessage = "Terjadi kesalahan saat menghapus user.";
