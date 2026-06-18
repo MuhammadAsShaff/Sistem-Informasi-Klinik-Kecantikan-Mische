@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axiosClient from '@/core/api/axiosClient';
 import { endpoints } from '@/core/api/endpoints';
+import ToastAlert from '@/view/components/ToastAlert';
 
 export default function ModalExportExcel({ isOpen, onClose }) {
   const [jenisTreatment, setJenisTreatment] = useState('semua');
   const [tanggalMulai, setTanggalMulai] = useState('');
   const [tanggalSelesai, setTanggalSelesai] = useState('');
   const [isExporting, setIsExporting] = useState(false);
+  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
 
   const handleExport = async () => {
     try {
@@ -41,7 +43,7 @@ export default function ModalExportExcel({ isOpen, onClose }) {
       onClose(); // Tutup modal setelah export
     } catch (error) {
       console.error("Gagal melakukan export excel:", error);
-      alert("Terjadi kesalahan saat mengunduh file Excel.");
+      setToast({ isOpen: true, message: "Terjadi kesalahan saat mengunduh file Excel.", type: "error" });
     } finally {
       setIsExporting(false);
     }
@@ -125,6 +127,12 @@ export default function ModalExportExcel({ isOpen, onClose }) {
         </div>
 
       </div>
+      <ToastAlert 
+        isOpen={toast.isOpen} 
+        message={toast.message} 
+        type={toast.type} 
+        onClose={() => setToast({ ...toast, isOpen: false })} 
+      />
     </div>
   );
 }

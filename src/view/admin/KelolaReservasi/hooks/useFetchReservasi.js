@@ -1,43 +1,35 @@
 import { useState, useEffect } from "react";
-import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
+import { useFetchWithCache } from "@/core/hooks/useFetchWithCache";
 
 export function useFetchReservasi(page = 1) {
+  const url = `${endpoints.admin.reservations}?page=${page}&per_page=6`;
+  const { data, isLoading: isCacheLoading, mutate } = useFetchWithCache(url);
+  
   const [dataReservasi, setDataReservasi] = useState([]);
   const [meta, setMeta] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchReservasi = async (currentPage = page) => {
-    setIsLoading(true);
-    try {
-      const res = await axiosClient.get(`${endpoints.admin.reservations}?page=${currentPage}&per_page=6`);
-      if (res.data.success) {
-        // Jika response dibungkus paginate() Laravel, bentuknya data.data.data dan data.data (untuk meta)
-        const responseData = res.data.data;
-        
-        if (responseData && responseData.data) {
-          setDataReservasi(responseData.data);
-          setMeta({
-            current_page: responseData.current_page,
-            last_page: responseData.last_page,
-            total: responseData.total,
-            from: responseData.from,
-            to: responseData.to,
-          });
-        } else {
-          setDataReservasi(responseData || []);
-        }
-      }
-    } catch (error) {
-      console.error("Gagal mengambil data reservasi:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const isLoading = isCacheLoading;
 
   useEffect(() => {
-    fetchReservasi(page);
-  }, [page]);
+    if (data) {
+      if (data && data.data && Array.isArray(data.data)) {
+        setDataReservasi(data.data);
+        setMeta({
+          current_page: data.current_page,
+          last_page: data.last_page,
+          total: data.total,
+          from: data.from,
+          to: data.to,
+        });
+      } else {
+        setDataReservasi(data || []);
+      }
+    }
+  }, [data]);
+
+  const fetchReservasi = async (currentPage = page) => {
+    mutate();
+  };
 
   return {
     dataReservasi,

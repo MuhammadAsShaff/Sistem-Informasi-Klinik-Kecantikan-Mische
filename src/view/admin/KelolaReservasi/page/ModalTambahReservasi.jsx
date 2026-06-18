@@ -113,6 +113,7 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
                   placeholder="Isi Nomor Whatsapp"
                   className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-green-500 text-sm"
                 />
+                <p className="text-[11px] text-red-500 italic mt-0.5">* Harus diawali dengan '08' atau '+62' dan berisi 10-15 angka</p>
               </div>
             </div>
 

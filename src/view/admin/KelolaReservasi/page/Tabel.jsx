@@ -1,7 +1,7 @@
 import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 
-const Tabel = ({ data, meta, page, setPage, onEditStatus, onDelete, onDetail }) => {
+const Tabel = ({ isLoading, data, meta, page, setPage, onEditStatus, onDelete, onDetail }) => {
   // Pagination helpers
   const handlePrev = () => {
     if (page > 1) setPage(page - 1);
@@ -80,13 +80,7 @@ const Tabel = ({ data, meta, page, setPage, onEditStatus, onDelete, onDetail }) 
                       </td>
                       <td className="px-4 py-4 text-right">
                         <div className="flex justify-end gap-3 items-center">
-                          <button
-                            onClick={() => onEditStatus(item)}
-                            className="text-gray-500 hover:text-black transition-colors"
-                            title="Edit"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                          </button>
+
                           <button
                             onClick={() => onDelete(item)}
                             className="text-gray-500 hover:text-black transition-colors"
