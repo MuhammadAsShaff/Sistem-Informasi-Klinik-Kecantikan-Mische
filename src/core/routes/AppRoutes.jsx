@@ -9,6 +9,7 @@ import AdminLayout from "@/view/admin/AdminLayout";
 import LandingPage from "@/view/Customer/LandingPage/page/landingPage";
 import HalamanPromo from "@/view/Customer/HalamanPromo/Index";
 import PromoDetail from "@/view/Customer/HalamanPromo/page/PromoDetail";
+import DetailJenisPerawatan from "@/view/Customer/DetailJenisPerawatan/page/Index";
 import ReservasiPage from "@/view/Customer/ReservasiPage/page/Index";
 import HalamanEvent from "@/view/Customer/HalamanEvent/Index";
 import EventDetail from "@/view/Customer/HalamanEvent/page/EventDetail";
@@ -21,6 +22,7 @@ import HalamanTestimoni from "@/view/Customer/HalamanTestimoni/page/Index";
 import DetailTestimoni from "@/view/Customer/HalamanTestimoni/page/DetailTestimoni";
 import ProfilCustomerPage from "@/view/Customer/ProfilCustomer/page/Index";
 import RiwayatReservasiPage from "@/view/Customer/ProfilCustomer/page/RiwayatReservasi";
+import RiwayatPembelianPage from "@/view/Customer/ProfilCustomer/page/RiwayatPembelian";
 import HalamanProduk from "@/view/Customer/HalamanProduk/page/Index";
 import DetailProduk from "@/view/Customer/HalamanProduk/page/DetailProduk";
 import DetailKeranjang from "@/view/Customer/DetailKeranjang/Index";
@@ -31,17 +33,17 @@ import KelolaUser from "@/view/admin/KelolaUser/page/Index";
 import KelolaJadwalReservasiTreatment from "@/view/admin/KelolaJadwalReservasiTreatment/page/Index";
 import KelolaProfilKlinik from "@/view/admin/KelolaProfilKlinik/page/Index";
 import KelolaProfilAdmin from "@/view/admin/KelolaProfilAdmin/page/Index";
-import KelolaTestimoni from "@/view/admin/KelolaTestimoni/Index";
-import KelolaProduk from "@/view/admin/KelolaProduk/Index";
-import KelolaPenjualan from "@/view/admin/KelolaPenjualan/Index";
+import KelolaTestimoni from "@/view/admin/KelolaTestimoni/page/Index";
+import KelolaProduk from "@/view/admin/KelolaProduk/page/Index";
+import KelolaPenjualan from "@/view/admin/KelolaPenjualan/page/Index";
 
 // Core Routing & Shared Components
 import ProtectedRoute from "./ProtectedRoute";
-import KelolaProfilDokter from "@/view/admin/KelolaProfilDokter/Index";
-import KelolaPromo from "@/view/admin/KelolaPromo/Index";
-import KelolaEvent from "@/view/admin/KelolaEvent/Index";
-import KelolaReservasi from "@/view/admin/KelolaReservasi/Index";
-import KelolaKategoriProduk from "@/view/admin/KelolaKategoriProduk/Index";
+import KelolaProfilDokter from "@/view/admin/KelolaProfilDokter/page/Index";
+import KelolaPromo from "@/view/admin/KelolaPromo/page/Index";
+import KelolaEvent from "@/view/admin/KelolaEvent/page/Index";
+import KelolaReservasi from "@/view/admin/KelolaReservasi/page/Index";
+import KelolaKategoriProduk from "@/view/admin/KelolaKategoriProduk/page/Index";
 import Page404 from "@/view/components/Page404";
 
 export default function AppRoutes() {
@@ -54,6 +56,7 @@ export default function AppRoutes() {
       {/* ================= CUSTOMER ROUTES ================= */}
       <Route path="/" element={<CustomerLayout />}>
         <Route index element={<LandingPage />} /> 
+        <Route path="perawatan/:id" element={<DetailJenisPerawatan />} />
         <Route path="promo" element={<HalamanPromo />} />
         <Route path="promo/:id" element={<PromoDetail />} />
         <Route path="event" element={<HalamanEvent />} />
@@ -71,6 +74,7 @@ export default function AppRoutes() {
         <Route element={<ProtectedRoute allowedRoles={['customer']} />}>
           <Route path="ProfilCustomer" element={<ProfilCustomerPage />} />
           <Route path="ProfilCustomer/riwayat-reservasi" element={<RiwayatReservasiPage />} />
+          <Route path="ProfilCustomer/riwayat-pembelian" element={<RiwayatPembelianPage />} />
           <Route path="reservasi" element={<ReservasiPage />} />
         </Route>
       </Route>
