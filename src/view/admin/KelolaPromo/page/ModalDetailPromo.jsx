@@ -30,8 +30,16 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
   const prodId = promo.idProduk || promo.id_produk || promo.produk_id;
 
   // Cek apakah ada data teks (string) atau ambil nama berdasarkan ID
-  const kategori = promo.kategoriProduk || promo.kategori_produk || promo.kategori || (katId ? getKategoriName(katId) : null);
-  const produk = promo.produk || promo.namaProduk || promo.nama_produk || (prodId ? getProdukName(prodId) : null);
+  const parseName = (val) => {
+    if (!val) return null;
+    if (typeof val === 'object') {
+      return val.nama || val.namaKategori || val.namaProduk || null;
+    }
+    return val;
+  };
+
+  const kategori = parseName(promo.kategoriProduk || promo.kategori_produk || promo.kategori) || (katId ? getKategoriName(katId) : null);
+  const produk = parseName(promo.produk || promo.namaProduk || promo.nama_produk) || (prodId ? getProdukName(prodId) : null);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -81,8 +89,18 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
               {/* Diskon */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Diskon</label>
-                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
-                  {promo.diskon || "-"}
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium">
+                  {(() => {
+                    const jenis = String(promo.jenisPromo || promo.jenis_promo || "").toLowerCase();
+                    const isGratis = jenis.includes("gratis") || promo.diskon == 0;
+                    const isPersen = jenis.includes("persen") || (jenis === "diskon" && promo.diskon <= 100) || (!jenis && promo.diskon > 0 && promo.diskon <= 100);
+                    const isPotongan = jenis.includes("potongan") || jenis.includes("nominal") || (jenis === "diskon" && promo.diskon > 100) || (!jenis && promo.diskon > 100);
+
+                    if (isGratis) return "Gratis Produk";
+                    if (isPersen) return `${promo.diskon}%`;
+                    if (isPotongan) return `Rp ${Number(promo.diskon).toLocaleString('id-ID')}`;
+                    return promo.diskon || "-";
+                  })()}
                 </div>
               </div>
 
@@ -124,14 +142,22 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Kategori / Produk Spesifik (Optional) */}
-              {(kategori || produk) && (
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-800 mb-2">Kategori / Produk Terkait</label>
+              {/* Kategori Terkait */}
+              {kategori && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">Kategori Terkait</label>
                   <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
-                    {kategori ? `Kategori: ${kategori}` : ''}
-                    {kategori && produk ? ' | ' : ''}
-                    {produk ? `Produk: ${produk}` : ''}
+                    {kategori}
+                  </div>
+                </div>
+              )}
+
+              {/* Produk Terkait */}
+              {produk && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 mb-2">Produk Terkait</label>
+                  <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
+                    {produk}
                   </div>
                 </div>
               )}

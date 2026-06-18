@@ -14,8 +14,8 @@ export function useEditPromo(selectedPromo, onSuccess, showToast) {
     diskon: "",
     status: true,
     gambar: null,
-    idKategori: 1,
-    idProduk: 1
+    idKategori: "",
+    idProduk: ""
   });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,8 +33,8 @@ export function useEditPromo(selectedPromo, onSuccess, showToast) {
         diskon: selectedPromo.diskon || "",
         status: selectedPromo.status !== undefined ? selectedPromo.status : true,
         gambar: null,
-        idKategori: selectedPromo.idKategori || 1,
-        idProduk: selectedPromo.idProduk || 1
+        idKategori: selectedPromo.idKategori || "ALL",
+        idProduk: selectedPromo.idProduk || "ALL"
       });
     }
   }, [selectedPromo]);
@@ -99,11 +99,46 @@ const convertToJPEG = (file) => {
       return;
     }
 
+    const isKategoriSelected = formData.idKategori && formData.idKategori !== "ALL";
+    const isProdukSelected = formData.idProduk && formData.idProduk !== "ALL";
+
+    if (isKategoriSelected && isProdukSelected) {
+      setError("Tidak bisa memilih Kategori dan Produk secara bersamaan. Pilih salah satu, atau kosongkan keduanya.");
+      return;
+    }
+
+    if (formData.jenisPromo === "Gratis Produk" && !isProdukSelected) {
+      setError("Untuk promo Gratis Produk, Anda wajib memilih produk bonus secara spesifik (tidak boleh 'Semua Produk' atau kosong).");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const payload = new FormData();
+
+      let finalDiskon = formData.diskon;
+      if (formData.jenisPromo === "Gratis Produk") {
+        finalDiskon = 0;
+      } else if (!finalDiskon) {
+        finalDiskon = 0;
+      }
+
       Object.keys(formData).forEach(key => {
-        if (formData[key] !== null && formData[key] !== undefined) {
+        if (key === 'diskon') {
+           payload.append('diskon', finalDiskon);
+           return;
+        }
+
+        if (key === 'idKategori' || key === 'idProduk') {
+           if (!formData[key] || formData[key] === 'ALL') {
+             payload.append(key, ""); // Kirim string kosong agar laravel mengubahnya jadi null
+           } else {
+             payload.append(key, formData[key]);
+           }
+           return;
+        }
+
+        if (formData[key] !== null && formData[key] !== undefined && formData[key] !== "") {
            payload.append(key, formData[key]);
         }
       });
@@ -112,12 +147,10 @@ const convertToJPEG = (file) => {
       payload.append('_method', 'PUT'); // untuk laravel multipart form data update
 
       const idPromo = selectedPromo.idPromo || selectedPromo.id;
-      const res = await axiosClient.post(`${endpoints.admin.promo}/${idPromo}`, payload, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await axiosClient.post(`${endpoints.admin.promo}/${idPromo}`, payload);
       
       if (res.data?.success) {
-        showToast("Promo ini berhasil diperbarui!", "success");
+        showToast("Berhasil memperbarui promo", "success");
         if (onSuccess) onSuccess();
       } else {
         showToast("Gagal memperbarui promo.", "error");

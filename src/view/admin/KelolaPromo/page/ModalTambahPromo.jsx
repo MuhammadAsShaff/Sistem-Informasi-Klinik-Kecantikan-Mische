@@ -72,13 +72,14 @@ export default function ModalTambahPromo({
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors bg-white"
                 >
                   <option value="">Pilih Kategori</option>
+                  <option value="ALL">Semua Kategori</option>
                   {categories.map((cat) => (
                     <option key={cat.idKategori || cat.id} value={cat.idKategori || cat.id}>
                       {cat.nama}
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-red-500 mt-1">*Pilih kategori produk bila promo berdasarkan kategori produk</p>
+                <p className="text-xs text-gray-500 mt-1">*Pilih kategori jika promo khusus kategori tertentu</p>
               </div>
 
               <div>
@@ -101,8 +102,9 @@ export default function ModalTambahPromo({
                   value={formData.minimalTransaksi}
                   onChange={handleInputChange}
                   placeholder="Minimal Transaksi"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
+                <p className="text-[11px] text-red-500 italic mt-0.5">*isi dalam besaran rupiah</p>
               </div>
 
               <div>
@@ -145,13 +147,14 @@ export default function ModalTambahPromo({
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors bg-white"
                 >
                   <option value="">Pilih Produk</option>
+                  <option value="ALL">Semua Produk</option>
                   {products.map((p) => (
                     <option key={p.idProduk || p.id} value={p.idProduk || p.id}>
                       {p.nama || p.namaProduk}
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-red-500 mt-1">*Pilih produk bila promo berdasarkan produk</p>
+                <p className="text-xs text-gray-500 mt-1">*Pilih produk jika promo khusus produk tertentu</p>
               </div>
 
               <div>
@@ -164,6 +167,7 @@ export default function ModalTambahPromo({
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors"
                   required
                 />
+                <p className="text-[11px] text-red-500 italic mt-0.5">* Pastikan tanggal selesai lebih dari atau sama dengan tanggal mulai</p>
               </div>
 
               <div>
@@ -178,6 +182,7 @@ export default function ModalTambahPromo({
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors"
                   required
                 />
+                <p className="text-[11px] text-red-500 italic mt-0.5">* Hanya huruf dan angka, tanpa spasi</p>
               </div>
 
               <div>
@@ -190,6 +195,7 @@ export default function ModalTambahPromo({
                   placeholder="Diskon"
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-[#56BC36] focus:ring-1 focus:ring-[#56BC36] transition-colors"
                 />
+                <p className="text-[11px] text-red-500 italic mt-0.5">* Input dalam bentuk Rupiah atau Persentase</p>
               </div>
 
               <div>
@@ -209,7 +215,7 @@ export default function ModalTambahPromo({
                     {formData.gambar ? (formData.gambar.name || "Gambar Terpilih") : "No File Chosen"}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Format: Semua Format Gambar. Max: 4MB.</p>
+                <p className="text-[11px] text-red-500 italic mt-2">* Format: JPG/PNG/JPEG. Ukuran maksimal 2MB.</p>
               </div>
             </div>
 
