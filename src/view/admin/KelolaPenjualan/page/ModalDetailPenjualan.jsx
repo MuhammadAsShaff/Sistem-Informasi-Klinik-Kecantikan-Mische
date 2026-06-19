@@ -14,6 +14,19 @@ const ModalDetailPenjualan = ({ isOpen, onClose, data }) => {
     return detailpenjualan.reduce((acc, curr) => acc + curr.jumlahProduk, 0);
   };
 
+  const formatPaymentType = (type) => {
+    if (!type) return 'Belum Melakukan Pembayaran';
+    const s = String(type).toLowerCase();
+    if (s === 'bank_transfer') return 'Transfer Bank';
+    if (s === 'echannel') return 'Mandiri Bill';
+    if (s === 'gopay') return 'GoPay';
+    if (s === 'qris') return 'QRIS';
+    if (s === 'shopeepay') return 'ShopeePay';
+    if (s === 'cstore') return 'Indomaret / Alfamart';
+    if (s === 'credit_card') return 'Kartu Kredit / Debit';
+    return type;
+  };
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl overflow-hidden font-sans">
@@ -29,7 +42,7 @@ const ModalDetailPenjualan = ({ isOpen, onClose, data }) => {
         
         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
           {/* Info Utama */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">No. Invoice</label>
               <div className="text-gray-800 font-medium">{data.invoiceNumber || '-'}</div>
@@ -49,6 +62,10 @@ const ModalDetailPenjualan = ({ isOpen, onClose, data }) => {
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Status Pembayaran</label>
               <div className="text-gray-800 font-medium capitalize">{data.paymentStatus || '-'}</div>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Metode Pembayaran</label>
+              <div className="text-gray-800 font-medium">{formatPaymentType(data.payment_type || data.paymentMethod)}</div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nomor Resi</label>

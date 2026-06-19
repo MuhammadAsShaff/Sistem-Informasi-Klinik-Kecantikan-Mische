@@ -30,6 +30,19 @@ export default function ModalDetailPembelian({ isOpen, onClose, selectedOrder })
     return 'text-red-600 bg-red-50 px-2 py-1 rounded-md text-xs font-bold';
   };
 
+  const formatPaymentType = (type) => {
+    if (!type) return 'Belum Melakukan Pembayaran';
+    const s = String(type).toLowerCase();
+    if (s === 'bank_transfer') return 'Transfer Bank';
+    if (s === 'echannel') return 'Mandiri Bill';
+    if (s === 'gopay') return 'GoPay';
+    if (s === 'qris') return 'QRIS';
+    if (s === 'shopeepay') return 'ShopeePay';
+    if (s === 'cstore') return 'Indomaret / Alfamart';
+    if (s === 'credit_card') return 'Kartu Kredit / Debit';
+    return type;
+  };
+
   const items = order.detailPenjualan || order.items || [];
 
   return (
@@ -75,7 +88,7 @@ export default function ModalDetailPembelian({ isOpen, onClose, selectedOrder })
                </div>
                <div className="flex justify-between text-sm">
                  <span className="text-gray-500">Metode</span>
-                 <span className="font-semibold text-gray-800">{order.payment_type || order.paymentMethod || 'Otomatis via Midtrans'}</span>
+                 <span className="font-semibold text-gray-800">{formatPaymentType(order.payment_type || order.paymentMethod)}</span>
                </div>
                <div className="flex justify-between text-sm">
                  <span className="text-gray-500">Total Harga</span>

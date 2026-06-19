@@ -26,6 +26,9 @@ export const CartProvider = ({ children }) => {
   const fetchCart = useCallback(async () => {
     // Cek token secara aman (opsional, axios interceptor biasanya handle, tapi mencegah hit API jika belum login)
     if (!localStorage.getItem('token') && !sessionStorage.getItem('token')) {
+      setCartItems([]);
+      setAppliedVoucher(null);
+      setVoucherCode('');
       setIsCartLoading(false);
       return;
     }

@@ -20,6 +20,7 @@ const DetailKeranjang = () => {
     handleCheckout,
     formatRupiah,
     appliedVoucher,
+    setAppliedVoucher,
     voucherError,
     isCartLoading,
   } = useCart();
@@ -69,6 +70,7 @@ const DetailKeranjang = () => {
               voucherCode={voucherCode}
               onVoucherChange={handleVoucherChange}
               onApplyVoucher={applyVoucher}
+              onRemoveVoucher={() => setAppliedVoucher(null)}
               onCheckout={() => setIsCheckoutModalOpen(true)}
               formatRupiah={formatRupiah}
               appliedVoucher={appliedVoucher}

@@ -6,12 +6,13 @@ const OrderSummary = ({
   voucherCode,
   onVoucherChange,
   onApplyVoucher,
+  onRemoveVoucher,
   onCheckout,
   formatRupiah,
   appliedVoucher,
   voucherError,
 }) => {
-  const finalTotal = appliedVoucher ? totalAmount - appliedVoucher.diskon : totalAmount;
+  const finalTotal = appliedVoucher ? totalAmount - (appliedVoucher.diskon_nominal ?? appliedVoucher.diskon ?? 0) : totalAmount;
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
       <h2 className="text-xl font-bold text-gray-900 mb-6">
@@ -57,19 +58,28 @@ const OrderSummary = ({
         <div className="flex gap-0">
           <input
             type="text"
-            placeholder="Masukkan Voucher"
-            value={voucherCode}
+            placeholder="Masukkan kode promo"
+            value={appliedVoucher ? appliedVoucher.kode : voucherCode}
             onChange={onVoucherChange}
             disabled={!!appliedVoucher || selectedItems.length === 0}
             className={`flex-1 border border-gray-300 rounded-l-full px-4 py-2 text-sm focus:outline-none ${appliedVoucher || selectedItems.length === 0 ? 'bg-gray-100 text-gray-500' : 'focus:ring-1 focus:ring-[#5cb85c] focus:border-[#5cb85c]'} placeholder-gray-400`}
           />
-          <button
-            onClick={onApplyVoucher}
-            disabled={!!appliedVoucher || selectedItems.length === 0}
-            className={`px-6 py-2 rounded-r-full transition-colors text-sm font-bold text-white ${appliedVoucher || selectedItems.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#56BC36] hover:bg-[#2da509]'}`}
-          >
-            Pakai
-          </button>
+          {appliedVoucher ? (
+            <button
+              onClick={onRemoveVoucher}
+              className={`px-6 py-2 rounded-r-full transition-colors text-sm font-bold text-white bg-red-500 hover:bg-red-600`}
+            >
+              Batal
+            </button>
+          ) : (
+            <button
+              onClick={onApplyVoucher}
+              disabled={selectedItems.length === 0}
+              className={`px-6 py-2 rounded-r-full transition-colors text-sm font-bold text-white ${selectedItems.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#56BC36] hover:bg-[#2da509]'}`}
+            >
+              Pakai
+            </button>
+          )}
         </div>
         {voucherError && (
           <p className="text-red-500 text-xs mt-2 text-left">{voucherError}</p>

@@ -36,7 +36,7 @@ export default function ModalCheckout({
   useEffect(() => {
     if (isOpen) {
       if (appliedVoucher) {
-        setDiscountAmount(appliedVoucher.diskon);
+        setDiscountAmount(appliedVoucher.diskon_nominal ?? appliedVoucher.diskon ?? 0);
       } else {
         setDiscountAmount(0);
       }
