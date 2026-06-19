@@ -10,7 +10,11 @@ const TableSection = ({ data, onDeleteClick, onDetailClick, onResiClick, onStatu
     { label: 'Tanggal', render: (item) => formatDate(item.tanggal), className: 'text-center whitespace-nowrap', cellClassName: 'text-center whitespace-nowrap' },
     { 
       label: 'Total Harga', 
-      render: (item) => <span className="text-green-600 font-medium">Rp {item.total ? item.total.toLocaleString('id-ID') : 0}</span>, 
+      render: (item) => {
+        const ps = (item.paymentStatus || item.status_pembayaran || '').toLowerCase();
+        const isPaid = ps === 'paid' || ps === 'settlement' || ps === 'capture';
+        return <span className={`${isPaid ? 'text-green-600' : 'text-red-500'} font-bold`}>Rp {item.total ? item.total.toLocaleString('id-ID') : 0}</span>;
+      }, 
       className: 'text-center', 
       cellClassName: 'text-center' 
     },

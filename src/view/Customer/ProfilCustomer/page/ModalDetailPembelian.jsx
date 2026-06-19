@@ -25,9 +25,9 @@ export default function ModalDetailPembelian({ isOpen, onClose, selectedOrder })
 
   const getPaymentStatusColor = (status) => {
     const s = (status || '').toLowerCase();
-    if (s === 'paid' || s === 'settlement' || s === 'capture') return 'text-green-600 bg-green-50 px-2 py-1 rounded-md text-xs font-bold';
-    if (s === 'pending') return 'text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md text-xs font-bold';
-    return 'text-red-600 bg-red-50 px-2 py-1 rounded-md text-xs font-bold';
+    if (s === 'paid' || s === 'settlement' || s === 'capture') return 'text-green-700 bg-green-50 border border-green-200 px-3 py-1 rounded-full text-xs font-bold';
+    if (s === 'pending') return 'text-yellow-700 bg-yellow-50 border border-yellow-200 px-3 py-1 rounded-full text-xs font-bold';
+    return 'text-red-700 bg-red-50 border border-red-200 px-3 py-1 rounded-full text-xs font-bold';
   };
 
   const formatPaymentType = (type) => {

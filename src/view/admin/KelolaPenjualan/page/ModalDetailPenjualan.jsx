@@ -61,7 +61,16 @@ const ModalDetailPenjualan = ({ isOpen, onClose, data }) => {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Status Pembayaran</label>
-              <div className="text-gray-800 font-medium capitalize">{data.paymentStatus || '-'}</div>
+              <div className={`inline-flex px-3 py-1 rounded-full text-xs font-bold border ${
+                (() => {
+                  const s = (data.paymentStatus || '').toLowerCase();
+                  if (s === 'paid' || s === 'settlement' || s === 'capture') return 'bg-green-50 text-green-700 border-green-200';
+                  if (s === 'pending') return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+                  return 'bg-red-50 text-red-700 border-red-200';
+                })()
+              }`}>
+                {(data.paymentStatus || 'UNPAID').toUpperCase()}
+              </div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Metode Pembayaran</label>

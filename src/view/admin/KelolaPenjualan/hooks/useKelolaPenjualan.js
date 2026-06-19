@@ -104,9 +104,16 @@ export const useKelolaPenjualan = () => {
     const searchMatch = (item.user?.nama?.toLowerCase() || '').includes(searchQuery.toLowerCase()) || 
                         (item.invoiceNumber?.toLowerCase() || '').includes(searchQuery.toLowerCase());
     
-    const tabMatch = activeTab === 'Semua' || (item.orderStatus || 'pending') === activeTab;
-    
-    // Nanti filterProduk bisa diimplementasi jika produk benar-benar disaring
+    let tabMatch = true;
+    if (activeTab === 'Sudah Bayar') {
+      const ps = (item.paymentStatus || item.status_pembayaran || '').toLowerCase();
+      tabMatch = ps === 'paid' || ps === 'settlement' || ps === 'capture';
+    } else if (activeTab === 'Belum Bayar') {
+      const ps = (item.paymentStatus || item.status_pembayaran || '').toLowerCase();
+      tabMatch = !(ps === 'paid' || ps === 'settlement' || ps === 'capture');
+    } else if (activeTab !== 'Semua') {
+      tabMatch = (item.orderStatus || 'pending') === activeTab;
+    }
     return searchMatch && tabMatch;
   }).sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
 

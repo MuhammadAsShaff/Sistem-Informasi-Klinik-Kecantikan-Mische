@@ -153,8 +153,8 @@ const KelolaPenjualan = () => {
       />
 
       {/* Tabs Section */}
-      <div className="flex border-b border-gray-200 mb-6">
-        {['Semua', 'pending', 'diproses', 'dikirim', 'selesai', 'dibatalkan'].map((tab) => (
+      <div className="flex border-b border-gray-200 mb-6 overflow-x-auto custom-scrollbar">
+        {['Semua', 'Sudah Bayar', 'Belum Bayar', 'pending', 'diproses', 'dikirim', 'selesai', 'dibatalkan'].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}

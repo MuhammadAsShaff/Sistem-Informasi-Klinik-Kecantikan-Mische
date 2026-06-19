@@ -51,18 +51,34 @@ const DetailProduk = () => {
           {/* Details Area */}
           <div className="w-full md:w-3/5 flex flex-col">
             <h1 className="text-4xl font-extrabold text-black mb-2">{product.nama || product.name}</h1>
-            <p className="text-3xl font-extrabold text-black mb-8">
+            <p className="text-3xl font-extrabold text-black mb-4">
               {product.harga 
                 ? `Rp ${Number(product.harga).toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
                 : product.price}
             </p>
+            
+            <div className="flex items-center gap-2 mb-8">
+              <span className="text-gray-500 font-medium">Stok Tersedia:</span>
+              <span className={`font-bold px-3 py-1 rounded-full text-sm ${
+                (product.stok || product.stock || 0) > 0 
+                  ? 'bg-green-50 text-green-700 border border-green-200' 
+                  : 'bg-red-50 text-red-700 border border-red-200'
+              }`}>
+                {product.stok || product.stock || 0} Pcs
+              </span>
+            </div>
             
             <div className="flex flex-wrap items-center gap-10 mb-8">
               {/* Qty Selector */}
               <div className="flex items-center gap-6 text-[#69C146] font-bold text-2xl">
                 <button onClick={() => setQty(Math.max(1, qty - 1))} className="hover:text-green-700 transition-colors">-</button>
                 <span className="w-6 text-center">{qty}</span>
-                <button onClick={() => setQty(qty + 1)} className="hover:text-green-700 transition-colors">+</button>
+                <button 
+                  onClick={() => setQty(Math.min(product.stok || product.stock || 999, qty + 1))} 
+                  className="hover:text-green-700 transition-colors"
+                >
+                  +
+                </button>
               </div>
               
               {/* Add to Cart Button */}
