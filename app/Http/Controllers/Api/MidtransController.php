@@ -6,25 +6,22 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Penjualan;
 use Illuminate\Support\Facades\Log;
+use App\Services\MidtransService;
 
-class WebhookController extends Controller
+class MidtransController extends Controller
 {
     /**
      * Handler Notifikasi dari Midtrans
      */
-    public function midtransNotification(Request $request)
+    public function midtransNotification(Request $request, MidtransService $midtransService)
     {
-        $serverKey = config('midtrans.server_key');
-        
         $orderId = $request->order_id;
         $statusCode = $request->status_code;
         $grossAmount = $request->gross_amount;
         $signatureKey = $request->signature_key;
         
-        // Verifikasi Signature Key untuk memastikan notifikasi benar-benar dari Midtrans
-        $calculatedSignatureKey = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
-
-        if ($calculatedSignatureKey !== $signatureKey) {
+        // Verifikasi Signature Key via Service
+        if (!$midtransService->verifySignature($orderId, $statusCode, $grossAmount, $signatureKey)) {
             Log::error('Midtrans Webhook: Invalid Signature', ['order_id' => $orderId]);
             return response()->json(['status' => 'error', 'message' => 'Invalid signature key'], 403);
         }

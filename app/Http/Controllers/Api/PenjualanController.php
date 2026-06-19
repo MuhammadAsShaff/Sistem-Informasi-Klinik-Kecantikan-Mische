@@ -12,8 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Promo;
 use App\Models\AlamatCustomer;
-use Midtrans\Config;
-use Midtrans\Snap;
+use App\Services\MidtransService;
 
 class PenjualanController extends Controller
 {
@@ -291,7 +290,7 @@ class PenjualanController extends Controller
     /**
      * Checkout dari Keranjang Belanja (E-Commerce) dengan Midtrans Snap
      */
-    public function checkoutCart(Request $request)
+    public function checkoutCart(Request $request, MidtransService $midtransService)
     {
         $validator = Validator::make($request->all(), [
             'idAlamat' => 'required|exists:alamat_customer,id',
@@ -300,7 +299,9 @@ class PenjualanController extends Controller
             'shippingCost' => 'required|numeric|min:0',
             'idPromo' => 'nullable|exists:promo,idPromo',
             'cart_ids' => 'required|array',
-            'cart_ids.*' => 'integer|exists:keranjang,idKeranjang'
+            'cart_ids.*' => 'integer|exists:keranjang,idKeranjang',
+            'paymentMethod' => 'nullable|array',
+            'paymentMethod.*' => 'string'
         ]);
 
         if ($validator->fails()) {
@@ -404,27 +405,9 @@ class PenjualanController extends Controller
             // Kosongkan item keranjang yang dipilih saja
             Keranjang::whereIn('idKeranjang', $request->cart_ids)->delete();
 
-            // Set konfigurasi Midtrans
-            Config::$serverKey = config('midtrans.server_key');
-            Config::$isProduction = config('midtrans.is_production');
-            Config::$isSanitized = config('midtrans.is_sanitized');
-            Config::$is3ds = config('midtrans.is_3ds');
-
-            // Persiapkan parameter untuk Midtrans Snap
-            $params = [
-                'transaction_details' => [
-                    'order_id' => $invoiceNumber,
-                    'gross_amount' => $total,
-                ],
-                'customer_details' => [
-                    'first_name' => auth('api')->user()->nama,
-                    'email' => auth('api')->user()->email,
-                    'phone' => auth('api')->user()->nomorWa,
-                ],
-            ];
-
-            // Dapatkan Snap Token dari Midtrans
-            $snapToken = Snap::getSnapToken($params);
+            // Dapatkan Snap Token dari Midtrans via Service (Opsional dengan custom payment methods)
+            $paymentMethods = $request->input('paymentMethod', null);
+            $snapToken = $midtransService->createSnapToken($invoiceNumber, $total, auth('api')->user(), $paymentMethods);
             
             // Simpan token ke database untuk referensi
             $penjualan->update(['snapToken' => $snapToken]);

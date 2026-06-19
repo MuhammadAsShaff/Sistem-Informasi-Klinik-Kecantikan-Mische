@@ -20,7 +20,7 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\KeranjangController;
 use App\Http\Controllers\Api\PenjualanController;
 use App\Http\Controllers\Api\RajaOngkirController;
-use App\Http\Controllers\Api\WebhookController;
+use App\Http\Controllers\Api\MidtransController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -303,6 +303,6 @@ Route::prefix('admin')->middleware(['role:admin'])->group(function () {
 // Prefix: /api/webhook/...
 // ============================================
 Route::prefix('webhook')->group(function () {
-    Route::post('/midtrans', [WebhookController::class, 'midtransNotification'])->name('webhook.midtrans');
+    Route::post('/midtrans', [MidtransController::class, 'midtransNotification'])->name('webhook.midtrans');
 });
 
