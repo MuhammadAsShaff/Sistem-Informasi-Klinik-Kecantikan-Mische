@@ -175,7 +175,7 @@ class PenjualanController extends Controller
      * receiveItem
      * Menerima barang (Customer mengubah status dari dikirim menjadi selesai)
      */
-    public function receiveItem($idPenjualan)
+     public function receiveItem(Request $request, $idPenjualan)
     {
         try {
             $idUser = auth('api')->user()->idUser;
@@ -186,6 +186,38 @@ class PenjualanController extends Controller
                     'success' => false,
                     'message' => 'Data penjualan tidak ditemukan atau bukan milik Anda.'
                 ], 404);
+            }
+
+            if ($request->action === 'cancel') {
+                if ($penjualan->orderStatus !== 'pending' && $penjualan->orderStatus !== 'diproses') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Hanya pesanan yang belum dikirim yang dapat dibatalkan.'
+                    ], 400);
+                }
+
+                DB::beginTransaction();
+                try {
+                    $penjualan->update(['orderStatus' => 'dibatalkan', 'paymentStatus' => 'failed']);
+                    
+                    // Restore stock
+                    $detailPenjualan = DetailPenjualan::where('idPenjualan', $idPenjualan)->get();
+                    foreach ($detailPenjualan as $detail) {
+                        $produk = ProdukKlinik::find($detail->idProduk);
+                        if ($produk) {
+                            $produk->increment('stock', $detail->jumlahProduk);
+                        }
+                    }
+
+                    DB::commit();
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Pesanan berhasil dibatalkan.'
+                    ], 200);
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    throw $e;
+                }
             }
 
             if ($penjualan->orderStatus !== 'dikirim') {
@@ -205,12 +237,11 @@ class PenjualanController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengkonfirmasi barang diterima.',
+                'message' => 'Gagal memproses permintaan.',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
-
     /**
      * Memesan produk langsung (Customer)
      */
