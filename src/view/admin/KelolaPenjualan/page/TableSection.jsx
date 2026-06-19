@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trash2, Eye, Truck } from 'lucide-react';
 import { formatDate } from '../../../../core/utils/formatDate';
-import Table from '../../components/Table';
+import Table from '@/components/Table';
 
 const TableSection = ({ data, onDeleteClick, onDetailClick, onResiClick, onStatusChange, currentPage = 1, itemsPerPage = 6, isLoading }) => {
   const columns = [

@@ -4,7 +4,7 @@ import CartHeader from './page/CartHeader';
 import CartItem from './page/CartItem';
 import OrderSummary from './page/OrderSummary';
 import ModalCheckout from './page/ModalCheckout';
-import CustomerLoading from '../components/CustomerLoading';
+import CustomerLoading from '@/components/CustomerLoading';
 
 const DetailKeranjang = () => {
   const {

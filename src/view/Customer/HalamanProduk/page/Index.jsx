@@ -4,7 +4,7 @@ import DescriptionSection from './DescriptionSection';
 import CategoryTabs from './CategoryTabs';
 import ProductGrid from './ProductGrid';
 import { useProdukData } from '../hooks/useProdukData';
-import CustomerLoading from '../../components/CustomerLoading';
+import CustomerLoading from '@/components/CustomerLoading';
 
 const Index = () => {
   const { activeCategory, setActiveCategory, filteredProducts, categories, isLoading } = useProdukData();

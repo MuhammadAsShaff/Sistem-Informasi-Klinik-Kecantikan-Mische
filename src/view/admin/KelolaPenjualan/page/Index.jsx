@@ -4,10 +4,10 @@ import ModalHapus from './ModalHapus';
 import ModalExportExcel from './ModalExportExcel';
 import ModalDetailPenjualan from './ModalDetailPenjualan';
 import ModalResi from './ModalResi';
-import SearchBar from '../../components/SearchBar';
+import SearchBar from '@/components/SearchBar';
 import { ChevronDown, FileSpreadsheet } from 'lucide-react';
 import TableSection from './TableSection';
-import Pagination from '../../components/Pagination';
+import Pagination from '@/components/Pagination';
 import { useKelolaPenjualan } from '../hooks/useKelolaPenjualan';
 
 import ToastAlert from '@/view/components/ToastAlert';

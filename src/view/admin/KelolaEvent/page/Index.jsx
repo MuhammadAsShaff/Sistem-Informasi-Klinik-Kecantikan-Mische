@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Header from './Header';
-import SearchBar from '../../components/SearchBar';
-import Pagination from '../../components/Pagination';
+import SearchBar from '@/components/SearchBar';
+import Pagination from '@/components/Pagination';
 import { ChevronDown, Plus } from 'lucide-react';
 import Tabel from './Tabel';
 import ModalTambahEvent from './ModalTambahEvent';

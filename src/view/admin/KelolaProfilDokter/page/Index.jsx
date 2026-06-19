@@ -5,14 +5,14 @@ import { useEditDokter } from "../hooks/useEditDokter";
 import { useHapusDokter } from "../hooks/useHapusDokter";
 
 import Header from "./Header";
-import SearchBar from "../../components/SearchBar";
+import SearchBar from '@/components/SearchBar';
 import { Plus } from "lucide-react";
 import Tabel from "./Tabel";
 import ModalTambahDokter from "./ModalTambahDokter";
 import ModalPerbaruiDokter from "./ModalPerbaruiDokter";
 import ModalHapusDokter from "./ModalHapusDokter";
 import ToastAlert from "@/view/components/ToastAlert";
-import Pagination from "../../components/Pagination";
+import Pagination from '@/components/Pagination';
 
 export default function KelolaProfilDokter() {
   // State seleksi dokter (untuk edit & hapus)

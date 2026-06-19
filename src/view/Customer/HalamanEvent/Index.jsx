@@ -4,7 +4,7 @@ import { useEventData } from './hooks/useEventData';
 import EventCard from './page/EventCard';
 import logomischee from '@/assets/images/logomischee.png'
 import bgEvent from '@/assets/images/gambar event yang berlangsung.png'
-import CustomerLoading from '../components/CustomerLoading';
+import CustomerLoading from '@/components/CustomerLoading';
 
 export default function HalamanEvent() {
   const { events, searchQuery, setSearchQuery, activeFilter, setActiveFilter, summary, isLoading } = useEventData();

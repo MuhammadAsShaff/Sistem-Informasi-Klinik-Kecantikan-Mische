@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import HeaderSection from './HeaderSection';
-import SearchBar from '../../components/SearchBar';
+import SearchBar from '@/components/SearchBar';
 import { ChevronDown, Plus } from 'lucide-react';
 import TableSection from './TableSection';
 import { useFetchProduk } from '../hooks/useFetchProduk';
@@ -9,7 +9,7 @@ import ModalTambahProduk from './ModalTambahProduk';
 import ModalPerbaruiProduk from './ModalPerbaruiProduk';
 import ModalHapusProduk from './ModalHapusProduk';
 import ModalDetailProduk from './ModalDetailProduk';
-import Pagination from '../../components/Pagination';
+import Pagination from '@/components/Pagination';
 import ToastAlert from '@/view/components/ToastAlert';
 
 const KelolaProduk = () => {

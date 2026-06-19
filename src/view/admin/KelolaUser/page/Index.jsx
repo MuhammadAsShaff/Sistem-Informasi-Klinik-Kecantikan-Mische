@@ -5,10 +5,10 @@ import { useEditUser } from "../hooks/useEditUser";
 import { useHapusUser } from "../hooks/useHapusUser";
 
 import Header from "./Header";
-import SearchBar from "../../components/SearchBar";
+import SearchBar from '@/components/SearchBar';
 import { Plus } from "lucide-react";
 import Tabel from "./Tabel";
-import Pagination from "../../components/Pagination";
+import Pagination from '@/components/Pagination';
 import ModalTambahUser from "./ModalTambahUser";
 import ModalPerbaruiUser from "./ModalPerbaruiUser";
 import ModalHapusUser from "./ModalHapusUser";

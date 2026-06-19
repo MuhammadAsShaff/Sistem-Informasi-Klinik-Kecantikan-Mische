@@ -2,7 +2,7 @@ import React from 'react';
 import TestimoniHeader from './TestimoniHeader';
 import TestimoniCard from './TestimoniCard';
 import { useTestimoniData } from '../hooks/useTestimoniData';
-import CustomerLoading from '../../components/CustomerLoading';
+import CustomerLoading from '@/components/CustomerLoading';
 
 const HalamanTestimoni = () => {
   const { testimonials, isLoading } = useTestimoniData();

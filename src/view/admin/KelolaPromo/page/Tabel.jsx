@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { PencilLine, Trash2, Send, Eye } from "lucide-react";
 import { STORAGE_BASE_URL } from "@/core/api/endpoints";
-import Table from "../../components/Table";
-import Pagination from "../../components/Pagination";
+import Table from '@/components/Table';
+import Pagination from '@/components/Pagination';
 
 const StatusDropdown = ({ status, onChange }) => {
   const [isOpen, setIsOpen] = React.useState(false);

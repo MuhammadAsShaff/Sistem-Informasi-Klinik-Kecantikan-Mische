@@ -5,10 +5,10 @@ import { useEditJadwal } from "../hooks/useEditJadwal";
 import { useHapusJadwal } from "../hooks/useHapusJadwal";
 
 import Header from "./Header";
-import SearchBar from "../../components/SearchBar";
+import SearchBar from '@/components/SearchBar';
 import { Plus } from "lucide-react";
 import Tabel from "./Tabel";
-import Pagination from "../../components/Pagination";
+import Pagination from '@/components/Pagination';
 import ModalTambahJadwal from "./ModalTambahJadwal";
 import ModalPerbaruiJadwal from "./ModalPerbaruiJadwal";
 import ModalHapusJadwal from "./ModalHapusJadwal";

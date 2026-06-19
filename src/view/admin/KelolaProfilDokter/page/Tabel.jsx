@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { PencilLine, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { STORAGE_BASE_URL } from "@/core/api/endpoints";
-import Table from "../../components/Table";
+import Table from '@/components/Table';
 
 export default function Tabel({ isLoading, data, onEdit, onDelete, onStatusChange, startIndex = 1 }) {
   const [expandedDescId, setExpandedDescId] = useState(null);

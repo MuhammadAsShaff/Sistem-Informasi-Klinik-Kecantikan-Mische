@@ -1,7 +1,7 @@
 import React from 'react';
 import { Edit, Trash2, Plus, Minus, Eye } from 'lucide-react';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
-import Table from '../../components/Table';
+import Table from '@/components/Table';
 
 const TableSection = ({ isLoading, categories, onDeleteClick, onEditClick, onDetailClick, onUpdateStock, showToast, currentPage = 1, itemsPerPage = 6 }) => {
   const handleUpdateStock = async (id, newStock) => {

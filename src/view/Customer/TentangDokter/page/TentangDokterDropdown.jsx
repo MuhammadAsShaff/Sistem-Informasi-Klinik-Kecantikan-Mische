@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useDokterData } from '../hooks/useDokterData';
-import CustomerLoading from '@/view/Customer/components/CustomerLoading';
+import CustomerLoading from '@/components/CustomerLoading';
 
 export default function TentangDokterDropdown() {
   const { doctors, isLoading } = useDokterData();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Edit, Trash2, Send, Eye } from 'lucide-react';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
-import Table from '../../components/Table';
+import Table from '@/components/Table';
 
 export default function Tabel({ isLoading, events, onEdit, onDelete, onSend, onView, currentPage = 1, itemsPerPage = 6 }) {
   // Format Tanggal

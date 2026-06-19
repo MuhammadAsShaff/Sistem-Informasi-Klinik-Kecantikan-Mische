@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import HeaderSection from './HeaderSection';
-import SearchBar from '../../components/SearchBar';
+import SearchBar from '@/components/SearchBar';
 import { ChevronDown, Plus } from 'lucide-react';
 import TableSection from './TableSection';
 import { useFetchKategori } from '../hooks/useFetchKategori';
 import ModalTambahKategori from './ModalTambahKategori';
 import ModalPerbaruiKategori from './ModalPerbaruiKategori';
 import ModalHapusKategori from './ModalHapusKategori';
-import Pagination from '../../components/Pagination';
+import Pagination from '@/components/Pagination';
 import ToastAlert from '@/view/components/ToastAlert';
 
 const KelolaKategoriProduk = () => {

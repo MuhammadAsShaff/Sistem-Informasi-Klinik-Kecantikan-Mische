@@ -8,7 +8,7 @@ import { useDokterData } from '@/view/Customer/TentangDokter/hooks/useDokterData
 import { useFetchPublicJadwal } from '../hooks/useFetchPublicJadwal';
 import { useCreateReservasi } from '../hooks/useCreateReservasi';
 import ToastAlert from '@/view/components/ToastAlert';
-import CustomerLoading from '../../components/CustomerLoading';
+import CustomerLoading from '@/components/CustomerLoading';
 
 export default function ReservasiPage() {
   const navigate = useNavigate();

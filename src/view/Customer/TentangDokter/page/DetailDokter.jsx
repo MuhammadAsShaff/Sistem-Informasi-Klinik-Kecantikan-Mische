@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useDokterData } from '../hooks/useDokterData';
 import EmailIcon from '../../../../assets/icons/ic_round-email.png';
-import CustomerLoading from '../../components/CustomerLoading';
+import CustomerLoading from '@/components/CustomerLoading';
 
 export default function DetailDokterPage() {
   const { id } = useParams();

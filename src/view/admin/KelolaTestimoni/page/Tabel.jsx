@@ -1,6 +1,6 @@
 import React from 'react';
 import { STORAGE_BASE_URL } from "@/core/api/endpoints";
-import Table from '../../components/Table';
+import Table from '@/components/Table';
 
 const Tabel = ({ isLoading, data, onEdit, onDelete, currentPage = 1, itemsPerPage = 6 }) => {
   const columns = [

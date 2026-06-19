@@ -15,7 +15,7 @@ import ModalTambahKegiatanBaru from "./ModalTambahKegiatanBaru";
 import ModalEditKegiatan from "./ModalPerbaruiKegiatan";
 import ModalHapusKegiatan from "./ModalHapusKegiatan";
 import ToastAlert from "@/view/components/ToastAlert";
-import Pagination from "../../components/Pagination";
+import Pagination from '@/components/Pagination';
 
 const KelolaProfilKlinik = () => {
   // State modal

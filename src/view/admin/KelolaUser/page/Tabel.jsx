@@ -1,7 +1,7 @@
 import React from "react";
 import { PencilLine, Trash2, Eye } from "lucide-react";
 import { formatDate } from "@/core/utils/formatDate";
-import Table from "../../components/Table";
+import Table from '@/components/Table';
 
 export default function Tabel({ isLoading, data, onEdit, onDelete, onDetail, startIndex = 1 }) {
   const columns = [

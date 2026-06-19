@@ -5,7 +5,7 @@ import { useEditPromo } from "../hooks/useEditPromo";
 import { useHapusPromo } from "../hooks/useHapusPromo";
 
 import Header from "./Header";
-import SearchBar from "../../components/SearchBar";
+import SearchBar from '@/components/SearchBar';
 import { ChevronDown, Plus } from "lucide-react";
 import Tabel from "./Tabel";
 import ModalTambahPromo from "./ModalTambahPromo";

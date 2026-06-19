@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 import { usePromoData } from './hooks/usePromoData';
 import PromoCard from './page/PromoCard';
 import FilterPromo from './page/FilterPromo';
-import CustomerLoading from '../components/CustomerLoading';
+import CustomerLoading from '@/components/CustomerLoading';
 
 export default function HalamanPromo() {
   const { 

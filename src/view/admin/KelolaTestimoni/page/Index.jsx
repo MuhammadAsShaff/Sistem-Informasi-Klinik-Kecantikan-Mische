@@ -3,7 +3,7 @@ import Tabel from "./Tabel";
 import ModalTambah from "./ModalTambah";
 import ModalEdit from "./ModalEdit";
 import ModalHapus from "./ModalHapus";
-import Pagination from "../../components/Pagination";
+import Pagination from '@/components/Pagination';
 import { useFetchTestimoni } from "../hooks/useFetchTestimoni";
 import ToastAlert from "@/view/components/ToastAlert";
 

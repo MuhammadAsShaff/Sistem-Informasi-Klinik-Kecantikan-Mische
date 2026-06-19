@@ -1,6 +1,6 @@
 import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
-import Table from '../../components/Table';
+import Table from '@/components/Table';
 
 const TableSection = ({ isLoading, categories, onDeleteClick, onEditClick, currentPage = 1, itemsPerPage = 6 }) => {
   const columns = [
