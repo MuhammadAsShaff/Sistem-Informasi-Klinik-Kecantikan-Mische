@@ -23,7 +23,7 @@ class PenjualanController extends Controller
     public function index()
     {
         try {
-            $penjualan = Penjualan::with(['user', 'promo', 'detailpenjualan.produk'])->latest()->get();
+            $penjualan = Penjualan::with(['user', 'promo', 'detailpenjualan.produk', 'alamat'])->latest()->get();
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil mengambil semua data penjualan.',
