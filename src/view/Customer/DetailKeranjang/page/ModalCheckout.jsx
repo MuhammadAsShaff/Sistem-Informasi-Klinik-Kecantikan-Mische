@@ -4,6 +4,7 @@ import { STORAGE_BASE_URL, endpoints } from '@/core/api/endpoints';
 import axiosClient from '@/core/api/axiosClient';
 import { useNavigate } from 'react-router-dom';
 import ToastAlert from '@/view/components/ToastAlert';
+import { useCartContext } from '@/core/context/CartContext';
 
 export default function ModalCheckout({ 
   isOpen, 
@@ -13,8 +14,9 @@ export default function ModalCheckout({
   formatRupiah,
   appliedVoucher
 }) {
+  const { fetchCart } = useCartContext();
   const navigate = useNavigate();
-  const [voucher, setVoucher] = useState('');
+
   const [discountAmount, setDiscountAmount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('');
   
@@ -34,10 +36,8 @@ export default function ModalCheckout({
   useEffect(() => {
     if (isOpen) {
       if (appliedVoucher) {
-        setVoucher(appliedVoucher.kode);
         setDiscountAmount(appliedVoucher.diskon);
       } else {
-        setVoucher('');
         setDiscountAmount(0);
       }
       setPaymentMethod('');
@@ -113,18 +113,6 @@ export default function ModalCheckout({
     }
   };
 
-  const handleApplyVoucher = () => {
-    if (!voucher) return;
-    
-    // In ModalCheckout, if appliedVoucher matches, we just use it.
-    if (appliedVoucher && voucher.toUpperCase() === appliedVoucher.kode.toUpperCase()) {
-      setDiscountAmount(appliedVoucher.diskon);
-    } else {
-      setDiscountAmount(0);
-      setToast({ isOpen: true, message: 'Voucher tidak valid atau hanya bisa dicek dari halaman keranjang.', type: 'error' });
-    }
-  };
-
   const handleCheckout = async () => {
     if (!selectedAddressId) {
       setToast({ isOpen: true, message: 'Harap lengkapi alamat pengiriman!', type: 'warning' });
@@ -144,55 +132,50 @@ export default function ModalCheckout({
     setIsCheckingOut(true);
     try {
       const payload = {
+        cart_ids: selectedItems.map(item => item.idKeranjang || item.id),
         idAlamat: selectedAddressId,
-        paymentMethod: paymentMethod,
+        shippingCourier: selectedShipping.code,
+        shippingService: selectedShipping.service,
+        shippingCost: selectedShipping.value,
         idPromo: appliedVoucher ? appliedVoucher.idPromo : null,
-        shipping: selectedShipping
+        paymentMethod: paymentMethod === 'semua' ? [] : [paymentMethod]
       };
 
-      // MATIKAN HIT API SEMENTARA UNTUK MELIHAT CONTOH MODAL
-      // const response = await axiosClient.post(endpoints.customer.checkout, payload);
-      const response = {
-        data: {
-          status: 'success',
-          data: {
-            snap_token: 'dummy-token-12345' // Token sembarang agar window.snap.pay terpanggil
-          }
-        }
-      };
+      const response = await axiosClient.post(endpoints.customer.checkout, payload);
       
-      if (response.data?.status === 'success' && response.data?.data?.snap_token) {
-        // Trigger Midtrans Snap
-        window.snap.pay(response.data.data.snap_token, {
-          onSuccess: function(){
-            setToast({ isOpen: true, message: 'Pembayaran berhasil!', type: 'success' });
-            setTimeout(() => {
-              onClose();
+      const responseData = response.data;
+      if ((responseData?.success || responseData?.status === 'success') && responseData?.data?.snap_token) {
+        // 1. Refresh keranjang di background agar ter-update
+        fetchCart();
+        // 2. Tutup Modal Checkout agar tidak tumpang tindih dengan Midtrans
+        onClose();
+        
+        // 3. Beri sedikit jeda agar animasi tutup modal selesai, lalu panggil Midtrans
+        setTimeout(() => {
+          window.snap.pay(responseData.data.snap_token, {
+            onSuccess: async function(result){
+              try {
+                await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id });
+              } catch (e) { console.error('Gagal sinkronisasi status', e); }
               navigate('/ProfilCustomer/riwayat-pembelian');
-            }, 1000);
-          },
-          onPending: function(){
-            setToast({ isOpen: true, message: 'Menunggu pembayaran!', type: 'warning' });
-            setTimeout(() => {
-              onClose();
+            },
+            onPending: async function(result){
+              try {
+                await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id });
+              } catch (e) { console.error('Gagal sinkronisasi status', e); }
               navigate('/ProfilCustomer/riwayat-pembelian');
-            }, 1000);
-          },
-          onError: function(){
-            setToast({ isOpen: true, message: 'Pembayaran gagal!', type: 'error' });
-            setTimeout(() => {
-              onClose();
+            },
+            onError: async function(result){
+              if (result && result.order_id) {
+                 try { await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id }); } catch (e) {}
+              }
               navigate('/ProfilCustomer/riwayat-pembelian');
-            }, 1000);
-          },
-          onClose: function(){
-            setToast({ isOpen: true, message: 'Anda menutup pop-up tanpa menyelesaikan pembayaran', type: 'warning' });
-            setTimeout(() => {
-              onClose();
+            },
+            onClose: function(){
               navigate('/ProfilCustomer/riwayat-pembelian');
-            }, 1000);
-          }
-        });
+            }
+          });
+        }, 300);
       } else {
         setToast({ isOpen: true, message: response.data?.message || 'Gagal membuat pesanan.', type: 'error' });
       }
@@ -385,61 +368,43 @@ export default function ModalCheckout({
           {/* Section 3: Split Columns */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             
-            {/* Left Column: Voucher */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-              <h3 className="font-bold text-gray-800 text-lg mb-4">Voucher Mische</h3>
-              <p className="text-sm text-gray-500 mb-4">Masukkan kode voucher untuk mendapatkan diskon.</p>
-              <div className="flex gap-0">
-                <input
-                  type="text"
-                  placeholder="Kode Voucher"
-                  value={voucher}
-                  readOnly={!!appliedVoucher}
-                  onChange={(e) => setVoucher(e.target.value)}
-                  className={`flex-1 border border-gray-300 rounded-l-xl px-4 py-3 text-sm focus:outline-none ${appliedVoucher ? 'bg-gray-100 text-gray-500' : 'focus:border-[#5cb85c]'}`}
-                />
-                <button
-                  onClick={handleApplyVoucher}
-                  disabled={!!appliedVoucher}
-                  className={`px-6 py-3 rounded-r-xl transition-colors text-sm font-bold text-white ${appliedVoucher ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#56BC36] hover:bg-[#2da509]'}`}
-                >
-                  Pakai
-                </button>
+            {/* Left Column: Payment Method */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full">
+              <h3 className="font-bold text-gray-800 text-lg mb-4">Metode Pembayaran</h3>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                {[
+                  { id: 'bca_va', name: 'BCA VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg' },
+                  { id: 'bni_va', name: 'BNI VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Bank_Negara_Indonesia_logo_%282004%29.svg' },
+                  { id: 'bri_va', name: 'BRI VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/BRI_2020.svg' },
+                  { id: 'echannel', name: 'Mandiri VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Bank_Mandiri_logo_2016.svg' },
+                  { id: 'permata_va', name: 'Permata VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/PermataBank_logo.svg' },
+                  { id: 'gopay', name: 'GoPay', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg' },
+                  { id: 'shopeepay', name: 'ShopeePay', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg' },
+                  { id: 'qris', name: 'QRIS', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg' },
+                  { id: 'indomaret', name: 'Indomaret', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Logo_Indomaret.png' },
+                  { id: 'alfamart', name: 'Alfamart', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Alfamart_logo.svg' },
+                ].map((method) => (
+                  <div 
+                    key={method.id}
+                    onClick={() => setPaymentMethod(method.id)}
+                    className={`cursor-pointer border-2 rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${paymentMethod === method.id ? 'border-[#56BC36] bg-green-50 shadow-sm' : 'border-gray-200 hover:border-[#56BC36] hover:bg-green-50/30'}`}
+                  >
+                    <div className="h-8 w-full flex items-center justify-center rounded px-1">
+                      <img 
+                        src={method.logo} 
+                        alt={method.name} 
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                        className="max-h-full max-w-full object-contain mix-blend-multiply" 
+                      />
+                    </div>
+                    <span className="text-xs font-bold text-gray-700 text-center">{method.name}</span>
+                  </div>
+                ))}
               </div>
-              {discountAmount > 0 && (
-                <div className="mt-4 p-3 bg-green-50 border border-green-100 rounded-xl">
-                  <p className="text-[#56BC36] text-sm font-bold">✅ Promo berhasil diterapkan!</p>
-                  <p className="text-green-700 text-xs mt-1">Anda menghemat {formatRupiah(discountAmount)}</p>
-                </div>
-              )}
             </div>
 
-            {/* Right Column: Payment, Total */}
+            {/* Right Column: Total Summary */}
             <div className="space-y-6">
-              
-              {/* Payment Method */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 className="font-bold text-gray-800 text-lg mb-4">Metode Pembayaran</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { id: 'bca', name: 'BCA VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg' },
-                    { id: 'mandiri', name: 'Mandiri VA', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Bank_Mandiri_logo_2016.svg' },
-                    { id: 'gopay', name: 'GoPay', logo: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg' },
-                    { id: 'qris', name: 'QRIS', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg' },
-                  ].map((method) => (
-                    <div 
-                      key={method.id}
-                      onClick={() => setPaymentMethod(method.id)}
-                      className={`cursor-pointer border-2 rounded-xl p-3 flex flex-col items-center justify-center gap-2 transition-all ${paymentMethod === method.id ? 'border-[#56BC36] bg-green-50 shadow-sm' : 'border-gray-200 hover:border-[#56BC36] hover:bg-green-50/30'}`}
-                    >
-                      <div className="h-8 w-full flex items-center justify-center rounded px-1">
-                        <img src={method.logo} alt={method.name} className="max-h-full max-w-full object-contain mix-blend-multiply" />
-                      </div>
-                      <span className="text-xs font-bold text-gray-700 text-center">{method.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
 
               {/* Total Summary */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">

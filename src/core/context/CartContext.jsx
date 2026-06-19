@@ -210,6 +210,7 @@ export const CartProvider = ({ children }) => {
     setAppliedVoucher,
     voucherError,
     isCartLoading,
+    fetchCart,
   };
 
   return (

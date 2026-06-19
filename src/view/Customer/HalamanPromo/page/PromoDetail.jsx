@@ -244,19 +244,27 @@ export default function PromoDetail() {
             </div>
           </div>
 
-          {/* Kategori Produk */}
+          {/* Syarat & Ketentuan */}
           <div className="bg-white rounded-tl-[30px] rounded-br-[30px] shadow-sm p-6 md:p-8 flex items-start border border-gray-100">
             <div className="w-12 h-12 bg-[#56BC36] rounded-t-xl rounded-b-md flex items-center justify-center text-white mr-6 mt-1 shrink-0">
                <ShoppingBag size={24} />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-black mb-4">Produk Promo</h2>
+              <h2 className="text-2xl font-bold text-black mb-4">Syarat & Ketentuan</h2>
               <div className="space-y-2">
                 <p className="text-gray-500 font-medium text-sm">
-                  Kategori &nbsp;&nbsp;:&nbsp;&nbsp; <span className="text-black">{safeRender(kategoriTeks, "Semua Kategori")}</span>
+                  Berlaku Untuk &nbsp;&nbsp;:&nbsp;&nbsp; 
+                  <span className="text-[#56BC36] font-bold">
+                    {prodId ? `Khusus Produk: ${extractName(dinamisNamaProduk) || extractName(promo.produk) || extractName(promo.namaProduk) || extractName(promo.nama_produk) || `ID ${prodId}`}` 
+                      : katId ? `Khusus Kategori: ${extractName(dinamisNamaKategori) || extractName(promo.kategori) || extractName(promo.kategoriProduk) || extractName(promo.kategori_produk) || `ID ${katId}`}` 
+                      : "Semua Produk (Global)"}
+                  </span>
                 </p>
                 <p className="text-gray-500 font-medium text-sm">
-                  Produk &nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp; <span className="text-black">{safeRender(produkTeks, "Semua Produk")}</span>
+                  Minimal Order &nbsp;:&nbsp;&nbsp; 
+                  <span className="text-black">
+                    {promo.minimalTransaksi ? `Rp ${Number(promo.minimalTransaksi).toLocaleString('id-ID')}` : 'Tanpa Minimal Pembelian'}
+                  </span>
                 </p>
               </div>
             </div>

@@ -55,15 +55,20 @@ export default function RiwayatPembelian() {
     }
     if (window.snap) {
         window.snap.pay(snapToken, {
-        onSuccess: function() {
+        onSuccess: async function(result) {
+            try { await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id }); } catch (e) {}
             setToast({ isOpen: true, message: 'Pembayaran berhasil!', type: 'success' });
             fetchOrders();
         },
-        onPending: function() {
+        onPending: async function(result) {
+            try { await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id }); } catch (e) {}
             setToast({ isOpen: true, message: 'Menunggu pembayaran!', type: 'warning' });
             fetchOrders();
         },
-        onError: function() {
+        onError: async function(result) {
+            if (result && result.order_id) {
+               try { await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id }); } catch (e) {}
+            }
             setToast({ isOpen: true, message: 'Pembayaran gagal!', type: 'error' });
         },
         onClose: function() {

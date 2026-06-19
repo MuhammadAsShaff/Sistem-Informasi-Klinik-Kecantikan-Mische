@@ -47,13 +47,14 @@ export const endpoints = {
     promo: '/customer/promo',
     promoCheck: '/customer/promo/check',
     event: '/customer/event',
-    testimonials: '/testimonials',
+    testimonials: '/customer/testimonials',
     product: '/customer/product',
     cart: '/customer/card', // Menggunakan 'card' sesuai prefix di route PHP
     alamat: '/customer/alamat',
     setAlamatUtama: '/customer/profile/alamat-utama',
     rajaongkirCostByAddress: '/customer/rajaongkir/cost-by-address',
     checkout: '/customer/penjualan/checkout',
+    checkStatus: '/customer/penjualan/check-status', // NEW for Midtrans Pull Method
     riwayatPembelian: '/customer/penjualan', // NEW
     konfirmasiDiterima: '/customer/penjualan', // NEW
   },

@@ -142,25 +142,13 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Kategori Terkait */}
-              {kategori && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-2">Kategori Terkait</label>
-                  <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
-                    {kategori}
-                  </div>
+              {/* Target Promo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-2">Berlaku Untuk</label>
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-[#56BC36] font-bold text-sm">
+                  {produk ? `Khusus Produk: ${produk}` : kategori ? `Khusus Kategori: ${kategori}` : "Semua Produk (Global)"}
                 </div>
-              )}
-
-              {/* Produk Terkait */}
-              {produk && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-2">Produk Terkait</label>
-                  <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
-                    {produk}
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
 
             {/* Deskripsi */}
