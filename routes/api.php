@@ -119,6 +119,7 @@ Route::prefix('customer')->group(function () {
         Route::get('/', [PenjualanController::class, 'getCustomerOrders'])->name('customer.getOrders');
         Route::patch('/{idPenjualan}', [PenjualanController::class, 'receiveItem'])->name('customer.receiveItem');
         Route::post('/checkout', [PenjualanController::class, 'checkoutCart'])->name('customer.checkoutCart');
+        Route::post('/check-status', [MidtransController::class, 'checkStatus'])->name('customer.checkStatus');
     });
 
     // Rute RajaOngkir (Customer Cek Ongkir)

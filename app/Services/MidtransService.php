@@ -69,4 +69,20 @@ class MidtransService
 
         return $calculatedSignatureKey === $signatureKey;
     }
+
+    /**
+     * Meminta status terbaru transaksi langsung dari server Midtrans (Pull Method)
+     *
+     * @param string $orderId Nomor Invoice / Order ID
+     * @return object Respons dari Midtrans
+     */
+    public function checkTransactionStatus($orderId)
+    {
+        try {
+            return \Midtrans\Transaction::status($orderId);
+        } catch (\Exception $e) {
+            Log::error('Midtrans Check Status Error: ' . $e->getMessage(), ['order_id' => $orderId]);
+            throw $e;
+        }
+    }
 }

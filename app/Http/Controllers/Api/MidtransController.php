@@ -68,4 +68,51 @@ class MidtransController extends Controller
 
         return response()->json(['status' => 'success', 'message' => 'Notification processed successfully']);
     }
+
+    /**
+     * Pengecekan status manual dari Frontend (Pull Method)
+     */
+    public function checkStatus(Request $request, MidtransService $midtransService)
+    {
+        $orderId = $request->order_id;
+        
+        $penjualan = Penjualan::where('invoiceNumber', $orderId)->first();
+        if (!$penjualan) {
+            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+        }
+
+        try {
+            // Meminta status terbaru langsung dari server Midtrans via Service
+            $statusResponse = $midtransService->checkTransactionStatus($orderId);
+            
+            $transactionStatus = $statusResponse->transaction_status;
+            $paymentType = $statusResponse->payment_type ?? $penjualan->paymentMethod;
+            
+            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
+                $penjualan->update([
+                    'paymentStatus' => 'paid',
+                    'paymentMethod' => $paymentType,
+                    'orderStatus' => 'diproses',
+                    'paidAt' => now()
+                ]);
+            } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
+                $penjualan->update([
+                    'paymentStatus' => 'failed',
+                    'orderStatus' => 'dibatalkan'
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Status updated', 
+                'data' => $penjualan
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Failed to check status: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
