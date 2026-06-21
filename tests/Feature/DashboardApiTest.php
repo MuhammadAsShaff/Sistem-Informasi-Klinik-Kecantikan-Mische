@@ -106,7 +106,8 @@ class DashboardApiTest extends TestCase
         Reservasi::create([
             'namaCustomer' => 'Customer Baru',
             'nomorWa' => '081234567891',
-            'jenisTreatment' => 'Facial Glowing',
+            'kategoriReservasi' => 'Facial',
+            'jenisReservasi' => 'Facial Glowing',
             'tanggalReservasi' => Carbon::now(),
             'status' => 'Selesai',
             'idUser' => $customer->idUser,
@@ -143,7 +144,7 @@ class DashboardApiTest extends TestCase
         $response->assertJsonPath('data.summary.reservations_this_month', 1);
         
         $this->assertEquals(2, $response->json('data.top_products.0.total_terjual'));
-        $this->assertEquals('Facial Glowing', $response->json('data.charts.treatment_comparison.0.jenisTreatment'));
+        $this->assertEquals('Facial', $response->json('data.charts.treatment_comparison.0.kategoriReservasi'));
         $this->assertEquals(1, $response->json('data.charts.treatment_comparison.0.total'));
     }
 

@@ -59,7 +59,8 @@ class ReservasiSeeder extends Seeder
             [
                 'namaCustomer' => $customer->nama,
                 'nomorWa' => $customer->nomorWa,
-                'jenisTreatment' => 'Facial Glowing',
+                'kategoriReservasi' => 'Facial',
+                'jenisReservasi' => 'Facial Glowing',
                 'tanggalReservasi' => Carbon::now()->addDays(2)->format('Y-m-d'),
                 'status' => 'Menunggu',
                 'idUser' => $customer->idUser,
@@ -69,7 +70,8 @@ class ReservasiSeeder extends Seeder
             [
                 'namaCustomer' => $customer->nama,
                 'nomorWa' => $customer->nomorWa,
-                'jenisTreatment' => 'Laser Acne',
+                'kategoriReservasi' => 'Laser',
+                'jenisReservasi' => 'Laser Acne',
                 'tanggalReservasi' => Carbon::now()->addDays(5)->format('Y-m-d'),
                 'status' => 'Dikonfirmasi',
                 'idUser' => $customer->idUser,

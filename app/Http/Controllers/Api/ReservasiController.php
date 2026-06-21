@@ -46,7 +46,8 @@ class ReservasiController extends Controller
                 'idUser.exists' => 'Customer tidak ditemukan di sistem.',
                 'namaCustomer.required_without' => 'Nama customer wajib diisi jika bukan member.',
                 'nomorWa.required_without' => 'Nomor WA wajib diisi jika bukan member.',
-                'jenisTreatment.required' => 'Jenis treatment wajib diisi.',
+                'kategoriReservasi.required' => 'Kategori reservasi wajib diisi.',
+                'jenisReservasi.required' => 'Jenis reservasi wajib diisi.',
                 'tanggalReservasi.required' => 'Tanggal reservasi wajib diisi.',
                 'tanggalReservasi.date' => 'Format tanggal reservasi tidak valid.',
                 'idDokter.required' => 'Dokter wajib dipilih.',
@@ -59,7 +60,8 @@ class ReservasiController extends Controller
                 'idUser' => 'nullable|exists:user,idUser',
                 'namaCustomer' => 'required_without:idUser|string|max:60',
                 'nomorWa' => 'required_without:idUser|string|max:16',
-                'jenisTreatment' => 'required|string|max:60',
+                'kategoriReservasi' => 'required|string|max:60',
+                'jenisReservasi' => 'required|string|max:60',
                 'tanggalReservasi' => 'required|date',
                 'idDokter' => 'required|exists:profilDokter,idDokter',
                 'idJadwal' => 'required|exists:jadwalReservasi,idJadwal',
@@ -100,7 +102,8 @@ class ReservasiController extends Controller
             $reservasi = Reservasi::create([
                 'namaCustomer' => $namaCustomer, 
                 'nomorWa' => $nomorWa,   
-                'jenisTreatment' => $request->jenisTreatment,
+                'kategoriReservasi' => $request->kategoriReservasi,
+                'jenisReservasi' => $request->jenisReservasi,
                 'tanggalReservasi' => $request->tanggalReservasi,
                 'status' => $request->status ?? 'Dikonfirmasi', // Admin biasa langsung konfirmasi
                 'idUser' => $request->idUser, // Akan bernilai null jika tidak diisi
@@ -213,7 +216,8 @@ class ReservasiController extends Controller
             }
 
             $pesanEror = [
-                'jenisTreatment.required' => 'Jenis treatment wajib dipilih.',
+                'kategoriReservasi.required' => 'Kategori reservasi wajib dipilih.',
+                'jenisReservasi.required' => 'Jenis reservasi wajib dipilih.',
                 'tanggalReservasi.required' => 'Tanggal reservasi wajib dipilih.',
                 'tanggalReservasi.date' => 'Format tanggal reservasi tidak valid.',
                 'idDokter.required' => 'Dokter wajib dipilih.',
@@ -223,7 +227,8 @@ class ReservasiController extends Controller
             ];
 
             $validator = Validator::make($request->all(), [
-                'jenisTreatment' => 'required|string|max:60',
+                'kategoriReservasi' => 'required|string|max:60',
+                'jenisReservasi' => 'required|string|max:60',
                 'tanggalReservasi' => 'required|date',
                 'idDokter' => 'required|exists:profilDokter,idDokter',
                 'idJadwal' => 'required|exists:jadwalReservasi,idJadwal'
@@ -254,7 +259,8 @@ class ReservasiController extends Controller
             $reservasi = Reservasi::create([
                 'namaCustomer' => $user->nama, // Ambil langsung dari profil
                 'nomorWa' => $user->nomorWa,   // Ambil langsung dari profil
-                'jenisTreatment' => $request->jenisTreatment,
+                'kategoriReservasi' => $request->kategoriReservasi,
+                'jenisReservasi' => $request->jenisReservasi,
                 'tanggalReservasi' => $request->tanggalReservasi,
                 'status' => 'Menunggu', // Default state ketika baru membuat pesanan
                 'idUser' => $user->idUser,
@@ -288,7 +294,8 @@ class ReservasiController extends Controller
             $user = auth('api')->user();
 
             $pesanEror = [
-                'jenisTreatment.required' => 'Jenis treatment wajib diisi.',
+                'kategoriReservasi.required' => 'Kategori reservasi wajib diisi.',
+                'jenisReservasi.required' => 'Jenis reservasi wajib diisi.',
                 'tanggalReservasi.required' => 'Tanggal reservasi wajib diisi.',
                 'tanggalReservasi.date' => 'Format tanggal reservasi tidak valid.',
                 'idDokter.required' => 'Dokter wajib dipilih.',
@@ -298,7 +305,8 @@ class ReservasiController extends Controller
             ];
 
             $validator = Validator::make($request->all(), [
-                'jenisTreatment' => 'required|string|max:60',
+                'kategoriReservasi' => 'required|string|max:60',
+                'jenisReservasi' => 'required|string|max:60',
                 'tanggalReservasi' => 'required|date',
                 'idDokter' => 'required|exists:profilDokter,idDokter',
                 'idJadwal' => 'required|exists:jadwalReservasi,idJadwal'
@@ -362,7 +370,8 @@ class ReservasiController extends Controller
             }
 
             // Update data jadwal
-            $reservasi->jenisTreatment = $request->jenisTreatment;
+            $reservasi->kategoriReservasi = $request->kategoriReservasi;
+            $reservasi->jenisReservasi = $request->jenisReservasi;
             $reservasi->tanggalReservasi = $request->tanggalReservasi;
             $reservasi->idDokter = $request->idDokter;
             $reservasi->idJadwal = $request->idJadwal;

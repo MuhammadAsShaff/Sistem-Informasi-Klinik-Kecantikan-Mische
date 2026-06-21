@@ -81,7 +81,7 @@ class ReservasiApiTest extends TestCase
         Reservasi::create([
             'namaCustomer' => $customer->nama,
             'nomorWa' => $customer->nomorWa,
-            'jenisTreatment' => 'Laser Acne',
+            'kategoriReservasi' => 'Laser', 'jenisReservasi' => 'Laser Acne',
             'tanggalReservasi' => Carbon::now()->addDays(2)->format('Y-m-d'),
             'status' => 'Menunggu',
             'idUser' => $customer->idUser,
@@ -107,7 +107,7 @@ class ReservasiApiTest extends TestCase
 
         $response = $this->withHeaders(['Authorization' => "Bearer $token"])
                          ->postJson('/api/customer/reservations', [
-                             'jenisTreatment' => 'Facial Treatment',
+                             'kategoriReservasi' => 'Facial', 'jenisReservasi' => 'Facial Treatment',
                              'tanggalReservasi' => Carbon::now()->addDays(3)->format('Y-m-d'),
                              'idDokter' => $dokter->idDokter,
                              'idJadwal' => $jadwal->idJadwal
@@ -117,7 +117,7 @@ class ReservasiApiTest extends TestCase
                  ->assertJson(['success' => true]);
 
         $this->assertDatabaseHas('reservasi', [
-            'jenisTreatment' => 'Facial Treatment',
+            'kategoriReservasi' => 'Facial', 'jenisReservasi' => 'Facial Treatment',
             'status' => 'Menunggu'
         ]);
     }
@@ -136,7 +136,7 @@ class ReservasiApiTest extends TestCase
         Reservasi::create([
             'namaCustomer' => 'Orang Lain',
             'nomorWa' => '0899999999',
-            'jenisTreatment' => 'Facial Treatment',
+            'kategoriReservasi' => 'Facial', 'jenisReservasi' => 'Facial Treatment',
             'tanggalReservasi' => $tanggal,
             'status' => 'Menunggu',
             'idUser' => $customer->idUser, // anggap aja
@@ -147,7 +147,7 @@ class ReservasiApiTest extends TestCase
         // Customer mencoba booking di waktu yang sama
         $response = $this->withHeaders(['Authorization' => "Bearer $token"])
                          ->postJson('/api/customer/reservations', [
-                             'jenisTreatment' => 'Facial Glowing',
+                             'kategoriReservasi' => 'Facial', 'jenisReservasi' => 'Facial Glowing',
                              'tanggalReservasi' => $tanggal,
                              'idDokter' => $dokter->idDokter,
                              'idJadwal' => $jadwal->idJadwal
@@ -168,7 +168,7 @@ class ReservasiApiTest extends TestCase
         $reservasi = Reservasi::create([
             'namaCustomer' => $customer->nama,
             'nomorWa' => $customer->nomorWa,
-            'jenisTreatment' => 'Laser Acne',
+            'kategoriReservasi' => 'Laser', 'jenisReservasi' => 'Laser Acne',
             'tanggalReservasi' => Carbon::now()->addDays(2)->format('Y-m-d'),
             'status' => 'Menunggu',
             'idUser' => $customer->idUser,
@@ -181,7 +181,7 @@ class ReservasiApiTest extends TestCase
 
         $response->assertStatus(200)
                  ->assertJson(['success' => true])
-                 ->assertJsonPath('data.jenisTreatment', 'Laser Acne');
+                 ->assertJsonPath('data.jenisReservasi', 'Laser Acne')->assertJsonPath('data.kategoriReservasi', 'Laser');
     }
 
     public function test_customer_bisa_merubah_jadwal_reservasi_hanya_sekali()
@@ -195,7 +195,7 @@ class ReservasiApiTest extends TestCase
         $reservasi = Reservasi::create([
             'namaCustomer' => $customer->nama,
             'nomorWa' => $customer->nomorWa,
-            'jenisTreatment' => 'Laser Acne',
+            'kategoriReservasi' => 'Laser', 'jenisReservasi' => 'Laser Acne',
             'tanggalReservasi' => Carbon::now()->addDays(2)->format('Y-m-d'),
             'status' => 'Dikonfirmasi',
             'idUser' => $customer->idUser,
@@ -207,7 +207,7 @@ class ReservasiApiTest extends TestCase
         // Percobaan pertama merubah jadwal (Harus Berhasil)
         $response1 = $this->withHeaders(['Authorization' => "Bearer $token"])
                           ->putJson("/api/customer/reservations/{$reservasi->idReservasi}", [
-                              'jenisTreatment' => 'Laser Acne Update',
+                              'kategoriReservasi' => 'Laser', 'jenisReservasi' => 'Laser Acne Update',
                               'tanggalReservasi' => Carbon::now()->addDays(5)->format('Y-m-d'),
                               'idDokter' => $dokter->idDokter,
                               'idJadwal' => $jadwal->idJadwal
@@ -225,7 +225,7 @@ class ReservasiApiTest extends TestCase
         // Percobaan kedua merubah jadwal (Harus Gagal)
         $response2 = $this->withHeaders(['Authorization' => "Bearer $token"])
                           ->putJson("/api/customer/reservations/{$reservasi->idReservasi}", [
-                              'jenisTreatment' => 'Laser Acne Edit Lagi',
+                              'kategoriReservasi' => 'Laser', 'jenisReservasi' => 'Laser Acne Edit Lagi',
                               'tanggalReservasi' => Carbon::now()->addDays(10)->format('Y-m-d'),
                               'idDokter' => $dokter->idDokter,
                               'idJadwal' => $jadwal->idJadwal
@@ -256,7 +256,7 @@ class ReservasiApiTest extends TestCase
         $reservasi = Reservasi::create([
             'namaCustomer' => $customer->nama,
             'nomorWa' => $customer->nomorWa,
-            'jenisTreatment' => 'Laser Acne',
+            'kategoriReservasi' => 'Laser', 'jenisReservasi' => 'Laser Acne',
             'tanggalReservasi' => Carbon::now()->addDays(2)->format('Y-m-d'),
             'status' => 'Menunggu',
             'idUser' => $customer->idUser,
@@ -299,7 +299,7 @@ class ReservasiApiTest extends TestCase
         $reservasi = Reservasi::create([
             'namaCustomer' => $customer->nama,
             'nomorWa' => $customer->nomorWa,
-            'jenisTreatment' => 'Laser Acne',
+            'kategoriReservasi' => 'Laser', 'jenisReservasi' => 'Laser Acne',
             'tanggalReservasi' => Carbon::now()->addDays(2)->format('Y-m-d'),
             'status' => 'Menunggu',
             'idUser' => $customer->idUser,

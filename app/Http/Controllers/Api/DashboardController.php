@@ -57,10 +57,10 @@ class DashboardController extends Controller
             ->with('produk:idProduk,nama,harga,gambar') // asumsi relasi 'produk' ada di DetailPenjualan
             ->get();
 
-        // 6. Perbandingan reservasi treatment (Pie Chart)
-        $treatmentComparison = Reservasi::select('jenisTreatment', DB::raw('count(*) as total'))
-            ->whereNotNull('jenisTreatment')
-            ->groupBy('jenisTreatment')
+        // 6. Perbandingan reservasi treatment (Pie Chart) berdasarkan Kategori
+        $treatmentComparison = Reservasi::select('kategoriReservasi', DB::raw('count(*) as total'))
+            ->whereNotNull('kategoriReservasi')
+            ->groupBy('kategoriReservasi')
             ->get();
 
         // 7. Grafik penjualan per bulan (tahun ini)

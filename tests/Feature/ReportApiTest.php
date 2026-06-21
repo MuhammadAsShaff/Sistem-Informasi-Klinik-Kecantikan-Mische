@@ -56,7 +56,7 @@ class ReportApiTest extends TestCase
         $filename = 'Laporan_Reservasi_' . date('Y-m-d_H-i-s') . '.xlsx';
         $response = $this->withHeaders([
             'Authorization' => "Bearer $token"
-        ])->get('/api/admin/report/reservasi?jenisTreatment=Facial');
+        ])->get('/api/admin/report/reservasi?kategoriReservasi=Facial');
 
         $response->assertStatus(200);
 

@@ -17,7 +17,8 @@ class Reservasi extends Model
     protected $fillable = [
         'namaCustomer',
         'nomorWa',
-        'jenisTreatment',
+        'kategoriReservasi',
+        'jenisReservasi',
         'tanggalReservasi',
         'status',
         'idUser',

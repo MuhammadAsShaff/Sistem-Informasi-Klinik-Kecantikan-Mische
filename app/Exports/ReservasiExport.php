@@ -24,8 +24,12 @@ class ReservasiExport implements FromArray, WithHeadings, ShouldAutoSize, WithSt
     {
         $query = Reservasi::with(['user', 'dokter', 'jadwal']);
 
-        if (!empty($this->filters['jenisTreatment']) && !in_array(strtolower($this->filters['jenisTreatment']), ['semua', 'all', '0', 'semua treatment'])) {
-            $query->where('jenisTreatment', $this->filters['jenisTreatment']);
+        if (!empty($this->filters['kategoriReservasi']) && !in_array(strtolower($this->filters['kategoriReservasi']), ['semua', 'all', '0', 'semua kategori'])) {
+            $query->where('kategoriReservasi', $this->filters['kategoriReservasi']);
+        }
+
+        if (!empty($this->filters['jenisReservasi']) && !in_array(strtolower($this->filters['jenisReservasi']), ['semua', 'all', '0', 'semua jenis'])) {
+            $query->where('jenisReservasi', $this->filters['jenisReservasi']);
         }
 
         if (!empty($this->filters['status']) && !in_array(strtolower($this->filters['status']), ['semua', 'all', '0', 'semua status'])) {
@@ -76,7 +80,8 @@ class ReservasiExport implements FromArray, WithHeadings, ShouldAutoSize, WithSt
                 $waktuJadwal,
                 $reservasi->namaCustomer ?? ($reservasi->user->nama ?? '-'),
                 $reservasi->nomorWa ?? '-',
-                $reservasi->jenisTreatment ?? '-',
+                $reservasi->kategoriReservasi ?? '-',
+                $reservasi->jenisReservasi ?? '-',
                 $reservasi->dokter->nama ?? '-',
                 $reservasi->is_rescheduled ? 'Ya' : 'Tidak',
                 $reservasi->status ?? '-'
@@ -86,15 +91,15 @@ class ReservasiExport implements FromArray, WithHeadings, ShouldAutoSize, WithSt
         $this->totalRowCounter = count($rows) + 1; // +1 untuk baris Header utama
 
         // Tambahkan spasi
-        $rows[] = ['', '', '', '', '', '', '', '', '', ''];
-        $rows[] = ['', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['', '', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['', '', '', '', '', '', '', '', '', '', ''];
 
         // Tambahkan Baris Kesimpulan
-        $rows[] = ['KESIMPULAN LAPORAN', '', '', '', '', '', '', '', '', ''];
-        $rows[] = ['Total Seluruh Reservasi', $totalReservasi . ' Reservasi', '', '', '', '', '', '', '', ''];
-        $rows[] = ['Total Reservasi Sukses (Selesai/Disetujui)', $totalSelesai . ' Reservasi', '', '', '', '', '', '', '', ''];
-        $rows[] = ['Total Reservasi Dibatalkan/Ditolak', $totalDibatalkan . ' Reservasi', '', '', '', '', '', '', '', ''];
-        $rows[] = ['Total Pasien Reschedule', $totalReschedule . ' Pasien', '', '', '', '', '', '', '', ''];
+        $rows[] = ['KESIMPULAN LAPORAN', '', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Seluruh Reservasi', $totalReservasi . ' Reservasi', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Reservasi Sukses (Selesai/Disetujui)', $totalSelesai . ' Reservasi', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Reservasi Dibatalkan/Ditolak', $totalDibatalkan . ' Reservasi', '', '', '', '', '', '', '', '', ''];
+        $rows[] = ['Total Pasien Reschedule', $totalReschedule . ' Pasien', '', '', '', '', '', '', '', '', ''];
 
         return $rows;
     }
@@ -108,7 +113,8 @@ class ReservasiExport implements FromArray, WithHeadings, ShouldAutoSize, WithSt
             'Jadwal / Waktu',
             'Nama Customer',
             'Nomor WA',
-            'Jenis Treatment',
+            'Kategori Reservasi',
+            'Jenis Reservasi',
             'Nama Dokter',
             'Status Reschedule',
             'Status Reservasi'

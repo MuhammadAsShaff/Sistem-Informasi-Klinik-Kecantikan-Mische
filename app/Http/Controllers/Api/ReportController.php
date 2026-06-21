@@ -32,7 +32,7 @@ class ReportController extends Controller
      */
     public function exportReportReservasi(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $filters = $request->only(['jenisTreatment', 'status', 'tanggalMulai', 'tanggalSelesai']);
+        $filters = $request->only(['kategoriReservasi', 'jenisReservasi', 'status', 'tanggalMulai', 'tanggalSelesai']);
         
         $filename = 'Laporan_Reservasi_' . date('Y-m-d_H-i-s') . '.xlsx';
         
