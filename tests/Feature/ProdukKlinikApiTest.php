@@ -173,6 +173,41 @@ class ProdukKlinikApiTest extends TestCase
         $response = $this->getJson('/api/customer/product');
 
         $response->assertStatus(200)
-                 ->assertJson(['status' => 'success']);
+                 ->assertJson(['status' => 'success'])
+                 ->assertJsonCount(1, 'data');
+    }
+
+    public function test_customer_bisa_memfilter_produk_berdasarkan_kategori()
+    {
+        $kategori1 = KategoriProduk::create(['nama' => 'Skincare', 'deskripsi' => 'Deskripsi Skincare']);
+        $kategori2 = KategoriProduk::create(['nama' => 'Haircare', 'deskripsi' => 'Deskripsi Haircare']);
+
+        ProdukKlinik::create([
+            'nama' => 'Produk A',
+            'deskripsi' => 'Deskripsi',
+            'harga' => 50000,
+            'stock' => 10,
+            'berat' => 150,
+            'gambar' => 'a.jpg',
+            'idKategori' => $kategori1->idKategori
+        ]);
+
+        ProdukKlinik::create([
+            'nama' => 'Produk B',
+            'deskripsi' => 'Deskripsi',
+            'harga' => 50000,
+            'stock' => 10,
+            'berat' => 150,
+            'gambar' => 'b.jpg',
+            'idKategori' => $kategori2->idKategori
+        ]);
+
+        $response = $this->getJson('/api/customer/product?idKategori=' . $kategori1->idKategori);
+
+        $response->assertStatus(200)
+                 ->assertJson(['status' => 'success'])
+                 ->assertJsonCount(1, 'data');
+        
+        $this->assertEquals('Produk A', $response->json('data.0.nama'));
     }
 }

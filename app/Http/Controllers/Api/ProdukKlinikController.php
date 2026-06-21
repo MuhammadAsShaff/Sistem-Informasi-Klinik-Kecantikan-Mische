@@ -218,9 +218,15 @@ class ProdukKlinikController extends Controller
     /**
      * Menampilkan daftar produk (Customer)
      */
-    public function getPublicProducts()
+    public function getPublicProducts(Request $request)
     {
-        $produk = ProdukKlinik::where('stock', '>', 0)->with('kategori')->get();
+        $query = ProdukKlinik::where('stock', '>', 0)->with('kategori');
+
+        if ($request->has('idKategori')) {
+            $query->where('idKategori', $request->idKategori);
+        }
+
+        $produk = $query->get();
         return response()->json([
             'status' => 'success',
             'data' => $produk
