@@ -210,4 +210,15 @@ class ProdukKlinikApiTest extends TestCase
         
         $this->assertEquals('Produk A', $response->json('data.0.nama'));
     }
+
+    public function test_customer_bisa_melihat_kategori_produk()
+    {
+        KategoriProduk::create(['nama' => 'Skincare', 'deskripsi' => 'Deskripsi Skincare']);
+        
+        $response = $this->getJson('/api/customer/product/categories');
+
+        $response->assertStatus(200)
+                 ->assertJson(['status' => 'success'])
+                 ->assertJsonFragment(['nama' => 'Skincare']);
+    }
 }

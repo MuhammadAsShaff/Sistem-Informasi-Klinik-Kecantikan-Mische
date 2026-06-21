@@ -74,6 +74,7 @@ Route::prefix('customer')->group(function () {
     // RUTE PRODUK PUBLIC / CUSTOMER
     // ----------------------------------------
     Route::prefix('product')->group(function () {
+        Route::get('/categories', [KategoriProdukController::class, 'getAllCategories'])->name('customer.productCategories');
         Route::get('/', [ProdukKlinikController::class, 'getPublicProducts'])->name('customer.products');
         Route::get('/{idProduk}', [ProdukKlinikController::class, 'getProductById'])->name('customer.productById');
         // Hanya pengguna dengan role customer yang telah login yang bisa order
