@@ -69,6 +69,34 @@ class ReservasiApiTest extends TestCase
         $response->assertStatus(200)
                  ->assertJson(['success' => true]);
     }
+    
+    public function test_admin_bisa_membuat_reservasi_untuk_pasien_walk_in()
+    {
+        $token = $this->getAdminToken();
+
+        $dokter = null; $jadwal = null;
+        $this->createDummyDependencies($dokter, $jadwal);
+
+        $response = $this->withHeaders(['Authorization' => "Bearer $token"])
+                         ->postJson('/api/admin/reservations', [
+                             'namaCustomer' => 'Pasien Walk In',
+                             'nomorWa' => '08111222333',
+                             'kategoriReservasi' => 'Laser', 
+                             'jenisReservasi' => 'Laser Hair Removal',
+                             'tanggalReservasi' => Carbon::now()->addDays(1)->format('Y-m-d'),
+                             'idDokter' => $dokter->idDokter,
+                             'idJadwal' => $jadwal->idJadwal
+                         ]);
+
+        $response->assertStatus(201)
+                 ->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('reservasi', [
+            'namaCustomer' => 'Pasien Walk In',
+            'jenisReservasi' => 'Laser Hair Removal',
+            'status' => 'Dikonfirmasi' // Biasa kalau admin yang buat otomatis dikonfirmasi
+        ]);
+    }
 
     public function test_customer_bisa_melihat_reservasi_miliknya_sendiri()
     {

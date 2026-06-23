@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\KategoriProduk;
 use App\Models\ProdukKlinik;
 use App\Models\Promo;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class ProdukKlinikApiTest extends TestCase
 {
@@ -45,9 +47,26 @@ class ProdukKlinikApiTest extends TestCase
         return auth('api')->login($customer);
     }
 
+    public function test_admin_bisa_melihat_semua_produk()
+    {
+        $token = $this->getAdminToken();
+        $kategori = KategoriProduk::create(['nama' => 'Kategori A', 'deskripsi' => 'Deskripsi Kategori A']);
+        ProdukKlinik::create([
+            'nama' => 'Produk A', 'deskripsi' => 'A', 'harga' => 100, 'stock' => 10, 'berat' => 10, 'gambar' => 'a.jpg', 'idKategori' => $kategori->idKategori
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token"
+        ])->getJson('/api/admin/product');
+
+        $response->assertStatus(200)
+                 ->assertJson(['status' => 'success']);
+    }
+
     public function test_admin_bisa_menambah_produk()
     {
         $token = $this->getAdminToken();
+        Storage::fake('public');
         $kategori = KategoriProduk::create(['nama' => 'Kategori A', 'deskripsi' => 'Deskripsi Kategori A']);
 
         $response = $this->withHeaders([
@@ -58,7 +77,7 @@ class ProdukKlinikApiTest extends TestCase
             'harga' => 100000,
             'stock' => 50,
             'berat' => 200,
-            'gambar' => \Illuminate\Http\UploadedFile::fake()->image('gambar_baru.jpg'),
+            'gambar' => UploadedFile::fake()->image('gambar_baru.jpg'),
             'idKategori' => $kategori->idKategori
         ]);
 
@@ -69,6 +88,41 @@ class ProdukKlinikApiTest extends TestCase
             'nama' => 'Produk Baru',
             'stock' => 50,
             'berat' => 200
+        ]);
+    }
+
+    public function test_admin_bisa_memperbarui_data_produk_penuh()
+    {
+        $token = $this->getAdminToken();
+        $kategori = KategoriProduk::create(['nama' => 'Kategori A', 'deskripsi' => 'Deskripsi Kategori A']);
+        $produk = ProdukKlinik::create([
+            'nama' => 'Produk Lama',
+            'deskripsi' => 'Deskripsi Lama',
+            'harga' => 50000,
+            'stock' => 10,
+            'berat' => 100,
+            'gambar' => 'gambar_lama.jpg',
+            'idKategori' => $kategori->idKategori
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token"
+        ])->putJson("/api/admin/product/{$produk->idProduk}", [
+            'nama' => 'Produk Updated',
+            'deskripsi' => 'Deskripsi Baru',
+            'harga' => 75000,
+            'stock' => 15,
+            'berat' => 250,
+            'idKategori' => $kategori->idKategori
+        ]);
+
+        $response->assertStatus(200)
+                 ->assertJson(['status' => 'success']);
+
+        $this->assertDatabaseHas('produkklinik', [
+            'idProduk' => $produk->idProduk,
+            'nama' => 'Produk Updated',
+            'harga' => 75000
         ]);
     }
 
@@ -98,6 +152,32 @@ class ProdukKlinikApiTest extends TestCase
         $this->assertDatabaseHas('produkklinik', [
             'idProduk' => $produk->idProduk,
             'stock' => 20
+        ]);
+    }
+
+    public function test_admin_bisa_menghapus_produk()
+    {
+        $token = $this->getAdminToken();
+        $kategori = KategoriProduk::create(['nama' => 'Kategori A', 'deskripsi' => 'Deskripsi Kategori A']);
+        $produk = ProdukKlinik::create([
+            'nama' => 'Produk Dihapus',
+            'deskripsi' => 'Deskripsi Lama',
+            'harga' => 50000,
+            'stock' => 10,
+            'berat' => 100,
+            'gambar' => 'gambar_lama.jpg',
+            'idKategori' => $kategori->idKategori
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token"
+        ])->deleteJson("/api/admin/product/{$produk->idProduk}");
+
+        $response->assertStatus(200)
+                 ->assertJson(['status' => 'success']);
+
+        $this->assertDatabaseMissing('produkklinik', [
+            'idProduk' => $produk->idProduk
         ]);
     }
 
@@ -175,6 +255,26 @@ class ProdukKlinikApiTest extends TestCase
         $response->assertStatus(200)
                  ->assertJson(['status' => 'success'])
                  ->assertJsonCount(1, 'data');
+    }
+
+    public function test_customer_bisa_melihat_detail_satu_produk()
+    {
+        $kategori = KategoriProduk::create(['nama' => 'Kategori A', 'deskripsi' => 'Deskripsi Kategori A']);
+        $produk = ProdukKlinik::create([
+            'nama' => 'Produk Tunggal',
+            'deskripsi' => 'Deskripsi Publik',
+            'harga' => 50000,
+            'stock' => 10,
+            'berat' => 150,
+            'gambar' => 'gambar_publik.jpg',
+            'idKategori' => $kategori->idKategori
+        ]);
+
+        $response = $this->getJson("/api/customer/product/{$produk->idProduk}");
+
+        $response->assertStatus(200)
+                 ->assertJson(['status' => 'success'])
+                 ->assertJsonPath('data.nama', 'Produk Tunggal');
     }
 
     public function test_customer_bisa_memfilter_produk_berdasarkan_kategori()

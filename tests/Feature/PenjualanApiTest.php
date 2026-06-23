@@ -190,6 +190,31 @@ class PenjualanApiTest extends TestCase
         $response->assertStatus(200)
                  ->assertJsonPath('success', true);
     }
+    
+    /** @test */
+    public function customer_bisa_melihat_histori_pesanannya_sendiri()
+    {
+        $penjualan = Penjualan::create([
+            'tanggal' => now(),
+            'invoiceNumber' => 'INV-' . time() . '-9',
+            'subtotal' => 50000,
+            'shippingCost' => 0,
+            'shippingCourier' => 'jne',
+            'shippingService' => 'REG',
+            'total' => 50000,
+            'paymentStatus' => 'paid',
+            'orderStatus' => 'pending',
+            'idUser' => $this->customer->idUser,
+            'idPromo' => $this->promo->idPromo
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->tokenCustomer,
+        ])->getJson('/api/customer/penjualan');
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('success', true);
+    }
 
     /** @test */
     public function customer_bisa_menerima_barang()

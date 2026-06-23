@@ -74,6 +74,26 @@ class TestimoniApiTest extends TestCase
                  ->assertJsonFragment(['namaTester' => 'Budi']);
     }
 
+    public function test_admin_bisa_melihat_detail_testimoni()
+    {
+        $token = $this->getAdminToken();
+        $testimoni = Testimoni::create([
+            'namaTester' => 'Budi Detail',
+            'jenisTestimoni' => 'Laser',
+            'deskripsi' => 'Bagus Sekali',
+            'tanggalTreatment' => '2025-02-01',
+            'buktiFoto' => 'testimoni/budi.jpg'
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token"
+        ])->getJson("/api/admin/testimonials/{$testimoni->idTestimoni}");
+
+        $response->assertStatus(200)
+                 ->assertJson(['success' => true])
+                 ->assertJsonFragment(['namaTester' => 'Budi Detail']);
+    }
+
     public function test_admin_bisa_memperbarui_testimoni()
     {
         $token = $this->getAdminToken();

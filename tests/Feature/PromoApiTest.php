@@ -154,6 +154,41 @@ class PromoApiTest extends TestCase
             'namaPromo' => 'Promo C Updated'
         ]);
     }
+    
+    public function test_admin_bisa_memperbarui_status_promo()
+    {
+        $token = $this->getAdminToken();
+        [$kategori, $produk] = $this->createDummyDeps();
+        
+        $promo = Promo::create([
+            'gambar' => 'promo.jpg',
+            'namaPromo' => 'Promo C',
+            'jenisPromo' => 'Diskon',
+            'kode' => 'PROMOC',
+            'diskon' => 15000,
+            'deskripsi' => 'Deskripsi Promo',
+            'tanggalMulai' => Carbon::now()->format('Y-m-d'),
+            'tanggalSelesai' => Carbon::now()->addDays(5)->format('Y-m-d'),
+            'minimalTransaksi' => 50000,
+            'status' => true,
+            'idKategori' => $kategori->idKategori,
+            'idProduk' => null
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer $token"
+        ])->patchJson("/api/admin/promo/{$promo->idPromo}/status", [
+            'status' => false
+        ]);
+
+        $response->assertStatus(200)
+                 ->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('promo', [
+            'idPromo' => $promo->idPromo,
+            'status' => 0
+        ]);
+    }
 
     public function test_admin_bisa_menghapus_promo()
     {
