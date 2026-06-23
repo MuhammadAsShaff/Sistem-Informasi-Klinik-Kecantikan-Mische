@@ -16,7 +16,7 @@ class TestimoniController extends Controller
     /**
      * getAllTestimonials
      * 
-     * Mengambil daftar testimoni (Admin)
+     * Menarik seluruh data master review/testimoni pelanggan (Untuk ditampilkan di tabel Admin).
      */
     public function getAllTestimonials()
     {
@@ -39,7 +39,8 @@ class TestimoniController extends Controller
     /**
      * getPublicTestimonials
      * 
-     * Mengambil daftar testimoni untuk publik/customer
+     * Menampilkan daftar testimoni di halaman depan (Landing Page).
+     * Biasanya ini di-render dalam bentuk slider/carousel.
      */
     public function getPublicTestimonials()
     {
@@ -62,7 +63,7 @@ class TestimoniController extends Controller
     /**
      * getTestimoniById
      * 
-     * Mengambil detail testimoni berdasarkan ID
+     * Mengambil secara detail satu testimoni tertentu (Contoh: jika user meng-klik Read More).
      */
     public function getTestimoniById($idTestimoni)
     {
@@ -93,14 +94,14 @@ class TestimoniController extends Controller
     /**
      * createTestimoni
      * 
-     * Menambahkan testimoni baru (Admin)
+     * Menambahkan data ulasan/testimoni baru beserta bukti foto wajah/hasil treatment (Oleh Admin).
      */
     public function createTestimoni(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
                 'namaTester' => 'required|string|max:20',
-                'jenisTestimoni' => 'required|string|max:60',
+                'jenisTestimoni' => 'required|string|max:60', // Misal: "Perawatan Jerawat Punggung"
                 'deskripsi' => 'required|string',
                 'tanggalTreatment' => 'required|date',
                 'buktiFoto' => 'required|image|mimes:jpeg,png,jpg|max:4000'
@@ -126,6 +127,8 @@ class TestimoniController extends Controller
             }
 
             $dataToInsert = $request->all();
+            
+            // Proses kompresi gambar testimoni
             if ($request->hasFile('buktiFoto')) {
                 $file = $request->file('buktiFoto');
                 $filename = time() . '_' . uniqid() . '.webp';
@@ -157,7 +160,7 @@ class TestimoniController extends Controller
     /**
      * updateTestimoni
      * 
-     * Memperbarui testimoni yang ada (Admin)
+     * Memperbaiki ejaan teks ulasan atau mengganti gambar bukti pada data testimoni (Oleh Admin).
      */
     public function updateTestimoni(Request $request, $idTestimoni)
     {
@@ -175,6 +178,7 @@ class TestimoniController extends Controller
                 'jenisTestimoni' => 'required|string|max:60',
                 'deskripsi' => 'required|string',
                 'tanggalTreatment' => 'required|date',
+                // Foto itu nullable, yang artinya Admin tidak harus melampirkan foto jika hanya mau mengedit teks namanya saja.
                 'buktiFoto' => 'nullable|image|mimes:jpeg,png,jpg|max:4000'
             ], [
                 'namaTester.required' => 'Nama tester wajib diisi.',
@@ -198,7 +202,9 @@ class TestimoniController extends Controller
 
             $dataToUpdate = $request->except(['buktiFoto']);
             
+            // Proses Penggantian Foto Testimoni
             if ($request->hasFile('buktiFoto')) {
+                // Jangan lupakan file lamanya! Hapus dulu dari Disk Server!
                 if ($testimoni->buktiFoto) {
                     Storage::disk('public')->delete($testimoni->buktiFoto);
                 }
@@ -232,7 +238,7 @@ class TestimoniController extends Controller
     /**
      * deleteTestimoni
      * 
-     * Menghapus testimoni (Admin)
+     * Menghapus secara permanen satu data testimoni beserta file gambarnya dari sistem (Admin).
      */
     public function deleteTestimoni($idTestimoni)
     {
@@ -245,6 +251,7 @@ class TestimoniController extends Controller
                 ], 404);
             }
 
+            // Hapus file gambar buktinya juga agar penyimpanan server tidak bocor (Storage Leak)
             if ($testimoni->buktiFoto) {
                 Storage::disk('public')->delete($testimoni->buktiFoto);
             }

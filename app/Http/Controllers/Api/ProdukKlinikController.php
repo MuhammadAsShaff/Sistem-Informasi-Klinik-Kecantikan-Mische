@@ -17,10 +17,13 @@ use Illuminate\Support\Facades\DB;
 class ProdukKlinikController extends Controller
 {
     /**
-     * Menampilkan daftar produk (Admin)
+     * getAllProducts
+     * 
+     * Menampilkan daftar semua produk beserta kategorinya (Khusus Admin, termasuk yang stok habis).
      */
     public function getAllProducts()
     {
+        // Menarik semua data produk dan merelasikannya langsung dengan tabel kategori agar nama kategori ikut tampil
         $produk = ProdukKlinik::with('kategori')->get();
         return response()->json([
             'status' => 'success',
@@ -29,19 +32,23 @@ class ProdukKlinikController extends Controller
     }
 
     /**
-     * Menambahkan data produk (Admin)
+     * createProduct
+     * 
+     * Menambahkan data produk baru oleh Admin. Termasuk otomatis mengkompres gambar ke WebP agar website lebih cepat dimuat.
      */
     public function createProduct(Request $request)
     {
+        // 1. Validasi Inputan form dari Admin
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'berat' => 'required|integer|min:1',
-            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:4000',
+            'berat' => 'required|integer|min:1', // Berat dipakai nanti untuk ongkir
+            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:4000', // max 4MB
             'idKategori' => 'required|exists:kategoriproduk,idKategori'
         ], [
+            // Custom pesan bahasa Indonesia agar admin mudah mengerti jika ada error
             'nama.required' => 'Nama produk wajib diisi.',
             'nama.string' => 'Nama produk harus berupa teks.',
             'nama.max' => 'Nama produk maksimal 255 karakter.',
@@ -70,20 +77,29 @@ class ProdukKlinikController extends Controller
             ], 422);
         }
 
+        // Ambil semua data teks (selain gambar)
         $dataToInsert = $request->except('gambar');
 
+        // 2. Manipulasi & Kompresi Gambar
         if ($request->hasFile('gambar')) {
             $file = $request->file('gambar');
+            
+            // Generate nama file acak yang aman (Contoh: 170023456_aBcDeF.webp)
             $filename = time() . '_' . uniqid() . '.webp';
             
+            // Menggunakan library Intervention Image untuk mengkompres JPG/PNG menjadi WEBP (kualitas 80%)
             $manager = new ImageManager(new Driver());
             $image = $manager->decode($file->getPathname());
             $webpData = $image->encodeUsingFileExtension('webp', 80)->toString();
             
+            // Simpan gambar tersebut ke dalam folder storage public /produk
             Storage::disk('public')->put('produk/' . $filename, $webpData);
+            
+            // Masukkan path gambar ke dalam array data yang akan disimpan ke database
             $dataToInsert['gambar'] = 'produk/' . $filename;
         }
 
+        // 3. Simpan ke database
         $produk = ProdukKlinik::create($dataToInsert);
 
         return response()->json([
@@ -94,7 +110,9 @@ class ProdukKlinikController extends Controller
     }
 
     /**
-     * Memperbarui data produk (Admin)
+     * updateProduct
+     * 
+     * Memperbarui detail informasi produk yang sudah ada.
      */
     public function updateProduct(Request $request, $idProduk)
     {
@@ -109,9 +127,11 @@ class ProdukKlinikController extends Controller
             'harga' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'berat' => 'required|integer|min:1',
+            // Gambar boleh null (tidak wajib diisi) jika admin hanya ingin mengubah teks saja
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
             'idKategori' => 'required|exists:kategoriproduk,idKategori'
         ], [
+            // ... (Pesan error disamakan seperti fungsi create) ...
             'nama.required' => 'Nama produk wajib diisi.',
             'nama.string' => 'Nama produk harus berupa teks.',
             'nama.max' => 'Nama produk maksimal 255 karakter.',
@@ -138,10 +158,14 @@ class ProdukKlinikController extends Controller
 
         $dataToUpdate = $request->except('gambar');
 
+        // Jika admin mengupload gambar baru
         if ($request->hasFile('gambar')) {
+            // Hapus fisik gambar yang lama di dalam server agar storage tidak bengkak
             if ($produk->gambar) {
                 Storage::disk('public')->delete($produk->gambar);
             }
+            
+            // Lakukan proses kompresi webp sama seperti saat create
             $file = $request->file('gambar');
             $filename = time() . '_' . uniqid() . '.webp';
             
@@ -153,6 +177,7 @@ class ProdukKlinikController extends Controller
             $dataToUpdate['gambar'] = 'produk/' . $filename;
         }
 
+        // Terapkan semua perubahan di database
         $produk->update($dataToUpdate);
 
         return response()->json([
@@ -163,7 +188,9 @@ class ProdukKlinikController extends Controller
     }
 
     /**
-     * Memperbarui stok produk (Admin)
+     * updateStock
+     * 
+     * Memperbarui HANYA angka stok produk dengan cepat tanpa perlu edit seluruh detail produk (Admin)
      */
     public function updateStock(Request $request, $idProduk)
     {
@@ -194,7 +221,9 @@ class ProdukKlinikController extends Controller
     }
 
     /**
-     * Menghapus data produk (Admin)
+     * deleteProduct
+     * 
+     * Menghapus produk secara permanen dari database
      */
     public function deleteProduct($idProduk)
     {
@@ -203,6 +232,7 @@ class ProdukKlinikController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Produk tidak ditemukan'], 404);
         }
 
+        // Hapus fisik gambar produk di server sebelum data database dihapus
         if ($produk->gambar) {
             Storage::disk('public')->delete($produk->gambar);
         }
@@ -216,17 +246,23 @@ class ProdukKlinikController extends Controller
     }
 
     /**
-     * Menampilkan daftar produk (Customer)
+     * getPublicProducts
+     * 
+     * Menampilkan katalog produk kepada Publik/Customer (Tamu Web E-Commerce).
+     * Berbeda dengan Admin, ini hanya menampilkan barang yang STOK-NYA ADA (> 0).
      */
     public function getPublicProducts(Request $request)
     {
+        // Hanya tarik produk yang ready stock
         $query = ProdukKlinik::where('stock', '>', 0)->with('kategori');
 
+        // Jika frontend mengirim parameter ?idKategori=1 di URL, maka saring/filter berdasarkan kategori tersebut (Fitur Tab)
         if ($request->has('idKategori')) {
             $query->where('idKategori', $request->idKategori);
         }
 
         $produk = $query->get();
+        
         return response()->json([
             'status' => 'success',
             'data' => $produk
@@ -234,11 +270,14 @@ class ProdukKlinikController extends Controller
     }
 
     /**
-     * Menampilkan detail produk (Customer)
+     * getProductById
+     * 
+     * Menampilkan detail lengkap 1 produk tertentu (Customer klik gambar produk untuk baca deksripsi).
      */
     public function getProductById($idProduk)
     {
         $produk = ProdukKlinik::with('kategori')->find($idProduk);
+        
         if (!$produk) {
             return response()->json(['status' => 'error', 'message' => 'Produk tidak ditemukan'], 404);
         }

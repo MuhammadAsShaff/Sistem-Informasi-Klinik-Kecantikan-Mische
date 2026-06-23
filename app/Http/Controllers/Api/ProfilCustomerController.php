@@ -11,9 +11,9 @@ use App\Models\AlamatCustomer;
 class ProfilCustomerController extends Controller
 {
     /**
-     * Tampil Profil Customer
+     * getProfileCustomer
      * 
-     * Mengambil data profil milik customer yang sedang login saat ini.
+     * Mengambil data profil milik customer yang sedang login saat ini. (Diarahkan ke menu Akun Saya pada sisi Customer).
      */
     public function getProfileCustomer(Request $request)
     {
@@ -36,9 +36,9 @@ class ProfilCustomerController extends Controller
     }
 
     /**
-     * Edit Profil Customer
+     * updateProfileCustomer
      * 
-     * Memperbarui profil milik customer yang sedang login saat ini.
+     * Memperbarui biodata milik customer yang sedang login saat ini.
      */
     public function updateProfileCustomer(Request $request)
     {
@@ -65,6 +65,7 @@ class ProfilCustomerController extends Controller
                 'tanggalLahir' => 'required|date',
                 'email' => 'required|email|max:50|unique:user,email,' . $user->idUser . ',idUser',
                 'nomorWa' => 'required|string|max:16',
+                // Password boleh kosong bila customer tidak bermaksud menggantinya
                 'password' => ['nullable', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
             ], $pesanEror);
 
@@ -76,7 +77,7 @@ class ProfilCustomerController extends Controller
                 ], 400);
             }
 
-            // Siapkan variabel penampung pembaruan data tanpa melibatkan role
+            // Siapkan variabel penampung pembaruan data
             $updateData = [
                 'nama' => $request->nama,
                 'alamat' => $request->alamat,
@@ -86,7 +87,7 @@ class ProfilCustomerController extends Controller
                 'nomorWa' => $request->nomorWa,
             ];
 
-            // Jika ada password yang diisi, berarti dia ingin mengganti password lamanya
+            // Jika ada password baru yang diisi, maka hash password itu
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->password);
             }
@@ -107,9 +108,10 @@ class ProfilCustomerController extends Controller
     }
 
     /**
-     * Set Alamat Utama Customer
+     * setAlamatUtama
      * 
-     * Menetapkan salah satu alamat yang sudah ada sebagai alamat utama.
+     * Menetapkan salah satu dari sekian banyak alamat milik customer menjadi "Alamat Utama".
+     * (Alamat Utama = Alamat yang otomatis terpilih saat checkout barang).
      */
     public function setAlamatUtama(Request $request)
     {
@@ -132,16 +134,18 @@ class ProfilCustomerController extends Controller
 
             $user = auth()->user();
 
-            // Pastikan alamat tersebut benar-benar milik user yang sedang login
+            // Pengecekan Keamanan Kritis: Pastikan alamat tersebut benar-benar MILIK user yang sedang login
+            // Jangan sampai user A menyetel alamat rumah user B sebagai alamat utamanya (IDOR Vulnerability)
             $alamat = AlamatCustomer::where('id', $request->idAlamat)->where('idUser', $user->idUser)->first();
 
             if (!$alamat) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Akses ditolak. Alamat ini bukan milik Anda atau tidak ditemukan.'
-                ], 403);
+                ], 403); // Forbidden
             }
 
+            // Ubah referensi kolom idAlamatUtama di tabel Users menjadi ID alamat yang dituju
             $user->update(['idAlamatUtama' => $alamat->id]);
 
             return response()->json([

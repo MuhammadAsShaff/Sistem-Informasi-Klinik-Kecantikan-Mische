@@ -14,17 +14,20 @@ use Illuminate\Support\Facades\Validator;
 class DistribusiPromoEventController extends Controller
 {
     /**
-     * Menampilkan daftar customer untuk dipilih saat distribusi
+     * getCustomers
+     * 
+     * Menampilkan daftar semua customer (untuk dipilih oleh admin) saat ingin mengirim Broadcast Promo via WhatsApp.
      */
     public function getCustomers(Request $request)
     {
         $query = User::where('role', 'customer');
 
-        // Jika ada input pencarian dari frontend
+        // Fitur Filter: Jika admin mengetik nama di kolom pencarian
         if ($request->has('search') && $request->search != '') {
             $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
+        // Hanya mengambil ID, Nama, No WA, dan Email untuk menghemat bandwidth
         $customers = $query->get(['idUser', 'nama', 'nomorWa', 'email']);
         
         return response()->json([
@@ -34,13 +37,16 @@ class DistribusiPromoEventController extends Controller
     }
 
     /**
-     * Mendistribusikan Promo via WhatsApp
+     * distributePromo
+     * 
+     * FITUR BROADCAST PROMO: Mengirim pesan blast via WhatsApp (menggunakan layanan pihak ke-3 "Fonnte") ke banyak customer sekaligus.
      */
     public function distributePromo(Request $request, FonnteService $fonnte)
     {
+        // 1. Validasi Input Admin
         $validator = Validator::make($request->all(), [
             'idPromo' => 'required|exists:promo,idPromo',
-            'type' => 'required|in:all,selected',
+            'type' => 'required|in:all,selected', // 'all' = Kirim ke semua orang, 'selected' = Kirim ke orang tertentu saja
             'customer_ids' => 'required_if:type,selected|array',
             'customer_ids.*' => 'exists:user,idUser'
         ], [
@@ -59,9 +65,10 @@ class DistribusiPromoEventController extends Controller
 
         $promo = Promo::find($request->idPromo);
         
-        // Dapatkan data target (nomor WA & Nama)
+        // 2. Dapatkan data target (nomor WA & Nama) dari Helper Function di bawah
         $targets = $this->getTargetData($request);
 
+        // Jika kebetulan tidak ada customer yang punya No WA
         if (empty($targets)) {
             return response()->json([
                 'status' => 'error',
@@ -69,21 +76,24 @@ class DistribusiPromoEventController extends Controller
             ], 400);
         }
 
-        // Format target Fonnte (nomor|nama)
+        // 3. Format Target Sesuai Syarat API Fonnte
+        // Fonnte meminta format string: "08123|Budi,08999|Siti" agar fitur greeting {name} berfungsi
         $formattedTargets = [];
         foreach ($targets as $t) {
             $formattedTargets[] = $t['nomorWa'] . '|' . $t['nama'];
         }
         $targetString = implode(',', $formattedTargets);
 
-        // Susun pesan Promo dengan Personalisasi {name}
-        $message = "Halo {name}! 🌟\n\n";
+        // 4. Susun pesan Promo (Copywriting WhatsApp)
+        $message = "Halo {name}! 🌟\n\n"; // {name} akan otomatis diganti oleh Fonnte sesuai nama target
         $message .= "Ada kabar gembira nih untuk kamu dari Mische Clinic!\n";
         $message .= "🎉 *{$promo->namaPromo}* 🎉\n\n";
         $message .= "_{$promo->deskripsi}_\n\n";
         
         $message .= "📌 *Detail Promo:*\n";
         $message .= "🔸 Jenis Promo: {$promo->jenisPromo}\n";
+        
+        // Cuma tambahkan baris Kode Promo jika memang butuh kode
         if ($promo->kode) {
             $message .= "🔸 Kode Promo: *{$promo->kode}*\n";
         }
@@ -101,7 +111,7 @@ class DistribusiPromoEventController extends Controller
         $message .= "Tunggu apa lagi? Yuk buruan klaim promonya sebelum kehabisan! 🥰\n\n";
         $message .= "Salam Hangat,\n*Mische Clinic*";
 
-        // Kirim menggunakan Fonnte
+        // 5. Eksekusi Pengiriman menggunakan FonnteService
         $result = $fonnte->sendMessage($targetString, $message);
 
         return response()->json([
@@ -112,7 +122,9 @@ class DistribusiPromoEventController extends Controller
     }
 
     /**
-     * Mendistribusikan Event/Kegiatan via WhatsApp
+     * distributeEvent
+     * 
+     * FITUR BROADCAST EVENT: Mirip seperti broadcast Promo, tapi ini untuk mengirim Undangan Acara.
      */
     public function distributeEvent(Request $request, FonnteService $fonnte)
     {
@@ -137,7 +149,6 @@ class DistribusiPromoEventController extends Controller
 
         $event = \App\Models\Event::find($request->idEvent);
         
-        // Dapatkan data target (nomor WA & Nama)
         $targets = $this->getTargetData($request);
 
         if (empty($targets)) {
@@ -147,20 +158,20 @@ class DistribusiPromoEventController extends Controller
             ], 400);
         }
 
-        // Format target Fonnte (nomor|nama)
         $formattedTargets = [];
         foreach ($targets as $t) {
             $formattedTargets[] = $t['nomorWa'] . '|' . $t['nama'];
         }
         $targetString = implode(',', $formattedTargets);
 
-        // Susun pesan Event dengan Personalisasi {name}
+        // Susun pesan Event
         $message = "Halo {name}! ✨\n\n";
         $message .= "Mische Clinic punya acara spesial nih, dan kami sangat ingin kamu hadir!\n\n";
         $message .= "🎟️ *{$event->nama}* 🎟️\n\n";
         $message .= "_{$event->deskripsi}_\n\n";
         
         $message .= "📌 *Detail Acara:*\n";
+        // Rapikan format tanggal (Jika cuma sehari, jangan tulis tanggal s/d tanggal)
         if ($event->tanggalMulai == $event->tanggalSelesai) {
             $message .= "📅 Tanggal: {$event->tanggalMulai}\n";
         } else {
@@ -171,7 +182,6 @@ class DistribusiPromoEventController extends Controller
         $message .= "Jangan sampai kelewatan ya, pastikan kamu catat tanggalnya! Sampai jumpa di sana! 👋\n\n";
         $message .= "Salam Hangat,\n*Mische Clinic*";
 
-        // Kirim menggunakan Fonnte
         $result = $fonnte->sendMessage($targetString, $message);
 
         return response()->json([
@@ -182,14 +192,18 @@ class DistribusiPromoEventController extends Controller
     }
 
     /**
-     * Helper untuk mengambil data target (WA & Nama) berdasarkan tipe distribusi
+     * getTargetData (Helper Internal)
+     * 
+     * Fungsi pembantu untuk mengambil nomor WA customer yang tidak kosong.
      */
     private function getTargetData(Request $request)
     {
+        // Syarat mutlak: Role Customer, WA Tidak Null, WA Tidak Kosong
         $query = User::where('role', 'customer')
                      ->whereNotNull('nomorWa')
                      ->where('nomorWa', '!=', '');
 
+        // Jika admin memilih opsi 'selected' (centang-centang nama manual)
         if ($request->type === 'selected' && $request->has('customer_ids')) {
             $query->whereIn('idUser', $request->customer_ids);
         }

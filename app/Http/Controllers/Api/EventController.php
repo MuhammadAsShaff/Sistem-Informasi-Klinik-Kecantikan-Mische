@@ -14,11 +14,14 @@ class EventController extends Controller
 {
     /**
      * getAllEvents
-     * Menampilkan daftar event (Admin)
+     * 
+     * Menampilkan daftar semua event yang ada (Biasanya digunakan oleh Admin untuk Dashboard Manajemen).
+     * Menggunakan pagination agar loading tidak berat jika event sudah sangat banyak.
      */
     public function getAllEvents()
     {
         try {
+            // latest() mengurutkan dari yang terbaru ditambahkan. paginate(10) membatasi 10 baris per halaman.
             $events = Event::latest()->paginate(10);
             return response()->json([
                 'success' => true,
@@ -36,7 +39,9 @@ class EventController extends Controller
 
     /**
      * getPublicEvents
-     * Menampilkan data event pada halaman customer
+     * 
+     * Menampilkan data event untuk halaman pengunjung/Customer (Publik).
+     * Mengambil semua event tanpa pagination (get) untuk ditampilkan mungkin di Carousel atau Banner Web.
      */
     public function getPublicEvents()
     {
@@ -58,11 +63,13 @@ class EventController extends Controller
 
     /**
      * getEventById
-     * Menampilkan detail event
+     * 
+     * Menampilkan detail dari 1 event tertentu (Saat Customer / Admin klik "Baca Selengkapnya").
      */
     public function getEventById($idEvent)
     {
         try {
+            // Mencari event berdasarkan Primary Key
             $event = Event::find($idEvent);
             if (!$event) {
                 return response()->json([
@@ -86,16 +93,20 @@ class EventController extends Controller
 
     /**
      * createEvent
-     * Menambahkan data event (Admin)
+     * 
+     * Menambahkan data event baru (Khusus Admin). 
+     * Otomatis mengkompresi gambar banner/poster event menjadi format WebP.
      */
     public function createEvent(Request $request)
     {
         try {
+            // 1. Validasi Inputan Admin
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:60',
                 'deskripsi' => 'required|string',
                 'foto' => 'required|image|mimes:jpeg,png,jpg|max:4000',
                 'tanggalMulai' => 'required|date',
+                // Validasi Cerdas: after_or_equal memastikan Tanggal Selesai TIDAK BOLEH lebih dulu dari Tanggal Mulai
                 'tanggalSelesai' => 'required|date|after_or_equal:tanggalMulai',
                 'lokasi' => 'required|string|max:100'
             ], [
@@ -120,18 +131,23 @@ class EventController extends Controller
             }
 
             $dataToInsert = $request->all();
+            
+            // 2. Proses Kompresi Gambar Event
             if ($request->hasFile('foto')) {
                 $file = $request->file('foto');
                 $filename = time() . '_' . uniqid() . '.webp';
                 
+                // Decode gambar asli lalu Encode paksa menjadi webp (kualitas 80%)
                 $manager = new ImageManager(new Driver());
                 $image = $manager->decode($file->getPathname());
                 $webpData = $image->encodeUsingFileExtension('webp', 80)->toString();
                 
+                // Simpan ke harddisk server
                 Storage::disk('public')->put('event/' . $filename, $webpData);
                 $dataToInsert['foto'] = 'event/' . $filename;
             }
 
+            // 3. Simpan data lengkap ke database
             $event = Event::create($dataToInsert);
 
             return response()->json([
@@ -150,7 +166,8 @@ class EventController extends Controller
 
     /**
      * updateEvent
-     * Memperbarui data event (Admin)
+     * 
+     * Memperbarui/Mengedit informasi event yang sudah ada.
      */
     public function updateEvent(Request $request, $idEvent)
     {
@@ -166,11 +183,13 @@ class EventController extends Controller
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:60',
                 'deskripsi' => 'required|string',
+                // Foto jadi nullable (boleh tidak diisi) karena mungkin admin hanya ingin mengedit judul saja tanpa ganti gambar
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
                 'tanggalMulai' => 'required|date',
                 'tanggalSelesai' => 'required|date|after_or_equal:tanggalMulai',
                 'lokasi' => 'required|string|max:100'
             ], [
+                // Pesan sama dengan fungsi Create
                 'nama.required' => 'Nama event wajib diisi.',
                 'deskripsi.required' => 'Deskripsi wajib diisi.',
                 'foto.image' => 'File harus berupa gambar.',
@@ -191,10 +210,15 @@ class EventController extends Controller
             }
 
             $dataToUpdate = $request->except(['foto']);
+            
+            // Jika ada upload gambar baru
             if ($request->hasFile('foto')) {
+                // 1. Hapus gambar event yang lama terlebih dahulu
                 if ($event->foto) {
                     Storage::disk('public')->delete($event->foto);
                 }
+                
+                // 2. Upload gambar yang baru
                 $file = $request->file('foto');
                 $filename = time() . '_' . uniqid() . '.webp';
                 
@@ -224,7 +248,8 @@ class EventController extends Controller
 
     /**
      * deleteEvent
-     * Menghapus data event (Admin)
+     * 
+     * Menghapus data event secara permanen dari sistem.
      */
     public function deleteEvent($idEvent)
     {
@@ -236,10 +261,14 @@ class EventController extends Controller
                     'message' => 'Event tidak ditemukan.'
                 ], 404);
             }
+            
+            // Jangan lupa menghapus file gambarnya agar storage server tidak penuh dengan data sampah
             if ($event->foto) {
                 Storage::disk('public')->delete($event->foto);
             }
+            
             $event->delete();
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Event berhasil dihapus.'

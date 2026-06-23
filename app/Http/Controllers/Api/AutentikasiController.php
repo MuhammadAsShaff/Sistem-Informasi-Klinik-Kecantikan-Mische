@@ -12,12 +12,14 @@ use App\Models\User;
 class AutentikasiController extends Controller
 {
     /**
-     * Daftar Akun Baru
+     * registerUser
      * 
-     * Membuat akun customer baru di sistem klinik.
+     * Mendaftarkan akun customer baru di sistem klinik.
      */
     public function registerUser(Request $request)
     {
+        // 1. Pesan Eror Khusus
+        // Agar ketika ada input yang salah, sistem mengembalikan pesan Bahasa Indonesia yang ramah, bukan bahasa Inggris kaku dari Laravel.
         $pesanEror = [
             'nama.required' => 'Kolom nama lengkap tidak boleh kosong.',
             'email.required' => 'Email wajib diisi!',
@@ -30,17 +32,17 @@ class AutentikasiController extends Controller
             'password.mixed' => 'Pastikan kata sandimu menantang dengan menyisipkan huruf BESAR (A-Z) dan kecil (a-z).'
         ];
 
-        // Validasi batasan tipe data pada input yang dikirim Client
+        // 2. Validasi Ketat pada Inputan (Cegah Hacker / Data Sampah)
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:60',
-            
             'jenisKelamin' => 'required|string|max:12',
             'tanggalLahir' => 'required|date',
-            'email' => 'required|email|unique:user,email|max:50',
+            'email' => 'required|email|unique:user,email|max:50', // unique:user memastikan email ini belum pernah dipakai di tabel user
             'nomorWa' => 'required|string|max:16',
-            'password' => ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
+            'password' => ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()] // Aturan password kuat
         ], $pesanEror);
 
+        // Jika salah satu dari aturan validasi di atas dilanggar, tolak!
         if ($validator->fails()) {
             return response()->json([
                 'code' => 400,
@@ -50,21 +52,22 @@ class AutentikasiController extends Controller
             ], 400);
         }
 
-        // Simpan data
+        // 3. Simpan data ke Database
         try {
             $user = User::create([
                 'nama' => $request->nama,
                 'alamat' => $request->alamat,
                 'jenisKelamin' => $request->jenisKelamin,
                 'tanggalLahir' => $request->tanggalLahir,
-                'role' => 'customer',
+                'role' => 'customer', // Pendaftaran umum otomatis menjadi customer (Admin dibuat manual)
                 'email' => $request->email,
                 'nomorWa' => $request->nomorWa,
+                // WAJIB: Password tidak boleh disimpan mentah, harus dienkripsi menjadi teks acak menggunakan Hash::make()
                 'password' => Hash::make($request->password)
             ]);
 
             return response()->json([
-                'code' => 201,
+                'code' => 201, // 201 artinya Created (Berhasil Dibuat)
                 'success' => true,
                 'message' => 'Registrasi berhasil!',
                 'data' => $user
@@ -81,9 +84,9 @@ class AutentikasiController extends Controller
     }
 
     /**
-     * Login Pengguna
+     * loginUser
      * 
-     * Otentikasi masuk pengguna dan menerbitkan Token JWT.
+     * Melakukan pengecekan email & password, lalu memberikan "Kunci Masuk" bernama JWT Token.
      */
     public function loginUser(Request $request)
     {
@@ -95,7 +98,7 @@ class AutentikasiController extends Controller
             'password.mixed' => 'Pastikan kata sandimu menantang dengan menyisipkan huruf BESAR (A-Z) dan kecil (a-z).'
         ];
 
-        // Validasi Input agar tidak Crash 500 bila kosong
+        // Validasi Input
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
@@ -109,57 +112,67 @@ class AutentikasiController extends Controller
             ], 400);
         }
 
+        // Hanya mengambil email dan password dari form request
         $credentials = $request->only('email', 'password');
 
+        // 1. Coba Melakukan Login (Otomasis mencocokkan password yang di-hash di DB)
+        // Jika sukses, auth()->attempt() akan mengembalikan teks panjang yang disebut "Token JWT"
+        // Jika gagal (salah password/email), dia akan mengembalikan FALSE
         if (!$token = auth('api')->attempt($credentials)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Email atau password yang Anda masukkan salah.',
-            ], 401);
+            ], 401); // 401 artinya Unauthorized
         }
 
+        // 2. Setting Cookie Keamanan Tinggi
+        // Kami mengirim token lewat Cookie agar aman dari pencurian javascript (Serangan XSS).
         $cookieName = env('JWT_COOKIE', 'jwt_token');
-        $isSecure = app()->environment('production');
+        $isSecure = app()->environment('production'); // Secure (https) aktif kalau di tahap produksi
+        
         $cookie = cookie(
             $cookieName,
-            $token,
-            0, // Diubah menjadi 0 (Session Cookie) agar hancur otomatis saat browser/PC ditutup
+            $token,     // Isi kuncinya
+            0,          // Umur: 0 = Session Cookie (Langsung musnah saat browser ditutup)
             '/',
             null,
-            $isSecure,
-            true,
+            $isSecure,  // Secure flag
+            true,       // HttpOnly flag (Anti pencurian javascript)
             false,
-            'Lax'
+            'Lax'       // SameSite protection (Anti serangan CSRF dasar)
         );
 
+        // 3. Kembalikan Response beserta Cookie-nya
         return response()->json([
             'success' => true,
             'message' => 'Login berhasil!',
-            'token' => $token,
+            'token' => $token, // Opsional: Juga kita berikan di body (bisa untuk Postman test/mobile apps)
             'type' => 'Bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
         ])->withCookie($cookie);
     }
 
     /**
-     * Logout Pengguna
+     * logoutUser
      * 
-     * Mengakhiri sesi pengguna dan menghancurkan Token JWT.
+     * Menghapus jejak login (Mencabut izin JWT Token dan menghapus Cookie).
      */
     public function logoutUser(Request $request)
     {
         try {
-            // [Refaktor Kustom] Karena Middleware JwtFromCookie mengekstraksi token ke Header, kita cukup cek session.
-            // Tidak perlu lagi mengambil token secara manual menggunakan $request->cookie() !
+            // Cek apakah user memang sedang dalam keadaan login?
             if (auth('api')->check()) {
+                // Cabut akses / Blacklist Token JWT saat ini agar tidak bisa dipakai lagi (Mencegah maling token)
                 auth('api')->logout();
                 $pesan = 'Sesi Anda berhasil diakhiri (Logout).';
             } else {
+                // Bisa terjadi kalau user klik tombol logout 2 kali berturut-turut dengan cepat
                 $pesan = 'Permintaan diterima, namun sesi Anda tampaknya memang sudah tidak aktif.';
             }
 
             $cookieName = env('JWT_COOKIE', 'jwt_token');
 
+            // forget() digunakan untuk memerintahkan Browser agar segera menghapus file cookie tersebut dari komputer pengguna
             return response()->json([
                 'success' => true,
                 'message' => $pesan
@@ -176,13 +189,15 @@ class AutentikasiController extends Controller
     }
 
     /**
-     * Tampil Data Login Saat Ini
+     * getUserProfile
      * 
-     * Mengambil profil pengguna berdasarkan token yang sedang aktif.
+     * Menarik detail profil User yang sedang login (Nama, Foto, No HP, dll).
+     * Biasanya ini dipanggil setiap kali pindah halaman di Frontend untuk memastikan user masih login.
      */
     public function getUserProfile(Request $request)
     {
         try {
+            // Jika token sudah expired / tidak valid
             if (!auth('api')->check()) {
                 return response()->json([
                     'success' => false,
@@ -190,8 +205,7 @@ class AutentikasiController extends Controller
                 ], 401);
             }
 
-            // [Refaktor Kustom] Langsung ambil user menggunakan bawaan JWT:
-            // Sistem akan otomatis menerjemahkan token yang tertempel di Header tadi menjadi data spesifik `User`.
+            // auth('api')->user() secara ajaib menerjemahkan Token JWT yang berantakan menjadi data dari tabel User
             $user = auth('api')->user();
 
             return response()->json([
@@ -210,13 +224,14 @@ class AutentikasiController extends Controller
     }
 
     /**
-     * Ubah Kata Sandi
+     * resetPassword
      * 
-     * Memperbarui kata sandi pengguna yang sedang login.
+     * Fitur ubah kata sandi dari dalam halaman profil saat user sedang login.
      */
     public function resetPassword(Request $request)
     {
         try {
+            // Keamanan: Pastikan harus login dulu baru boleh ganti password
             if (!auth('api')->check()) {
                 return response()->json([
                     'success' => false,
@@ -224,11 +239,9 @@ class AutentikasiController extends Controller
                 ], 401);
             }
 
-            // [Refaktor Kustom] Cukup panggil user(). Ini memotong boilerplate sintaks "setToken($token)"
-            // yang sebelumnya harus ditulis manual. Token yg di Header diterjemahkan otomatis.
+            // Ambil identitas user yang mau ganti password
             $user = auth('api')->user();
 
-            // 2. Validasi Inputan Sesuai Ketentuan Ketat (Harus 8 Karakter & Huruf Besar/Kecil)
             $pesanEror = [
                 'password_lama.required' => 'Mohon ketikkan sandi lama Anda.',
                 'password_baru.required' => 'Sandi baru wajib diisi.',
@@ -236,6 +249,7 @@ class AutentikasiController extends Controller
                 'password_baru.mixed' => 'Sandi baru harus memuat setidaknya kata huruf Kapital (A-Z) dan huruf kecil (a-z).'
             ];
 
+            // 1. Validasi Input form Ganti Password
             $validator = Validator::make($request->all(), [
                 'password_lama' => 'required|string',
                 'password_baru' => ['required', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
@@ -250,7 +264,8 @@ class AutentikasiController extends Controller
                 ], 400);
             }
 
-            // 3. Pengecekan Keamanan Ekstra: Apakah Sandi Lama-nya Akurat?
+            // 2. Keamanan Ekstra: Cek secara ketat apakah Password Lama yang dia ketik cocok dengan di Database?
+            // Hash::check akan mengecek text mentah vs text terenkripsi
             if (!Hash::check($request->password_lama, $user->password)) {
                 return response()->json([
                     'code' => 400,
@@ -259,7 +274,7 @@ class AutentikasiController extends Controller
                 ], 400);
             }
 
-            // 4. Sukses: Ubah dan Enkripsi (Hash) Sandi Baru ke Database
+            // 3. Ganti passwordnya, dan pastikan DI-ENKRIPSI kembali sebelum disimpan!
             $user->password = Hash::make($request->password_baru);
             $user->save();
 
@@ -273,10 +288,8 @@ class AutentikasiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Kesalahan saat mereset password.',
-                'error' => $e->getMessage(),
-                'isi_token_yang_ditangkap' => $token ?? 'TIDAK ADA'
+                'error' => $e->getMessage()
             ], 500);
         }
     }
-
 }

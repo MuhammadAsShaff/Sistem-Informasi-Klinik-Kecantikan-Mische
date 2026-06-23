@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Validator;
 class KategoriProdukController extends Controller
 {
     /**
-     * Menampilkan daftar kategori
+     * getAllCategories
+     * 
+     * Menampilkan daftar semua kategori (Contoh: Skincare, Bodycare, Haircare).
      */
     public function getAllCategories()
     {
@@ -24,13 +26,18 @@ class KategoriProdukController extends Controller
     }
 
     /**
-     * Menghitung jumlah produk per kategori
+     * getProductCountByCategory
+     * 
+     * Menampilkan daftar kategori, tapi DITAMBAH dengan angka jumlah produk yang ada di dalam kategori tersebut.
+     * (Contoh output: "Skincare (10 Produk)", "Bodycare (5 Produk)").
      */
     public function getProductCountByCategory()
     {
         try {
+            // withCount('produkklinik') secara otomatis akan menghitung jumlah relasi anak (produk) dari setiap kategori
             $kategori = KategoriProduk::withCount('produkklinik')->get();
             
+            // Format ulang array JSON agar namanya lebih enak dibaca oleh Frontend (produkklinik_count diubah jadi jumlahProduk)
             $formattedData = $kategori->map(function ($item) {
                 return [
                     'idKategori' => $item->idKategori,
@@ -54,7 +61,9 @@ class KategoriProdukController extends Controller
     }
 
     /**
-     * Menambahkan data kategori
+     * createCategory
+     * 
+     * Menambahkan label kategori baru (Khusus Admin).
      */
     public function createCategory(Request $request)
     {
@@ -88,7 +97,9 @@ class KategoriProdukController extends Controller
     }
 
     /**
-     * Memperbarui kategori
+     * updateCategory
+     * 
+     * Mengubah nama / deksripsi kategori (Khusus Admin).
      */
     public function updateCategory(Request $request, $idKategori)
     {
@@ -131,7 +142,9 @@ class KategoriProdukController extends Controller
     }
 
     /**
-     * Menghapus data kategori
+     * deleteCategory
+     * 
+     * Menghapus kategori produk (Khusus Admin).
      */
     public function deleteCategory($idKategori)
     {
@@ -144,12 +157,13 @@ class KategoriProdukController extends Controller
             ], 404);
         }
 
-        // Opsional: Validasi jika kategori masih dipakai produk
+        // Validasi Bisnis: Jangan hapus kategori JIKA di dalamnya masih ada produk yang menumpang pada kategori ini!
+        // Kalau dihapus paksa, produk-produk tersebut bisa jadi yatim-piatu (error database).
         if ($kategori->produkklinik()->count() > 0) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Gagal menghapus kategori karena masih digunakan pada produk'
-            ], 400);
+            ], 400); // 400 Bad Request
         }
 
         $kategori->delete();

@@ -13,14 +13,15 @@ use App\Models\AlamatCustomer;
 class KelolaUserController extends Controller
 {
     /**
-     * Tampil Semua Pengguna
+     * getAllUsers
      * 
-     * Mengambil daftar seluruh pengguna terdaftar (Khusus Admin).
+     * Mengambil daftar seluruh pengguna (Bisa difilter menjadi Customer atau Admin di Frontend).
+     * Digunakan pada Menu Manajemen Akun di sisi Admin.
      */
     public function getAllUsers()
     {
         try {
-            // Mengambil semua data user beserta relasi alamatnya dengan paginasi 
+            // Mengambil semua data user beserta relasi tabel "Buku Alamat" mereka, dipaginasi 10 per halaman
             $users = User::with(['alamats', 'alamatUtama'])->latest()->paginate(10);
 
             return response()->json([
@@ -38,14 +39,14 @@ class KelolaUserController extends Controller
     }
 
     /**
-     * Tampil Pengguna Spesifik
+     * getUserById
      * 
-     * Mengambil detail satu pengguna berdasarkan ID (Khusus Admin).
+     * Mengambil detail 1 profil pengguna lengkap beserta susunan alamatnya (Saat Admin mengklik icon Detail).
      */
     public function getUserById($idUser)
     {
         try {
-            // Mencari user beserta relasi alamatnya berdasarkan ID (findOrFail)
+            // findOrFail: Akan otomatis melempar error (Exception) kalau ID yang dicari tidak ada di database
             $user = User::with(['alamats', 'alamatUtama'])->findOrFail($idUser);
 
             return response()->json([
@@ -62,9 +63,10 @@ class KelolaUserController extends Controller
     }
 
     /**
-     * Tambah Pengguna Baru
+     * createUser
      * 
-     * Mendaftarkan pengguna atau admin baru ke dalam sistem (Khusus Admin).
+     * Menambahkan akun pengguna baru secara manual dari sisi panel Admin.
+     * Dapat mendaftarkan Admin Baru, atau mendaftarkan Customer yang datang langsung (Walk-in) ke klinik.
      */
     public function createUser(Request $request)
     {
@@ -100,9 +102,11 @@ class KelolaUserController extends Controller
             ], 400);
         }
 
+        // DB::beginTransaction() digunakan untuk memastikan 2 Tabel (User & Alamat) tersimpan secara atomik.
+        // Jika tabel User sukses tapi tabel Alamat gagal, tabel User akan ikut dibatalkan simpannya (Rollback).
         DB::beginTransaction();
         try {
-            // Menghemat kueri dan sangat aman (Mass Assignment)
+            // 1. Buat Akun Profil Inti
             $user = User::create([
                 'nama' => $request->nama,
                 'jenisKelamin' => $request->jenisKelamin,
@@ -110,34 +114,39 @@ class KelolaUserController extends Controller
                 'role' => $request->role,
                 'email' => $request->email,
                 'nomorWa' => $request->nomorWa,
+                // WAJIB: Enkripsi / Acak Password
                 'password' => Hash::make($request->password)
             ]);
 
-            // Jika role customer dan terdapat input alamat
+            // 2. Jika akun yang dibuat adalah Customer, dan Admin mengisi form Alamat lengkap
             if ($user->role === 'customer' && $request->filled('provinceId')) {
+                // Simpan Alamat Pertamanya di tabel alamat_customer
                 $alamat = AlamatCustomer::create([
                     'idUser' => $user->idUser,
                     'namaPenerima' => $user->nama,
                     'nomorHp' => $user->nomorWa,
                     'provinceId' => $request->provinceId,
                     'cityId' => $request->cityId,
-                    'districtId' => $request->kecamatan, // map dari request->kecamatan
+                    'districtId' => $request->kecamatan, // Menyesuaikan input name frontend
                     'kodePos' => $request->kodePos,
                     'detailAlamat' => $request->detailAlamat
                 ]);
 
-                // Set alamat ini sebagai alamat utama
+                // 3. Update profil inti: Jadikan alamat ini sebagai alamat Utama (Centang Hijau Default)
                 $user->update(['idAlamatUtama' => $alamat->id]);
             }
 
+            // Sah-kan penyimpanan ke Database
             DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Akun userr baru berhasil ditambahkan',
+                // load('alamatUtama') menarik relasinya sekalian untuk respon balik
                 'data' => $user->load('alamatUtama')
             ], 201);
         } catch (\Exception $e) {
+            // Batalkan semua query ke DB karena terjadi error
             DB::rollBack();
             return response()->json([
                 'success' => false,
@@ -148,9 +157,9 @@ class KelolaUserController extends Controller
     }
 
     /**
-     * Edit Pengguna
+     * updateUser
      * 
-     * Memperbarui informasi profil dari pengguna tertentu (Khusus Admin).
+     * Mengedit Biodata dan sinkronisasi banyak alamat (Array) dari pengguna tertentu (Khusus Admin).
      */
     public function updateUser(Request $request, $idUser)
     {
@@ -165,6 +174,7 @@ class KelolaUserController extends Controller
                 'role.required' => 'Role pengguna wajib ditentukan.',
                 'email.required' => 'Email wajib diisi.',
                 'email.email' => 'Format email tidak valid.',
+                // Pengecualian unik: Boleh menyamai email miliknya sendiri (Pengecualian ID ini)
                 'email.unique' => 'Email ini sudah terdaftar oleh pengguna lain.',
                 'nomorWa.required' => 'Nomor WhatsApp wajib diisi.',
                 'password.min' => 'Password minimal terdiri dari 8 karakter.',
@@ -178,6 +188,7 @@ class KelolaUserController extends Controller
                 'role' => 'sometimes|string|max:12',
                 'email' => 'sometimes|email|unique:user,email,' . $user->idUser . ',idUser',
                 'nomorWa' => 'sometimes|string|max:16',
+                // Password boleh kosong, artinya Admin tidak mau mereset password customer
                 'password' => ['nullable', 'string', \Illuminate\Validation\Rules\Password::min(8)->mixedCase()]
             ], $pesanEror);
 
@@ -189,40 +200,46 @@ class KelolaUserController extends Controller
                 ], 400);
             }
 
-            // Pisahkan password dari data regular
+            // Pisahkan field password dan alamat_lengkap dari data regular agar tidak error (Keduanya butuh perlakuan khusus)
             $dataToUpdate = $request->except(['password', 'alamat_lengkap']);
 
-            // Re-hash sandi jika ternyata diganti
+            // Jika Admin mereset/mengganti password, maka hash ulang
             if ($request->filled('password')) {
                 $dataToUpdate['password'] = Hash::make($request->password);
             }
 
+            // Update profil Biodata dasar
             $user->update($dataToUpdate);
 
-            // Jika ada payload alamat_lengkap untuk disinkronisasi
+            // =========================================================================
+            // SINKRONISASI ALAMAT ARRAY (Logic yang paling canggih di Controller Ini)
+            // =========================================================================
             if ($user->role === 'customer' && $request->has('alamat_lengkap')) {
                 $payloadAlamat = $request->alamat_lengkap;
                 
-                // Ambil ID yang dianggap data lama/asli (di bawah 1 juta)
+                // 1. Saring ID alamat yang valid (ID Asli biasanya di bawah 1 juta).
+                // Frontend React kadang memberi ID buatan sementara (seperti 123456789) untuk alamat yang baru diketik namun belum disave.
                 $realIds = collect($payloadAlamat)
                     ->pluck('id')
                     ->filter(function ($id) {
                         return $id && $id < 1000000;
                     })->toArray();
 
-                // Hapus alamat lama milik user ini yang TIDAK dikirim lagi dari frontend
+                // 2. HAPUS ALAMAT: 
+                // Jika di DB dia punya 3 alamat, tapi dari Payload Frontend cuma ngirim 2 alamat, 
+                // berarti 1 alamat sudah sengaja dihapus oleh Admin di tampilan, kita hapus juga di DB!
                 AlamatCustomer::where('idUser', $user->idUser)
                     ->whereNotIn('id', $realIds)
                     ->delete();
 
                 $idUtamaBaru = null;
 
-                // Looping untuk Insert / Update
+                // 3. Proses INSERT BARU atau UPDATE LAMA berdasarkan List Payload
                 foreach ($payloadAlamat as $item) {
                     $isNew = (!isset($item['id']) || $item['id'] > 1000000);
 
                     if ($isNew) {
-                        // Insert Alamat Baru
+                        // Jika tidak ada ID atau ID-nya jutaan (ID palsu buatan React), berarti ini Alamat Baru!
                         $alamatBaru = AlamatCustomer::create([
                             'idUser' => $user->idUser,
                             'namaPenerima' => $item['namaPenerima'] ?? $user->nama,
@@ -234,11 +251,12 @@ class KelolaUserController extends Controller
                             'detailAlamat' => $item['detailAlamat'] ?? null
                         ]);
 
+                        // Jika dia dicentang is_utama = true, ingat ID-nya!
                         if (isset($item['is_utama']) && $item['is_utama']) {
                             $idUtamaBaru = $alamatBaru->id;
                         }
                     } else {
-                        // Update Alamat Lama
+                        // Jika ID-nya asli (Angka wajar), berarti ini cuma Update Alamat yang sudah ada!
                         $alamatLama = AlamatCustomer::find($item['id']);
                         if ($alamatLama && $alamatLama->idUser == $user->idUser) {
                             $alamatLama->update([
@@ -251,6 +269,7 @@ class KelolaUserController extends Controller
                                 'detailAlamat' => $item['detailAlamat'] ?? $alamatLama->detailAlamat
                             ]);
 
+                            // Jika dia dicentang is_utama = true, ingat ID-nya!
                             if (isset($item['is_utama']) && $item['is_utama']) {
                                 $idUtamaBaru = $alamatLama->id;
                             }
@@ -258,11 +277,11 @@ class KelolaUserController extends Controller
                     }
                 }
 
-                // Update idAlamatUtama di tabel user
+                // 4. Update Siapa Alamat Utamanya (Default Delivery)
                 if ($idUtamaBaru) {
                     $user->update(['idAlamatUtama' => $idUtamaBaru]);
                 } else if ($request->has('alamat_lengkap') && empty($request->alamat_lengkap)) {
-                    // Jika semua dihapus
+                    // Jika Payload dikirim tapi Array Kosong (Semua alamat dihapus bersih)
                     $user->update(['idAlamatUtama' => null]);
                 }
             }
@@ -285,9 +304,9 @@ class KelolaUserController extends Controller
     }
 
     /**
-     * Hapus Pengguna
+     * deleteUser
      * 
-     * Menghapus data pengguna secara permanen dari sistem (Khusus Admin).
+     * Menghapus Akun secara ekstrim (Permanen) dari Sistem (Hati-hati, histori transaksinya bisa hilang karena cascade delete).
      */
     public function deleteUser($idUser)
     {
@@ -295,7 +314,7 @@ class KelolaUserController extends Controller
             $user = User::findOrFail($idUser);
             $user->delete();
 
-            // Sesuai standar REST API (204 No Content)
+            // Status 204 berarti Operasi Delete sukses tanpa kembalian pesan json
             return response()->noContent();
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['success' => false, 'message' => 'Data itu sudah dihapus atau tidak ditemukan'], 404);

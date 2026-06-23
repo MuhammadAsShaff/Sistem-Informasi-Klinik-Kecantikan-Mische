@@ -11,13 +11,14 @@ class JadwalReservasiController extends Controller
 {
    
     /**
-     * Tampil Semua Jadwal
+     * getAllSchedule
      * 
-     * Mengambil seluruh data jadwal reservasi tanpa filter (Khusus Admin).
+     * Menarik seluruh master data jadwal jam operasional/reservasi klinik (Khusus Admin).
      */
     public function getAllSchedule()
     {
         try {
+            // Urutkan jadwal dari jam paling awal (08:00) ke jam paling akhir
             $jadwal = JadwalReservasi::orderBy('jamMulai', 'asc')->get();
             return response()->json([
                 'success' => true,
@@ -34,12 +35,10 @@ class JadwalReservasiController extends Controller
     }
 
     /**
-     * Mendapatkan jadwal reservasi untuk Publik (Tampil di Landing Page/Customer)
-     */
-    /**
-     * Tampil Jadwal Publik
+     * getPublicSchedule
      * 
-     * Mengambil daftar jadwal dokter yang aktif untuk dilihat pengunjung.
+     * Mengambil daftar jadwal dokter yang aktif dan belum di-booking (Dilihat oleh Pengunjung/Customer).
+     * Jika tanggal dan dokter diisi, sistem akan menandai jam mana yang "Sudah Terisi" (Tidak bisa di-klik).
      */
     public function getPublicSchedule(Request $request)
     {
@@ -50,14 +49,15 @@ class JadwalReservasiController extends Controller
             $idDokter = $request->query('idDokter');
 
             if ($tanggal && $idDokter) {
-                // Ambil semua idJadwal yang sudah di-booking pada tanggal dan dokter tersebut
+                // Cari apakah pada hari tersebut dan untuk dokter tersebut, sudah ada jam yang di-booking orang lain?
+                // Hanya mengecek yang statusnya "Menunggu" atau "Dikonfirmasi" (Jika "Dibatalkan", berarti jam itu kosong lagi)
                 $bookedJadwalIds = \App\Models\Reservasi::where('tanggalReservasi', $tanggal)
                     ->where('idDokter', $idDokter)
                     ->whereIn('status', ['Menunggu', 'Dikonfirmasi'])
                     ->pluck('idJadwal')
                     ->toArray();
 
-                // Format respon jadwal dengan menyisipkan 'status'
+                // Ubah (Transform) hasil respons: tambahkan properti "status" (Tersedia / Sudah Terisi) pada setiap jam
                 $jadwal->transform(function ($item) use ($bookedJadwalIds) {
                     $item->status = in_array($item->idJadwal, $bookedJadwalIds) ? 'Sudah Terisi' : 'Tersedia';
                     return $item;
@@ -79,12 +79,9 @@ class JadwalReservasiController extends Controller
     }
 
     /**
-     * Membuat jadwal reservasi baru (Hanya Admin)
-     */
-    /**
-     * Tambah Jadwal Baru
+     * createSchedule
      * 
-     * Membuat slot jadwal reservasi dokter baru (Khusus Admin).
+     * Membuat slot jam reservasi dokter yang baru (Misal: 08:00 sampai 09:00). (Khusus Admin)
      */
     public function createSchedule(Request $request)
     {
@@ -95,6 +92,7 @@ class JadwalReservasiController extends Controller
             'jamSelesai.date_format' => 'Format jam selesai harus HH:MM.'
         ];
 
+        // Validasi format jam harus pakai H:i (08:00, bukan jam 8 pagi)
         $validator = Validator::make($request->all(), [
             'jamMulai' => 'required|date_format:H:i',
             'jamSelesai' => 'required|date_format:H:i'
@@ -108,7 +106,7 @@ class JadwalReservasiController extends Controller
             ], 400);
         }
 
-        // Logika agar jamSelesai tidak lebih kecil/sama dengan jamMulai
+        // Pengecekan Logika Waktu: Mencegah Admin salah ketik. Jam Selesai tidak boleh lebih pagi dari Jam Mulai.
         if (strtotime($request->jamSelesai) <= strtotime($request->jamMulai)) {
             return response()->json([
                 'success' => false,
@@ -137,12 +135,9 @@ class JadwalReservasiController extends Controller
     }
 
     /**
-     * Mengubah jadwal reservasi (Hanya Admin)
-     */
-    /**
-     * Edit Jadwal
+     * updateSchedule
      * 
-     * Mengubah data jadwal reservasi yang sudah ada (Khusus Admin).
+     * Mengedit jadwal (jam) yang sudah telanjur dibuat sebelumnya. (Khusus Admin)
      */
     public function updateSchedule(Request $request, $idJadwal)
     {
@@ -154,6 +149,7 @@ class JadwalReservasiController extends Controller
                 'jamSelesai.date_format' => 'Format jam selesai harus HH:MM.'
             ];
 
+            // 'sometimes' berarti validasi ini hanya berjalan JIKA admin mengirimkan data jamMulai. Jika kosong, biarkan yang lama.
             $validator = Validator::make($request->all(), [
                 'jamMulai' => 'sometimes|date_format:H:i',
                 'jamSelesai' => 'sometimes|date_format:H:i'
@@ -167,12 +163,11 @@ class JadwalReservasiController extends Controller
                 ], 400);
             }
 
-            // Validasi Logika agar jamSelesai tidak lebih kecil dari jamMulai
+            // Gabungkan data baru dengan data lama jika admin hanya mengubah salah satu (Jam Mulai saja / Jam Selesai saja)
             $jamMulai = $request->jamMulai ?? $jadwal->jamMulai;
             $jamSelesai = $request->jamSelesai ?? $jadwal->jamSelesai;
 
-            // Format ulang untuk strtotime
-            // Karena dari DB kadang formatnya H:i:s, dari JSON H:i.
+            // Memotong format detik (H:i:s menjadi H:i) agar bisa di-convert dan dibandingkan oleh fungsi strtotime PHP
             $jamMulai = substr($jamMulai, 0, 5);
             $jamSelesai = substr($jamSelesai, 0, 5);
 
@@ -202,12 +197,10 @@ class JadwalReservasiController extends Controller
     }
 
     /**
-     * Menghapus jadwal reservasi permanen (Hanya Admin)
-     */
-    /**
-     * Hapus Jadwal
+     * deleteSchedule
      * 
-     * Menghapus slot jadwal secara permanen (Khusus Admin).
+     * Menghapus slot jam secara permanen (Khusus Admin). 
+     * Hati-hati: Jika jam dihapus, reservasi yang terkait mungkin akan crash jika tidak dilindungi oleh foreign key (onDelete).
      */
     public function deleteSchedule($idJadwal)
     {
@@ -215,7 +208,7 @@ class JadwalReservasiController extends Controller
             $jadwal = JadwalReservasi::findOrFail($idJadwal);
             $jadwal->delete();
 
-            // Sesuai standar REST API (204 No Content)
+            // Sesuai standar REST API, bila data berhasil dihapus kita kembalikan response 204 No Content
             return response()->noContent();
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['success' => false, 'message' => 'Data jadwal tidak ditemukan'], 404);

@@ -13,14 +13,14 @@ use Intervention\Image\Drivers\Gd\Driver;
 class KegiatanController extends Controller
 {
     /**
-     * Tampil Kegiatan Publik
+     * getPublicKegiatan
      * 
-     * Mengambil daftar semua kegiatan terbaru untuk ditampilkan di halaman publik.
+     * Mengambil daftar kegiatan klinik terbaru untuk ditampilkan di Landing Page (Bisa diakses tanpa Login).
      */
     public function getPublicKegiatan()
     {
         try {
-            // Urutkan dari kegiatan terbaru
+            // Urutkan dari kegiatan terbaru berdasarkan tanggal pelaksanaannya
             $kegiatan = Kegiatan::orderBy('tanggalKegiatan', 'desc')->get();
 
             if ($kegiatan->isEmpty()) {
@@ -41,9 +41,9 @@ class KegiatanController extends Controller
 
  
     /**
-     * Tampil Semua Kegiatan
+     * getAllKegiatan
      * 
-     * Mengambil daftar lengkap seluruh kegiatan klinik (Khusus Admin).
+     * Mengambil daftar lengkap seluruh kegiatan (Khusus untuk tabel manajemen Admin).
      */
     public function getAllKegiatan()
     {
@@ -62,9 +62,9 @@ class KegiatanController extends Controller
     }
 
     /**
-     * Tambah Kegiatan Baru
+     * createKegiatan
      * 
-     * Menambahkan data kegiatan baru beserta upload foto (Khusus Admin).
+     * Menambahkan data kegiatan (Dokumentasi / Galeri) baru beserta upload foto (Khusus Admin).
      */
     public function createKegiatan(Request $request)
     {
@@ -97,7 +97,7 @@ class KegiatanController extends Controller
 
             $data = $request->only(['namaKegiatan', 'deskripsi', 'tanggalKegiatan']);
 
-            // Proses unggah foto jika ada
+            // Proses unggah dan Kompresi foto (Menjadi WebP untuk loading web yang lebih ringan)
             if ($request->hasFile('foto')) {
                 $file = $request->file('foto');
                 $filename = time() . '_' . uniqid() . '.webp';
@@ -109,7 +109,8 @@ class KegiatanController extends Controller
                 Storage::disk('public')->put('kegiatan/' . $filename, $webpData);
                 $data['foto'] = 'kegiatan/' . $filename;
             } else {
-                $data['foto'] = 'kegiatan/default.png'; // Fallback gambar default agar tidak error NOT NULL di DB
+                // Fallback gambar default agar tidak error karena kolom foto di DB tidak boleh NULL
+                $data['foto'] = 'kegiatan/default.png'; 
             }
 
             $kegiatan = Kegiatan::create($data);
@@ -126,9 +127,9 @@ class KegiatanController extends Controller
     }
 
     /**
-     * Edit Kegiatan
+     * updateKegiatan
      * 
-     * Memperbarui informasi kegiatan atau mengganti foto lama dengan yang baru (Khusus Admin).
+     * Memperbarui/Mengedit teks kegiatan atau mengganti foto lama dengan foto yang baru (Khusus Admin).
      */
     public function updateKegiatan(Request $request, $idKegiatan)
     {
@@ -150,6 +151,7 @@ class KegiatanController extends Controller
                 'namaKegiatan' => 'sometimes|required|string|max:60',
                 'deskripsi' => 'sometimes|required|string',
                 'tanggalKegiatan' => 'sometimes|required|date',
+                // Foto bisa saja nullable karena admin mungkin cuma mau ganti judulnya saja, tidak mau ganti foto
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ], $pesanEror);
 
@@ -163,13 +165,14 @@ class KegiatanController extends Controller
 
             $updateData = $request->only(['namaKegiatan', 'deskripsi', 'tanggalKegiatan']);
 
-            // Jika ada foto baru yang diunggah
+            // Proses Penggantian Foto
             if ($request->hasFile('foto')) {
-                // Hapus foto lama jika ada
+                // 1. Bersihkan foto lama dari folder storage server (agar tidak numpuk jadi file yatim-piatu)
                 if ($kegiatan->foto && Storage::disk('public')->exists($kegiatan->foto)) {
                     Storage::disk('public')->delete($kegiatan->foto);
                 }
                 
+                // 2. Upload yang baru
                 $file = $request->file('foto');
                 $filename = time() . '_' . uniqid() . '.webp';
                 
@@ -197,23 +200,23 @@ class KegiatanController extends Controller
     }
 
     /**
-     * Hapus Kegiatan
+     * deleteKegiatan
      * 
-     * Menghapus data kegiatan secara permanen beserta file fotonya dari server (Khusus Admin).
+     * Menghapus data dokumentasi kegiatan secara permanen beserta file fotonya (Khusus Admin).
      */
     public function deleteKegiatan($idKegiatan)
     {
         try {
             $kegiatan = Kegiatan::findOrFail($idKegiatan);
 
-            // Bersihkan file foto dari server agar tidak jadi sampah
+            // Jangan biarkan gambarnya tersisa di server kalau datanya dihapus!
             if ($kegiatan->foto && Storage::disk('public')->exists($kegiatan->foto)) {
                 Storage::disk('public')->delete($kegiatan->foto);
             }
 
             $kegiatan->delete();
 
-            // Sesuai standar REST API (204 No Content)
+            // Status HTTP 204 No Content untuk aksi hapus yang sukses tanpa data return
             return response()->noContent();
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {

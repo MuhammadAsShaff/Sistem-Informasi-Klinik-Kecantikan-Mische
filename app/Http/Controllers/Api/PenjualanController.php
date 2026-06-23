@@ -18,18 +18,22 @@ class PenjualanController extends Controller
 {
     /**
      * index
-     * Menampilkan data penjualan (Admin)
+     * Menampilkan semua data penjualan (Biasanya digunakan oleh Admin untuk melihat riwayat semua transaksi)
      */
     public function index()
     {
         try {
+            // Mengambil semua data dari tabel penjualan sekaligus mengambil relasi ke tabel user, promo, produk, dan alamat agar data tampil lengkap
             $penjualan = Penjualan::with(['user', 'promo', 'detailpenjualan.produk', 'alamat'])->latest()->get();
+            
+            // Jika berhasil, kirim response JSON dengan status 200 (OK)
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil mengambil semua data penjualan.',
                 'data' => $penjualan
             ], 200);
         } catch (\Exception $e) {
+            // Jika ada error pada database atau server, tangkap errornya dan kirim response 500 (Server Error)
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengambil data penjualan.',
@@ -40,11 +44,12 @@ class PenjualanController extends Controller
 
     /**
      * updateStatus
-     * Mengubah status data penjualan (Admin)
+     * Fungsi bagi Admin untuk mengubah status perjalanan pesanan (Misal dari diproses menjadi dikirim)
      */
     public function updateStatus(Request $request, $idPenjualan)
     {
         try {
+            // Memvalidasi bahwa status yang dikirim admin harus salah satu dari daftar enum yang valid
             $validator = Validator::make($request->all(), [
                 'orderStatus' => 'required|string|in:pending,diproses,dikirim,selesai,dibatalkan',
                 'nomorResi' => 'nullable|string|max:255'
@@ -53,6 +58,7 @@ class PenjualanController extends Controller
                 'orderStatus.in' => 'Status tidak valid.'
             ]);
 
+            // Jika inputan admin tidak memenuhi aturan validasi, tolak dengan status 400 (Bad Request)
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
@@ -61,6 +67,7 @@ class PenjualanController extends Controller
                 ], 400);
             }
 
+            // Mencari transaksi penjualan berdasarkan ID yang dilempar dari URL
             $penjualan = Penjualan::find($idPenjualan);
 
             if (!$penjualan) {
@@ -70,8 +77,8 @@ class PenjualanController extends Controller
                 ], 404);
             }
 
+            // Memperbarui hanya field orderStatus di database
             $updateData = ['orderStatus' => $request->orderStatus];
-
             $penjualan->update($updateData);
 
             return response()->json([
@@ -89,11 +96,13 @@ class PenjualanController extends Controller
     }
 
     /**
-     * Memasukkan atau mengubah nomor resi pesanan
+     * inputResi
+     * Fungsi khusus untuk Admin memasukkan nomor resi ekspedisi setelah barang dipaketkan
      */
     public function inputResi(Request $request, $idPenjualan)
     {
         try {
+            // Memastikan admin benar-benar mengetikkan nomor resi (tidak boleh kosong)
             $validator = Validator::make($request->all(), [
                 'nomorResi' => 'required|string|max:100'
             ]);
@@ -115,12 +124,15 @@ class PenjualanController extends Controller
                 ], 404);
             }
 
-            // Update nomor resi, otomatis set status ke dikirim jika belum dikirim atau selesai
+            // Menyiapkan data resi yang akan disimpan
             $updateData = ['nomorResi' => $request->nomorResi];
+            
+            // Logika otomatis: Jika barang tadinya belum selesai, maka saat diinput resi, statusnya otomatis berubah jadi "dikirim"
             if ($penjualan->orderStatus !== 'selesai') {
                 $updateData['orderStatus'] = 'dikirim';
             }
 
+            // Simpan perubahan ke database
             $penjualan->update($updateData);
 
             return response()->json([
@@ -140,7 +152,7 @@ class PenjualanController extends Controller
 
     /**
      * destroy
-     * Menghapus data penjualan (Admin)
+     * Fungsi bagi Admin untuk menghapus data penjualan secara permanen
      */
     public function destroy($idPenjualan)
     {
@@ -154,8 +166,10 @@ class PenjualanController extends Controller
                 ], 404);
             }
 
-            // Hapus relasi detail penjualan terlebih dahulu
+            // Logika penting: Hapus dulu data anaknya (Detail Penjualan) agar tidak terjadi data yatim/orphan (Relasi Database)
             DetailPenjualan::where('idPenjualan', $idPenjualan)->delete();
+            
+            // Setelah detailnya dihapus, baru hapus data induknya
             $penjualan->delete();
 
             return response()->json([
@@ -173,14 +187,18 @@ class PenjualanController extends Controller
 
     /**
      * receiveItem
-     * Menerima barang (Customer mengubah status dari dikirim menjadi selesai)
+     * Fungsi bagi Customer untuk melakukan konfirmasi bahwa paket sudah mendarat dengan aman (Selesai)
      */
      public function receiveItem(Request $request, $idPenjualan)
     {
         try {
+            // Mengambil ID User dari token JWT yang sedang login saat ini (Keamanan)
             $idUser = auth('api')->user()->idUser;
+            
+            // Mencari transaksi yang ID-nya cocok dan benar-benar milik User yang sedang login
             $penjualan = Penjualan::where('idUser', $idUser)->where('idPenjualan', $idPenjualan)->first();
 
+            // Jika tidak ketemu, berarti transaksinya milik orang lain atau ID salah
             if (!$penjualan) {
                 return response()->json([
                     'success' => false,
@@ -188,7 +206,9 @@ class PenjualanController extends Controller
                 ], 404);
             }
 
+            // Fitur tambahan: Jika customer ingin membatalkan pesanan (bukan menerima)
             if ($request->action === 'cancel') {
+                // Pesanan cuma bisa dibatalkan jika belum dikirim kurir
                 if ($penjualan->orderStatus !== 'pending' && $penjualan->orderStatus !== 'diproses') {
                     return response()->json([
                         'success' => false,
@@ -196,11 +216,13 @@ class PenjualanController extends Controller
                     ], 400);
                 }
 
+                // Memulai mode Transaksi Database (Mencegah data setengah masuk)
                 DB::beginTransaction();
                 try {
+                    // Update status transaksi jadi batal dan pembayarannya dianggap gagal
                     $penjualan->update(['orderStatus' => 'dibatalkan', 'paymentStatus' => 'failed']);
                     
-                    // Restore stock
+                    // Kembalikan stok (Restore Stock) karena barangnya tidak jadi dibeli
                     $detailPenjualan = DetailPenjualan::where('idPenjualan', $idPenjualan)->get();
                     foreach ($detailPenjualan as $detail) {
                         $produk = ProdukKlinik::find($detail->idProduk);
@@ -209,17 +231,20 @@ class PenjualanController extends Controller
                         }
                     }
 
+                    // Terapkan semua perubahan di atas ke database secara permanen
                     DB::commit();
                     return response()->json([
                         'success' => true,
                         'message' => 'Pesanan berhasil dibatalkan.'
                     ], 200);
                 } catch (\Exception $e) {
+                    // Jika ada error di tengah jalan, batalkan semua proses manipulasi stok dan status di atas
                     DB::rollBack();
                     throw $e;
                 }
             }
 
+            // Jika requestnya adalah menerima barang, pastikan status barang sudah dikirim oleh admin
             if ($penjualan->orderStatus !== 'dikirim') {
                 return response()->json([
                     'success' => false,
@@ -227,6 +252,7 @@ class PenjualanController extends Controller
                 ], 400);
             }
 
+            // Jika lolos validasi, ubah status pesanan menjadi Selesai
             $penjualan->update(['orderStatus' => 'selesai']);
 
             return response()->json([
@@ -242,25 +268,23 @@ class PenjualanController extends Controller
             ], 500);
         }
     }
+
     /**
-     * Memesan produk langsung (Customer)
+     * orderProduct
+     * Fungsi untuk Beli Langsung (tanpa lewat keranjang)
      */
     public function orderProduct(Request $request, $idProduk)
     {
+        // Cek apakah produk yang mau dibeli tersedia di database
         $produk = ProdukKlinik::find($idProduk);
         if (!$produk) {
             return response()->json(['status' => 'error', 'message' => 'Produk tidak ditemukan'], 404);
         }
 
+        // Validasi form pembelian dari customer
         $validator = Validator::make($request->all(), [
             'jumlah' => 'required|integer|min:1',
             'idPromo' => 'required|exists:promo,idPromo'
-        ], [
-            'jumlah.required' => 'Jumlah pesanan wajib diisi.',
-            'jumlah.integer' => 'Jumlah pesanan harus berupa angka bulat.',
-            'jumlah.min' => 'Jumlah pesanan minimal 1.',
-            'idPromo.required' => 'Promo wajib dipilih.',
-            'idPromo.exists' => 'Promo yang dipilih tidak valid atau tidak ditemukan.'
         ]);
 
         if ($validator->fails()) {
@@ -269,38 +293,41 @@ class PenjualanController extends Controller
 
         $jumlah = $request->jumlah;
 
+        // Mengecek ketersediaan fisik stok produk sebelum uang ditransfer
         if ($produk->stock < $jumlah) {
             return response()->json(['status' => 'error', 'message' => 'Stok produk tidak mencukupi'], 400);
         }
 
+        // Menggunakan Transaksi Database agar tidak terjadi kebocoran stok jika script gagal di tengah jalan
         DB::beginTransaction();
         try {
-            // Kurangi stok produk
+            // 1. Kurangi stok produk secara langsung
             $produk->decrement('stock', $jumlah);
 
-            // Buat record penjualan
+            // 2. Buat record penjualan induk (Nota / Invoice)
             $totalHarga = $produk->harga * $jumlah;
             $penjualan = Penjualan::create([
                 'tanggal' => now(),
                 'invoiceNumber' => $this->generateInvoiceNumber(),
                 'subtotal' => $totalHarga,
-                'shippingCost' => 0,
+                'shippingCost' => 0, // Default 0 jika ini asumsikan ambil di klinik, atau belum diset
                 'shippingCourier' => null,
                 'shippingService' => null,
                 'total' => $totalHarga,
                 'paymentStatus' => 'unpaid',
                 'orderStatus' => 'pending',
-                'idUser' => auth('api')->user()->idUser,
+                'idUser' => auth('api')->user()->idUser, // Siapa yang beli?
                 'idPromo' => $request->idPromo
             ]);
 
-            // Buat record detail penjualan
+            // 3. Buat rincian isi dari nota tersebut (Produk A jumlahnya X)
             DetailPenjualan::create([
                 'jumlahProduk' => $jumlah,
                 'idPenjualan' => $penjualan->idPenjualan,
                 'idProduk' => $produk->idProduk
             ]);
 
+            // Sahkan transaksi
             DB::commit();
 
             return response()->json([
@@ -310,6 +337,7 @@ class PenjualanController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
+            // Batalkan semua (stok kembali semula) jika error
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -319,19 +347,22 @@ class PenjualanController extends Controller
     }
 
     /**
-     * Checkout dari Keranjang Belanja (E-Commerce) dengan Midtrans Snap
+     * checkoutCart
+     * Fungsi Checkout Utama (Mengubah isi keranjang menjadi Invoice dan meminta Midtrans Payment Link)
+     * Ini fungsi paling kompleks dan paling penting untuk E-Commerce!
      */
     public function checkoutCart(Request $request, MidtransService $midtransService)
     {
+        // 1. Memvalidasi bahwa customer mengirimkan data pengiriman yang lengkap
         $validator = Validator::make($request->all(), [
             'idAlamat' => 'required|exists:alamat_customer,id',
             'shippingCourier' => 'required|string',
             'shippingService' => 'required|string',
             'shippingCost' => 'required|numeric|min:0',
             'idPromo' => 'nullable|exists:promo,idPromo',
-            'cart_ids' => 'required|array',
+            'cart_ids' => 'required|array',          // Daftar ID keranjang yang di-ceklis customer
             'cart_ids.*' => 'integer|exists:keranjang,idKeranjang',
-            'paymentMethod' => 'nullable|array',
+            'paymentMethod' => 'nullable|array',     // Misal: ['gopay', 'bca_va']
             'paymentMethod.*' => 'string'
         ]);
 
@@ -339,62 +370,80 @@ class PenjualanController extends Controller
             return response()->json(['status' => 'error', 'message' => $validator->errors()], 422);
         }
 
+        // 2. Keamanan: Ambil ID Customer dari sesi JWT yang aktif
         $idUser = auth('api')->user()->idUser;
 
-        // Validasi Alamat milik user
+        // 3. Validasi Keamanan: Pastikan alamat yang dikirim adalah milik user tersebut (Bukan hacking ID)
         $alamat = AlamatCustomer::where('id', $request->idAlamat)->where('idUser', $idUser)->first();
         if (!$alamat) {
             return response()->json(['status' => 'error', 'message' => 'Alamat tidak ditemukan atau bukan milik Anda.'], 403);
         }
 
-        // Ambil data keranjang yang dipilih saja
+        // 4. Ambil isi keranjang HANYA yang di-ceklis (cart_ids) dari database
         $keranjangItems = Keranjang::with('produk')->where('idUser', $idUser)->whereIn('idKeranjang', $request->cart_ids)->get();
+        
+        // Pastikan jumlah item yang ditarik dari DB sama dengan jumlah yang dikirim customer (Mencegah keranjang kosong)
         if ($keranjangItems->isEmpty() || count($keranjangItems) !== count($request->cart_ids)) {
             return response()->json(['status' => 'error', 'message' => 'Beberapa item keranjang tidak valid atau kosong.'], 400);
         }
 
-        // Kalkulasi Subtotal & Stok
+        // 5. Tahap Kalkulasi Subtotal & Pengecekan Stok per Item di keranjang
         $subtotal = 0;
         foreach ($keranjangItems as $item) {
             if ($item->produk->stock < $item->jumlahProduk) {
+                // Jika stok kehabisan saat orang sedang antri checkout
                 return response()->json(['status' => 'error', 'message' => 'Stok produk ' . $item->produk->nama . ' tidak mencukupi'], 400);
             }
+            // Hitung subtotal berjalan (harga * kuantitas)
             $subtotal += $item->jumlahProduk * $item->produk->harga;
         }
 
-        // Kalkulasi Promo (Diskon) & Bonus
+        // 6. Tahap Kalkulasi Promo (Diskon / Gratis Produk)
         $diskon = 0;
         $idProdukBonus = null;
+        
         if ($request->idPromo) {
             $promo = Promo::find($request->idPromo);
+            
+            // Cek apakah belanjaannya cukup untuk syarat promo
             if ($subtotal >= $promo->minimalTransaksi) {
                 $jenisPromoLower = strtolower($promo->jenisPromo);
+                
+                // Jika promo berupa potongan persen
                 if ($jenisPromoLower === 'diskon persen' || $jenisPromoLower === 'persen' || $jenisPromoLower === 'persentase') {
                     $diskon = $subtotal * ($promo->diskon / 100);
-                } elseif ($jenisPromoLower === 'potongan harga' || $jenisPromoLower === 'nominal') {
+                } 
+                // Jika promo berupa nominal rupiah (contoh: potong Rp 50.000)
+                elseif ($jenisPromoLower === 'potongan harga' || $jenisPromoLower === 'nominal') {
                     $diskon = $promo->diskon;
-                } elseif ($jenisPromoLower === 'gratis produk') {
+                } 
+                // Jika promo berupa produk gratisan (buy 1 get 1 dsb)
+                elseif ($jenisPromoLower === 'gratis produk') {
                     if (is_null($promo->idProduk)) {
                         return response()->json(['status' => 'error', 'message' => 'Konfigurasi promo tidak valid.'], 400);
                     }
-                    $idProdukBonus = $promo->idProduk;
-                    $diskon = 0; // Tidak memotong total bayar
+                    $idProdukBonus = $promo->idProduk; // Simpan ID produk bonus
+                    $diskon = 0; // Tidak memotong total bayar uangnya
                 } else {
-                    $diskon = $promo->diskon; // Fallback
+                    $diskon = $promo->diskon; // Fallback aman
                 }
             } else {
+                // Tolak transaksi jika nilai keranjang di bawah minimal syarat voucher
                 return response()->json(['status' => 'error', 'message' => 'Subtotal tidak memenuhi minimal transaksi promo ini.'], 400);
             }
         }
 
+        // 7. Kalkulasi Grand Total = Harga Barang + Ongkir - Voucher Diskon
         $total = $subtotal + $request->shippingCost - $diskon;
-        if ($total < 0) $total = 0; // Cegah total minus
+        if ($total < 0) $total = 0; // Cegah total minus (Nanti aplikasinya yang utang ke pelanggan)
 
+        // 8. Eksekusi Penyimpanan Database Terpusat (Mencegah data korup)
         DB::beginTransaction();
         try {
+            // Buat ID Invoice unik
             $invoiceNumber = $this->generateInvoiceNumber();
             
-            // Simpan ke tabel penjualan
+            // A. Simpan data induk Penjualan
             $penjualan = Penjualan::create([
                 'tanggal' => now(),
                 'invoiceNumber' => $invoiceNumber,
@@ -410,7 +459,7 @@ class PenjualanController extends Controller
                 'idAlamat' => $request->idAlamat
             ]);
 
-            // Simpan detail penjualan & kurangi stok
+            // B. Simpan daftar barang yang dibeli ke tabel Detail Penjualan dan Kurangi Stoknya
             foreach ($keranjangItems as $item) {
                 $item->produk->decrement('stock', $item->jumlahProduk);
                 DetailPenjualan::create([
@@ -420,9 +469,11 @@ class PenjualanController extends Controller
                 ]);
             }
 
-            // Tambahkan produk bonus jika promo Gratis Produk berlaku
+            // C. Injeksi barang gratisan jika promo Gratis Produk berlaku
             if ($idProdukBonus) {
+                // Memanggil spesifik model ProdukKlinik
                 $produkBonus = App\Models\ProdukKlinik::find($idProdukBonus);
+                // Hanya injeksi jika stok barang bonus masih ada
                 if ($produkBonus && $produkBonus->stock >= 1) {
                     $produkBonus->decrement('stock', 1);
                     DetailPenjualan::create([
@@ -433,18 +484,21 @@ class PenjualanController extends Controller
                 }
             }
 
-            // Kosongkan item keranjang yang dipilih saja
+            // D. Bersihkan / Hapus barang yang sudah berhasil di-checkout dari Keranjang User
             Keranjang::whereIn('idKeranjang', $request->cart_ids)->delete();
 
-            // Dapatkan Snap Token dari Midtrans via Service (Opsional dengan custom payment methods)
+            // 9. Komunikasi dengan API MIDTRANS untuk mendapatkan Token Pembayaran (Link Bayar)
             $paymentMethods = $request->input('paymentMethod', null);
+            // $midtransService adalah class buatan sendiri untuk menyembunyikan kerumitan curl Midtrans
             $snapToken = $midtransService->createSnapToken($invoiceNumber, $total, auth('api')->user(), $paymentMethods);
             
-            // Simpan token ke database untuk referensi
+            // Simpan token snap dari Midtrans ke database kita sebagai jejak
             $penjualan->update(['snapToken' => $snapToken]);
 
+            // Jika semua langkah (A-D dan Midtrans) sukses, Patenkan perubahan Database!
             DB::commit();
 
+            // Kembalikan Token tersebut ke Frontend (React) agar frontend bisa memunculkan popup pembayaran
             return response()->json([
                 'status' => 'success',
                 'message' => 'Checkout berhasil, silakan lakukan pembayaran.',
@@ -455,6 +509,7 @@ class PenjualanController extends Controller
             ], 201);
             
         } catch (\Exception $e) {
+            // Jika tiba-tiba koneksi mati atau Midtrans error, kembalikan stok barang yang sudah sempat dipotong
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
@@ -464,13 +519,16 @@ class PenjualanController extends Controller
     }
 
     /**
-     * Menampilkan riwayat pesanan (History) milik customer yang login
+     * getCustomerOrders
+     * Menampilkan riwayat belanjaan khusus untuk customer yang sedang login di HP/Webnya sendiri
      */
     public function getCustomerOrders()
     {
         try {
+            // Deteksi siapa yang sedang memanggil API ini berdasarkan Token JWT
             $user = auth('api')->user();
 
+            // Mengambil seluruh data belanjaan dari yang terbaru ('desc'), beserta relasi data terkait
             $orders = Penjualan::with(['detailPenjualan.produk', 'promo', 'alamat'])
                 ->where('idUser', $user->idUser)
                 ->orderBy('created_at', 'desc')
@@ -490,18 +548,25 @@ class PenjualanController extends Controller
 
 
     /**
-     * Helper untuk membuat nomor invoice unik dengan format INV-YYYYMMDD-0001
+     * Helper untuk membuat nomor invoice unik secara otomatis (Misal: INV-20231225-0001)
      */
     private function generateInvoiceNumber()
     {
+        // Ambil tanggal hari ini dalam format Angka nyambung (YYYYMMDD)
         $todayDate = now()->format('Ymd');
+        
+        // Cari nota terakhir yang dibuat di hari ini
         $lastPenjualan = Penjualan::whereDate('tanggal', now()->toDateString())->latest('idPenjualan')->first();
         
-        $sequence = 1;
+        $sequence = 1; // Mulai dari urutan 1
+        
+        // Jika hari ini sudah ada nota sebelumnya, ekstrak angkanya dan tambahkan + 1
         if ($lastPenjualan && preg_match('/INV-' . $todayDate . '-(\d+)/', $lastPenjualan->invoiceNumber, $matches)) {
             $sequence = intval($matches[1]) + 1;
         }
         
+        // Kembalikan format string dengan padding 0 di kiri (0001, 0002, dst)
         return 'INV-' . $todayDate . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
     }
 }
+

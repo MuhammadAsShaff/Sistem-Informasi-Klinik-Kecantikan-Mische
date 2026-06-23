@@ -11,6 +11,7 @@ use App\Models\Keranjang;
 
 class RajaOngkirController extends Controller
 {
+    // Dependency Injection: Menyuntikkan Service RajaOngkir ke dalam Controller ini
     protected $rajaOngkirService;
 
     public function __construct(RajaOngkirService $rajaOngkirService)
@@ -19,7 +20,10 @@ class RajaOngkirController extends Controller
     }
 
     /**
-     * Mendapatkan daftar provinsi
+     * getProvinces
+     * 
+     * Mengambil daftar seluruh Provinsi di Indonesia (Untuk dropdown Alamat di Frontend).
+     * Datanya ditarik langsung (Live) dari API pihak ketiga (RajaOngkir).
      */
     public function getProvinces()
     {
@@ -48,11 +52,15 @@ class RajaOngkirController extends Controller
     }
 
     /**
-     * Mendapatkan daftar kota berdasarkan provinsi
+     * getCities
+     * 
+     * Mengambil daftar Kota/Kabupaten berdasarkan ID Provinsi yang dipilih user.
+     * Contoh Request URL: /api/cities?province=11
      */
     public function getCities(Request $request)
     {
         try {
+            // Validasi: Pastikan query string ?province wajib ada dan berupa angka
             $validator = Validator::make($request->query(), [
                 'province' => 'required|numeric|min:1'
             ], [
@@ -66,7 +74,7 @@ class RajaOngkirController extends Controller
                     'success' => false,
                     'message' => 'Terdapat kesalahan input',
                     'errors' => $validator->errors()
-                ], 422);
+                ], 422); // 422 Unprocessable Entity
             }
 
             $provinceId = $request->query('province');
@@ -94,11 +102,15 @@ class RajaOngkirController extends Controller
     }
 
     /**
-     * Mengecek ongkos kirim berdasarkan alamat customer untuk semua kurir aktif
+     * checkCostByAddress
+     * 
+     * Fitur Krusial: Menghitung secara otomatis berapa Ongkos Kirim (Ongkir) 
+     * berdasarkan berat total barang di keranjang VS Kota Tujuan alamat si Customer.
      */
     public function checkCostByAddress(Request $request)
     {
         try {
+            // 1. Validasi Input: Pastikan dia memilih alamat mana dan keranjang mana yang mau di-checkout
             $validator = Validator::make($request->all(), [
                 'idAlamat' => 'required|numeric|exists:alamat_customer,id',
                 'cart_ids' => 'required|array',
@@ -120,7 +132,7 @@ class RajaOngkirController extends Controller
 
             $idUser = auth('api')->user()->idUser;
 
-            // Pastikan alamat tersebut milik user yang sedang login
+            // 2. Keamanan: Pastikan alamat yang diaudit benar-benar miliknya, bukan alamat orang lain
             $alamat = AlamatCustomer::where('id', $request->idAlamat)->where('idUser', $idUser)->first();
             if (!$alamat) {
                 return response()->json([
@@ -129,9 +141,10 @@ class RajaOngkirController extends Controller
                 ], 403);
             }
 
+            // RajaOngkir menggunakan cityId untuk menentukan tujuan pengiriman
             $destinationCityId = $alamat->cityId;
 
-            // Kalkulasi berat total keranjang
+            // 3. Kalkulasi BERAT TOTAL dari semua barang yang dicheckout
             $keranjangItems = Keranjang::with('produk')->where('idUser', $idUser)->whereIn('idKeranjang', $request->cart_ids)->get();
             if ($keranjangItems->isEmpty()) {
                 return response()->json([
@@ -142,31 +155,35 @@ class RajaOngkirController extends Controller
 
             $weight = 0;
             foreach ($keranjangItems as $item) {
-                // Asumsi berat kolom adalah 'berat' (gram)
-                $beratSatuan = $item->produk->berat ?? 500; // default 500g jika kosong
+                // (Setiap barang punya berat dalam gram, jika NULL kita anggap 500g sebagai default aman)
+                $beratSatuan = $item->produk->berat ?? 500; 
                 $weight += ($beratSatuan * $item->jumlahProduk);
             }
 
+            // Fallback Ekstra: Kurir menolak berat 0 gram, setidaknya minimal paket adalah 1kg (1000g)
             if ($weight < 1) {
-                $weight = 1000; // fallback jika ada kesalahan data
+                $weight = 1000; 
             }
 
-            // Ambil daftar kurir yang didukung dari config
+            // 4. Proses Request Biaya ke Server RajaOngkir untuk semua kurir yang didukung klinik
+            // (Kurir bisa diatur di file config/rajaongkir.php)
             $couriers = config('rajaongkir.supported_couriers', ['jne', 'pos', 'tiki']);
 
             $allCourierCosts = [];
 
+            // Loop untuk menarik harga dari JNE, lalu POS, lalu TIKI, dst...
             foreach ($couriers as $courier) {
                 $costs = $this->rajaOngkirService->getCost(
-                    $destinationCityId,
-                    $weight,
-                    $courier
+                    $destinationCityId, // Kota Tujuan (Customer)
+                    $weight,            // Berat Paket (Gram)
+                    $courier            // Nama Kurir (JNE/POS/dll)
                 );
 
+                // Jika layanan tersedia untuk jalur rute tersebut, simpan ke array hasil
                 if (!empty($costs)) {
                     $allCourierCosts[] = [
                         'code' => $courier,
-                        'name' => $this->getCourierName($courier),
+                        'name' => $this->getCourierName($courier), // Memanggil fungsi helper di bawah untuk mempercantik nama
                         'costs' => $costs
                     ];
                 }
@@ -188,7 +205,9 @@ class RajaOngkirController extends Controller
     }
 
     /**
-     * Mendapatkan nama kurir yang ramah pengguna
+     * getCourierName (Helper Internal)
+     * 
+     * Mengubah kode singkatan ('jne') menjadi nama panggung yang lebih formal ('Jalur Nugraha Ekakurir (JNE)')
      */
     private function getCourierName($code)
     {
@@ -200,6 +219,7 @@ class RajaOngkirController extends Controller
             'sicepat' => 'SiCepat Express',
         ];
 
+        // Jika ada di list, tampilkan namanya, jika tidak kembalikan HURUF BESAR nya saja.
         return $names[strtolower($code)] ?? strtoupper($code);
     }
 }

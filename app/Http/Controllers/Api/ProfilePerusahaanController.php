@@ -14,12 +14,14 @@ use Intervention\Image\Drivers\Gd\Driver;
 class ProfilePerusahaanController extends Controller
 {
     /**
-     * Tampil Profil Lengkap (Admin)
+     * getProfile
      * 
-     * Mengambil data profil perusahaan beserta seluruh strukturnya (Khusus Admin).
+     * Mengambil data profil perusahaan beserta seluruh strukturnya.
+     * Biasanya hanya ada 1 record tunggal di tabel ini. (Khusus Admin).
      */
     public function getProfile()
     {
+        // first() akan mengambil baris pertama dari tabel.
         $profil = ProfilPerusahaan::first();
 
         if (!$profil) {
@@ -37,9 +39,10 @@ class ProfilePerusahaanController extends Controller
     }
 
     /**
-     * Tampil Profil (Publik)
+     * getPublicProfile
      * 
-     * Mengambil profil perusahaan untuk ditampilkan di Landing Page publik.
+     * Mengambil data dasar perusahaan (Tentang Kami, Jam Buka, No CS, Visi Misi) 
+     * untuk ditampilkan di Header/Footer/Halaman About pada Landing Page publik.
      */
     public function getPublicProfile()
     {
@@ -60,9 +63,10 @@ class ProfilePerusahaanController extends Controller
     }
 
     /**
-     * Tambah Profil Baru
+     * createProfile
      * 
-     * Membuat data profil perusahaan baru jika sebelumnya kosong (Khusus Admin).
+     * Membuat data profil perusahaan baru JIKA sebelumnya masih kosong melompong (Khusus Admin).
+     * Biasanya fungsi ini hanya dieksekusi 1 kali seumur hidup aplikasi saat setup awal.
      */
     public function createProfile(Request $request)
     {
@@ -85,7 +89,7 @@ class ProfilePerusahaanController extends Controller
         $validator = Validator::make($request->all(), [
             'visi' => 'required|string',
             'misi' => 'required|string',
-            'fotoPerusahaan' => 'required|image|mimes:jpeg,png,jpg|max:4000', // Benar-benar file gambar. Maks 2MB
+            'fotoPerusahaan' => 'required|image|mimes:jpeg,png,jpg|max:4000', // Benar-benar file gambar. Maks 4MB
             'deskripsiPerusahaan' => 'required|string',
             'nomorCustomerService' => 'required|string|max:16',
             'jamBuka' => 'required|date_format:H:i',
@@ -101,8 +105,8 @@ class ProfilePerusahaanController extends Controller
         }
 
         try {
+            // Optimasi dan Penyimpanan File Gambar Logo Perusahaan menjadi WebP
             $fotoPath = null;
-            // Jika ada payload FILE masuk dengan nama field 'fotoPerusahaan'
             if ($request->hasFile('fotoPerusahaan')) {
                 $file = $request->file('fotoPerusahaan');
                 $filename = time() . '_' . uniqid() . '.webp';
@@ -140,9 +144,9 @@ class ProfilePerusahaanController extends Controller
     }
 
     /**
-     * Edit Profil Perusahaan
+     * updateProfile
      * 
-     * Mengubah visi, misi, deskripsi, atau logo perusahaan (Khusus Admin).
+     * Mengubah visi, misi, deskripsi, jadwal operasional, atau logo klinik (Khusus Admin).
      */
     public function updateProfile(Request $request, $idProfile) // Menangkap parameter dari URL /admin/clinic/{idProfile}
     {
@@ -192,9 +196,9 @@ class ProfilePerusahaanController extends Controller
                 'jamTutup' => $request->jamTutup,
             ];
 
-            // Jika ada kiriman file foto PERBAIKAN dari Client
+            // Jika ada kiriman file foto PERBAIKAN / Penggantian Logo dari Admin
             if ($request->hasFile('fotoPerusahaan')) {
-                // Sapu bersih/Hapus gambar lama dari Harddisk Server agar tidak menumpuk memenuhi kuota
+                // Sapu bersih/Hapus gambar lama dari Harddisk Server agar tidak menumpuk memenuhi kuota server
                 if ($profilPerusahaan->fotoPerusahaan) {
                     Storage::disk('public')->delete($profilPerusahaan->fotoPerusahaan);
                 }
@@ -225,23 +229,25 @@ class ProfilePerusahaanController extends Controller
     }
 
     /**
-     * Hapus Profil Perusahaan
+     * deleteProfile
      * 
-     * Menghapus profil perusahaan beserta logo dari server secara permanen (Khusus Admin).
+     * Menghapus master data profil perusahaan beserta logo dari server secara permanen (Khusus Admin).
+     * SANGAT JARANG DIGUNAKAN.
      */
     public function deleteProfile($idProfile) // Langsung ambil parameter dari Route URL
     {
         try {
             $profilPerusahaan = ProfilPerusahaan::findOrFail($idProfile);
 
-            // Perhatian: Karena ini di luar database, hancurkan juga file asli dari Server jika rute datanya dihapus
+            // Perhatian: Karena ini di luar database, hancurkan juga file aslinya dari folder Server (Storage)
             if ($profilPerusahaan->fotoPerusahaan) {
                 Storage::disk('public')->delete($profilPerusahaan->fotoPerusahaan);
             }
 
-            $profilPerusahaan->delete(); // Perbaikan fatal: panggil dengan object ->delete() (BUKAN ::delete())
+            // Perbaikan fatal (sebelumnya ::delete() statis, kini ->delete() pada instans model)
+            $profilPerusahaan->delete(); 
 
-            // Sesuai standar REST API, operasi DELETE yang berhasil tidak mengembalikan konten (204)
+            // Sesuai standar REST API, operasi DELETE yang berhasil tidak mengembalikan konten bodi JSON (Status 204)
             return response()->noContent();
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {

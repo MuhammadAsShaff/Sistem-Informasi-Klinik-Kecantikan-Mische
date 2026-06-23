@@ -10,11 +10,16 @@ use Illuminate\Support\Facades\Validator;
 class AlamatCustomerController extends Controller
 {
     /**
-     * Menampilkan daftar alamat (Customer)
+     * getCustomerAddresses
+     * 
+     * Menampilkan daftar alamat yang disimpan oleh Customer yang sedang login.
      */
     public function getCustomerAddresses()
     {
+        // Mengambil ID User dari token JWT yang dikirim dari Frontend
         $idUser = auth('api')->user()->idUser;
+        
+        // Tarik semua data alamat milik user tersebut
         $alamat = AlamatCustomer::where('idUser', $idUser)->get();
 
         return response()->json([
@@ -24,21 +29,24 @@ class AlamatCustomerController extends Controller
     }
 
     /**
-     * Menambahkan alamat baru
+     * createAddress
+     * 
+     * Menambahkan alamat pengiriman baru untuk Customer yang sedang login.
      */
     public function createAddress(Request $request)
     {
         $idUser = auth('api')->user()->idUser;
 
-        // Cek limit maksimal 3 alamat
+        // 1. Cek Limitasi Maksimal Alamat (Aturan Bisnis: Maksimal 3 alamat per akun)
         $jumlahAlamat = AlamatCustomer::where('idUser', $idUser)->count();
         if ($jumlahAlamat >= 3) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Anda sudah mencapai batas maksimal 3 alamat.'
-            ], 400);
+            ], 400); // 400 Bad Request
         }
 
+        // 2. Validasi kelengkapan form input alamat
         $validator = Validator::make($request->all(), [
             'namaPenerima' => 'required|string|max:255',
             'nomorHp' => 'required|string|max:20',
@@ -48,6 +56,7 @@ class AlamatCustomerController extends Controller
             'districtId' => 'nullable|string',
             'kodePos' => 'required|string'
         ], [
+            // Pesan Error Bahasa Indonesia yang Ramah Pengguna
             'namaPenerima.required' => 'Nama penerima wajib diisi.',
             'nomorHp.required' => 'Nomor HP wajib diisi.',
             'detailAlamat.required' => 'Detail alamat wajib diisi.',
@@ -60,12 +69,14 @@ class AlamatCustomerController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()
-            ], 422);
+            ], 422); // 422 Unprocessable Entity
         }
 
         $data = $request->all();
+        // Sisipkan ID User otomatis agar alamat ini terikat ke akunnya, bukan akun orang lain
         $data['idUser'] = $idUser;
 
+        // 3. Simpan ke Database
         $alamat = AlamatCustomer::create($data);
 
         return response()->json([
@@ -76,11 +87,15 @@ class AlamatCustomerController extends Controller
     }
 
     /**
-     * Memperbarui alamat
+     * updateAddress
+     * 
+     * Mengedit atau memperbarui rincian alamat yang sudah ada.
      */
     public function updateAddress(Request $request, $id)
     {
         $idUser = auth('api')->user()->idUser;
+        
+        // Validasi Ekstra: Pastikan alamat yang diedit BENAR-BENAR milik user yang sedang login! (Mencegah IDOR attack)
         $alamat = AlamatCustomer::where('idUser', $idUser)->where('id', $id)->first();
 
         if (!$alamat) {
@@ -90,6 +105,7 @@ class AlamatCustomerController extends Controller
             ], 404);
         }
 
+        // Validasi input
         $validator = Validator::make($request->all(), [
             'namaPenerima' => 'required|string|max:255',
             'nomorHp' => 'required|string|max:20',
@@ -107,6 +123,7 @@ class AlamatCustomerController extends Controller
             ], 422);
         }
 
+        // Terapkan perubahan
         $alamat->update($request->all());
 
         return response()->json([
@@ -117,11 +134,15 @@ class AlamatCustomerController extends Controller
     }
 
     /**
-     * Menghapus alamat
+     * deleteAddress
+     * 
+     * Menghapus salah satu alamat pengiriman.
      */
     public function deleteAddress($id)
     {
         $idUser = auth('api')->user()->idUser;
+        
+        // Pengecekan keamanan ganda: Hanya boleh menghapus alamat miliknya sendiri
         $alamat = AlamatCustomer::where('idUser', $idUser)->where('id', $id)->first();
 
         if (!$alamat) {

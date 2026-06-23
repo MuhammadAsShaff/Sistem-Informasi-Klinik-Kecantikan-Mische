@@ -15,7 +15,7 @@ class ProfilDokterController extends Controller
     /**
      * getAllDoctors
      * 
-     * Mengambil daftar dokter (Admin)
+     * Mengambil daftar seluruh dokter secara lengkap untuk dikelola di tabel halaman Admin.
      */
     public function getAllDoctors()
     {
@@ -39,11 +39,12 @@ class ProfilDokterController extends Controller
     /**
      * getPublicDoctors
      * 
-     * Menampilkan data dokter pada halaman customer (Customer)
+     * Menampilkan daftar dokter-dokter aktif untuk dipamerkan di halaman Landing Page Customer.
      */
     public function getPublicDoctors()
     {
         try {
+            // (Sebaiknya ditambahkan filter ->where('status', 'Tersedia') agar dokter yang sedang cuti tidak tampil)
             $dokters = ProfilDokter::latest()->get();
             
             return response()->json([
@@ -63,7 +64,7 @@ class ProfilDokterController extends Controller
     /**
      * getDoctorById
      * 
-     * Mengambil data dokter berdasarkan id (Customer)
+     * Mengambil detail profil satu dokter (Misal saat Customer mengklik foto dokter di Landing Page).
      */
     public function getDoctorById($idDokter)
     {
@@ -94,7 +95,7 @@ class ProfilDokterController extends Controller
     /**
      * createDoctor
      * 
-     * Menambahkan data dokter (Admin)
+     * Mendaftarkan profil dokter baru ke dalam klinik beserta unggahan foto dokternya (Khusus Admin).
      */
     public function createDoctor(Request $request)
     {
@@ -127,6 +128,7 @@ class ProfilDokterController extends Controller
                 ], 400);
             }
 
+            // Proses Optimasi dan Unggah Foto Dokter (Convert ke WEBP)
             $fotoPath = null;
             if ($request->hasFile('foto')) {
                 $file = $request->file('foto');
@@ -165,7 +167,7 @@ class ProfilDokterController extends Controller
     /**
      * updateDoctor
      * 
-     * Memperbarui data dokter berdasarkan id (Admin)
+     * Mengedit Biodata (atau mengganti foto) profil Dokter (Khusus Admin).
      */
     public function updateDoctor(Request $request, $idDokter)
     {
@@ -193,6 +195,7 @@ class ProfilDokterController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'nama' => 'required|string|max:60',
+                // Foto itu nullable, yang berarti Admin tidak diwajibkan mengganti fotonya kalau cuma mau ganti nama
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:4000',
                 'email' => 'required|email|unique:profilDokter,email,' . $idDokter . ',idDokter',
                 'deskripsi' => 'required|string'
@@ -212,10 +215,13 @@ class ProfilDokterController extends Controller
                 'deskripsi' => $request->deskripsi
             ];
 
+            // Proses Penggantian Foto
             if ($request->hasFile('foto')) {
+                // Jangan lupa hapus foto yang lama di server agar tidak memakan penyimpanan
                 if ($dokter->foto) {
                     Storage::disk('public')->delete($dokter->foto);
                 }
+                
                 $file = $request->file('foto');
                 $filename = time() . '_' . uniqid() . '.webp';
                 
@@ -247,7 +253,7 @@ class ProfilDokterController extends Controller
     /**
      * deleteDoctor
      * 
-     * Menghapus data dokter berdasarkan id (Admin)
+     * Memecat / Menghapus profil dokter secara permanen dari sistem klinik (Khusus Admin).
      */
     public function deleteDoctor($idDokter)
     {
@@ -261,6 +267,7 @@ class ProfilDokterController extends Controller
                 ], 404);
             }
 
+            // Bersihkan file foto dari Server
             if ($dokter->foto) {
                 Storage::disk('public')->delete($dokter->foto);
             }
@@ -283,7 +290,7 @@ class ProfilDokterController extends Controller
     /**
      * updateStatus
      * 
-     * Mengubah status ketersediaan dokter (Admin)
+     * Tombol cepat (Toggle) untuk mengubah status dokter (Contoh: Sedang Cuti -> Tidak Tersedia).
      */
     public function updateStatus(Request $request, $idDokter)
     {
@@ -297,6 +304,7 @@ class ProfilDokterController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
+                // Validasi ketat, value status hanya boleh 2 kata ini
                 'status' => 'required|in:Tersedia,Tidak Tersedia'
             ], [
                 'status.required' => 'Status wajib diisi.',

@@ -16,11 +16,13 @@ class PromoController extends Controller
 {
     /**
      * getAllPromos
-     * Menampilkan daftar promo (Admin)
+     * 
+     * Menarik semua data promo (baik yang masih aktif, sudah mati, maupun kedaluwarsa). Khusus untuk halaman Admin.
      */
     public function getAllPromos()
     {
         try {
+            // Relasikan dengan master kategori dan produk agar admin tahu promo ini berlaku untuk Kategori apa / Produk apa
             $promos = Promo::with(['kategori', 'produk'])->latest()->paginate(10);
             return response()->json([
                 'success' => true,
@@ -38,13 +40,15 @@ class PromoController extends Controller
 
     /**
      * getPublicPromos
-     * Menampilkan promo pada halaman customer (Hanya yang status aktif / true)
+     * 
+     * Menampilkan banner promo pada halaman Landing Page Customer.
+     * Tentu saja HANYA Promo yang STATUSNYA AKTIF yang boleh tampil! (where status = true).
      */
     public function getPublicPromos()
     {
         try {
             $promos = Promo::with(['kategori', 'produk'])
-                           ->where('status', true)
+                           ->where('status', true) // Filter ini sangat krusial!
                            ->latest()
                            ->get();
                            
@@ -64,12 +68,14 @@ class PromoController extends Controller
 
     /**
      * createPromo
-     * Menambah promo (Admin)
+     * 
+     * Menambahkan kampanye promo diskon baru oleh Admin.
      */
     public function createPromo(Request $request)
     {
         try {
-            // Bersihkan inputan dari frontend (FormData JavaScript sering mengirim string "null")
+            // Pembersihan Bug: Terkadang Form Data JS dari browser mengirim teks mentah "null" alih-alih data Null sejati.
+            // Kita paksa konversi jadi Null PHP agar tidak error masuk ke Database.
             if (in_array($request->input('idKategori'), ['null', 'undefined', ''])) {
                 $request->merge(['idKategori' => null]);
             }
@@ -81,7 +87,7 @@ class PromoController extends Controller
                 'gambar' => 'required|image|mimes:jpeg,png,jpg|max:4000',
                 'namaPromo' => 'required|string|max:60',
                 'jenisPromo' => 'required|string|max:60',
-                'kode' => 'required|string|max:12|unique:promo,kode',
+                'kode' => 'required|string|max:12|unique:promo,kode', // Kode (misal HARBOLNAS12) harus unik!
                 'diskon' => 'required|integer|min:0',
                 'deskripsi' => 'required|string',
                 'tanggalMulai' => 'required|date',
@@ -91,6 +97,7 @@ class PromoController extends Controller
                 'idKategori' => 'nullable|exists:kategoriProduk,idKategori',
                 'idProduk' => 'nullable|exists:produkKlinik,idProduk'
             ], [
+                // Pesan Error Bahasa Indonesia ...
                 'gambar.required' => 'Gambar promo wajib diunggah.',
                 'gambar.image' => 'File harus berupa gambar.',
                 'gambar.mimes' => 'Format gambar yang diperbolehkan adalah jpeg, png, atau jpg.',
@@ -109,7 +116,10 @@ class PromoController extends Controller
                 ], 400);
             }
 
-            // Aturan Bisnis: Tidak bisa memilih Kategori dan Produk secara bersamaan
+            // Aturan Bisnis Krusial: Promo hanya boleh DUA TIPE.
+            // 1. Promo Global (berlaku untuk semua = kategori dan produk dikosongkan)
+            // 2. Promo Spesifik (hanya produk X, ATAU hanya kategori Y)
+            // TIDAK BOLEH memasukkan kategori DAN produk secara bersamaan untuk mencegah konflik prioritas diskon.
             if (!is_null($request->input('idKategori')) && !is_null($request->input('idProduk'))) {
                 return response()->json([
                     'success' => false,
@@ -122,6 +132,8 @@ class PromoController extends Controller
             }
 
             $dataToInsert = $request->all();
+            
+            // Proses Kompresi Banner Promo menjadi WebP
             if ($request->hasFile('gambar')) {
                 $file = $request->file('gambar');
                 $filename = time() . '_' . uniqid() . '.webp';
@@ -152,7 +164,8 @@ class PromoController extends Controller
 
     /**
      * updatePromo
-     * Memperbarui promo (Admin)
+     * 
+     * Mengedit aturan atau besaran diskon promo (Khusus Admin).
      */
     public function updatePromo(Request $request, $idPromo)
     {
@@ -165,7 +178,7 @@ class PromoController extends Controller
                 ], 404);
             }
 
-            // Bersihkan inputan dari frontend (FormData JavaScript sering mengirim string "null")
+            // Pembersihan Bug JS Null (Seperti pada Create)
             if ($request->has('idKategori') && in_array($request->input('idKategori'), ['null', 'undefined', ''])) {
                 $request->merge(['idKategori' => null]);
             }
@@ -173,6 +186,7 @@ class PromoController extends Controller
                 $request->merge(['idProduk' => null]);
             }
 
+            // Pengecualian Validasi Unik: Biarkan dia menyimpan kode promo yang sama dengan dirinya sendiri (idPromo miliknya)
             $rules = [
                 'namaPromo' => 'required|string|max:60',
                 'jenisPromo' => 'required|string|max:60',
@@ -209,7 +223,7 @@ class PromoController extends Controller
                 ], 400);
             }
 
-            // Aturan Bisnis: Tidak bisa memilih Kategori dan Produk secara bersamaan
+            // Aturan Bisnis Krusial
             if (!is_null($request->input('idKategori')) && !is_null($request->input('idProduk'))) {
                 return response()->json([
                     'success' => false,
@@ -222,6 +236,8 @@ class PromoController extends Controller
             }
 
             $dataToUpdate = $request->except(['gambar']);
+            
+            // Proses Ganti Gambar Promo Baru
             if ($request->hasFile('gambar')) {
                 if ($promo->gambar) {
                     Storage::disk('public')->delete($promo->gambar);
@@ -255,7 +271,8 @@ class PromoController extends Controller
 
     /**
      * updateStatus
-     * Memperbarui hanya status aktif/tidak aktif promo (Admin)
+     * 
+     * Tombol cepat (Toggle) untuk mematikan atau menyalakan Promo secara instan tanpa mengedit deskripsinya.
      */
     public function updateStatus(Request $request, $idPromo)
     {
@@ -301,7 +318,8 @@ class PromoController extends Controller
 
     /**
      * deletePromo
-     * Menghapus promo (Admin)
+     * 
+     * Menghapus secara permanen banner kampanye Promo dari sistem (Dan menghapus gambarnya).
      */
     public function deletePromo($idPromo)
     {
@@ -332,11 +350,14 @@ class PromoController extends Controller
 
     /**
      * checkPromo
-     * Memvalidasi kode promo saat checkout (Customer)
+     * 
+     * JANTUNG DARI FITUR PROMO! (Saat Customer mengetik kode promo di Keranjang Belanja).
+     * Mengecek puluhan kriteria (Tanggal, Status, Produk, Minimal Belanja) sebelum mengesahkan diskon.
      */
     public function checkPromo(Request $request)
     {
         try {
+            // 1. Pastikan user mengetik sesuatu (kode) dan membawa ID isi keranjangnya
             $validator = Validator::make($request->all(), [
                 'kode' => 'required|string|max:12',
                 'cart_ids' => 'required|array',
@@ -355,8 +376,10 @@ class PromoController extends Controller
                 ], 422);
             }
 
+            // 2. Cari kode tersebut di database
             $promo = Promo::where('kode', $request->kode)->first();
 
+            // Skenario Error A: Kode Ngawur
             if (!$promo) {
                 return response()->json([
                     'success' => false,
@@ -364,6 +387,7 @@ class PromoController extends Controller
                 ], 404);
             }
 
+            // Skenario Error B: Promo sudah dimatikan Admin
             if (!$promo->status) {
                 return response()->json([
                     'success' => false,
@@ -371,6 +395,7 @@ class PromoController extends Controller
                 ], 400);
             }
 
+            // Skenario Error C: Belum Waktunya atau Sudah Basi (Expired)
             $today = Carbon::now()->format('Y-m-d');
             if ($today < $promo->tanggalMulai || $today > $promo->tanggalSelesai) {
                 return response()->json([
@@ -379,6 +404,7 @@ class PromoController extends Controller
                 ], 400);
             }
 
+            // 3. Tarik isi belanjaannya Customer dari database untuk mulai dihitung
             $user = auth()->user();
             $cartItems = Keranjang::where('idUser', $user->idUser)
                                   ->whereIn('idKeranjang', $request->cart_ids)
@@ -395,22 +421,24 @@ class PromoController extends Controller
             $subtotal = 0;
             $isProductValid = false;
 
-            // Jika idProduk dan idKategori promo null, promo berlaku untuk semua produk
+            // Jika Promo ini adalah "Promo Global" (Tanpa Kategori Tertentu / Tanpa Barang Tertentu)
             $isGlobalPromo = is_null($promo->idProduk) && is_null($promo->idKategori);
 
+            // Menghitung uang yang harus dibayar
             foreach ($cartItems as $item) {
                 $subtotal += ($item->jumlahProduk * $item->produk->harga);
 
-                // Cek apakah produk atau kategori sesuai dengan promo
+                // Mencari tahu, apakah di dalam keranjangnya ada barang yang MENCAKUP Promo ini?
                 if ($isGlobalPromo) {
-                    $isProductValid = true;
+                    $isProductValid = true; // Langsung valid karena global
                 } elseif (!is_null($promo->idProduk) && $item->idProduk == $promo->idProduk) {
-                    $isProductValid = true;
+                    $isProductValid = true; // Valid! Ternyata dia beli barang yang sedang didiskon
                 } elseif (!is_null($promo->idKategori) && $item->produk->idKategori == $promo->idKategori) {
-                    $isProductValid = true;
+                    $isProductValid = true; // Valid! Ternyata dia beli barang dari Kategori yang sedang didiskon
                 }
             }
 
+            // Skenario Error D: Uangnya kurang dari syarat minimal (Contoh: Minimal belanja 100rb)
             if ($subtotal < $promo->minimalTransaksi) {
                 return response()->json([
                     'success' => false,
@@ -418,6 +446,7 @@ class PromoController extends Controller
                 ], 400);
             }
 
+            // Skenario Error E: Keranjangnya isinya Lipstik, tapi dia masukin Kupon Diskon Facial Wash.
             if (!$isProductValid) {
                 return response()->json([
                     'success' => false,
@@ -425,25 +454,31 @@ class PromoController extends Controller
                 ], 400);
             }
 
-            // Hitung nilai diskon sebenarnya untuk ditampilkan di frontend
+            // 4. Kalkulator Besaran Diskon yang Akan Dipotong
             $nilaiDiskon = 0;
             $jenisPromoLower = strtolower($promo->jenisPromo);
+            
+            // Logika Jenis Promo
             if ($jenisPromoLower === 'diskon persen' || $jenisPromoLower === 'persen' || $jenisPromoLower === 'persentase') {
+                // (Persen: Subtotal dikali sekian persen)
                 $nilaiDiskon = $subtotal * ($promo->diskon / 100);
             } elseif ($jenisPromoLower === 'potongan harga' || $jenisPromoLower === 'nominal') {
+                // (Potongan Langsung: Langsung potong 50ribu)
                 $nilaiDiskon = $promo->diskon;
             } elseif ($jenisPromoLower === 'gratis produk') {
+                // (Beli 1 Gratis 1: Diskon nominalnya 0, tapi ada hadiah barang yang ikut)
                 if (is_null($promo->idProduk)) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Konfigurasi promo tidak valid: Promo Gratis Produk harus memiliki produk bonus (idProduk).'
                     ], 400);
                 }
-                $nilaiDiskon = 0; // Diskon nominal 0, karena bonus berupa barang fisik
+                $nilaiDiskon = 0; 
             } else {
-                $nilaiDiskon = $promo->diskon; // Fallback
+                $nilaiDiskon = $promo->diskon; // Fallback darurat
             }
 
+            // 5. Berikan Izin Lolos (Success 200) beserta rincian potongannya
             return response()->json([
                 'success' => true,
                 'message' => 'Promo berhasil digunakan.',
@@ -451,8 +486,8 @@ class PromoController extends Controller
                     'idPromo' => $promo->idPromo,
                     'kode' => $promo->kode,
                     'jenisPromo' => $promo->jenisPromo,
-                    'diskon_nominal' => $nilaiDiskon,
-                    'diskon_raw' => $promo->diskon,
+                    'diskon_nominal' => $nilaiDiskon,   // Berapa Rupiah hasil potongannya
+                    'diskon_raw' => $promo->diskon,     // Angka mentah (Misal: 10 dari 10%)
                     'namaPromo' => $promo->namaPromo,
                     'idProdukBonus' => $jenisPromoLower === 'gratis produk' ? $promo->idProduk : null
                 ]

@@ -18,6 +18,7 @@ class ReservasiController extends Controller
     {
         try {
             // Relasi ke tabel user, dokter, dan jadwal agar datanya lengkap saat ditarik
+            // latest() mengurutkan dari yang paling baru dibuat. paginate(10) membagi data jadi 10 baris per halaman.
             $reservasi = Reservasi::with(['user', 'dokter', 'jadwal'])->latest()->paginate(10);
             
             return response()->json([
@@ -37,11 +38,12 @@ class ReservasiController extends Controller
     /**
      * createReservationAdmin
      * 
-     * Melakukan pembuatan reservasi oleh admin untuk customer.
+     * Melakukan pembuatan reservasi oleh admin untuk customer (terutama bagi customer yang langsung datang ke klinik tanpa aplikasi).
      */
     public function createReservationAdmin(Request $request)
     {
         try {
+            // Menyiapkan custom pesan error agar bahasa mudah dipahami user
             $pesanEror = [
                 'idUser.exists' => 'Customer tidak ditemukan di sistem.',
                 'namaCustomer.required_without' => 'Nama customer wajib diisi jika bukan member.',
@@ -56,6 +58,7 @@ class ReservasiController extends Controller
                 'idJadwal.exists' => 'Jadwal yang dipilih tidak valid.'
             ];
 
+            // Validasi Input: 'required_without:idUser' artinya Admin harus mengisi Nama manual JIKA user tersebut belum terdaftar (bukan member)
             $validator = Validator::make($request->all(), [
                 'idUser' => 'nullable|exists:user,idUser',
                 'namaCustomer' => 'required_without:idUser|string|max:60',
@@ -76,7 +79,8 @@ class ReservasiController extends Controller
                 ], 400);
             }
 
-            // Mengecek apakah jadwal sudah dipakai orang lain
+            // Mengecek apakah jadwal (Tanggal + Jam) sudah di-booking orang lain untuk Dokter yang sama
+            // Kita mengecek status 'Menunggu' atau 'Dikonfirmasi' karena kalau 'Batal' berarti jam tersebut kosong lagi
             $cekBentrokan = Reservasi::where('tanggalReservasi', $request->tanggalReservasi)
                                      ->where('idJadwal', $request->idJadwal)
                                      ->where('idDokter', $request->idDokter)
@@ -93,20 +97,22 @@ class ReservasiController extends Controller
             $namaCustomer = $request->namaCustomer;
             $nomorWa = $request->nomorWa;
 
+            // Jika Admin menginputkan ID User (Customer terdaftar), maka data nama & no WA ditarik otomatis dari Database User
             if ($request->idUser) {
                 $user = \App\Models\User::find($request->idUser);
                 $namaCustomer = $user->nama;
                 $nomorWa = $user->nomorWa;
             }
 
+            // Menyimpan Data Reservasi
             $reservasi = Reservasi::create([
                 'namaCustomer' => $namaCustomer, 
                 'nomorWa' => $nomorWa,   
                 'kategoriReservasi' => $request->kategoriReservasi,
                 'jenisReservasi' => $request->jenisReservasi,
                 'tanggalReservasi' => $request->tanggalReservasi,
-                'status' => $request->status ?? 'Dikonfirmasi', // Admin biasa langsung konfirmasi
-                'idUser' => $request->idUser, // Akan bernilai null jika tidak diisi
+                'status' => $request->status ?? 'Dikonfirmasi', // Admin biasa langsung konfirmasi (Bypass verifikasi)
+                'idUser' => $request->idUser, // Akan bernilai null jika tidak diisi (Tamu walk-in)
                 'idDokter' => $request->idDokter,
                 'idJadwal' => $request->idJadwal
             ]);
@@ -129,11 +135,12 @@ class ReservasiController extends Controller
     /**
      * getCustomerReservations
      * 
-     * Mengambil daftar reservasi khusus milik customer yang sedang login.
+     * Mengambil daftar reservasi khusus milik customer yang sedang login di aplikasi.
      */
     public function getCustomerReservations()
     {
         try {
+            // Memastikan siapa yang sedang menggunakan aplikasi dengan mengecek Token JWT
             $user = auth('api')->user();
 
             if (!$user) {
@@ -143,6 +150,7 @@ class ReservasiController extends Controller
                 ], 401);
             }
 
+            // Memanggil data reservasi yang 'idUser'-nya cocok dengan ID user login
             $reservasi = Reservasi::with(['dokter', 'jadwal'])
                                   ->where('idUser', $user->idUser)
                                   ->latest()
@@ -165,13 +173,14 @@ class ReservasiController extends Controller
     /**
      * getDetailReservationCustomer
      * 
-     * Menampilkan detail reservasi customer
+     * Menampilkan informasi lebih rinci untuk 1 tiket reservasi tertentu (Misal di klik "Lihat Detail")
      */
     public function getDetailReservationCustomer($idReservasi)
     {
         try {
             $user = auth('api')->user();
 
+            // Memastikan bahwa Reservasi yang dipanggil benar-benar milik user tersebut (Keamanan Data)
             $reservasi = Reservasi::with(['dokter', 'jadwal'])
                                   ->where('idReservasi', $idReservasi)
                                   ->where('idUser', $user->idUser)
@@ -201,7 +210,7 @@ class ReservasiController extends Controller
     /**
      * createReservationCustomer
      * 
-     * Melakukan pemesanan reservasi oleh customer.
+     * Melakukan pemesanan tiket reservasi secara mandiri oleh customer lewat aplikasi/web.
      */
     public function createReservationCustomer(Request $request)
     {
@@ -249,6 +258,7 @@ class ReservasiController extends Controller
                                      ->whereIn('status', ['Menunggu', 'Dikonfirmasi'])
                                      ->exists();
 
+            // Jika bentrok, tolak pemesanan dan minta customer cari jam lain
             if ($cekBentrokan) {
                 return response()->json([
                     'success' => false,
@@ -256,13 +266,14 @@ class ReservasiController extends Controller
                 ], 400);
             }
 
+            // Pembuatan Reservasi Baru
             $reservasi = Reservasi::create([
-                'namaCustomer' => $user->nama, // Ambil langsung dari profil
-                'nomorWa' => $user->nomorWa,   // Ambil langsung dari profil
+                'namaCustomer' => $user->nama, // Nama otomatis ditarik dari profil akun (tidak bisa dipalsukan)
+                'nomorWa' => $user->nomorWa,   
                 'kategoriReservasi' => $request->kategoriReservasi,
                 'jenisReservasi' => $request->jenisReservasi,
                 'tanggalReservasi' => $request->tanggalReservasi,
-                'status' => 'Menunggu', // Default state ketika baru membuat pesanan
+                'status' => 'Menunggu', // Default state ketika baru membuat pesanan, butuh verifikasi Admin Klinik
                 'idUser' => $user->idUser,
                 'idDokter' => $request->idDokter,
                 'idJadwal' => $request->idJadwal
@@ -286,7 +297,8 @@ class ReservasiController extends Controller
     /**
      * rescheduleReservationCustomer
      * 
-     * Mengubah jadwal (reschedule) reservasi (Khusus Customer). Hanya bisa dilakukan 1 kali.
+     * Mengubah jadwal (reschedule) reservasi secara mandiri (Khusus Customer). 
+     * Aturan Bisnis: Reschedule Hanya bisa dilakukan 1 kali untuk mencegah spam.
      */
     public function rescheduleReservationCustomer(Request $request, $idReservasi)
     {
@@ -320,6 +332,7 @@ class ReservasiController extends Controller
                 ], 400);
             }
 
+            // Pastikan reservasi ini ada dan benar milik user yang request
             $reservasi = Reservasi::where('idReservasi', $idReservasi)
                                   ->where('idUser', $user->idUser)
                                   ->first();
@@ -331,7 +344,8 @@ class ReservasiController extends Controller
                 ], 404);
             }
 
-            // Validasi apakah sudah pernah reschedule?
+            // Validasi Aturan Bisnis: apakah sudah pernah di-reschedule sebelumnya?
+            // is_rescheduled adalah tipe boolean (1/0)
             if ($reservasi->is_rescheduled) {
                 return response()->json([
                     'success' => false,
@@ -339,7 +353,7 @@ class ReservasiController extends Controller
                 ], 403);
             }
 
-            // Validasi apakah status masih memungkinkan untuk diubah
+            // Validasi Aturan Bisnis: Jangan izinkan ubah jadwal kalau statusnya sudah Selesai atau Dibatalkan
             if (!in_array($reservasi->status, ['Menunggu', 'Dikonfirmasi'])) {
                 return response()->json([
                     'success' => false,
@@ -352,7 +366,7 @@ class ReservasiController extends Controller
                                      ->where('idJadwal', $request->idJadwal)
                                      ->where('idDokter', $request->idDokter)
                                      ->whereIn('status', ['Menunggu', 'Dikonfirmasi', 'Menunggu Merubah Jadwal', 'Dikonfirmasi Merubah Jadwal'])
-                                     ->where('idReservasi', '!=', $idReservasi) // kecualikan diri sendiri
+                                     ->where('idReservasi', '!=', $idReservasi) // kecualikan jadwal saya sendiri dari pengecekan
                                      ->exists();
 
             if ($cekBentrokan) {
@@ -362,20 +376,22 @@ class ReservasiController extends Controller
                 ], 400);
             }
 
-            // Update status string
+            // Update status string agar Admin sadar bahwa customer ini habis meminta pindah jadwal
             if ($reservasi->status === 'Menunggu') {
                 $reservasi->status = 'Menunggu Merubah Jadwal';
             } elseif ($reservasi->status === 'Dikonfirmasi') {
                 $reservasi->status = 'Dikonfirmasi Merubah Jadwal';
             }
 
-            // Update data jadwal
+            // Timpa jadwal lama dengan jadwal yang baru dipilih
             $reservasi->kategoriReservasi = $request->kategoriReservasi;
             $reservasi->jenisReservasi = $request->jenisReservasi;
             $reservasi->tanggalReservasi = $request->tanggalReservasi;
             $reservasi->idDokter = $request->idDokter;
             $reservasi->idJadwal = $request->idJadwal;
-            $reservasi->is_rescheduled = true; // Tandai sudah diubah jadwalnya
+            
+            // Flag/Tandai bahwa jatah ganti jadwal sudah terpakai
+            $reservasi->is_rescheduled = true; 
             
             $reservasi->save();
 
@@ -397,7 +413,7 @@ class ReservasiController extends Controller
     /**
      * updateStatusReservationAdmin
      * 
-     * Mengubah status reservasi (Admin)
+     * Admin mengubah status reservasi (Menunggu -> Dikonfirmasi -> Selesai)
      */
     public function updateStatusReservationAdmin(Request $request, $idReservasi)
     {
@@ -419,6 +435,7 @@ class ReservasiController extends Controller
                 ], 400);
             }
 
+            // findOrFail akan memunculkan Error 404 otomatis jika ID tidak ditemukan di database
             $reservasi = Reservasi::findOrFail($idReservasi);
             $reservasi->status = $request->status;
             $reservasi->save();
@@ -430,6 +447,7 @@ class ReservasiController extends Controller
             ], 200);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Tangkapan otomatis jika findOrFail gagal
             return response()->json([
                 'success' => false,
                 'message' => 'Reservasi tidak ditemukan.'
@@ -446,13 +464,14 @@ class ReservasiController extends Controller
     /**
      * deleteReservation
      * 
-     * Menghapus data reservasi (Khusus Admin).
+     * Menghapus data reservasi sepenuhnya (Khusus Admin).
      */
     public function deleteReservation($idReservasi)
     {
         try {
             $reservasi = Reservasi::findOrFail($idReservasi);
             
+            // Hapus record dari database
             $reservasi->delete();
 
             return response()->json([
