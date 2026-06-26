@@ -1,23 +1,8 @@
-import React, { useState } from "react";
-import { useHapusTestimoni } from "../hooks/useHapusTestimoni";
+import React from "react";
+import { useModalHapus } from "../hooks/useModalHapus";
 
 const ModalHapus = ({ isOpen, onClose, data, refetch, showToast }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const { hapusTestimoni } = useHapusTestimoni(refetch);
-
-  const handleDelete = async () => {
-    if (!data) return;
-    setIsDeleting(true);
-    const result = await hapusTestimoni(data.id || data.idTestimoni);
-    setIsDeleting(false);
-
-    if (result.success) {
-      showToast("Berhasil menghapus testimoni", "success");
-      onClose();
-    } else {
-      showToast(result.message, "error");
-    }
-  };
+  const { isDeleting, handleDelete } = useModalHapus(data, refetch, showToast, onClose);
 
   if (!isOpen) return null;
 

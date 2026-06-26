@@ -1,37 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useSalesLineChart } from '../hooks/useSalesLineChart';
 
-const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const filters = ['1M', '3M', '6M', '1Y', 'ALL'];
+/* 
+ * =========================================================================
+ * SALES LINE CHART (GRAFIK GARIS PENJUALAN)
+ * =========================================================================
+ * Komponen ini menggambar garis seperti grafik saham untuk melihat apakah 
+ * penjualan bulan ini naik (hijau ke atas) atau turun.
+ */
 
 const SalesLineChart = ({ data }) => {
-  const [activeFilter, setActiveFilter] = useState('1M');
-
-  const chartData = monthNames.map((month, index) => {
-    const monthKey = String(index + 1).padStart(2, '0');
-    return {
-      name: month,
-      value: data ? data[monthKey] || 0 : 0
-    };
-  });
-
-  const getFilteredData = () => {
-    const currentMonthIndex = new Date().getMonth(); // 0-11
-    let numMonths = 12;
-    if (activeFilter === '1M') numMonths = 1;
-    else if (activeFilter === '3M') numMonths = 3;
-    else if (activeFilter === '6M') numMonths = 6;
-
-    if (numMonths === 12 || activeFilter === 'ALL' || activeFilter === '1Y') {
-      return chartData; // Return full year
-    }
-
-    // Return last N months up to current month (no wrapping for simplicity, just slice)
-    const startIndex = Math.max(0, currentMonthIndex - numMonths + 1);
-    return chartData.slice(startIndex, currentMonthIndex + 1);
-  };
-
-  const filteredChartData = getFilteredData();
+  const { activeFilter, setActiveFilter, filters, filteredChartData } = useSalesLineChart(data);
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm flex-[2] border border-gray-100 w-full overflow-hidden">

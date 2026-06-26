@@ -1,48 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { X } from 'lucide-react';
-import { useEditKategori } from '../hooks/useEditKategori';
+import { useModalPerbaruiKategori } from '../hooks/useModalPerbaruiKategori';
 
 const ModalPerbaruiKategori = ({ isOpen, onClose, categoryData, refetch, showToast }) => {
-  const [nama, setNama] = useState('');
-  const [deskripsi, setDeskripsi] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { editKategori } = useEditKategori(refetch);
-
-  useEffect(() => {
-    if (categoryData) {
-      setNama(categoryData.nama || categoryData.name || '');
-      setDeskripsi(categoryData.deskripsi || categoryData.description || '');
-    } else {
-      setNama('');
-      setDeskripsi('');
-    }
-  }, [categoryData, isOpen]);
+  const {
+    nama,
+    setNama,
+    deskripsi,
+    setDeskripsi,
+    isSubmitting,
+    handleSave
+  } = useModalPerbaruiKategori(categoryData, isOpen, refetch, showToast, onClose);
 
   if (!isOpen) return null;
-
-  const handleSave = async () => {
-    if (categoryData) {
-      if (!nama.trim()) {
-        showToast('Nama kategori wajib diisi', 'error');
-        return;
-      }
-      setIsSubmitting(true);
-      const result = await editKategori(categoryData.idKategori || categoryData.id, { nama, deskripsi });
-      setIsSubmitting(false);
-
-      if (result.success) {
-        showToast("Berhasil memperbarui kategori produk", 'success');
-        onClose();
-      } else {
-        let errorDetail = result.message;
-        if (result.errors) {
-          const firstErrorKey = Object.keys(result.errors)[0];
-          errorDetail = result.errors[firstErrorKey][0];
-        }
-        showToast(errorDetail, 'error');
-      }
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm font-sans transition-opacity">

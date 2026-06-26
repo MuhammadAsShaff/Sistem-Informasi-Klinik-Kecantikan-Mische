@@ -1,118 +1,95 @@
-/**
- * @file authStorage.js
- * @location src/core/utils/authStorage.js
- *
- * Utilitas terpusat untuk semua operasi autentikasi di localStorage.
- *
- * MENGAPA ADA FILE INI?
- * Pola baca/tulis token & user di localStorage tersebar di 7+ file berbeda.
- * File ini menyatukannya agar:
- *   - Kunci storage ("token", "user") hanya didefinisikan SATU KALI
- *   - Perubahan nama kunci cukup diubah di sini saja
- *   - Tidak ada duplikasi try-catch JSON.parse di tiap hook
- *   - Mudah diuji (unit test) secara terisolasi
- *
- * CARA PAKAI (import di hook mana pun):
- *   import { getToken, getUser, saveUser, clearAuth } from '@/core/utils/authStorage';
+/* 
+ * =========================================================================
+ * AUTH STORAGE (BRANKAS PENYIMPANAN KTP & TIKET LOGIN)
+ * =========================================================================
+ * File ini bertugas sebagai "Brankas Rahasia" di dalam browser pengguna (localStorage).
+ * Saat pengguna login, kita menyimpan 2 hal penting di sini:
+ * 1. Tiket Masuk (Token JWT)
+ * 2. KTP Pengguna (Data Profil User)
+ * 
+ * Kenapa dipisah ke file ini?
+ * Agar kalau kita mau mengambil atau mengecek KTP/Tiket dari halaman manapun,
+ * kita cukup memanggil fungsi dari file ini, tidak perlu membongkar brankas manual.
  */
 
-// ─── Kunci Storage (Single Source of Truth) ───────────────────────────────────
-const TOKEN_KEY = "token";
-const USER_KEY  = "user";
+// ─── Label Laci Brankas (Agar tidak tertukar) ───────────────────────────────────
+const TOKEN_KEY = "token"; // Laci tempat menyimpan Tiket
+const USER_KEY  = "user";  // Laci tempat menyimpan KTP
 
-// ─── Nama Event (untuk reaktivitas antar-komponen) ────────────────────────────
+// ─── Alarm Pemberitahuan ────────────────────────────────────────────────────────
+// Alarm ini akan berbunyi ke seluruh halaman web jika KTP/Tiket diperbarui (misal habis edit profil)
 export const AUTH_UPDATED_EVENT = "user-profile-updated";
 
-// ─── READ ──────────────────────────────────────────────────────────────────────
+// =========================================================================
+// 1. FUNGSI MEMBACA ISI BRANKAS (READ)
+// =========================================================================
 
-/**
- * Ambil token autentikasi dari localStorage.
- * @returns {string|null} Token JWT atau null jika belum login.
- */
+// Mengambil Tiket Masuk (Token)
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-/**
- * Ambil & parse data user dari localStorage.
- * @returns {Object|null} Objek user atau null jika tidak ada / JSON rusak.
- */
+// Mengambil KTP (Data Profil) dan menerjemahkannya agar bisa dibaca web
 export function getUser() {
   const raw = localStorage.getItem(USER_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw);
+    return JSON.parse(raw); // Mengubah teks biasa menjadi bentuk objek data
   } catch (e) {
-    console.error("[authStorage] Gagal membaca data user dari localStorage:", e);
+    console.error("[Brankas] KTP rusak atau tidak bisa dibaca:", e);
     return null;
   }
 }
 
-/**
- * Cek apakah user sedang login (ada token & data user).
- * @returns {boolean}
- */
+// Mengecek apakah orang ini sedang berada di dalam sistem (Sudah Login?)
+// Syaratnya: Harus punya Tiket DAN punya KTP di brankas.
+// ! : TIDAK
+// && : IYA
 export function isLoggedIn() {
   return getToken() !== null && getUser() !== null;
 }
 
-/**
- * Ambil role user yang sedang login.
- * @returns {string|null} Role (contoh: "admin", "customer") atau null.
- */
+// Mengecek Jabatan (Role) dari KTP (Misal: admin, atau customer)
+//? IF ; mengecek dulu baru ambil
+//?? : nilai pengganti kalau kosong, gagal, ataupun blm login
 export function getUserRole() {
   return getUser()?.role ?? null;
 }
 
-/**
- * Cek apakah user yang login adalah admin.
- * @returns {boolean}
- */
+// Mengecek secara spesifik, apakah orang ini adalah Admin?
 export function isAdmin() {
   return getUserRole() === "admin";
 }
 
-// ─── WRITE ─────────────────────────────────────────────────────────────────────
+// =========================================================================
+// 2. FUNGSI MEMASUKKAN BARANG KE BRANKAS (WRITE)
+// =========================================================================
 
-/**
- * Simpan token ke localStorage.
- * @param {string} token
- */
+// Menyimpan Tiket baru ke dalam laci
 export function saveToken(token) {
   localStorage.setItem(TOKEN_KEY, token);
 }
 
-/**
- * Simpan data user ke localStorage DAN kirim event reaktivitas
- * agar semua komponen yang mendengarkan (Navbar, Sidebar, dll) langsung update.
- *
- * @param {Object} userData - Objek data user dari response API.
- * @param {boolean} [silent=false] - Jika true, tidak dispatch event (untuk init awal).
- */
+// Menyimpan KTP baru ke dalam laci DAN membunyikan alarm agar semua halaman tahu ada KTP baru
 export function saveUser(userData, silent = false) {
-  localStorage.setItem(USER_KEY, JSON.stringify(userData));
+  localStorage.setItem(USER_KEY, JSON.stringify(userData)); // Menerjemahkan objek data menjadi teks
   if (!silent) {
-    window.dispatchEvent(new Event(AUTH_UPDATED_EVENT));
+    window.dispatchEvent(new Event(AUTH_UPDATED_EVENT)); // Bunyikan alarm!
   }
 }
 
-/**
- * Simpan token & user sekaligus setelah login berhasil.
- * @param {string} token
- * @param {Object} userData
- */
+// Fungsi serbaguna: Langsung simpan Tiket dan KTP sekaligus saat baru selesai Login
 export function saveAuth(token, userData) {
   saveToken(token);
-  saveUser(userData, true); // silent=true: dispatch event cukup sekali di bawah
-  window.dispatchEvent(new Event(AUTH_UPDATED_EVENT));
+  saveUser(userData, true); // silent=true agar alarm tidak berbunyi dua kali berturut-turut
+  window.dispatchEvent(new Event(AUTH_UPDATED_EVENT)); // Bunyikan alarm 1x saja
 }
 
-// ─── DELETE ────────────────────────────────────────────────────────────────────
+// =========================================================================
+// 3. FUNGSI MENGOSONGKAN BRANKAS (DELETE / LOGOUT)
+// =========================================================================
 
-/**
- * Hapus semua data autentikasi dari localStorage (logout).
- * Dipanggil saat: logout manual, token expired (401), atau sesi rusak.
- */
+// Membakar/membuang Tiket dan KTP dari brankas (Dipakai saat Logout atau sesi/waktu login habis)
 export function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);

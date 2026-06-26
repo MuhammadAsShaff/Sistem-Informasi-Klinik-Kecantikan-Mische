@@ -1,9 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
 export default function PromoCard({ promo }) {
-  const navigate = useNavigate();
   // Status dari backend mungkin integer (1/0) atau boolean atau string
   const isActive = promo.status === "Aktif" || promo.status === 1 || promo.status === true;
 
@@ -42,8 +41,8 @@ export default function PromoCard({ promo }) {
   };
 
   return (
-    <div 
-      onClick={() => navigate(`/promo/${promo.idPromo || promo.id}`)}
+    <Link 
+      to={`/promo/${promo.idPromo || promo.id}`}
       className="bg-white rounded-tl-[30px] rounded-br-[30px] shadow-sm hover:shadow-xl hover:-translate-y-1 active:scale-95 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col group relative border border-gray-100"
     >
       {/* Ribbon */}
@@ -95,6 +94,6 @@ export default function PromoCard({ promo }) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

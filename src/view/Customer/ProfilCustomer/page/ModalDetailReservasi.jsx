@@ -64,7 +64,7 @@ export default function ModalDetailReservasi({ isOpen, onClose, selectedReservas
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {renderField(<Stethoscope size={20} />, "Jenis Treatment", data.jenisTreatment)}
+            {renderField(<Stethoscope size={20} />, "Jenis Treatment", data.jenisReservasi || data.jenisTreatment)}
             {renderField(<Calendar size={20} />, "Tanggal Reservasi", data.tanggalReservasi)}
             {renderField(<Clock size={20} />, "Jadwal Waktu", data.jadwal ? `${data.jadwal.jamMulai?.substring(0,5)} - ${data.jadwal.jamSelesai?.substring(0,5)}` : "-")}
             {renderField(<CheckCircle2 size={20} />, "Dokter Menangani", data.dokter?.nama || "Akan diatur oleh admin")}

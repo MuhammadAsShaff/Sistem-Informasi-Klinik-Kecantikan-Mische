@@ -1,8 +1,19 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { useTreatmentPieChart } from '../hooks/useTreatmentPieChart';
 
+/* 
+ * =========================================================================
+ * TREATMENT PIE CHART (GRAFIK POTONGAN KUE LAYANAN)
+ * =========================================================================
+ * Komponen ini membagi lingkaran seperti memotong kue pizza untuk melihat 
+ * jenis treatment apa yang paling banyak di-reservasi oleh pelanggan.
+ * Potongan kue terbesar = Treatment Paling Laris.
+ */
+
+// Menyiapkan warna-warna hijau gradasi untuk tiap potongan kue
 const COLORS = [
-  '#018401',       // 100% opacity
+  '#018401',       // 100% opacity (Hijau Tua)
   '#018401CC',     // 87% opacity (tebal)
   '#01840199',     // 65% opacity (sedang)
   '#30AE30',       // 76 opacity (tipis)
@@ -10,13 +21,7 @@ const COLORS = [
 ];
 
 const TreatmentPieChart = ({ data }) => {
-  const chartData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    return data.map(item => ({
-      name: item.kategoriReservasi || 'Unknown',
-      value: parseInt(item.total) || 0
-    }));
-  }, [data]);
+  const { chartData } = useTreatmentPieChart(data);
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm flex-1 border border-gray-100 w-full overflow-hidden flex flex-col">

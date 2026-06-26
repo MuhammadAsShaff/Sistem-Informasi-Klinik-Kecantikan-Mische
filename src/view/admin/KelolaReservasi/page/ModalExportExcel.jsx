@@ -1,53 +1,24 @@
-import React, { useState } from 'react';
-import axiosClient from '@/core/api/axiosClient';
-import { endpoints } from '@/core/api/endpoints';
-import ToastAlert from '@/view/components/ToastAlert';
+import React from 'react';
+import ToastAlert from '@/view/components/ToastAlert/page/Index';
+import { useExportExcel } from '../hooks/useExportExcel';
 
+/**
+ * =========================================================================
+ * KOMPONEN: ModalExportExcel (TAMPILAN EXPORT EXCEL - VIEW)
+ * =========================================================================
+ * Komponen modal UI untuk memfilter dan mengekspor data laporan ke file Excel.
+ * Logika pembuatan request biner & pemicu unduhan dikelola oleh hook `useExportExcel`.
+ */
 export default function ModalExportExcel({ isOpen, onClose }) {
-  const [jenisTreatment, setJenisTreatment] = useState('semua');
-  const [tanggalMulai, setTanggalMulai] = useState('');
-  const [tanggalSelesai, setTanggalSelesai] = useState('');
-  const [isExporting, setIsExporting] = useState(false);
-  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
-
-  const handleExport = async () => {
-    try {
-      setIsExporting(true);
-      
-      const response = await axiosClient.get(endpoints.admin.report.reservasi, {
-        params: {
-          jenisTreatment: jenisTreatment === 'semua' ? '' : jenisTreatment,
-          tanggalMulai,
-          tanggalSelesai
-        },
-        responseType: 'blob' // Penting untuk file biner
-      });
-
-      // Buat URL dari blob
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      
-      // Ekstrak nama file dari header Content-Disposition jika ada (opsional), 
-      // tapi kita set manual aja sesuai default nama file
-      const link = document.createElement('a');
-      link.href = url;
-      const dateStr = new Date().toISOString().split('T')[0];
-      link.setAttribute('download', `Laporan_Reservasi_${dateStr}.xlsx`);
-      
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      link.parentNode.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      onClose(); // Tutup modal setelah export
-    } catch (error) {
-      console.error("Gagal melakukan export excel:", error);
-      setToast({ isOpen: true, message: "Terjadi kesalahan saat mengunduh file Excel.", type: "error" });
-    } finally {
-      setIsExporting(false);
-    }
-  };
+  // Destrukturisasi state dan handler dari custom hook useExportExcel
+  const {
+    jenisTreatment, setJenisTreatment,
+    tanggalMulai, setTanggalMulai,
+    tanggalSelesai, setTanggalSelesai,
+    isExporting,
+    toast, setToast,
+    handleExport
+  } = useExportExcel(onClose);
 
   if (!isOpen) return null;
 

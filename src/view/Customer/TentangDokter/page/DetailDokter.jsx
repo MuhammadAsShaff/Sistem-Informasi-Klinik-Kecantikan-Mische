@@ -1,13 +1,11 @@
 import React from 'react';
-import { useParams, Navigate } from 'react-router-dom';
-import { useDokterData } from '../hooks/useDokterData';
+import { Navigate } from 'react-router-dom';
+import { useDetailDokter } from '../hooks/useDetailDokter';
 import EmailIcon from '../../../../assets/icons/ic_round-email.png';
 import CustomerLoading from '@/components/CustomerLoading';
 
 export default function DetailDokterPage() {
-  const { id } = useParams();
-  const { getDoctorById, isLoading } = useDokterData();
-  const doctor = getDoctorById(id);
+  const { doctor, isLoading } = useDetailDokter();
 
   if (isLoading) {
     return <CustomerLoading text="Memuat profil dokter..." />;

@@ -1,23 +1,21 @@
-import React, { useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { treatments } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/hooks/TreatmentsData';
-import { dataJenisPerawatan } from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/hooks/DataJenisPerawatan';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import JenisPerawatanCard from '@/view/Customer/LandingPage/page/SectionInfoPerawatan/page/JenisPerawatanCard';
+import { useDetailJenisPerawatan } from '../hooks/useDetailJenisPerawatan';
 
+/**
+ * =========================================================================
+ * KOMPONEN VIEW: DetailJenisPerawatan (Halaman Pilihan Jenis Perawatan)
+ * =========================================================================
+ * Komponen ini hanya merender tampilan (UI/Layout) dari daftar jenis perawatan
+ * spesifik berdasarkan kategori yang diklik (misal: Facial, Botox, Laser).
+ * 
+ * Seluruh logika parameter URL, pencarian data kategori, penyaringan perawatan,
+ * dan pengaturan posisi scroll diatur di dalam custom hook `useDetailJenisPerawatan`.
+ */
 const DetailJenisPerawatan = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  
-  // Ambil detail kategori perawatan dari treatments (Landing Page)
-  const categoryId = parseInt(id) || 1;
-  const category = treatments.find(t => t.id === categoryId) || treatments[0];
+  const { category, items, navigate } = useDetailJenisPerawatan();
 
-  // Filter data jenis perawatan berdasarkan categoryId
-  const items = dataJenisPerawatan.filter(item => item.categoryId === categoryId);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <div className="w-full bg-[#F9FAFB] min-h-screen pb-20">

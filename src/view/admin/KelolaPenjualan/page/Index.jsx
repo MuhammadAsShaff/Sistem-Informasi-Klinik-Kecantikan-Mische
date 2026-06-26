@@ -1,126 +1,55 @@
-import React, { useState } from 'react';
+import React from 'react';
 import HeaderSection from './HeaderSection';
 import ModalHapus from './ModalHapus';
 import ModalExportExcel from './ModalExportExcel';
 import ModalDetailPenjualan from './ModalDetailPenjualan';
 import ModalResi from './ModalResi';
 import SearchBar from '@/components/SearchBar';
-import { ChevronDown, FileSpreadsheet } from 'lucide-react';
+import { FileSpreadsheet } from 'lucide-react';
 import TableSection from './TableSection';
 import Pagination from '@/components/Pagination';
 import { useKelolaPenjualan } from '../hooks/useKelolaPenjualan';
-
-import ToastAlert from '@/view/components/ToastAlert';
+import ToastAlert from '@/view/components/ToastAlert/page/Index';
 
 const KelolaPenjualan = () => {
   const {
     searchQuery,
     setSearchQuery,
-    filterProduk,
-    setFilterProduk,
     activeTab,
     setActiveTab,
-    filteredPenjualan,
     isLoading,
     error,
-    updateStatus,
-    inputResi,
-    hapusPenjualan,
-    exportExcelPenjualan
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isExportModalOpen,
+    setIsExportModalOpen,
+    isDetailModalOpen,
+    setIsDetailModalOpen,
+    isResiModalOpen,
+    setIsResiModalOpen,
+    itemToDetail,
+    setItemToDetail,
+    itemToResi,
+    setItemToResi,
+    setItemToDelete,
+    toastMessage,
+    toastType,
+    showToast,
+    setShowToast,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    ITEMS_PER_PAGE,
+    paginatedPenjualan,
+    handleDeleteClick,
+    handleDetailClick,
+    handleResiClick,
+    handleExportClick,
+    handleConfirmDelete,
+    handleConfirmExport,
+    handleStatusChange,
+    handleConfirmResi
   } = useKelolaPenjualan();
-
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isResiModalOpen, setIsResiModalOpen] = useState(false);
-  
-  const [itemToDelete, setItemToDelete] = useState(null);
-  const [itemToDetail, setItemToDetail] = useState(null);
-  const [itemToResi, setItemToResi] = useState(null);
-  
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastType, setToastType] = useState("success");
-  const [showToast, setShowToast] = useState(false);
-
-  // Pagination Logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
-  const totalPages = Math.ceil(filteredPenjualan.length / ITEMS_PER_PAGE);
-
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, filterProduk]);
-
-  const paginatedPenjualan = filteredPenjualan.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
-  const displayToast = (message, type = "success") => {
-    setToastMessage(message);
-    setToastType(type);
-    setShowToast(true);
-  };
-
-  const handleDeleteClick = (id) => {
-    setItemToDelete(id);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleDetailClick = (item) => {
-    setItemToDetail(item);
-    setIsDetailModalOpen(true);
-  };
-
-  const handleResiClick = (item) => {
-    setItemToResi(item);
-    setIsResiModalOpen(true);
-  };
-
-  const handleExportClick = () => setIsExportModalOpen(true);
-
-  const handleConfirmDelete = async () => {
-    if (itemToDelete) {
-      const res = await hapusPenjualan(itemToDelete);
-      if (res.success) {
-        displayToast(res.message, "success");
-      } else {
-        displayToast(res.message, "error");
-      }
-    }
-    setIsDeleteModalOpen(false);
-    setItemToDelete(null);
-  };
-
-  const handleConfirmExport = async (filters) => {
-    const res = await exportExcelPenjualan(filters);
-    if (res.success) {
-      displayToast('Laporan berhasil diunduh', "success");
-      setIsExportModalOpen(false);
-    } else {
-      displayToast(res.message || 'Gagal mengunduh laporan', "error");
-    }
-  };
-
-  const handleStatusChange = async (idPenjualan, newStatus) => {
-    const res = await updateStatus(idPenjualan, newStatus);
-    if (res.success) {
-      displayToast(res.message, "success");
-    } else {
-      displayToast(res.message, "error");
-    }
-  };
-
-  const handleConfirmResi = async (idPenjualan, nomorResi) => {
-    const res = await inputResi(idPenjualan, nomorResi);
-    if (res.success) {
-      displayToast(res.message, "success");
-      setIsResiModalOpen(false);
-      setItemToResi(null);
-    } else {
-      displayToast(res.message, "error");
-    }
-  };
 
   return (
     <div className="p-8 font-sans w-full bg-[#f8f9fa] min-h-screen relative">
@@ -139,9 +68,9 @@ const KelolaPenjualan = () => {
         </div>
       )}
 
-        <SearchBar 
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
+      <SearchBar 
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
         rightComponents={
           <button 
             onClick={handleExportClick}
@@ -179,6 +108,7 @@ const KelolaPenjualan = () => {
         itemsPerPage={ITEMS_PER_PAGE}
         isLoading={isLoading}
       />
+      
       <Pagination 
         currentPage={currentPage} 
         totalPages={totalPages} 

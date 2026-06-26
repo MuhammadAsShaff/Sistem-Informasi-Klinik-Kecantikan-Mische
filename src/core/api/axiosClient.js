@@ -2,87 +2,114 @@ import axios from 'axios';
 import { API_BASE_URL } from './endpoints';
 import { getToken, clearAuth } from '@/core/utils/authStorage';
 
-/**
- * Konfigurasi Global Axios Client
- * 
- * Scalability features:
- * 1. Base URL terpusat (mudah diubah antara DEV dan PROD)
- * 2. Request Interceptor otomatis menyisipkan Authorization Token (JWT) di setiap request
- * 3. Response Interceptor menangani error secara global (contoh: Token Expired 401)
+/* 
+ * =========================================================================
+ * KONFIGURASI AXIOS CLIENT (SANG KURIR PENGANTAR DATA)
+ * =========================================================================
+ * File ini adalah pusat pengaturan "Kurir" (Axios) yang bertugas 
+ * bolak-balik mengantar data dari Frontend (Mische) ke Backend (Laravel).
  */
 
 const axiosClient = axios.create({
+  // baseURL: Alamat tujuan utama si kurir (Misal: Kantor Backend Laravel)
   baseURL: API_BASE_URL,
+  
+  // withCredentials: Surat Izin Jalan. Wajib diaktifkan (true) agar si kurir 
+  // diizinkan membawa "Cookie/Session" ke Backend dengan aman.
+  withCredentials: true,
+  
+  // headers: Aturan paket. Mengatur agar si kurir hanya mau menerima 
+  // dan mengirim paket data dalam bentuk "JSON" (format standar komputer).
   headers: {
     'Accept': 'application/json',
   },
-  // timeout: 10000, // Opsional: Batas waktu timeout jika server lambat
 });
 
-// === REQUEST INTERCEPTOR ===
-// Dipanggil SEBELUM request dikirim ke backend
+/* 
+ * =========================================================================
+ * 1. PENCEGATAN SAAT BERANGKAT (REQUEST INTERCEPTOR)
+ * =========================================================================
+ * Fungsi ini bertindak sebagai "Satpam Pintu Keluar".
+ * Sebelum si kurir berangkat ke Backend, Satpam ini akan menghentikannya 
+ * sejenak untuk menitipkan "KTP/Tiket Login" (Token JWT) ke dalam tas si kurir.
+ */
 axiosClient.interceptors.request.use(
   (config) => {
-    // Selalu ambil token terbaru setiap kali request dilakukan
+    // Cek apakah di dompet browser (localStorage) ada Tiket Login (Token)
     const token = getToken();
+    
+    // Jika ada tiketnya, masukkan tiket tersebut ke dalam tas kurir (Authorization Header)
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Silakan berangkat, kurir!
     return config;
   },
   (error) => {
-    // Tangani error sebelum request dikirim
+    // Jika kurirnya error sebelum berangkat, laporkan errornya.
     return Promise.reject(error);
   }
 );
 
-// === RESPONSE INTERCEPTOR ===
-// Dipanggil SETELAH response diterima dari backend (atau jika terjadi error jaringan/status)
+/* 
+ * =========================================================================
+ * 2. PENCEGATAN SAAT PULANG (RESPONSE INTERCEPTOR)
+ * =========================================================================
+ * Fungsi ini bertindak sebagai "Satpam Pintu Masuk".
+ * Saat si kurir pulang membawa jawaban dari Backend, Satpam ini akan 
+ * mengecek apakah jawabannya sukses atau error.
+ */
 axiosClient.interceptors.response.use(
   (response) => {
-    // Lanjutkan response jika sukses (Status 2xx)
+    // Jika sukses (paket sampai dengan selamat), langsung berikan paketnya ke halaman web.
     return response;
   },
   (error) => {
-    // Global Error Handling
+    // Jika kurir pulang membawa laporan ERROR (Gagal)
     if (error.response) {
       const status = error.response.status;
 
-      // Sesi Habis / Tidak Valid (Unauthorized)
+      // ERROR 401 (Ditolak / Sesi Habis):
+      // Backend bilang "Tiket Login-nya sudah basi/kedaluwarsa!".
       if (status === 401) {
-        console.warn('[Axios] Sesi berakhir atau token tidak valid. Melakukan auto-logout...');
-        // Hapus data dari storage
+        console.warn('[Axios] Sesi berakhir. Melakukan auto-logout...');
+        
+        // Hapus tiket basi dari dompet browser (Logout Paksa)
         clearAuth();
 
-        // Hanya arahkan ke halaman login jika user berada di halaman yang wajib login
-        // agar pengunjung di halaman publik (seperti Landing Page, Promo) tidak terganggu.
+        // Daftar ruangan (halaman) yang wajib pakai tiket
         const protectedPaths = ['/ProfilCustomer', '/reservasi', '/keranjang', '/admin'];
+        
+        // Cek apakah saat ini kita sedang berada di dalam ruangan wajib tiket tersebut
         const isProtectedPath = protectedPaths.some(path => window.location.pathname.startsWith(path));
 
+        // Jika iya, segera usir (kembalikan) ke halaman Login untuk beli tiket baru
         if (isProtectedPath && window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
       }
 
-      // Akses Ditolak (Forbidden)
+      // ERROR 403 (Dilarang Masuk): Misalnya Customer memaksa masuk ke ruang Admin
       if (status === 403) {
-        console.warn('[Axios] Anda tidak memiliki hak akses untuk endpoint ini.');
+        console.warn('[Axios] Anda tidak punya izin (Hak Akses) ke sini.');
       }
 
-      // Data Tidak Ditemukan (Not Found)
+      // ERROR 404 (Nyasar): Data atau alamat yang dicari kurir tidak ada di Backend
       if (status === 404) {
-        console.warn('[Axios] Data atau endpoint yang diminta tidak ditemukan.');
+        console.warn('[Axios] Alamat atau data tidak ditemukan (404).');
       }
 
-      // Server Error
+      // ERROR 500 (Server Rusak): Komputer Backend sedang bermasalah/mati
       if (status >= 500) {
-        console.error('[Axios] Terjadi kesalahan fatal pada server backend.');
+        console.error('[Axios] Gawat! Server Backend sedang rusak/down.');
       }
     } else if (error.request) {
-      // Tidak ada response dari server (Misal: Server mati atau koneksi putus)
-      console.error('[Axios] Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
+      // Jika kurir sudah berangkat tapi Backend sama sekali tidak merespon (Mungkin internet putus)
+      console.error('[Axios] Tidak ada sinyal/koneksi. Server tidak merespon.');
     }
 
+    // Kembalikan status Error ini ke halaman supaya bisa dimunculkan Notifikasi Gagal.
     return Promise.reject(error);
   }
 );

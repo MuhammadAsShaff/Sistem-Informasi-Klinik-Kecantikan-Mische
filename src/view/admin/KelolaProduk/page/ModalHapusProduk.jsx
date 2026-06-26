@@ -1,24 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AlertCircle } from 'lucide-react';
-import { useHapusProduk } from '../hooks/useHapusProduk';
+import { useModalHapusProduk } from '../hooks/useModalHapusProduk';
 
 const ModalHapusProduk = ({ isOpen, onClose, dataId, refetch, showToast }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const { hapusProduk } = useHapusProduk(refetch);
-
-  const handleDelete = async () => {
-    if (!dataId) return;
-    setIsDeleting(true);
-    const result = await hapusProduk(dataId);
-    setIsDeleting(false);
-
-    if (result.success) {
-      showToast("Berhasil menghapus produk", 'success');
-      onClose();
-    } else {
-      showToast(result.message, 'error');
-    }
-  };
+  const { isDeleting, handleDelete } = useModalHapusProduk(dataId, refetch, showToast, onClose);
 
   if (!isOpen) return null;
 

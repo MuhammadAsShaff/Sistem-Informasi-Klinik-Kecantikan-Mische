@@ -1,18 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { PencilLine, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { STORAGE_BASE_URL } from "@/core/api/endpoints";
 import Table from '@/components/Table';
+import { useTabelProfilDokter } from "../hooks/useTabelProfilDokter";
 
 export default function Tabel({ isLoading, data, onEdit, onDelete, onStatusChange, startIndex = 1 }) {
-  const [expandedDescId, setExpandedDescId] = useState(null);
-
-  const handleStatusSelect = (id, newStatus) => {
-    onStatusChange(id, newStatus);
-  };
-
-  const toggleExpand = (id) => {
-    setExpandedDescId(prev => prev === id ? null : id);
-  };
+  const { expandedDescId, handleStatusSelect, toggleExpand } = useTabelProfilDokter(onStatusChange);
 
   const columns = [
     { label: 'No', render: (item, index) => index, className: 'w-12 text-center', cellClassName: 'text-center text-xs font-medium text-gray-500' },

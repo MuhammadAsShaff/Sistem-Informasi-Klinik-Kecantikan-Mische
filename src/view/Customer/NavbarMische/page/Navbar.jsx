@@ -8,6 +8,7 @@ import NavbarMobile  from './NavbarMobile';
 import { useNavbarAuth }   from '../hooks/useNavbarAuth';
 import { useNavbarMobile } from '../hooks/useNavbarMobile';
 import { useNavbarLinks }  from '../hooks/useNavbarLinks';
+import { useCartContext }  from '@/core/context/CartContext';
 
 /**
  * Orkestrator Navbar.
@@ -24,6 +25,7 @@ const Navbar = () => {
   const { isMobileMenuOpen, openMobileMenu,
           closeMobileMenu }                  = useNavbarMobile();
   const { navLinks }                         = useNavbarLinks();
+  const { cartCount }                        = useCartContext();
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -34,6 +36,7 @@ const Navbar = () => {
         navLinks={navLinks}
         isLoggedIn={isLoggedIn}
         isAdmin={isAdmin}
+        cartCount={cartCount}
       />
 
       {/* MOBILE VIEW */}
@@ -44,6 +47,7 @@ const Navbar = () => {
         links={navLinks}
         isLoggedIn={isLoggedIn}
         isAdmin={isAdmin}
+        cartCount={cartCount}
       />
 
     </header>

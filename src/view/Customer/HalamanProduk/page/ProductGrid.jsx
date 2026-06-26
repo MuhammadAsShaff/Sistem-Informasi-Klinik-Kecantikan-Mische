@@ -1,19 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import ProductCard from './ProductCard';
+import { useProductGrid } from '../hooks/useProductGrid';
 
 const ProductGrid = ({ products }) => {
-  const [visibleCount, setVisibleCount] = useState(3);
-
-  // Reset count when category changes (which changes the products array)
-  useEffect(() => {
-    setVisibleCount(3);
-  }, [products]);
-
-  const handleLoadMore = () => {
-    setVisibleCount(prev => prev + 3);
-  };
-
-  const visibleProducts = products.slice(0, visibleCount);
+  const { visibleCount, handleLoadMore, visibleProducts } = useProductGrid(products);
 
   return (
     <div className="w-full pb-10">

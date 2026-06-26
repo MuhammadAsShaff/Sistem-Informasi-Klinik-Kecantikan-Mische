@@ -1,14 +1,17 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTopProductsChart } from '../hooks/useTopProductsChart';
+
+/* 
+ * =========================================================================
+ * TOP PRODUCTS CHART (GRAFIK JUARA PRODUK TERLARIS)
+ * =========================================================================
+ * Menggambar balok horizontal panjang seperti balap mobil untuk melihat 
+ * 5 produk mana yang paling laku dijual bulan ini.
+ */
 
 const TopProductsChart = ({ data }) => {
-  const chartData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    return data.map(item => ({
-      name: item.produk?.nama || 'Unknown',
-      value: parseInt(item.total_terjual) || 0
-    }));
-  }, [data]);
+  const { chartData } = useTopProductsChart(data);
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm flex-1 border border-gray-100 w-full overflow-hidden">

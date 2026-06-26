@@ -1,23 +1,20 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
 import { ShoppingCart } from 'lucide-react';
-import { useProdukData } from '../hooks/useProdukData';
 import ProductGrid from './ProductGrid';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
-import { useCartContext } from '@/core/context/CartContext';
+import { useDetailProduk } from '../hooks/useDetailProduk';
 
 const DetailProduk = () => {
-  const { id } = useParams();
-  const { products, isLoading } = useProdukData();
-  const { addToCart } = useCartContext();
-  const product = products.find(p => (p.idProduk || p.id).toString() === id);
-  const [qty, setQty] = useState(1);
-
-  const handleAddToCart = () => {
-    if (product) {
-      addToCart(product, qty);
-    }
-  };
+  const {
+    id,
+    navigate,
+    products,
+    isLoading,
+    product,
+    qty,
+    handleAddToCart,
+    incrementQty,
+    decrementQty
+  } = useDetailProduk();
 
   if (isLoading) return <div className="text-center py-20 text-xl font-medium text-gray-500">Memuat produk...</div>;
   if (!product) return <div className="text-center py-20 text-xl font-bold">Produk tidak ditemukan</div>;
@@ -25,6 +22,16 @@ const DetailProduk = () => {
   return (
     <div className="bg-[#fafafa] min-h-screen py-10 font-sans">
       <div className="container mx-auto px-4 max-w-[820px]">
+        {/* Tombol Kembali */}
+        <button 
+          onClick={() => navigate(-1)} 
+          className="flex items-center text-gray-500 hover:text-[#69C146] transition-colors mb-6 font-medium cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Kembali
+        </button>
         
         {/* Detail Card */}
         <div className="bg-white rounded-tl-[60px] rounded-br-[60px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-10 md:p-14 lg:p-20 flex flex-col md:flex-row gap-10 lg:gap-20 items-center mb-16 border border-gray-50">
@@ -71,10 +78,10 @@ const DetailProduk = () => {
             <div className="flex flex-wrap items-center gap-10 mb-8">
               {/* Qty Selector */}
               <div className="flex items-center gap-6 text-[#69C146] font-bold text-2xl">
-                <button onClick={() => setQty(Math.max(1, qty - 1))} className="hover:text-green-700 transition-colors">-</button>
+                <button onClick={decrementQty} className="hover:text-green-700 transition-colors">-</button>
                 <span className="w-6 text-center">{qty}</span>
                 <button 
-                  onClick={() => setQty(Math.min(product.stok || product.stock || 999, qty + 1))} 
+                  onClick={incrementQty} 
                   className="hover:text-green-700 transition-colors"
                 >
                   +

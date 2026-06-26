@@ -117,6 +117,98 @@ export const useKelolaPenjualan = () => {
     return searchMatch && tabMatch;
   }).sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isResiModalOpen, setIsResiModalOpen] = useState(false);
+  
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [itemToDetail, setItemToDetail] = useState(null);
+  const [itemToResi, setItemToResi] = useState(null);
+  
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
+  const [showToast, setShowToast] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+  const totalPages = Math.ceil(filteredPenjualan.length / ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterProduk]);
+
+  const paginatedPenjualan = filteredPenjualan.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const displayToast = (message, type = "success") => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+  };
+
+  const handleDeleteClick = (id) => {
+    setItemToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDetailClick = (item) => {
+    setItemToDetail(item);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleResiClick = (item) => {
+    setItemToResi(item);
+    setIsResiModalOpen(true);
+  };
+
+  const handleExportClick = () => setIsExportModalOpen(true);
+
+  const handleConfirmDelete = async () => {
+    if (itemToDelete) {
+      const res = await hapusPenjualan(itemToDelete);
+      if (res.success) {
+        displayToast(res.message, "success");
+      } else {
+        displayToast(res.message, "error");
+      }
+    }
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
+
+  const handleConfirmExport = async (filters) => {
+    const res = await exportExcelPenjualan(filters);
+    if (res.success) {
+      displayToast('Laporan berhasil diunduh', "success");
+      setIsExportModalOpen(false);
+    } else {
+      displayToast(res.message || 'Gagal mengunduh laporan', "error");
+    }
+  };
+
+  const handleStatusChange = async (idPenjualan, newStatus) => {
+    const res = await updateStatus(idPenjualan, newStatus);
+    if (res.success) {
+      displayToast(res.message, "success");
+    } else {
+      displayToast(res.message, "error");
+    }
+  };
+
+  const handleConfirmResi = async (idPenjualan, nomorResi) => {
+    const res = await inputResi(idPenjualan, nomorResi);
+    if (res.success) {
+      displayToast(res.message, "success");
+      setIsResiModalOpen(false);
+      setItemToResi(null);
+    } else {
+      displayToast(res.message, "error");
+    }
+  };
+
   return {
     searchQuery,
     setSearchQuery,
@@ -132,6 +224,40 @@ export const useKelolaPenjualan = () => {
     updateStatus,
     inputResi,
     hapusPenjualan,
-    exportExcelPenjualan
+    exportExcelPenjualan,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isExportModalOpen,
+    setIsExportModalOpen,
+    isDetailModalOpen,
+    setIsDetailModalOpen,
+    isResiModalOpen,
+    setIsResiModalOpen,
+    itemToDelete,
+    setItemToDelete,
+    itemToDetail,
+    setItemToDetail,
+    itemToResi,
+    setItemToResi,
+    toastMessage,
+    setToastMessage,
+    toastType,
+    setToastType,
+    showToast,
+    setShowToast,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    ITEMS_PER_PAGE,
+    paginatedPenjualan,
+    displayToast,
+    handleDeleteClick,
+    handleDetailClick,
+    handleResiClick,
+    handleExportClick,
+    handleConfirmDelete,
+    handleConfirmExport,
+    handleStatusChange,
+    handleConfirmResi
   };
 };

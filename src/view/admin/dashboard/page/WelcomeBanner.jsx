@@ -2,7 +2,16 @@ import React from 'react';
 import IlustrasiDashboard from '../../../../assets/images/IlustrasiDashboard.png';
 import { getUser } from '@/core/utils/authStorage';
 
+/* 
+ * =========================================================================
+ * WELCOME BANNER (PAPAN UCAPAN SELAMAT DATANG)
+ * =========================================================================
+ * Ini adalah papan spanduk lucu di bagian paling atas Dashboard yang 
+ * menyapa nama Admin (misal: "Welcome Budi").
+ */
+
 const WelcomeBanner = () => {
+  // Buka brankas untuk mengecek siapa nama orang yang sedang login
   const user = getUser() || {};
   const namaUser = user.nama || user.name || 'Admin';
 
@@ -14,6 +23,7 @@ const WelcomeBanner = () => {
           Kerja keras kita hari ini adalah fondasi untuk membangun klinik kecantikan Mische yang lebih baik.
         </p>
       </div>
+      {/* Gambar kartun ilustrasi klinik di sebelah kanan */}
       <div className="hidden md:flex w-48 h-32 items-center justify-center">
         <img src={IlustrasiDashboard} alt="Ilustrasi Dashboard" className="w-full h-full object-contain" />
       </div>

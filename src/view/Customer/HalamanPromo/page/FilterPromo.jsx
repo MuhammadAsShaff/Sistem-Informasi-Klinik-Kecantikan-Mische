@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { SlidersHorizontal, Check } from 'lucide-react';
+import { useFilterPromo } from '../hooks/useFilterPromo';
 
 export default function FilterPromo({ 
   selectedJenis, 
@@ -7,37 +8,18 @@ export default function FilterPromo({
   selectedStatus, 
   setSelectedStatus 
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const jenisOptions = [
-    { label: 'Semua Jenis', value: 'Semua' },
-    { label: 'Gratis Produk', value: 'gratis produk' },
-    { label: 'Diskon Persen', value: 'diskon persen' },
-    { label: 'Potongan Harga', value: 'potongan harga' }
-  ];
-
-  const statusOptions = [
-    { label: 'Semua Status', value: 'Semua' },
-    { label: 'Masih Berlaku', value: 'Aktif' },
-    { label: 'Tidak Berlaku', value: 'Tidak Aktif' }
-  ];
+  const {
+    isOpen,
+    dropdownRef,
+    toggleDropdown,
+    jenisOptions,
+    statusOptions
+  } = useFilterPromo();
 
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
       <button 
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleDropdown}
         className="flex items-center gap-3 px-8 py-3 bg-white rounded-full shadow-sm hover:shadow-md transition-all shrink-0 border border-gray-100"
       >
         <SlidersHorizontal className={`h-5 w-5 ${selectedJenis !== 'Semua' || selectedStatus !== 'Semua' ? 'text-[#56BC36]' : 'text-black'}`} />

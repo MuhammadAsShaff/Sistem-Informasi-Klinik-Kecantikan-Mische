@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Package, Clock, Truck, CheckCircle, ChevronLeft, XCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import axiosClient from '@/core/api/axiosClient';
-import { endpoints, STORAGE_BASE_URL } from '@/core/api/endpoints';
-import ToastAlert from '@/view/components/ToastAlert';
-import ModalKonfirmasi from '@/view/components/ModalKonfirmasi';
+import { STORAGE_BASE_URL } from '@/core/api/endpoints';
+import ToastAlert from '@/view/components/ToastAlert/page/Index';
+import ModalKonfirmasi from '@/view/components/ModalKonfirmasi/page/Index';
 import ModalDetailPembelian from './ModalDetailPembelian';
 import { Eye } from 'lucide-react';
+import { useRiwayatPembelian } from '../hooks/useRiwayatPembelian';
 
+// Fungsi utilitas format mata uang Rupiah
 const formatRupiah = (number) => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -16,120 +16,31 @@ const formatRupiah = (number) => {
   }).format(number);
 };
 
+/**
+ * =========================================================================
+ * KOMPONEN: RiwayatPembelian (TAMPILAN MURNI / VIEW)
+ * =========================================================================
+ * Komponen ini hanya merender antarmuka halaman riwayat pembelian customer.
+ * Seluruh logika fetch data, filter tab, penanganan konfirmasi penerimaan,
+ * pembatalan, dan integrasi Midtrans Snap diserahkan ke hook `useRiwayatPembelian`.
+ */
 export default function RiwayatPembelian() {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('diproses');
-  const [orders, setOrders] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
-  const [confirmModal, setConfirmModal] = useState({ isOpen: false, idPenjualan: null, action: 'receive' });
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
-
-  const handleOpenDetail = (order) => {
-    setSelectedOrder(order);
-    setIsModalDetailOpen(true);
-  };
-
-  const fetchOrders = async () => {
-    setIsLoading(true);
-    try {
-      const res = await axiosClient.get(endpoints.customer.riwayatPembelian);
-      const data = res.data?.data || res.data || [];
-      setOrders(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Gagal mengambil riwayat pembelian", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  const handlePay = (snapToken) => {
-    if (!snapToken) {
-      setToast({ isOpen: true, message: "Token pembayaran tidak ditemukan. Harap hubungi admin.", type: 'error' });
-      return;
-    }
-    if (window.snap) {
-      window.snap.pay(snapToken, {
-        onSuccess: async function (result) {
-          try { await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id }); } catch (e) { }
-          setToast({ isOpen: true, message: 'Pembayaran berhasil!', type: 'success' });
-          fetchOrders();
-        },
-        onPending: async function (result) {
-          try { await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id }); } catch (e) { }
-          setToast({ isOpen: true, message: 'Menunggu pembayaran!', type: 'warning' });
-          fetchOrders();
-        },
-        onError: async function (result) {
-          if (result && result.order_id) {
-            try { await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id }); } catch (e) { }
-          }
-          setToast({ isOpen: true, message: 'Pembayaran gagal!', type: 'error' });
-        },
-        onClose: function () {
-          // User menutup modal midtrans
-        }
-      });
-    } else {
-      setToast({ isOpen: true, message: "Sistem pembayaran belum siap. Silakan refresh halaman.", type: 'error' });
-    }
-  };
-
-  const handleConfirmClick = (id) => {
-    setConfirmModal({ isOpen: true, idPenjualan: id, action: 'receive' });
-  };
-
-  const handleCancelClick = (id) => {
-    setConfirmModal({ isOpen: true, idPenjualan: id, action: 'cancel' });
-  };
-
-  const processConfirm = async () => {
-    console.log("processConfirm started", confirmModal);
-    const id = confirmModal.idPenjualan;
-    const action = confirmModal.action;
-    setConfirmModal({ isOpen: false, idPenjualan: null, action: null });
-    try {
-      console.log("Sending PATCH to", `${endpoints.customer.konfirmasiDiterima}/${id}`, { action });
-      const res = await axiosClient.patch(`${endpoints.customer.konfirmasiDiterima}/${id}`, { action });
-      console.log("Response:", res.data);
-      if (res.data?.success || res.status === 200 || res.data?.status === 'success') {
-         setToast({ isOpen: true, message: action === 'cancel' ? "Pesanan berhasil dibatalkan." : "Pesanan berhasil dikonfirmasi selesai.", type: 'success' });
-         fetchOrders();
-      } else {
-         setToast({ isOpen: true, message: "Gagal memproses pesanan.", type: 'error' });
-      }
-    } catch (error) {
-      console.error("Gagal konfirmasi", error);
-      setToast({ isOpen: true, message: error.response?.data?.message || "Gagal memproses pesanan.", type: 'error' });
-    }
-  };
-
-  // Filter logic
-  const getFilteredOrders = () => {
-    return orders.filter(order => {
-      const status = (order.orderStatus || order.status || '').toLowerCase();
-      if (activeTab === 'diproses') {
-        return status.includes('menunggu') || status.includes('proses') || status.includes('pending');
-      }
-      if (activeTab === 'dikirim') {
-        return status.includes('kirim') || status.includes('perjalanan');
-      }
-      if (activeTab === 'selesai') {
-        return status.includes('selesai') || status.includes('terima');
-      }
-      if (activeTab === 'dibatalkan') {
-        return status.includes('batal') || status.includes('expire');
-      }
-      return false; // fallback
-    });
-  };
-
-  const filteredOrders = getFilteredOrders();
+  // Hubungkan ke custom hook useRiwayatPembelian untuk mendapatkan semua state dan handler logika
+  const {
+    navigate,
+    activeTab, setActiveTab,         // State tab aktif (diproses/dikirim/selesai/batal) & fungsinya
+    isLoading,                        // Status loading fetch data
+    toast, setToast,                  // State notifikasi ToastAlert
+    confirmModal, setConfirmModal,    // State modal konfirmasi (batalkan/terima pesanan)
+    selectedOrder,                    // Objek pesanan yang sedang dipilih untuk modal detail
+    isModalDetailOpen, setIsModalDetailOpen, // State kontrol visibilitas modal detail
+    handleOpenDetail,                 // Handler membuka modal detail
+    handlePay,                        // Handler pemrosesan transaksi Midtrans Snap
+    handleConfirmClick,               // Handler klik konfirmasi pesanan diterima
+    handleCancelClick,                // Handler klik pembatalan pesanan
+    processConfirm,                   // Fungsi eksekusi akhir aksi konfirmasi
+    filteredOrders,                   // Array data pesanan yang sudah disaring per tab
+  } = useRiwayatPembelian();
 
   return (
     <div className="bg-[#f4f7f6] min-h-screen py-8">

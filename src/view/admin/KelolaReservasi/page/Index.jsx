@@ -1,98 +1,43 @@
-import React, { useState } from "react";
-import { useFetchReservasi } from "../hooks/useFetchReservasi";
-import { useUbahStatusReservasi } from "../hooks/useUbahStatusReservasi";
-import { useHapusReservasi } from "../hooks/useHapusReservasi";
-import { useTambahReservasi } from "../hooks/useTambahReservasi";
-
+import React from "react";
 import Tabel from "./Tabel";
 import ModalUbahStatus from "./ModalUbahStatus";
 import ModalDetail from "./ModalDetail";
 import ModalHapus from "./ModalHapus";
 import ModalTambahReservasi from "./ModalTambahReservasi";
 import ModalExportExcel from "./ModalExportExcel";
-import ToastAlert from "@/view/components/ToastAlert";
+import ToastAlert from "@/view/components/ToastAlert/page/Index";
+import { useKelolaReservasi } from "../hooks/useKelolaReservasi";
 
 export default function KelolaReservasi() {
-  const [selectedReservasi, setSelectedReservasi] = useState(null);
-
-  // State visibilitas modal
-  const [isStatusOpen, setIsStatusOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isHapusOpen, setIsHapusOpen] = useState(false);
-  const [isTambahOpen, setIsTambahOpen] = useState(false);
-  const [isExcelOpen, setIsExcelOpen] = useState(false);
-
-  // State toast notifikasi
-  const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
-  const showToast = (message, type = "success") => {
-    setToast({ isOpen: true, message, type });
-  };
-
-  // State pagination & search (Note: backend search not yet fully implemented, but we prepare state)
-  const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // HOOKS
-  const { dataReservasi, meta, isLoading, fetchReservasi } = useFetchReservasi(page);
-
-  const filteredReservasi = dataReservasi.filter(item => 
-    (item.namaCustomer?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (item.jenisTreatment?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (item.dokter?.nama?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (item.nomorWa?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (item.status?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-  );
-
-  const ubahStatusHook = useUbahStatusReservasi(
+  const {
     selectedReservasi,
-    () => {
-      setIsStatusOpen(false);
-      fetchReservasi();
-      showToast("Berhasil memperbarui reservasi");
-    },
-    isStatusOpen
-  );
-
-  const hapusHook = useHapusReservasi(
-    selectedReservasi,
-    () => {
-      setIsHapusOpen(false);
-      fetchReservasi();
-      showToast("Berhasil menghapus reservasi");
-    },
-    showToast
-  );
-
-  const { tambahReservasi, isSubmitting: isTambahSubmitting } = useTambahReservasi(
-    (msg) => {
-      setIsTambahOpen(false);
-      fetchReservasi();
-      showToast("Berhasil menambahkan reservasi");
-    },
-    (errMsg) => {
-      showToast(errMsg, "error");
-    }
-  );
-
-  // Handlers
-  const handleEditStatus = (item) => {
-    setSelectedReservasi(item);
-    setIsStatusOpen(true);
-  };
-
-  const handleDetail = (item) => {
-    setSelectedReservasi(item);
-    setIsDetailOpen(true);
-  };
-
-  const handleDelete = (item) => {
-    setSelectedReservasi(item);
-    setIsHapusOpen(true);
-  };
-
-  const handleTambahSubmit = (payload) => {
-    tambahReservasi(payload);
-  };
+    isStatusOpen,
+    setIsStatusOpen,
+    isDetailOpen,
+    setIsDetailOpen,
+    isHapusOpen,
+    setIsHapusOpen,
+    isTambahOpen,
+    setIsTambahOpen,
+    isExcelOpen,
+    setIsExcelOpen,
+    toast,
+    setToast,
+    page,
+    setPage,
+    searchTerm,
+    setSearchTerm,
+    filteredReservasi,
+    meta,
+    isLoading,
+    ubahStatusHook,
+    hapusHook,
+    isTambahSubmitting,
+    handleEditStatus,
+    handleDetail,
+    handleDelete,
+    handleTambahSubmit
+  } = useKelolaReservasi();
 
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen animate-in fade-in duration-700">

@@ -1,23 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useFetchProduk } from '../../KelolaProduk/hooks/useFetchProduk';
+import React from 'react';
+import { useModalExportExcel } from '../hooks/useModalExportExcel';
 
 export default function ModalExportExcel({ isOpen, onClose, onExport }) {
-  const { products } = useFetchProduk();
-  
-  const [filters, setFilters] = useState({
-    idProduk: 'semua',
-    tanggalMulai: '',
-    tanggalSelesai: ''
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleExport = () => {
-    onExport(filters);
-  };
+  const { products, filters, handleChange, handleExport } = useModalExportExcel(onExport);
 
   if (!isOpen) return null;
 

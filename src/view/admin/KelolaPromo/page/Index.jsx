@@ -1,87 +1,54 @@
-import React, { useState } from "react";
-import { useFetchPromo } from "../hooks/useFetchPromo";
-import { useTambahPromo } from "../hooks/useTambahPromo";
-import { useEditPromo } from "../hooks/useEditPromo";
-import { useHapusPromo } from "../hooks/useHapusPromo";
-
+import React from "react";
 import Header from "./Header";
 import SearchBar from '@/components/SearchBar';
-import { ChevronDown, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import Tabel from "./Tabel";
 import ModalTambahPromo from "./ModalTambahPromo";
 import ModalPerbaruiPromo from "./ModalPerbaruiPromo";
 import ModalHapusPromo from "./ModalHapusPromo";
 import ModalDetailPromo from "./ModalDetailPromo";
 import ModalDistribusiPromo from "./ModalDistribusiPromo";
-import ToastAlert from "@/view/components/ToastAlert";
+import ToastAlert from "@/view/components/ToastAlert/page/Index";
+import { useKelolaPromoHook } from "../hooks/useKelolaPromoHook";
 
 export default function KelolaPromo() {
-  // ─── STATE MODAL ──────────────────────────────────────────────────
-  const [isTambahOpen, setIsTambahOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isHapusOpen, setIsHapusOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isDistribusiOpen, setIsDistribusiOpen] = useState(false);
-  const [selectedPromo, setSelectedPromo] = useState(null);
-
-  // ─── STATE TOAST ──────────────────────────────────────────────────
-  const [toast, setToast] = useState(null);
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-  };
-
-  // ─── HOOKS DATA ───────────────────────────────────────────────────
-  const { dataPromo, searchQuery, setSearchQuery, fetchPromo, isLoading } = useFetchPromo();
-
   const {
-    formData: formTambah,
-    handleInputChange: handleInputTambah,
-    submitTambahPromo,
-    isSubmitting: isSubmittingTambah,
-    error: errorTambah,
-    resetForm: resetFormTambah,
-  } = useTambahPromo(() => {
-    setIsTambahOpen(false);
-    fetchPromo();
-  }, showToast);
-
-  const {
-    formData: formEdit,
-    handleInputChange: handleInputEdit,
-    submitEditPromo,
-    isSubmitting: isSubmittingEdit,
-    error: errorEdit,
-  } = useEditPromo(selectedPromo, () => {
-    setIsEditOpen(false);
-    fetchPromo();
-  }, showToast);
-
-  const { confirmDelete, updateStatusPromo } = useHapusPromo(
+    isTambahOpen,
+    setIsTambahOpen,
+    isEditOpen,
+    setIsEditOpen,
+    isHapusOpen,
+    setIsHapusOpen,
+    isDetailOpen,
+    setIsDetailOpen,
+    isDistribusiOpen,
+    setIsDistribusiOpen,
     selectedPromo,
-    () => fetchPromo(),
-    showToast
-  );
-
-  // ─── HANDLERS MODAL ───────────────────────────────────────────────
-  const handleOpenEdit = (promo) => {
-    setSelectedPromo(promo);
-    setIsEditOpen(true);
-  };
-
-  const handleOpenDetail = (promo) => {
-    setSelectedPromo(promo);
-    setIsDetailOpen(true);
-  };
-
-  const handleOpenDelete = (promo) => {
-    setSelectedPromo(promo);
-    setIsHapusOpen(true);
-  };
-
-  const handleSendPromo = (promo) => {
-    setSelectedPromo(promo);
-    setIsDistribusiOpen(true);
-  };
+    toast,
+    setToast,
+    showToast,
+    dataPromo,
+    searchQuery,
+    setSearchQuery,
+    isLoading,
+    formTambah,
+    handleInputTambah,
+    submitTambahPromo,
+    isSubmittingTambah,
+    errorTambah,
+    resetFormTambah,
+    formEdit,
+    handleInputEdit,
+    submitEditPromo,
+    isSubmittingEdit,
+    errorEdit,
+    confirmDelete,
+    updateStatusPromo,
+    handleOpenEdit,
+    handleOpenDetail,
+    handleOpenDelete,
+    handleSendPromo
+  } = useKelolaPromoHook();
 
   return (
     <div className="flex-1 w-full bg-[#F9FAFB] relative">
@@ -154,14 +121,12 @@ export default function KelolaPromo() {
         />
 
         {/* TOAST NOTIFICATION */}
-        {toast && toast.isOpen && (
-          <ToastAlert
-            isOpen={toast.isOpen}
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast({ ...toast, isOpen: false })}
-          />
-        )}
+        <ToastAlert
+          isOpen={toast.isOpen}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, isOpen: false })}
+        />
       </div>
     </div>
   );

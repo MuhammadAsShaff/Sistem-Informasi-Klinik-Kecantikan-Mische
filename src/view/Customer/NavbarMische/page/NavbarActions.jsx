@@ -1,16 +1,13 @@
 import React from "react";
 import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useCartContext } from "@/core/context/CartContext";
-
 /**
  * Komponen UI murni untuk aksi navbar (keranjang, tombol auth).
  * Semua data diterima dari props — tidak ada logic / hook di sini.
  *
- * @param {{ isLoggedIn: boolean, isAdmin: boolean }} props
+ * @param {{ isLoggedIn: boolean, isAdmin: boolean, cartCount: number }} props
  */
-const NavbarActions = ({ isLoggedIn, isAdmin }) => {
-  const { cartCount } = useCartContext();
+const NavbarActions = ({ isLoggedIn, isAdmin, cartCount }) => {
   
   const btnBaseClass =
     "rounded-full font-bold text-white shadow-xl transition-all active:scale-95";

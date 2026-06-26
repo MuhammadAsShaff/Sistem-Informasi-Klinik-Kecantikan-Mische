@@ -1,92 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { X, Search } from 'lucide-react';
+import { useDistribusiEvent } from '../hooks/useDistribusiEvent';
 
-import axiosClient from '@/core/api/axiosClient';
-import { endpoints } from '@/core/api/endpoints';
-
+/**
+ * =========================================================================
+ * KOMPONEN VIEW: ModalDistribusiEvent
+ * =========================================================================
+ * Komponen ini hanya menangani tampilan visual (UI/Layout) untuk membagikan/
+ * mendistribusikan event kepada customer.
+ * 
+ * Semua logika pengambilan data, pengiriman data ke server, dan state dikelola
+ * oleh custom hook `useDistribusiEvent`.
+ */
 export default function ModalDistribusiEvent({ isOpen, onClose, event, showToast }) {
-  const [targetType, setTargetType] = useState('Pilih Customer');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCustomers, setSelectedCustomers] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [isFetching, setIsFetching] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Memanggil custom hook untuk mendapatkan semua data & handler yang dibutuhkan
+  const {
+    targetType,
+    setTargetType,
+    searchQuery,
+    setSearchQuery,
+    selectedCustomers,
+    customers,
+    isFetching,
+    isSubmitting,
+    fetchCustomers,
+    handleCheckboxChange,
+    handleDistribute
+  } = useDistribusiEvent({ isOpen, onClose, event, showToast });
 
-  const fetchCustomers = async (search = '') => {
-    setIsFetching(true);
-    try {
-      const url = search ? `${endpoints.admin.distribusi.customers}?search=${encodeURIComponent(search)}` : endpoints.admin.distribusi.customers;
-      const res = await axiosClient.get(url);
-      console.log('Distribusi Customers Response:', res.data); // DEBUG: Lihat struktur data
-      if (res.data?.status === 'success') {
-        setCustomers(res.data.data.map(c => ({ id: c.idUser, name: c.nama, phone: c.nomorWa })));
-      }
-    } catch (error) {
-      console.error("Gagal mengambil data customer:", error);
-    } finally {
-      setIsFetching(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      console.log('Event terpilih untuk didistribusikan:', event); // DEBUG: Lihat id nya apa
-      setTargetType('Pilih Customer');
-      setSearchQuery('');
-      setSelectedCustomers([]);
-      fetchCustomers('');
-    }
-  }, [isOpen, event]);
-
-  useEffect(() => {
-    if (targetType === 'Semua Customer') {
-      setSelectedCustomers(customers.map(c => c.id));
-    } else {
-      setSelectedCustomers([]);
-    }
-  }, [targetType, customers]);
-
+  // Jika modal ditutup (isOpen = false), tidak merender apa-apa
   if (!isOpen) return null;
 
-  // Hapus filter client-side karena sekarang memanggil backend
+  // Menyalin daftar customer yang telah didapat dari hook ke variabel lokal untuk dirender
   const filteredCustomers = customers;
 
-  const handleCheckboxChange = (id) => {
-    if (targetType === 'Semua Customer') return; 
-    setSelectedCustomers(prev => 
-      prev.includes(id) ? prev.filter(cId => cId !== id) : [...prev, id]
-    );
-  };
-
-  const handleDistribute = async () => {
-    if (targetType === 'Pilih Customer' && selectedCustomers.length === 0) {
-      showToast('Pilih minimal satu customer untuk mendistribusikan event.', 'error');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const payload = {
-        idEvent: event?.idEvent || event?.idKegiatan || event?.id,
-        type: targetType === 'Semua Customer' ? 'all' : 'selected',
-        customer_ids: targetType === 'Semua Customer' ? [] : selectedCustomers
-      };
-      
-      console.log("Mencoba mengirim payload distribusi event:", payload);
-
-      const res = await axiosClient.post(endpoints.admin.distribusi.event, payload);
-      if (res.data?.status === 'success') {
-        const eventName = event?.namaKegiatan || event?.nama || 'ini';
-        showToast(`Event "${eventName}" berhasil didistribusikan!`, 'success');
-        onClose();
-      }
-    } catch (error) {
-      console.error("Gagal mendistribusikan event:", error);
-      showToast(error.response?.data?.message?.idKegiatan?.[0] || error.response?.data?.message || "Gagal mendistribusikan event", "error");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

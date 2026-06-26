@@ -1,3 +1,16 @@
+/* 
+ * =========================================================================
+ * BUKU PINTAR PETA WILAYAH (RAJA ONGKIR DATA)
+ * =========================================================================
+ * File ini ibarat "Buku Atlas" raksasa yang berisi kamus data seluruh 
+ * Provinsi dan Kabupaten/Kota di Indonesia.
+ * 
+ * Mengapa file ini diperlukan?
+ * Agar saat Customer mengisi alamat pengiriman di form, mereka bisa tinggal 
+ * pilih dari dropdown (tidak perlu mengetik manual). Data ID (angka) ini 
+ * yang akan dikirim ke Backend untuk menghitung ongkos kirim (Ongkir).
+ */
+
 export const PROVINCES = [
   { province_id: 1, province: "NUSA TENGGARA BARAT (NTB)" },
   { province_id: 2, province: "MALUKU" },

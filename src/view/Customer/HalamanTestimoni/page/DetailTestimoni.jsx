@@ -1,14 +1,11 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useTestimoniData } from '../hooks/useTestimoniData';
+import { Link } from 'react-router-dom';
+import { useDetailTestimoni } from '../hooks/useDetailTestimoni';
 import TestimoniHeader from './TestimoniHeader';
 
 const DetailTestimoni = () => {
-  const { id } = useParams();
-  const { testimonials } = useTestimoniData();
-
-  // Find the testimonial (dummy data, normally from API)
-  const testimonial = testimonials.find(t => t.id === parseInt(id));
+  // Seluruh logika pencarian data dipindahkan ke custom hook useDetailTestimoni
+  const { testimonial } = useDetailTestimoni();
 
   if (!testimonial) {
     return (

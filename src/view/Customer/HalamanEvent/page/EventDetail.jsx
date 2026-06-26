@@ -1,26 +1,11 @@
-import React, { useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
 import { Calendar, MapPin, ArrowLeft } from 'lucide-react';
 import gambarEvent from '@/assets/images/gambar event.png';
-import { endpoints, STORAGE_BASE_URL } from '@/core/api/endpoints';
-import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
+import { STORAGE_BASE_URL } from '@/core/api/endpoints';
+import { useEventDetail } from '../hooks/useEventDetail';
 
 export default function EventDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  const { data: rawEvent, isLoading } = useFetchWithCache(endpoints.customer.event, { ttl: 15000, revalidateOnMount: false });
-
-  const event = useMemo(() => {
-    if (!rawEvent) return null;
-    const eventData = rawEvent?.data?.data || rawEvent?.data || rawEvent;
-    const events = Array.isArray(eventData) ? eventData : [];
-    return events.find(e => (e.idEvent || e.id).toString() === id) || null;
-  }, [rawEvent, id]);
+  const { navigate, isLoading, event, formatTanggal } = useEventDetail();
 
   if (isLoading) {
     return (
@@ -38,11 +23,7 @@ export default function EventDetail() {
     );
   }
 
-  const formatTanggal = (dateString) => {
-    if (!dateString) return "";
-    const options = { day: 'numeric', month: 'short', year: 'numeric' };
-    return new Date(dateString).toLocaleDateString('id-ID', options);
-  };
+
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-10 pb-20">

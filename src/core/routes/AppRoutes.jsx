@@ -2,16 +2,16 @@ import React from 'react';
 import { Routes, Route } from "react-router-dom";
 
 // Layout
-import CustomerLayout from "@/view/Customer/CustomerLayout";
-import AdminLayout from "@/view/admin/AdminLayout";
+import CustomerLayout from "@/view/Customer/CustomerLayout/page/Index";
+import AdminLayout from "@/view/admin/AdminLayout/page/Index";
 
 // Customer Pages
 import LandingPage from "@/view/Customer/LandingPage/page/landingPage";
-import HalamanPromo from "@/view/Customer/HalamanPromo/Index";
+import HalamanPromo from "@/view/Customer/HalamanPromo/page/Index";
 import PromoDetail from "@/view/Customer/HalamanPromo/page/PromoDetail";
 import DetailJenisPerawatan from "@/view/Customer/DetailJenisPerawatan/page/Index";
 import ReservasiPage from "@/view/Customer/ReservasiPage/page/Index";
-import HalamanEvent from "@/view/Customer/HalamanEvent/Index";
+import HalamanEvent from "@/view/Customer/HalamanEvent/page/Index";
 import EventDetail from "@/view/Customer/HalamanEvent/page/EventDetail";
 import LoginPage from "@/view/authentication/Login/page/Index";
 import RegistrasiPage from "@/view/authentication/Registrasi/page/Index";
@@ -25,7 +25,7 @@ import RiwayatReservasiPage from "@/view/Customer/ProfilCustomer/page/RiwayatRes
 import RiwayatPembelianPage from "@/view/Customer/ProfilCustomer/page/RiwayatPembelian";
 import HalamanProduk from "@/view/Customer/HalamanProduk/page/Index";
 import DetailProduk from "@/view/Customer/HalamanProduk/page/DetailProduk";
-import DetailKeranjang from "@/view/Customer/DetailKeranjang/Index";
+import DetailKeranjang from "@/view/Customer/DetailKeranjang/page/Index";
 
 // Admin Pages
 import AdminDashboard from "@/view/admin/dashboard/page/Index";
@@ -44,7 +44,7 @@ import KelolaPromo from "@/view/admin/KelolaPromo/page/Index";
 import KelolaEvent from "@/view/admin/KelolaEvent/page/Index";
 import KelolaReservasi from "@/view/admin/KelolaReservasi/page/Index";
 import KelolaKategoriProduk from "@/view/admin/KelolaKategoriProduk/page/Index";
-import Page404 from "@/view/components/Page404";
+import Page404 from "@/view/components/Page404/page/Index";
 
 export default function AppRoutes() {
   return (

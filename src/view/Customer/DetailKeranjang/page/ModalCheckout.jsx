@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { X, MapPin, Loader2, Truck } from 'lucide-react';
-import { STORAGE_BASE_URL, endpoints } from '@/core/api/endpoints';
-import axiosClient from '@/core/api/axiosClient';
-import { useNavigate } from 'react-router-dom';
-import ToastAlert from '@/view/components/ToastAlert';
+import { STORAGE_BASE_URL } from '@/core/api/endpoints';
+import ToastAlert from '@/view/components/ToastAlert/page/Index';
 import { useCartContext } from '@/core/context/CartContext';
+import { useCheckout } from '../hooks/useCheckout';
 
 // Import Payment Method Images
 import imgBCA from '@/assets/images/MetodePembayaran/BCA.png';
@@ -17,6 +16,14 @@ import imgShopeePay from '@/assets/images/MetodePembayaran/SHOPEEPAY.png';
 import imgIndomaret from '@/assets/images/MetodePembayaran/INDOMARET.png';
 import imgAlfamart from '@/assets/images/MetodePembayaran/ALFAMART.png';
 
+/**
+ * =========================================================================
+ * KOMPONEN: ModalCheckout (VIEW CHECKOUT MURNI / VIEW)
+ * =========================================================================
+ * Komponen modal UI untuk memproses checkout belanja customer.
+ * Seluruh logika pemuatan alamat, perhitungan ongkir (RajaOngkir), caching data, 
+ * dan pembayaran (Midtrans Snap) dikelola oleh custom hook `useCheckout`.
+ */
 export default function ModalCheckout({ 
   isOpen, 
   onClose, 
@@ -26,180 +33,30 @@ export default function ModalCheckout({
   appliedVoucher
 }) {
   const { fetchCart } = useCartContext();
-  const navigate = useNavigate();
 
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState('');
-  
-  const [addresses, setAddresses] = useState([]);
-  const [selectedAddressId, setSelectedAddressId] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
-
-  const [shippingCosts, setShippingCosts] = useState([]);
-  const [isLoadingShipping, setIsLoadingShipping] = useState(false);
-  const [shippingCache, setShippingCache] = useState({});
-  const [selectedShipping, setSelectedShipping] = useState(null);
-
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
-
-  // Fetch addresses and reset state
-  useEffect(() => {
-    if (isOpen) {
-      if (appliedVoucher) {
-        setDiscountAmount(appliedVoucher.diskon_nominal ?? appliedVoucher.diskon ?? 0);
-      } else {
-        setDiscountAmount(0);
-      }
-      setPaymentMethod('');
-      fetchAddresses();
-    }
-  }, [isOpen, appliedVoucher]);
-
-  const fetchAddresses = async () => {
-    try {
-      const response = await axiosClient.get(endpoints.customer.alamat);
-      if (response.data?.status === 'success') {
-        const fetchedAddresses = response.data.data;
-        setAddresses(fetchedAddresses);
-        if (fetchedAddresses.length > 0) {
-          const utama = fetchedAddresses.find(a => a.is_utama);
-          setSelectedAddressId(utama ? utama.id : fetchedAddresses[0].id);
-        }
-      }
-    } catch (error) {
-      console.error('Gagal mengambil alamat:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen && selectedAddressId) {
-      fetchShippingCosts(selectedAddressId);
-    }
-  }, [isOpen, selectedAddressId]);
-
-  const fetchShippingCosts = async (alamatId) => {
-    // Retrieve cart IDs from selected items to send to the backend
-    const cartIds = selectedItems.map(item => item.idKeranjang || item.id);
-    const cartIdsString = [...cartIds].sort().join(',');
-    const cacheKey = `ongkir_${alamatId}_${cartIdsString}`;
-
-    // 1. Cek State Cache
-    if (shippingCache[cacheKey]) {
-      setShippingCosts(shippingCache[cacheKey]);
-      setSelectedShipping(null);
-      return;
-    }
-
-    // 2. Cek Session Storage Cache (persisten selama browser terbuka)
-    const sessionData = sessionStorage.getItem(cacheKey);
-    if (sessionData) {
-      const parsed = JSON.parse(sessionData);
-      setShippingCosts(parsed);
-      setShippingCache(prev => ({ ...prev, [cacheKey]: parsed }));
-      setSelectedShipping(null);
-      return;
-    }
-
-    setIsLoadingShipping(true);
-    setShippingCosts([]);
-    setSelectedShipping(null);
-
-    try {
-      const res = await axiosClient.post(endpoints.customer.rajaongkirCostByAddress, {
-        idAlamat: alamatId,
-        cart_ids: cartIds
-      });
-
-      if (res.data?.success) {
-        const ongkirData = res.data.data;
-        setShippingCosts(ongkirData);
-        setShippingCache(prev => ({ ...prev, [cacheKey]: ongkirData }));
-        sessionStorage.setItem(cacheKey, JSON.stringify(ongkirData));
-      }
-    } catch (error) {
-      console.error("Gagal mengambil ongkir", error);
-    } finally {
-      setIsLoadingShipping(false);
-    }
-  };
-
-  const handleCheckout = async () => {
-    if (!selectedAddressId) {
-      setToast({ isOpen: true, message: 'Harap lengkapi alamat pengiriman!', type: 'warning' });
-      return;
-    }
-
-    if (!selectedShipping) {
-      setToast({ isOpen: true, message: 'Harap pilih opsi pengiriman!', type: 'warning' });
-      return;
-    }
-
-    if (!paymentMethod) {
-      setToast({ isOpen: true, message: 'Harap pilih metode pembayaran!', type: 'warning' });
-      return;
-    }
-
-    setIsCheckingOut(true);
-    try {
-      const payload = {
-        cart_ids: selectedItems.map(item => item.idKeranjang || item.id),
-        idAlamat: selectedAddressId,
-        shippingCourier: selectedShipping.code,
-        shippingService: selectedShipping.service,
-        shippingCost: selectedShipping.value,
-        idPromo: appliedVoucher ? appliedVoucher.idPromo : null,
-        paymentMethod: paymentMethod === 'semua' ? [] : [paymentMethod]
-      };
-
-      const response = await axiosClient.post(endpoints.customer.checkout, payload);
-      
-      const responseData = response.data;
-      if ((responseData?.success || responseData?.status === 'success') && responseData?.data?.snap_token) {
-        // 1. Refresh keranjang di background agar ter-update
-        fetchCart();
-        // 2. Tutup Modal Checkout agar tidak tumpang tindih dengan Midtrans
-        onClose();
-        
-        // 3. Beri sedikit jeda agar animasi tutup modal selesai, lalu panggil Midtrans
-        setTimeout(() => {
-          window.snap.pay(responseData.data.snap_token, {
-            onSuccess: async function(result){
-              try {
-                await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id });
-              } catch (e) { console.error('Gagal sinkronisasi status', e); }
-              navigate('/ProfilCustomer/riwayat-pembelian');
-            },
-            onPending: async function(result){
-              try {
-                await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id });
-              } catch (e) { console.error('Gagal sinkronisasi status', e); }
-              navigate('/ProfilCustomer/riwayat-pembelian');
-            },
-            onError: async function(result){
-              if (result && result.order_id) {
-                 try { await axiosClient.post(endpoints.customer.checkStatus, { order_id: result.order_id }); } catch (e) {}
-              }
-              navigate('/ProfilCustomer/riwayat-pembelian');
-            },
-            onClose: function(){
-              navigate('/ProfilCustomer/riwayat-pembelian');
-            }
-          });
-        }, 300);
-      } else {
-        setToast({ isOpen: true, message: response.data?.message || 'Gagal membuat pesanan.', type: 'error' });
-      }
-    } catch (error) {
-      console.error('Error during checkout:', error);
-      setToast({ isOpen: true, message: error.response?.data?.message || 'Terjadi kesalahan sistem saat checkout.', type: 'error' });
-    } finally {
-      setIsCheckingOut(false);
-    }
-  };
-
-  const grandTotal = totalAmount - discountAmount + (selectedShipping?.value || 0);
-  const selectedAddress = addresses.find(a => a.id === selectedAddressId) || addresses[0];
+  // Memakai custom hook useCheckout untuk memisahkan seluruh logika bisnis dari visual JSX
+  const {
+    discountAmount,
+    paymentMethod, setPaymentMethod,               // Pilihan metode bayar
+    addresses,                                      // Array daftar alamat
+    selectedAddressId, setSelectedAddressId,       // Alamat terpilih
+    isDropdownOpen, setIsDropdownOpen,             // Dropdown toggle
+    toast, setToast,                                // Umpan balik notifikasi
+    shippingCosts,                                  // Tarif kurir dari RajaOngkir
+    isLoadingShipping,                              // Status loading hitung tarif
+    selectedShipping, setSelectedShipping,          // Tarif kurir terpilih
+    isCheckingOut,                                  // Status loading submit pesanan
+    handleCheckout,                                 // Trigger submit & pay
+    grandTotal,                                     // Total harga akhir
+    selectedAddress                                 // Objek alamat pengiriman aktif
+  } = useCheckout({
+    isOpen,
+    onClose,
+    selectedItems,
+    totalAmount,
+    appliedVoucher,
+    fetchCart
+  });
 
   if (!isOpen) return null;
 

@@ -1,28 +1,19 @@
-import React, { useState } from "react";
-import { useFetchProfilAdmin } from "../hooks/useFetchProfilAdmin";
-import { useUpdateProfilAdmin } from "../hooks/useUpdateProfilAdmin";
-
+import React from "react";
 import Header from "./Header";
 import Banner from "./Banner";
 import ProfilForm from "./ProfilForm";
-import ToastAlert from "@/view/components/ToastAlert";
+import ToastAlert from "@/view/components/ToastAlert/page/Index";
+import { useProfilAdminPage } from "../hooks/useProfilAdminPage";
 
 export default function KelolaProfilAdmin() {
-  // State toast notifikasi
-  const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
-  const showToast = (message, type = "success") => {
-    setToast({ isOpen: true, message, type });
-  };
-
-  // ─── HOOK: READ ───────────────────────────────────────────────
-  const { userData, setUserData, isLoading } = useFetchProfilAdmin();
-
-  // ─── HOOK: UPDATE ─────────────────────────────────────────────
-  const profilHook = useUpdateProfilAdmin(
-    userData,
+  const {
+    toast,
+    setToast,
     showToast,
-    (updatedUser) => setUserData(updatedUser)
-  );
+    userData,
+    setUserData,
+    profilHook
+  } = useProfilAdminPage();
 
   return (
     <div className="w-full bg-white p-6 md:p-10">

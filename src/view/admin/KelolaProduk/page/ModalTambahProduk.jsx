@@ -1,79 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { X, Upload } from 'lucide-react';
-import { useTambahProduk } from '../hooks/useTambahProduk';
-import { useFetchKategori } from '../../KelolaKategoriProduk/hooks/useFetchKategori';
+import { useModalTambahProduk } from '../hooks/useModalTambahProduk';
 
 const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
-  const [nama, setNama] = useState('');
-  const [harga, setHarga] = useState('');
-  const [stock, setStock] = useState('');
-  const [berat, setBerat] = useState('');
-  const [kategori, setKategori] = useState('');
-  const [deskripsi, setDeskripsi] = useState('');
-  const [gambar, setGambar] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const { tambahProduk } = useTambahProduk(refetch);
-  const { categories } = useFetchKategori();
-
-  // Reset fields when opened
-  useEffect(() => {
-    if (isOpen) {
-      setNama('');
-      setHarga('');
-      setStock('');
-      setBerat('');
-      setKategori('');
-      setDeskripsi('');
-      setGambar(null);
-      setPreview(null);
-    }
-  }, [isOpen]);
+  const {
+    nama, setNama,
+    harga, setHarga,
+    stock, setStock,
+    berat, setBerat,
+    kategori, setKategori,
+    deskripsi, setDeskripsi,
+    gambar,
+    preview,
+    isSubmitting,
+    categories,
+    handleImageChange,
+    handleSave
+  } = useModalTambahProduk(isOpen, refetch, showToast, onClose);
 
   if (!isOpen) return null;
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setGambar(file);
-      const objectUrl = URL.createObjectURL(file);
-      setPreview(objectUrl);
-    }
-  };
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    if (!nama || !harga || !stock || !berat || !kategori) {
-      showToast('Mohon isi semua field yang wajib', 'error');
-      return;
-    }
-
-    setIsSubmitting(true);
-    const formData = new FormData();
-    formData.append('nama', nama);
-    formData.append('harga', harga);
-    formData.append('stock', stock);
-    formData.append('berat', berat);
-    formData.append('idKategori', kategori);
-    if (deskripsi) formData.append('deskripsi', deskripsi);
-    if (gambar) formData.append('gambar', gambar);
-
-    const result = await tambahProduk(formData);
-    setIsSubmitting(false);
-
-    if (result.success) {
-      showToast("Berhasil menambahkan produk", 'success');
-      onClose();
-    } else {
-      let errorDetail = result.message;
-      if (result.errors) {
-        const firstErrorKey = Object.keys(result.errors)[0];
-        errorDetail = result.errors[firstErrorKey][0];
-      }
-      showToast(errorDetail, 'error');
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

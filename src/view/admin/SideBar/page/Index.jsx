@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
 import {
   LayoutDashboard, Package, Ticket, Calendar, LineChart,
   UserRound, Users, ClipboardList, Clock, Tags,
@@ -10,14 +10,14 @@ import { useSideBar } from "../hooks/useSideBar";
 import ModalKonfirmasiLogout from "./ModalKonfirmasiLogout";
 
 export default function AdminNavbar() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const currentPath = location.pathname;
-
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-
   // ─── HOOK ─────────────────────────────────────────────────────
-  const { user, handleLogout } = useSideBar();
+  const { 
+    user, 
+    handleLogout, 
+    currentPath, 
+    isLogoutModalOpen, 
+    setIsLogoutModalOpen 
+  } = useSideBar();
 
   const menuItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={20} /> },
@@ -86,7 +86,7 @@ export default function AdminNavbar() {
       <ModalKonfirmasiLogout
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
-        onConfirm={() => handleLogout(navigate)}
+        onConfirm={handleLogout}
       />
     </div>
   );

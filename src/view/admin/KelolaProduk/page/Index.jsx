@@ -1,54 +1,46 @@
-import React, { useState } from 'react';
+import React from 'react';
 import HeaderSection from './HeaderSection';
 import SearchBar from '@/components/SearchBar';
-import { ChevronDown, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import TableSection from './TableSection';
-import { useFetchProduk } from '../hooks/useFetchProduk';
-import { useUpdateStok } from '../hooks/useUpdateStok';
 import ModalTambahProduk from './ModalTambahProduk';
 import ModalPerbaruiProduk from './ModalPerbaruiProduk';
 import ModalHapusProduk from './ModalHapusProduk';
 import ModalDetailProduk from './ModalDetailProduk';
 import Pagination from '@/components/Pagination';
-import ToastAlert from '@/view/components/ToastAlert';
+import ToastAlert from '@/view/components/ToastAlert/page/Index';
+import { useKelolaProduk } from '../hooks/useKelolaProduk';
 
 const KelolaProduk = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedDetailCategory, setSelectedDetailCategory] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const { products, refetch, updateLocalStock, isLoading } = useFetchProduk();
-  const { updateStok } = useUpdateStok(updateLocalStock);
-
-  const filteredCategories = products.filter(product =>
-    (product.nama?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-    (product.deskripsi?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-    (product.kategori?.nama?.toLowerCase() || '').includes(searchQuery.toLowerCase())
-  );
-
-  const [toast, setToast] = useState(null);
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-  };
-
-  // Pagination Logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
-  const totalPages = Math.ceil(filteredCategories.length / ITEMS_PER_PAGE);
-
-  // Reset to first page when search changes
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
-  const paginatedCategories = filteredCategories.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const {
+    isLoading,
+    refetch,
+    updateStok,
+    searchQuery,
+    setSearchQuery,
+    paginatedCategories,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    ITEMS_PER_PAGE,
+    isModalOpen,
+    setIsModalOpen,
+    isEditModalOpen,
+    setIsEditModalOpen,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isDetailModalOpen,
+    setIsDetailModalOpen,
+    deleteId,
+    selectedCategory,
+    selectedDetailCategory,
+    toast,
+    setToast,
+    showToast,
+    handleDeleteClick,
+    handleEditClick,
+    handleDetailClick
+  } = useKelolaProduk();
 
   return (
     <div className="p-8 font-sans w-full bg-[#f8f9fa] min-h-screen relative animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -67,18 +59,9 @@ const KelolaProduk = () => {
       />
       <TableSection isLoading={isLoading} 
         categories={paginatedCategories} 
-        onDeleteClick={(id) => {
-          setDeleteId(id);
-          setIsDeleteModalOpen(true);
-        }} 
-        onEditClick={(category) => {
-          setSelectedCategory(category);
-          setIsEditModalOpen(true);
-        }}
-        onDetailClick={(category) => {
-          setSelectedDetailCategory(category);
-          setIsDetailModalOpen(true);
-        }}
+        onDeleteClick={handleDeleteClick} 
+        onEditClick={handleEditClick}
+        onDetailClick={handleDetailClick}
         onUpdateStock={updateStok}
         showToast={showToast}
         currentPage={currentPage}
@@ -120,14 +103,12 @@ const KelolaProduk = () => {
         data={selectedDetailCategory}
       />
 
-      {toast && toast.isOpen && (
-        <ToastAlert
-          isOpen={toast.isOpen}
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast({ ...toast, isOpen: false })}
-        />
-      )}
+      <ToastAlert
+        isOpen={toast.isOpen}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, isOpen: false })}
+      />
     </div>
   );
 };

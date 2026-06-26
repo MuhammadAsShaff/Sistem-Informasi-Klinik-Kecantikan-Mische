@@ -1,11 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import gambarEvent from '@/assets/images/gambar event.png';
 import bgEvent from '@/assets/images/gambar event yang berlangsung.png';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
 export default function EventCard({ event }) {
-  const navigate = useNavigate();
 
   const formatTanggalSingkat = (dateString) => {
     if (!dateString) return "";
@@ -14,8 +13,8 @@ export default function EventCard({ event }) {
   };
 
   return (
-    <div 
-      onClick={() => navigate(`/event/${event.idEvent || event.id}`)}
+    <Link 
+      to={`/event/${event.idEvent || event.id}`}
       className="bg-white rounded-tl-[60px] rounded-br-[60px] shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col group"
     >
       {/* Image Container */}
@@ -44,6 +43,6 @@ export default function EventCard({ event }) {
           {event.deskripsi}
         </p>
       </div>
-    </div>
+    </Link>
   );
 }

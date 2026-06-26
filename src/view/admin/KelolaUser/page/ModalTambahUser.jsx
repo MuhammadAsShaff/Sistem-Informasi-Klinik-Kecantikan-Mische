@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { X, Eye, EyeOff } from "lucide-react";
-import { PROVINCES, CITIES } from "@/core/utils/rajaOngkirData";
+import { PROVINCES } from "@/core/utils/rajaOngkirData";
+import { useModalTambahUser } from "../hooks/useModalTambahUser";
 
 /**
  * Modal untuk menambah user baru.
@@ -8,17 +9,15 @@ import { PROVINCES, CITIES } from "@/core/utils/rajaOngkirData";
  * yang dipass lewat prop `hook`.
  */
 export default function ModalTambahUser({ isOpen, onClose, hook }) {
-  const { formData, setFormData, showPassword, setShowPassword, handleChange, handleSubmit } = hook;
-
-  const [localCities, setLocalCities] = useState([]);
-
-  const fetchCities = (provinceId) => {
-    if (!provinceId) {
-      setLocalCities([]);
-      return;
-    }
-    setLocalCities(CITIES[provinceId] || []);
-  };
+  const {
+    formData,
+    showPassword,
+    setShowPassword,
+    handleChange,
+    handleSubmit,
+    localCities,
+    fetchCities
+  } = useModalTambahUser(hook);
 
   if (!isOpen) return null;
 

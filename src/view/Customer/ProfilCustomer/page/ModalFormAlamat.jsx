@@ -1,64 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import { useModalFormAlamat } from '../hooks/useModalFormAlamat';
 import { X } from 'lucide-react';
-import ToastAlert from '@/view/components/ToastAlert';
+import ToastAlert from '@/view/components/ToastAlert/page/Index';
 
 const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCities }) => {
-  const [formData, setFormData] = useState({
-    namaPenerima: '',
-    nomorHp: '',
-    provinceId: '',
-    cityId: '',
-    kecamatan: '',
-    kodePos: '',
-    detailAlamat: ''
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' });
-
-  useEffect(() => {
-    if (isOpen) {
-      setFormData({
-        namaPenerima: '',
-        nomorHp: '',
-        provinceId: '',
-        cityId: '',
-        kecamatan: '',
-        kodePos: '',
-        detailAlamat: ''
-      });
-    }
-  }, [isOpen]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'nomorHp') {
-      setFormData(prev => ({ ...prev, [name]: value.replace(/\D/g, '') }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
-
-    if (name === 'provinceId') {
-      setFormData(prev => ({ ...prev, cityId: '' }));
-      fetchCities(value);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.namaPenerima || !formData.nomorHp || !formData.provinceId || !formData.cityId || !formData.kecamatan || !formData.kodePos || !formData.detailAlamat) {
-      setToast({ isOpen: true, message: "Harap lengkapi semua field bertanda *", type: "warning" });
-      return;
-    }
-
-    setIsSubmitting(true);
-    const success = await onSave(formData);
-    setIsSubmitting(false);
-    
-    if (success) {
-      onClose();
-    }
-  };
+  const {
+    formData,
+    isSubmitting,
+    toast,
+    closeToast,
+    handleChange,
+    handleSubmit
+  } = useModalFormAlamat(isOpen, onClose, onSave, fetchCities);
 
   if (!isOpen) return null;
 
@@ -157,7 +109,7 @@ const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCiti
         isOpen={toast.isOpen} 
         message={toast.message} 
         type={toast.type} 
-        onClose={() => setToast({ ...toast, isOpen: false })} 
+        onClose={closeToast} 
       />
     </div>
   );

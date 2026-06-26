@@ -1,50 +1,60 @@
+/* 1. Mengambil jenis font (tulisan) 'Poppins' dari Google Fonts agar website terlihat modern */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+/* 2. Memanggil framework Tailwind CSS (alat bantu untuk mempercantik desain website dengan praktis) */
 @import "tailwindcss";
 
+/* 3. Mengatur tema bawaan Tailwind agar otomatis menggunakan font 'Poppins' sebagai tulisan utamanya */
 @theme {
   --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
   --font-serif: 'Poppins', ui-serif, Georgia, serif;
 }
 
+/* 4. Menambahkan plugin Flowbite (kumpulan tombol dan desain tambahan) ke dalam Tailwind */
 @plugin "flowbite-react/plugin/tailwindcss";
 @source "../.flowbite-react/class-list.json";
 @import "flowbite";
 
+/* 5. Memaksa secara paksa (!important) agar seluruh halaman dan elemen di website selalu memakai font Poppins */
 @layer base {
   *, html, body {
     font-family: 'Poppins', sans-serif !important;
   }
 }
 
+/* 6. Membuat kelas bantuan (utility) bernama '.no-scrollbar' untuk menghilangkan visual kotak gulir (scroll bar) di layar, 
+      tetapi layar tetap bisa di-scroll (digeser) dengan mouse atau tangan. */
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
-    display: none;
+    display: none; /* Menyembunyikan scrollbar di browser Chrome/Safari/Edge */
   }
   .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none; /* Menyembunyikan scrollbar di browser lama (Internet Explorer) */
+    scrollbar-width: none; /* Menyembunyikan scrollbar di browser Firefox */
   }
 }
 
-/* Swiper Custom Pagination */
+/* 7. Mengatur warna titik-titik (indikator halaman) pada fitur Carousel/Swiper (Slider Gambar) */
 .swiper-pagination-bullet {
-  background: #85C583 !important;
-  opacity: 0.5;
+  background: #85C583 !important; /* Warna titik dibuat hijau pucat saat tidak dipilih */
+  opacity: 0.5; /* Tingkat transparansi titik agar tidak terlalu mencolok */
 }
 
+/* 8. Mengubah bentuk titik indikator slide KETIKA sedang dipilih/aktif (yang sedang tampil di layar) */
 .swiper-pagination-bullet-active {
-  background: #ffffff !important;
-  opacity: 1;
-  width: 24px;
-  border-radius: 4px;
+  background: #ffffff !important; /* Warnanya berubah jadi putih bersih */
+  opacity: 1; /* Tidak transparan sama sekali */
+  width: 24px; /* Lebarnya dipanjangkan dari bentuk bulat menjadi bentuk kapsul */
+  border-radius: 4px; /* Sudutnya dibuat sedikit melengkung */
 }
 
-/* Hide number input spinners */
+/* 9. Menghilangkan tombol panah kecil naik/turun bawaan browser yang biasanya muncul di dalam kotak input angka (nomor WA, harga, dll).
+      Tujuannya agar tampilan form terlihat lebih rapi dan bersih. */
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button {
-  -webkit-appearance: none;
+  -webkit-appearance: none; /* Menghilangkan panah di browser Chrome dan Safari */
   margin: 0;
 }
 input[type='number'] {
-  -moz-appearance: textfield;
+  -moz-appearance: textfield; /* Menghilangkan panah di browser Firefox */
 }

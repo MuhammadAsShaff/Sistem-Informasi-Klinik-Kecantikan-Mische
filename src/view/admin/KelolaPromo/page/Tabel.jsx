@@ -1,22 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { PencilLine, Trash2, Send, Eye } from "lucide-react";
 import { STORAGE_BASE_URL } from "@/core/api/endpoints";
 import Table from '@/components/Table';
 import Pagination from '@/components/Pagination';
+import { useKelolaPromoTabel, useStatusDropdown } from "../hooks/useKelolaPromoTabel";
 
 const StatusDropdown = ({ status, onChange }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const dropdownRef = React.useRef(null);
-
-  React.useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const { isOpen, setIsOpen, dropdownRef } = useStatusDropdown();
 
   return (
     <div className="relative inline-block text-left" ref={dropdownRef}>
@@ -71,14 +61,13 @@ const StatusDropdown = ({ status, onChange }) => {
 };
 
 export default function Tabel({ isLoading, data, onEdit, onDelete, onDetail, onSend, updateStatus }) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-
-  const paginatedData = data.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const {
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    totalPages,
+    paginatedData
+  } = useKelolaPromoTabel(data);
 
   const columns = [
     { label: 'No', render: (item, index) => index, className: 'w-16', cellClassName: 'align-top' },

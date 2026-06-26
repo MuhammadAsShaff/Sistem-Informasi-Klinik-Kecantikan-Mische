@@ -1,92 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { X, Search } from 'lucide-react';
+import { useDistribusiPromo } from '../hooks/useDistribusiPromo';
 
-import axiosClient from '@/core/api/axiosClient';
-import { endpoints } from '@/core/api/endpoints';
-
+/**
+ * =========================================================================
+ * KOMPONEN: ModalDistribusiPromo (VIEW DISTRIBUSI PROMO - VIEW)
+ * =========================================================================
+ * Komponen modal UI untuk mendistribusikan promo ke daftar customer terdaftar.
+ * Logika pengambilan data customer dan post payload dikelola oleh hook `useDistribusiPromo`.
+ */
 export default function ModalDistribusiPromo({ isOpen, onClose, promo, showToast }) {
-  const [targetType, setTargetType] = useState('Pilih Customer');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCustomers, setSelectedCustomers] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [isFetching, setIsFetching] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const fetchCustomers = async (search = '') => {
-    setIsFetching(true);
-    try {
-      const url = search ? `${endpoints.admin.distribusi.customers}?search=${encodeURIComponent(search)}` : endpoints.admin.distribusi.customers;
-      const res = await axiosClient.get(url);
-      console.log('Distribusi Customers Response:', res.data); // DEBUG: Lihat struktur data
-      if (res.data?.status === 'success') {
-        setCustomers(res.data.data.map(c => ({ id: c.idUser, name: c.nama, phone: c.nomorWa })));
-      }
-    } catch (error) {
-      console.error("Gagal mengambil data customer:", error);
-    } finally {
-      setIsFetching(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      console.log('Promo terpilih untuk didistribusikan:', promo); // DEBUG: Lihat id nya apa
-      setTargetType('Pilih Customer');
-      setSearchQuery('');
-      setSelectedCustomers([]);
-      fetchCustomers('');
-    }
-  }, [isOpen, promo]);
-
-  useEffect(() => {
-    if (targetType === 'Semua Customer') {
-      setSelectedCustomers(customers.map(c => c.id));
-    } else {
-      setSelectedCustomers([]);
-    }
-  }, [targetType, customers]);
+  // Destrukturisasi state dan handler dari custom hook
+  const {
+    targetType, setTargetType,
+    searchQuery, setSearchQuery,
+    selectedCustomers,
+    customers,
+    isFetching,
+    isSubmitting,
+    fetchCustomers,
+    handleCheckboxChange,
+    handleDistribute
+  } = useDistribusiPromo({ isOpen, onClose, promo, showToast });
 
   if (!isOpen) return null;
 
-  // Hapus filter client-side karena sekarang memanggil backend
+  // Tampilkan data customer yang tersimpan di state hook
   const filteredCustomers = customers;
-
-  const handleCheckboxChange = (id) => {
-    if (targetType === 'Semua Customer') return; 
-    setSelectedCustomers(prev => 
-      prev.includes(id) ? prev.filter(cId => cId !== id) : [...prev, id]
-    );
-  };
-
-  const handleDistribute = async () => {
-    if (targetType === 'Pilih Customer' && selectedCustomers.length === 0) {
-      showToast('Pilih minimal satu customer untuk mendistribusikan promo.', 'error');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const payload = {
-        idPromo: promo?.idPromo || promo?.id_promo || promo?.id,
-        type: targetType === 'Semua Customer' ? 'all' : 'selected',
-        customer_ids: targetType === 'Semua Customer' ? [] : selectedCustomers
-      };
-
-      console.log("Mencoba mengirim payload distribusi promo:", payload);
-
-      const res = await axiosClient.post(endpoints.admin.distribusi.promo, payload);
-      if (res.data?.status === 'success') {
-        const promoName = promo?.namaPromo || promo?.nama || 'ini';
-        showToast(`Promo "${promoName}" berhasil didistribusikan!`, 'success');
-        onClose();
-      }
-    } catch (error) {
-      console.error("Gagal mendistribusikan promo:", error);
-      showToast(error.response?.data?.message?.idPromo?.[0] || error.response?.data?.message || "Gagal mendistribusikan promo", "error");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

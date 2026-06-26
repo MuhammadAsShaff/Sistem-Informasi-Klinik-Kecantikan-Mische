@@ -1,37 +1,19 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar, Hash, Stethoscope, Eye } from 'lucide-react';
 import ModalDetailReservasi from './ModalDetailReservasi';
-import { useFetchMyReservasi } from '../../ReservasiPage/hooks/useFetchMyReservasi';
+import { useRiwayatReservasi } from '../hooks/useRiwayatReservasi';
 
 export default function RiwayatReservasi() {
-  const navigate = useNavigate();
-  const { myReservasi, isLoading } = useFetchMyReservasi();
-  const [selectedReservasi, setSelectedReservasi] = React.useState(null);
-  const [isModalDetailOpen, setIsModalDetailOpen] = React.useState(false);
-
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'Selesai': 
-      case 'Dikonfirmasi': 
-      case 'Konfirmasi':
-      case 'Datang':
-        return 'bg-[#d1f4cc] text-[#2c7a20]';
-      case 'Menunggu':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'Batal':
-      case 'Dibatalkan':
-      case 'Tidak Datang':
-        return 'bg-red-100 text-red-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
-
-  const handleOpenDetail = (reservasi) => {
-    setSelectedReservasi(reservasi);
-    setIsModalDetailOpen(true);
-  };
+  const {
+    navigate,
+    myReservasi,
+    isLoading,
+    selectedReservasi,
+    isModalDetailOpen,
+    getStatusColor,
+    handleOpenDetail,
+    handleCloseDetail
+  } = useRiwayatReservasi();
 
   return (
     <div className="w-full min-h-screen bg-[#FAF8F5] py-8 md:py-12 px-4 md:px-10 font-poppins">
@@ -77,7 +59,7 @@ export default function RiwayatReservasi() {
                         #{item.idReservasi || 'REV-' + Math.floor(Math.random() * 10000)}
                       </td>
                       <td className="px-6 py-5 text-gray-700 font-medium">
-                        {item.jenisTreatment}
+                        {item.jenisReservasi || item.jenisTreatment || "-"}
                       </td>
                       <td className="px-6 py-5 text-gray-600">
                         {item.tanggalReservasi}
@@ -127,7 +109,7 @@ export default function RiwayatReservasi() {
       
       <ModalDetailReservasi 
         isOpen={isModalDetailOpen} 
-        onClose={() => setIsModalDetailOpen(false)} 
+        onClose={handleCloseDetail}
         selectedReservasi={selectedReservasi} 
       />
     </div>

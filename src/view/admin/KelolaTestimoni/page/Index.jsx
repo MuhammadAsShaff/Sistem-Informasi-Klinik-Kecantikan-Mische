@@ -1,58 +1,36 @@
-import React, { useState } from "react";
+import React from "react";
 import Tabel from "./Tabel";
 import ModalTambah from "./ModalTambah";
 import ModalEdit from "./ModalEdit";
 import ModalHapus from "./ModalHapus";
 import Pagination from '@/components/Pagination';
-import { useFetchTestimoni } from "../hooks/useFetchTestimoni";
-import ToastAlert from "@/view/components/ToastAlert";
+import ToastAlert from "@/view/components/ToastAlert/page/Index";
+import { useKelolaTestimoni } from "../hooks/useKelolaTestimoni";
 
 export default function KelolaTestimoni() {
-  const [isTambahOpen, setIsTambahOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isHapusOpen, setIsHapusOpen] = useState(false);
-  
-  const [selectedData, setSelectedData] = useState(null);
-  
-  const [toast, setToast] = useState(null);
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-  };
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const { testimoni, isLoading, refetch } = useFetchTestimoni();
-
-  const filteredTestimoni = testimoni.filter(item => 
-    (item.namaTester?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (item.deskripsi?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (item.jenisTestimoni?.toLowerCase() || '').includes(searchTerm.toLowerCase())
-  );
-
-  // Pagination Logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
-  const totalPages = Math.ceil(filteredTestimoni.length / ITEMS_PER_PAGE);
-
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  const paginatedTestimoni = filteredTestimoni.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
-  const handleEdit = (item) => {
-    setSelectedData(item);
-    setIsEditOpen(true);
-  };
-
-  const handleDelete = (item) => {
-    setSelectedData(item);
-    setIsHapusOpen(true);
-  };
-
-  // Modals handle API calls internally and call refetch, so we only need to pass refetch and showToast
+  const {
+    isTambahOpen,
+    setIsTambahOpen,
+    isEditOpen,
+    setIsEditOpen,
+    isHapusOpen,
+    setIsHapusOpen,
+    selectedData,
+    toast,
+    setToast,
+    showToast,
+    searchTerm,
+    setSearchTerm,
+    isLoading,
+    refetch,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    ITEMS_PER_PAGE,
+    paginatedTestimoni,
+    handleEdit,
+    handleDelete
+  } = useKelolaTestimoni();
 
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen animate-in fade-in duration-700">
@@ -132,14 +110,12 @@ export default function KelolaTestimoni() {
           showToast={showToast}
         />
 
-        {toast && toast.isOpen && (
-          <ToastAlert
-            isOpen={toast.isOpen}
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast({ ...toast, isOpen: false })}
-          />
-        )}
+        <ToastAlert
+          isOpen={toast.isOpen}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ ...toast, isOpen: false })}
+        />
       </div>
     </div>
   );

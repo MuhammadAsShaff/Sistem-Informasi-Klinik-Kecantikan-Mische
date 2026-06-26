@@ -1,7 +1,7 @@
 export const API_BASE_URL = 'http://127.0.0.1:8000/api';
 export const STORAGE_BASE_URL = 'http://127.0.0.1:8000/storage/';
 
-// Sentralisasi endpoint agar tidak ada hardcode URL string di komponen atau hook
+// Buku alamat pusat (Kamus URL). Semua alamat API dikumpulkan di sini supaya kita tidak perlu mengetik ulang alamat yang sama satu per satu di setiap halaman.
 export const endpoints = {
   auth: {
     login: '/auth/login',

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { useUbahPasswordAdmin } from "../hooks/useUbahPasswordAdmin";
+import React from "react";
 import ModalUbahPasswordAdmin from "./ModalUbahPasswordAdmin";
+import { useProfilForm } from "../hooks/useProfilForm";
 
 /**
  * Form profil admin — pure UI.
@@ -9,18 +9,12 @@ import ModalUbahPasswordAdmin from "./ModalUbahPasswordAdmin";
  */
 const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
   const { formData, handleChange, handleSimpan } = hook;
-
-  const [isModalPasswordOpen, setIsModalPasswordOpen] = useState(false);
-
-  // ─── HOOK: UBAH PASSWORD ───────────────────────────────────────
-  const passwordHook = useUbahPasswordAdmin(
-    formData,
-    (updatedUser) => {
-      showToast("Password berhasil diperbarui!", "success");
-      setIsModalPasswordOpen(false);
-      onUserUpdated && onUserUpdated(updatedUser);
-    }
-  );
+  
+  const {
+    isModalPasswordOpen,
+    setIsModalPasswordOpen,
+    passwordHook
+  } = useProfilForm(formData, showToast, onUserUpdated);
 
   return (
     <div className="w-full">

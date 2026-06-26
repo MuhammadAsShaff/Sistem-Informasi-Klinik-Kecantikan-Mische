@@ -1,24 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { X } from 'lucide-react';
+import { useModalResi } from '../hooks/useModalResi';
 
 const ModalResi = ({ isOpen, onClose, data, onSave }) => {
-  const [nomorResi, setNomorResi] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { nomorResi, setNomorResi, isSubmitting, handleSubmit } = useModalResi(data, onSave);
 
-  useEffect(() => {
-    if (data) {
-      setNomorResi(data.nomorResi || '');
-    }
-  }, [data]);
-
-  if (!isOpen || !data) return null;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    await onSave(data.idPenjualan || data.id, nomorResi);
-    setIsSubmitting(false);
-  };
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">

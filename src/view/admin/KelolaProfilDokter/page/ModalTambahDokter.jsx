@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { X } from "lucide-react";
 
 export default function ModalTambahDokter({ isOpen, onClose, hook }) {
@@ -10,8 +10,6 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
     handleFileChange,
     submitTambahDokter,
   } = hook;
-
-  const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 

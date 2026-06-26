@@ -15,9 +15,10 @@ import NavbarLogo from './NavbarLogo';
  *   links         : Array,
  *   isLoggedIn    : boolean,
  *   isAdmin       : boolean,
+ *   cartCount     : number,
  * }} props
  */
-const NavbarMobile = ({ isOpen, onOpen, onClose, links = [], isLoggedIn, isAdmin }) => {
+const NavbarMobile = ({ isOpen, onOpen, onClose, links = [], isLoggedIn, isAdmin, cartCount }) => {
   return (
     <div className="block md:hidden w-full">
       {/* ================================================================== */}
@@ -78,7 +79,7 @@ const NavbarMobile = ({ isOpen, onOpen, onClose, links = [], isLoggedIn, isAdmin
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">
               Akses Akun
             </p>
-            <NavbarActions isLoggedIn={isLoggedIn} isAdmin={isAdmin} />
+            <NavbarActions isLoggedIn={isLoggedIn} isAdmin={isAdmin} cartCount={cartCount} />
           </div>
 
           {/* Daftar Link Navigasi */}

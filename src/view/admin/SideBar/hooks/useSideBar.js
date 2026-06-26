@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
 import { getUser, saveUser, clearAuth, AUTH_UPDATED_EVENT } from "@/core/utils/authStorage";
@@ -11,7 +12,12 @@ import { getUser, saveUser, clearAuth, AUTH_UPDATED_EVENT } from "@/core/utils/a
  * Tidak ada lagi akses langsung ke localStorage — semua via authStorage.
  */
 export function useSideBar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   const [user, setUser] = useState({ nama: "Admin", email: "admin@klinik.com" });
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const loadUser = () => {
     const saved = getUser();
@@ -25,7 +31,7 @@ export function useSideBar() {
     return () => window.removeEventListener(AUTH_UPDATED_EVENT, loadUser);
   }, []);
 
-  const handleLogout = async (navigate) => {
+  const handleLogout = async () => {
     try {
       await axiosClient.post(endpoints.auth.logout);
     } catch (error) {
@@ -36,5 +42,12 @@ export function useSideBar() {
     }
   };
 
-  return { user, handleLogout };
+  return { 
+    user, 
+    handleLogout, 
+    currentPath, 
+    isLogoutModalOpen, 
+    setIsLogoutModalOpen,
+    navigate
+  };
 }

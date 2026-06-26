@@ -1,35 +1,27 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useProfilCustomer } from "../hooks/useProfilCustomer";
-import { useUbahPasswordCustomer } from "../hooks/useUbahPasswordCustomer";
+import { useProfileForm } from "../hooks/useProfileForm";
 import ModalUbahPassword from "./ModalUbahPassword";
 import ModalKelolaAlamat from "./ModalKelolaAlamat";
-import ToastAlert from "@/view/components/ToastAlert";
-import { useKelolaAlamat } from "../hooks/useKelolaAlamat";
+import ToastAlert from "@/view/components/ToastAlert/page/Index";
 
 /**
  * Form profil customer — semi-pure UI.
  * Logic profil dari useProfilCustomer, logic password dari useUbahPasswordCustomer.
  */
 const ProfileForm = () => {
-  const navigate = useNavigate();
-  const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
-  const showToast = (message, type = "success") => setToast({ isOpen: true, message, type });
-
-  const [isModalPasswordOpen, setIsModalPasswordOpen] = useState(false);
-  const [isModalAlamatOpen, setIsModalAlamatOpen] = useState(false);
-
-  const hookKelolaAlamat = useKelolaAlamat(showToast);
-
-  // ─── HOOK: PROFIL ─────────────────────────────────────────────
-  const { formData, handleChange, handleUpdate, handleLogout } = useProfilCustomer(showToast, navigate);
-
-  // ─── HOOK: PASSWORD ───────────────────────────────────────────
-  const passwordHook = useUbahPasswordCustomer(formData, (updatedUser) => {
-    showToast("Password berhasil diperbarui!", "success");
-    setIsModalPasswordOpen(false);
-    // saveUser sudah dipanggil di dalam useUbahPasswordCustomer — tidak perlu di sini
-  });
+  const {
+    toast,
+    closeToast,
+    isModalPasswordOpen,
+    setIsModalPasswordOpen,
+    isModalAlamatOpen,
+    setIsModalAlamatOpen,
+    hookKelolaAlamat,
+    formData,
+    handleChange,
+    handleUpdate,
+    handleLogout,
+    passwordHook
+  } = useProfileForm();
 
   const profileImg =
     formData.jenisKelamin === "Laki-laki"
@@ -44,7 +36,7 @@ const ProfileForm = () => {
   return (
     <div className="w-full">
       <ToastAlert isOpen={toast.isOpen} message={toast.message} type={toast.type}
-        onClose={() => setToast({ ...toast, isOpen: false })} />
+        onClose={closeToast} />
 
       <ModalUbahPassword
         isOpen={isModalPasswordOpen}

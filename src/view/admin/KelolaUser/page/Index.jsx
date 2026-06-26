@@ -1,9 +1,4 @@
-import React, { useState } from "react";
-import { useFetchUser } from "../hooks/useFetchUser";
-import { useTambahUser } from "../hooks/useTambahUser";
-import { useEditUser } from "../hooks/useEditUser";
-import { useHapusUser } from "../hooks/useHapusUser";
-
+import React from "react";
 import Header from "./Header";
 import SearchBar from '@/components/SearchBar';
 import { Plus } from "lucide-react";
@@ -13,76 +8,35 @@ import ModalTambahUser from "./ModalTambahUser";
 import ModalPerbaruiUser from "./ModalPerbaruiUser";
 import ModalHapusUser from "./ModalHapusUser";
 import ModalDetailUser from "./ModalDetailUser";
-import ToastAlert from "@/view/components/ToastAlert";
+import ToastAlert from "@/view/components/ToastAlert/page/Index";
+import { useKelolaUser } from "../hooks/useKelolaUser";
 
 export default function KelolaUser() {
-  // State seleksi user (untuk edit & hapus)
-  const [selectedUser, setSelectedUser] = useState(null);
-
-  // State visibilitas modal
-  const [isTambahOpen, setIsTambahOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isHapusOpen, setIsHapusOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-
-  // State toast notifikasi
-  const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
-  const showToast = (message, type = "success") => {
-    setToast({ isOpen: true, message, type });
-  };
-
-  // ─── HOOK: READ ───────────────────────────────────────────────
   const {
+    selectedUser,
+    isTambahOpen,
+    setIsTambahOpen,
+    isEditOpen,
+    setIsEditOpen,
+    isHapusOpen,
+    setIsHapusOpen,
+    isDetailOpen,
+    setIsDetailOpen,
+    toast,
+    setToast,
     dataUser,
     isLoading,
     currentPage,
     lastPage,
     startIndex,
-    fetchUsers,
-    setCurrentPage,
     handlePageChange,
-  } = useFetchUser();
-
-  // ─── HOOK: CREATE ─────────────────────────────────────────────
-  const tambahUser = useTambahUser(
-    () => { setIsTambahOpen(false); fetchUsers(currentPage); },
-    showToast
-  );
-
-  // ─── HOOK: UPDATE ─────────────────────────────────────────────
-  const editUser = useEditUser(
-    selectedUser,
-    () => { setIsEditOpen(false); fetchUsers(currentPage); },
-    showToast
-  );
-
-  // ─── HOOK: DELETE ─────────────────────────────────────────────
-  const { confirmDelete } = useHapusUser(
-    selectedUser,
-    currentPage,
-    dataUser.length,
-    fetchUsers,
-    setCurrentPage,
-    showToast
-  );
-
-  // Handler buka modal edit
-  const handleEdit = (user) => {
-    setSelectedUser(user);
-    setIsEditOpen(true);
-  };
-
-  // Handler buka modal detail
-  const handleDetail = (user) => {
-    setSelectedUser(user);
-    setIsDetailOpen(true);
-  };
-
-  // Handler buka modal hapus
-  const handleDelete = (user) => {
-    setSelectedUser(user);
-    setIsHapusOpen(true);
-  };
+    tambahUser,
+    editUser,
+    confirmDelete,
+    handleEdit,
+    handleDetail,
+    handleDelete
+  } = useKelolaUser();
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">

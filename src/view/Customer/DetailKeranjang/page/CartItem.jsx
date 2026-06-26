@@ -1,24 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Trash2 } from 'lucide-react';
 import ModalKonfirmasiHapus from './ModalKonfirmasiHapus';
+import { useCartItem } from '../hooks/useCartItem';
 
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
 const CartItem = ({ item, onQuantityChange, onToggleSelect, onRemove, formatRupiah }) => {
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const handleDecrease = () => {
-    if (item.quantity === 1) {
-      setIsDeleteModalOpen(true);
-    } else {
-      onQuantityChange(item.id, -1);
-    }
-  };
-
-  const handleConfirmDelete = () => {
-    setIsDeleteModalOpen(false);
-    onRemove(item.id);
-  };
+  const {
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    handleDecrease,
+    handleConfirmDelete
+  } = useCartItem(item, onQuantityChange, onRemove);
 
   const imageSrc = item.image?.startsWith?.('http') || item.image?.startsWith?.('data:') 
     ? item.image 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useModalKelolaAlamat } from '../hooks/useModalKelolaAlamat';
 import { X, MapPin, Plus, CheckCircle2, Trash2 } from 'lucide-react';
 import ModalFormAlamat from './ModalFormAlamat';
 import ModalKonfirmasiHapus from '../../DetailKeranjang/page/ModalKonfirmasiHapus';
@@ -15,27 +15,15 @@ const ModalKelolaAlamat = ({ isOpen, onClose, hookKelolaAlamat }) => {
     jadikanUtama 
   } = hookKelolaAlamat;
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [alamatToDelete, setAlamatToDelete] = useState(null);
-
-  const handleSaveBaru = async (formData) => {
-    const success = await tambahAlamat(formData);
-    if (success) {
-      setIsFormOpen(false);
-    }
-    return success;
-  };
-
-  const handleHapus = (id) => {
-    setAlamatToDelete(id);
-  };
-
-  const confirmHapus = async () => {
-    if (alamatToDelete) {
-      await hapusAlamat(alamatToDelete);
-      setAlamatToDelete(null);
-    }
-  };
+  const {
+    isFormOpen,
+    setIsFormOpen,
+    alamatToDelete,
+    setAlamatToDelete,
+    handleSaveBaru,
+    handleHapus,
+    confirmHapus
+  } = useModalKelolaAlamat(tambahAlamat, hapusAlamat);
 
   if (!isOpen) return null;
 

@@ -1,36 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { MessageSquare, ChevronUp } from 'lucide-react';
+import { useWhatsAppButton } from '../hooks/useWhatsAppButton';
 
+/**
+ * =========================================================================
+ * KOMPONEN VIEW: WhatsAppButton (Tombol WA & Scroll ke Atas Melayang)
+ * =========================================================================
+ * Komponen ini hanya menangani tampilan visual tombol melayang di pojok kanan bawah.
+ * Logika scroll listener dan redirect WhatsApp dikelola di hook `useWhatsAppButton`.
+ */
 const WhatsAppButton = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const phoneNumber = "628984818977"; 
-  const message = "Halo Mische Aesthetic Clinic, saya ingin bertanya tentang perawatan...";
+  const { isVisible, scrollToTop, openWhatsApp } = useWhatsAppButton();
 
-  // Logika Scroll to Top visibility
-  useEffect(() => {
-    const toggleVisibility = () => {
-      if (window.scrollY > 300) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-    };
-
-    window.addEventListener('scroll', toggleVisibility);
-    return () => window.removeEventListener('scroll', toggleVisibility);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  };
-
-  const openWhatsApp = () => {
-    const url = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-  };
 
   return (
     <div className="fixed bottom-6 right-6 z-[999] flex flex-col items-end gap-3 pointer-events-none">

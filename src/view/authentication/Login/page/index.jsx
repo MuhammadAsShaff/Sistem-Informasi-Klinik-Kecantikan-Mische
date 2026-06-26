@@ -1,30 +1,10 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useLoginPage } from '../hooks/useLoginPage';
 import LoginHeader from './LoginHeader';
 import LoginForm from './LoginForm';
 
 export default function LoginPage() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const userStr = localStorage.getItem('user');
-      let role = 'customer';
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          role = user.role || 'customer';
-        } catch (e) {}
-      }
-      
-      if (role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/');
-      }
-    }
-  }, [navigate]);
+  const { navigate } = useLoginPage();
 
   return (
     <div className="w-full min-h-screen bg-[#FAF8F5] flex items-center justify-center py-10 px-4">

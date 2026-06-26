@@ -1,15 +1,15 @@
 import React from 'react';
 import { ShoppingBag, BookmarkCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useHistoryTabs } from '../hooks/useHistoryTabs';
 
 const HistoryTabs = () => {
-    const navigate = useNavigate();
+    const { goToRiwayatPembelian, goToRiwayatReservasi } = useHistoryTabs();
     
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
             {/* Riwayat Pembelian Produk */}
             <div 
-                onClick={() => navigate('/ProfilCustomer/riwayat-pembelian')}
+                onClick={goToRiwayatPembelian}
                 className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 cursor-pointer hover:shadow-md transition-shadow group"
             >
                 <div className="p-4 bg-gradient-to-br from-[#74b35e] via-[#9ade97] to-[#a3e69a] rounded-2xl shadow-inner group-hover:scale-105 transition-transform duration-300">
@@ -23,7 +23,7 @@ const HistoryTabs = () => {
 
             {/* Riwayat Melakukan Reservasi */}
             <div 
-                onClick={() => navigate('/ProfilCustomer/riwayat-reservasi')}
+                onClick={goToRiwayatReservasi}
                 className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center gap-5 cursor-pointer hover:shadow-md transition-shadow group"
             >
                 <div className="p-4 bg-white border-2 border-[#a3e69a] rounded-2xl shadow-sm group-hover:bg-[#f0fff4] transition-colors duration-300">

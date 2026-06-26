@@ -1,9 +1,4 @@
-import React, { useState } from "react";
-import { useFetchDokter } from "../hooks/useFetchDokter";
-import { useTambahDokter } from "../hooks/useTambahDokter";
-import { useEditDokter } from "../hooks/useEditDokter";
-import { useHapusDokter } from "../hooks/useHapusDokter";
-
+import React from "react";
 import Header from "./Header";
 import SearchBar from '@/components/SearchBar';
 import { Plus } from "lucide-react";
@@ -11,93 +6,35 @@ import Tabel from "./Tabel";
 import ModalTambahDokter from "./ModalTambahDokter";
 import ModalPerbaruiDokter from "./ModalPerbaruiDokter";
 import ModalHapusDokter from "./ModalHapusDokter";
-import ToastAlert from "@/view/components/ToastAlert";
+import ToastAlert from "@/view/components/ToastAlert/page/Index";
 import Pagination from '@/components/Pagination';
+import { useKelolaProfilDokter } from "../hooks/useKelolaProfilDokter";
 
 export default function KelolaProfilDokter() {
-  // State seleksi dokter (untuk edit & hapus)
-  const [selectedDokter, setSelectedDokter] = useState(null);
-
-  // State visibilitas modal
-  const [isTambahOpen, setIsTambahOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isHapusOpen, setIsHapusOpen] = useState(false);
-
-  // State toast notifikasi
-  const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
-  
-  const showToast = (message, type = "success") => {
-    setToast({ isOpen: true, message, type });
-  };
-
-  // ─── HOOK: READ & SEARCH ───────────────────────────────────────
   const {
-    dataDokter,
+    isTambahOpen,
+    setIsTambahOpen,
+    isEditOpen,
+    setIsEditOpen,
+    isHapusOpen,
+    setIsHapusOpen,
+    toast,
+    setToast,
     searchQuery,
     setSearchQuery,
     isLoading,
-    fetchDokter,
-    startIndex,
-  } = useFetchDokter();
-
-  // ─── HOOK: CREATE ─────────────────────────────────────────────
-  const tambahDokter = useTambahDokter(
-    () => { 
-      setIsTambahOpen(false); 
-      fetchDokter(); 
-    },
-    showToast
-  );
-
-  // ─── HOOK: UPDATE ─────────────────────────────────────────────
-  const editDokter = useEditDokter(
-    selectedDokter,
-    () => { 
-      setIsEditOpen(false); 
-      fetchDokter(); 
-    },
-    showToast
-  );
-
-  // ─── HOOK: DELETE & STATUS ────────────────────────────────────
-  const { confirmDelete, updateStatusDokter } = useHapusDokter(
-    selectedDokter,
-    () => { 
-      fetchDokter(); 
-    },
-    showToast
-  );
-
-  // Handler buka modal edit
-  const handleEdit = (dokter) => {
-    setSelectedDokter(dokter);
-    setIsEditOpen(true);
-  };
-
-  // Handler buka modal hapus
-  const handleDelete = (dokter) => {
-    setSelectedDokter(dokter);
-    setIsHapusOpen(true);
-  };
-
-  // Handler update status
-  const handleStatusChange = (id, newStatus) => {
-    updateStatusDokter(id, newStatus);
-  };
-
-  // Pagination Logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
-  const totalPages = Math.ceil(dataDokter.length / ITEMS_PER_PAGE);
-
-  React.useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
-  const paginatedDokter = dataDokter.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+    tambahDokter,
+    editDokter,
+    confirmDelete,
+    handleEdit,
+    handleDelete,
+    handleStatusChange,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    ITEMS_PER_PAGE,
+    paginatedDokter
+  } = useKelolaProfilDokter();
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">

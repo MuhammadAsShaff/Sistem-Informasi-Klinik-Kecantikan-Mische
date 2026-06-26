@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import logomischee from '@/assets/images/LogoMischee.png';
+import { useModalDetailReservasi } from '../hooks/useModalDetailReservasi';
 
 export default function ModalDetailReservasi({ 
   isOpen, 
@@ -13,24 +14,13 @@ export default function ModalDetailReservasi({
   date, 
   formatTgl 
 }) {
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-
-  // Reset state pop-up saat modal utama ditutup
-  useEffect(() => {
-    if (!isOpen) {
-      setIsConfirmOpen(false);
-    }
-  }, [isOpen]);
+  const {
+    isConfirmOpen,
+    setIsConfirmOpen,
+    calculateJamSelesai
+  } = useModalDetailReservasi(isOpen);
 
   if (!isOpen || !slot) return null;
-
-  // Asumsi jam selesai adalah 1 jam setelah jam mulai (karena formatnya jam pas seperti "07:00")
-  const calculateJamSelesai = (jamMulai) => {
-    if (!jamMulai) return "";
-    const [jam] = jamMulai.split(':');
-    const jamBerikutnya = parseInt(jam) + 1;
-    return `${String(jamBerikutnya).padStart(2, '0')}:00`;
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-12 animate-in fade-in duration-300">

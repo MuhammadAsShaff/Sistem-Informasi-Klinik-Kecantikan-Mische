@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { X } from "lucide-react";
 
 export default function ModalPerbaruiDokter({ isOpen, onClose, hook }) {
@@ -10,8 +10,6 @@ export default function ModalPerbaruiDokter({ isOpen, onClose, hook }) {
     handleFileChange,
     submitEditDokter,
   } = hook;
-
-  const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 

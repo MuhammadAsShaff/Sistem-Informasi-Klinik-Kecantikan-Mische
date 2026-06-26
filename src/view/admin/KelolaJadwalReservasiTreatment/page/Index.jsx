@@ -1,9 +1,4 @@
-import React, { useState } from "react";
-import { useFetchJadwal } from "../hooks/useFetchJadwal";
-import { useTambahJadwal } from "../hooks/useTambahJadwal";
-import { useEditJadwal } from "../hooks/useEditJadwal";
-import { useHapusJadwal } from "../hooks/useHapusJadwal";
-
+import React from "react";
 import Header from "./Header";
 import SearchBar from '@/components/SearchBar';
 import { Plus } from "lucide-react";
@@ -12,81 +7,31 @@ import Pagination from '@/components/Pagination';
 import ModalTambahJadwal from "./ModalTambahJadwal";
 import ModalPerbaruiJadwal from "./ModalPerbaruiJadwal";
 import ModalHapusJadwal from "./ModalHapusJadwal";
-import ToastAlert from "@/view/components/ToastAlert";
+import ToastAlert from "@/view/components/ToastAlert/page/Index";
+import { useKelolaJadwal } from "../hooks/useKelolaJadwal";
 
 export default function KelolaJadwalReservasiTreatment() {
-  // State seleksi jadwal (untuk edit & hapus)
-  const [selectedJadwal, setSelectedJadwal] = useState(null);
-
-  // State visibilitas modal
-  const [isTambahOpen, setIsTambahOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isHapusOpen, setIsHapusOpen] = useState(false);
-
-  // State toast notifikasi
-  const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
-  const showToast = (message, type = "success") => {
-    setToast({ isOpen: true, message, type });
-  };
-
-  // ─── HOOK: READ ───────────────────────────────────────────────
-  const { dataJadwal, isLoading, fetchSchedules } = useFetchJadwal();
-
-  // ─── HOOK: CREATE ─────────────────────────────────────────────
-  const tambahJadwal = useTambahJadwal(
-    dataJadwal,
-    () => {
-      setIsTambahOpen(false);
-      fetchSchedules();
-      showToast("Jadwal berhasil ditambahkan!");
-    },
-    isTambahOpen
-  );
-
-  // ─── HOOK: UPDATE ─────────────────────────────────────────────
-  const editJadwal = useEditJadwal(
-    selectedJadwal,
-    dataJadwal,
-    () => {
-      setIsEditOpen(false);
-      fetchSchedules();
-      showToast("Jadwal berhasil diperbarui!");
-    },
-    isEditOpen
-  );
-
-  // ─── HOOK: DELETE ─────────────────────────────────────────────
-  const hapusJadwal = useHapusJadwal(
-    selectedJadwal,
-    () => {
-      setIsHapusOpen(false);
-      fetchSchedules();
-      showToast("Jadwal berhasil dihapus!");
-    },
-    showToast
-  );
-
-  // Handler buka modal edit
-  const handleEdit = (jadwal) => {
-    setSelectedJadwal(jadwal);
-    setIsEditOpen(true);
-  };
-
-  // Handler buka modal hapus
-  const handleDelete = (jadwal) => {
-    setSelectedJadwal(jadwal);
-    setIsHapusOpen(true);
-  };
-
-  // Pagination Logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
-  const totalPages = Math.ceil(dataJadwal.length / ITEMS_PER_PAGE);
-
-  const paginatedJadwal = dataJadwal.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const {
+    isLoading,
+    paginatedJadwal,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    ITEMS_PER_PAGE,
+    isTambahOpen,
+    setIsTambahOpen,
+    isEditOpen,
+    setIsEditOpen,
+    isHapusOpen,
+    setIsHapusOpen,
+    toast,
+    setToast,
+    tambahJadwal,
+    editJadwal,
+    hapusJadwal,
+    handleEdit,
+    handleDelete
+  } = useKelolaJadwal();
 
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen animate-in fade-in duration-700">

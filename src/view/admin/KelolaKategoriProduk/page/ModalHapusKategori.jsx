@@ -1,23 +1,8 @@
-import React, { useState } from 'react';
-import { useHapusKategori } from '../hooks/useHapusKategori';
+import React from 'react';
+import { useModalHapusKategori } from '../hooks/useModalHapusKategori';
 
 const ModalHapusKategori = ({ isOpen, onClose, dataId, refetch, showToast }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const { hapusKategori } = useHapusKategori(refetch);
-
-  const handleDelete = async () => {
-    if (!dataId) return;
-    setIsDeleting(true);
-    const result = await hapusKategori(dataId);
-    setIsDeleting(false);
-
-    if (result.success) {
-      showToast("Berhasil menghapus kategori produk", 'success');
-      onClose();
-    } else {
-      showToast(result.message, 'error');
-    }
-  };
+  const { isDeleting, handleDelete } = useModalHapusKategori(dataId, refetch, showToast, onClose);
 
   if (!isOpen) return null;
 

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { usePengaturanTentangKami } from '../hooks/usePengaturanTentangKami';
 import Editor from 'react-simple-wysiwyg';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -7,90 +8,16 @@ import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import dayjs from 'dayjs';
 
 const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
-  const [formData, setFormData] = useState({
-    deskripsiPerusahaan: '',
-    visi: '',
-    misi: '',
-    jamBuka: '',
-    jamTutup: '',
-    nomorCustomerService: '',
-    fotoPerusahaan: null
-  });
-  const [previewImage, setPreviewImage] = useState(null);
-  const [hasFileError, setHasFileError] = useState(false);
-
-  useEffect(() => {
-    if (data) {
-      setFormData({
-        deskripsiPerusahaan: data.deskripsiPerusahaan || '',
-        visi: data.visi || '',
-        misi: data.misi || '',
-        jamBuka: data.jamBuka ? data.jamBuka.substring(0, 5) : '',
-        jamTutup: data.jamTutup ? data.jamTutup.substring(0, 5) : '',
-        nomorCustomerService: data.nomorCustomerService || '',
-        fotoPerusahaan: null
-      });
-      setPreviewImage(data.fotoPerusahaan ? `http://127.0.0.1:8000/storage/${data.fotoPerusahaan}` : null);
-    } else {
-      setFormData({
-        deskripsiPerusahaan: '', visi: '', misi: '', jamBuka: '', jamTutup: '', nomorCustomerService: '', fotoPerusahaan: null
-      });
-      setPreviewImage(null);
-    }
-    
-    // Pastikan input file dibersihkan setelah fetch/reload data
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  }, [data]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'nomorCustomerService') {
-      const numericValue = value.replace(/\D/g, '');
-      setFormData({ ...formData, [name]: numericValue });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
-
-  const fileInputRef = React.useRef(null);
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate 2MB BEFORE converting, but the size check is typically on original file
-      if (file.size > 2 * 1024 * 1024) {
-        onError("Ukuran file terlalu besar! Maksimal 2MB.");
-        setHasFileError(true);
-        e.target.value = '';
-        return;
-      }
-      
-      const { convertToJPEG } = await import('@/utils/imageConverter');
-      const convertedFile = await convertToJPEG(file);
-      
-      setHasFileError(false);
-      setFormData({ ...formData, fotoPerusahaan: convertedFile });
-      setPreviewImage(URL.createObjectURL(convertedFile));
-    }
-  };
-
-  const handleSubmit = () => {
-    // Validasi inputan form agar tidak ada yang kosong
-    if (!formData.deskripsiPerusahaan || !formData.visi || !formData.misi || !formData.jamBuka || !formData.jamTutup || !formData.nomorCustomerService) {
-      onError("Isi profile klinik sesuai dengan ketentuan inputan!");
-      return;
-    }
-    
-    // Jika foto belum ada di database (atau buat baru), wajib upload
-    if (!data?.fotoPerusahaan && !formData.fotoPerusahaan) {
-      onError("Isi profile klinik sesuai dengan ketentuan inputan!");
-      return;
-    }
-
-    onSimpan(formData);
-  };
+  const {
+    formData,
+    setFormData,
+    previewImage,
+    hasFileError,
+    fileInputRef,
+    handleChange,
+    handleFileChange,
+    handleSubmit
+  } = usePengaturanTentangKami(data, onSimpan, onError);
 
   return (
     <div className="border border-black p-6 mb-6 rounded-none bg-transparent">

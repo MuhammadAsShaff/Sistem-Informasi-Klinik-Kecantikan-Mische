@@ -1,12 +1,4 @@
-import React, { useState } from "react";
-import { useFetchProfilKlinik } from "../hooks/useFetchProfilKlinik";
-import { useUpdateProfilKlinik } from "../hooks/useUpdateProfilKlinik";
-import { useHapusProfilKlinik } from "../hooks/useHapusProfilKlinik";
-import { useFetchKegiatan } from "../hooks/useFetchKegiatan";
-import { useTambahKegiatan } from "../hooks/useTambahKegiatan";
-import { useEditKegiatan } from "../hooks/useEditKegiatan";
-import { useHapusKegiatan } from "../hooks/useHapusKegiatan";
-
+import React from "react";
 import Header from "./Header";
 import PengaturanTentangKami from "./PengaturanTentangKami";
 import GaleriKegiatan from "./GaleriKegiatan";
@@ -14,63 +6,34 @@ import ModalHapusPengaturan from "./ModalHapusPengaturan";
 import ModalTambahKegiatanBaru from "./ModalTambahKegiatanBaru";
 import ModalEditKegiatan from "./ModalPerbaruiKegiatan";
 import ModalHapusKegiatan from "./ModalHapusKegiatan";
-import ToastAlert from "@/view/components/ToastAlert";
+import ToastAlert from "@/view/components/ToastAlert/page/Index";
 import Pagination from '@/components/Pagination';
+import { useKelolaProfilKlinik } from "../hooks/useKelolaProfilKlinik";
 
 const KelolaProfilKlinik = () => {
-  // State modal
-  const [isModalHapusPengaturanOpen, setIsModalHapusPengaturanOpen] = useState(false);
-  const [isModalTambahKegiatanOpen, setIsModalTambahKegiatanOpen] = useState(false);
-  const [isModalEditKegiatanOpen, setIsModalEditKegiatanOpen] = useState(false);
-  const [isModalHapusKegiatanOpen, setIsModalHapusKegiatanOpen] = useState(false);
-
-  // Toast notifikasi
-  const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
-  const showToast = (message, type = "success") => setToast({ isOpen: true, message, type });
-
-  // ─── HOOK: PROFIL KLINIK ──────────────────────────────────────
-  const { profileData, setProfileData, fetchProfile, isLoading } = useFetchProfilKlinik();
-  const { handleUpdateProfile } = useUpdateProfilKlinik(profileData, showToast, fetchProfile);
-  const { handleDeleteProfile } = useHapusProfilKlinik(profileData, showToast, setProfileData);
-
-  // ─── HOOK: KEGIATAN ───────────────────────────────────────────
-  const { kegiatanList, fetchKegiatan } = useFetchKegiatan();
-
-  const tambahKegiatan = useTambahKegiatan(() => {
-    setIsModalTambahKegiatanOpen(false);
-    fetchKegiatan();
-    showToast("Berhasil menambahkan kegiatan klinik");
-  });
-
-  const editKegiatan = useEditKegiatan(
-    isModalEditKegiatanOpen || null,
-    !!isModalEditKegiatanOpen,
-    () => {
-      setIsModalEditKegiatanOpen(false);
-      fetchKegiatan();
-      showToast("Berhasil memperbarui kegiatan klinik");
-    }
-  );
-
-  const hapusKegiatan = useHapusKegiatan(
-    isModalHapusKegiatanOpen || null,
-    () => {
-      setIsModalHapusKegiatanOpen(false);
-      fetchKegiatan();
-      showToast("Berhasil menghapus kegiatan klinik");
-    },
-    showToast
-  );
-
-  // Pagination Logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
-  const totalPages = Math.ceil(kegiatanList.length / ITEMS_PER_PAGE);
-
-  const paginatedKegiatan = kegiatanList.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const {
+    isModalHapusPengaturanOpen,
+    setIsModalHapusPengaturanOpen,
+    isModalTambahKegiatanOpen,
+    setIsModalTambahKegiatanOpen,
+    isModalEditKegiatanOpen,
+    setIsModalEditKegiatanOpen,
+    isModalHapusKegiatanOpen,
+    setIsModalHapusKegiatanOpen,
+    toast,
+    setToast,
+    showToast,
+    profileData,
+    handleUpdateProfile,
+    handleDeleteProfile,
+    tambahKegiatan,
+    editKegiatan,
+    hapusKegiatan,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    paginatedKegiatan
+  } = useKelolaProfilKlinik();
 
   return (
     <div className="p-8 bg-[#f4f6f9] min-h-screen font-sans">
