@@ -11,17 +11,11 @@ import { getToken, clearAuth } from '@/core/utils/authStorage';
  */
 
 const axiosClient = axios.create({
-  // baseURL: Alamat tujuan utama si kurir (Misal: Kantor Backend Laravel)
   baseURL: API_BASE_URL,
-  
-  // withCredentials: Surat Izin Jalan. Wajib diaktifkan (true) agar si kurir 
-  // diizinkan membawa "Cookie/Session" ke Backend dengan aman.
-  withCredentials: true,
-  
-  // headers: Aturan paket. Mengatur agar si kurir hanya mau menerima 
-  // dan mengirim paket data dalam bentuk "JSON" (format standar komputer).
+  withCredentials: false,
   headers: {
-    'Accept': 'application/json',
+    Accept: 'application/json',
+    'ngrok-skip-browser-warning': 'true',
   },
 });
 
