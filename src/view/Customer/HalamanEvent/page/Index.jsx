@@ -2,7 +2,7 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import { useEventData } from '../hooks/useEventData';
 import EventCard from './EventCard';
-import logomischee from '@/assets/images/logomischee.png'
+import logomischee from '@/assets/images/LogoMischee.png'
 import bgEvent from '@/assets/images/gambar event yang berlangsung.png'
 import CustomerLoading from '@/components/CustomerLoading';
 
