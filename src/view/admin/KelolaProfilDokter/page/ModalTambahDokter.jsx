@@ -1,7 +1,14 @@
 import React from "react";
 import { X } from "lucide-react";
 
+/**
+ * MEJA FORMULIR PENDAFTARAN DOKTER BARU (ModalTambahDokter)
+ * Ibarat meja pendaftaran yang muncul saat admin menekan tombol hijau tambah (+). Di meja ini, 
+ * asisten pendaftaran (useTambahDokter) menyodorkan formulir kosong untuk mencatat nama, email, 
+ * deskripsi keahlian, dan menempelkan pasfoto dokter baru sebelum diserahkan ke sistem pusat.
+ */
 export default function ModalTambahDokter({ isOpen, onClose, hook }) {
+  // Meminjam kertas isian, pena, dan tombol penyerahan dari asisten pendaftaran
   const {
     formData,
     error,
@@ -11,13 +18,14 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
     submitTambahDokter,
   } = hook;
 
+  // Jika saklar pembukanya mati, meja pendaftaran ini tetap tersembunyi
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl w-full max-w-[800px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         
-        {/* MODAL HEADER */}
+        {/* --- BAGIAN ATAS MEJA (JUDUL & TOMBOL SILANG TUTUP) --- */}
         <div className="flex justify-between items-center px-8 py-5 border-b border-gray-100">
           <h2 className="text-lg font-bold text-black">Tambah Profil Dokter</h2>
           <button 
@@ -28,9 +36,11 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
           </button>
         </div>
 
-        {/* MODAL FORM */}
+        {/* --- KOTAK-KOTAK ISIAN FORMULIR --- */}
         <form onSubmit={submitTambahDokter}>
           <div className="p-8 space-y-6">
+            
+            {/* Papan Catatan Teguran Jika Ada Kotak Kosong */}
             {error && (
               <div className="bg-red-50 text-red-500 text-xs font-semibold px-4 py-2.5 rounded-lg">
                 {error}
@@ -39,8 +49,9 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               
-              {/* KOLOM KIRI */}
+              {/* --- KOLOM KIRI: KOTAK NAMA & DESKRIPSI --- */}
               <div className="space-y-5">
+                {/* Kotak Isian Nama Dokter */}
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
                     Nama Dokter
@@ -55,6 +66,7 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
                   />
                 </div>
 
+                {/* Kotak Cerita Deskripsi Dokter */}
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
                     Deskripsi Dokter
@@ -70,8 +82,9 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
                 </div>
               </div>
 
-              {/* KOLOM KANAN */}
+              {/* --- KOLOM KANAN: KOTAK EMAIL & PASFOTO --- */}
               <div className="space-y-5 flex flex-col">
+                {/* Kotak Isian Email */}
                 <div>
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
                     Email
@@ -87,12 +100,13 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
                   <p className="text-[11px] text-red-500 italic mt-0.5">* Pastikan format email valid (@gmail.com)</p>
                 </div>
 
+                {/* Tombol Pemilihan Berkas Pasfoto Dokter */}
                 <div className="flex-1 flex flex-col justify-start">
                   <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
                     Foto Dokter
                   </label>
                   
-                  {/* Premium Styled File Input */}
+                  {/* Tombol Unggah Foto */}
                   <div className="flex items-center gap-3">
                     <label className="bg-[#1E293B] hover:bg-[#0F172A] text-white px-5 py-2 rounded-md text-xs font-bold transition-colors cursor-pointer inline-block">
                       Choose File
@@ -109,6 +123,7 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
                   </div>
                   <p className="text-[11px] text-red-500 italic mt-2">* Format: JPG/PNG/JPEG. Ukuran maksimal 2MB.</p>
 
+                  {/* Bingkai Intip Foto Wajah Dokter */}
                   {formData.image && (
                     <div className="mt-4 w-28 h-28 rounded-lg overflow-hidden border border-gray-100 shadow-sm bg-gray-50">
                       <img 
@@ -125,7 +140,7 @@ export default function ModalTambahDokter({ isOpen, onClose, hook }) {
             </div>
           </div>
 
-          {/* MODAL FOOTER */}
+          {/* --- TOMBOL PENDAFTARAN DI BAGIAN BAWAH MEJA --- */}
           <div className="px-8 py-5 border-t border-gray-100 flex justify-end">
             <button
               type="submit"

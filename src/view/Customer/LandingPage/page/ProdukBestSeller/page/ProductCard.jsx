@@ -2,16 +2,24 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
+/**
+ * =========================================================================
+ * KOTAK PAJANGAN SINGGASANA PRODUK (ProductCard)
+ * =========================================================================
+ * Ibarat singgasana mini berbahan pualam untuk memajang satu botol skincare.
+ * Saat calon pembeli mendekat (hover), singgasana ini akan melompat sedikit ke atas (translate-y-[-15px])
+ * untuk menarik perhatian tamu agar menekan tombol "Lihat Produk".
+ */
 const ProductCard = ({ product }) => {
   return (
     <div className="bg-white rounded-tl-[60px] rounded-br-[60px] pb-8 shadow-[0_30px_60px_rgba(0,0,0,0.08)] flex flex-col items-center text-center transition-all duration-300 hover:translate-y-[-15px]">
       {/* yang memberikan efek melompat itu adalah kode ini hover:translate-y-[-15px] */}
-      <div className="w-full h-48 md:h-64 object-cover mb-8 overflow-hidden bg-white rounded-tl-[60px] flex items-center justify-center">
+      <div className="w-full h-48 md:h-64 object-cover mb-8 overflow-hidden bg-white rounded-tl-[60px] flex items-center justify-center relative">
         {product.gambar || product.image ? (
           <img 
             src={(product.gambar || product.image).startsWith('http') ? (product.gambar || product.image) : `${STORAGE_BASE_URL}${String(product.gambar || product.image).replace(/^(?:public\/|storage\/|\/)+/, '')}`} 
             alt={product.nama || product.title || product.name} 
-            className="w-full h-full object-contain p-4" 
+            className="w-full h-full object-contain hover:scale-105 transition-transform duration-300" 
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>

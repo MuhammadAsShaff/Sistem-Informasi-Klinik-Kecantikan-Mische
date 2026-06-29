@@ -3,6 +3,13 @@ import { X } from "lucide-react";
 import { useFetchKategori } from "../../KelolaKategoriProduk/hooks/useFetchKategori";
 import { useFetchProduk } from "../../KelolaProduk/hooks/useFetchProduk";
 
+/**
+ * BILIK MEJA PENDAFTARAN PROMO BARU (ModalTambahPromo)
+ * Ibarat meja lipat khusus yang dibuka mandor saat admin menekan tombol Plus (+).
+ * Meja ini menyuguhkan selembar kertas isian putih kosong untuk mencatat nama promo baru, 
+ * menentukan masa berlaku, mencantumkan kode, dan menaruh foto pajangan.
+ * Segala aturan pena, pengukur berat foto, dan pencegahan tabrakan syarat dikawal ketat oleh Asisten Pendaftaran (useTambahPromo).
+ */
 export default function ModalTambahPromo({
   isOpen,
   onClose,
@@ -12,22 +19,23 @@ export default function ModalTambahPromo({
   isSubmitting,
   error,
 }) {
+  // Meminta daftar nama kategori dan produk dari gudang arsip klinik
   const { categories } = useFetchKategori();
   const { products } = useFetchProduk();
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, bilik meja lipat ini disimpan kembali
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {/* Tirai pembatas gelap di latar belakang */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       ></div>
 
-      {/* Modal Container */}
+      {/* Rangkaian Kotak Bilik Pendaftaran */}
       <div className="relative bg-white rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
+        {/* Atap Bilik Pendaftaran */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-800">Tambah Promo</h2>
           <button
@@ -38,8 +46,9 @@ export default function ModalTambahPromo({
           </button>
         </div>
 
-        {/* Content */}
+        {/* Ruangan Dalam Meja Formulir */}
         <div className="p-6 max-h-[80vh] overflow-y-auto">
+          {/* Papan Teguran Merah */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium">
               {error}
@@ -48,7 +57,7 @@ export default function ModalTambahPromo({
 
           <form id="tambahPromoForm" onSubmit={submitTambahPromo} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             
-            {/* Kiri */}
+            {/* Sisi Kiri Meja Kerja */}
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Nama Promo</label>
@@ -120,7 +129,7 @@ export default function ModalTambahPromo({
               </div>
             </div>
 
-            {/* Kanan */}
+            {/* Sisi Kanan Meja Kerja */}
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Jenis Promo</label>
@@ -222,7 +231,7 @@ export default function ModalTambahPromo({
           </form>
         </div>
 
-        {/* Footer */}
+        {/* Laci Tombol Utus Kurir */}
         <div className="p-6 border-t border-gray-100 flex justify-end">
           <button
             form="tambahPromoForm"

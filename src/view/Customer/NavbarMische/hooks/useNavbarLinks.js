@@ -1,12 +1,10 @@
 /**
- * Data statis daftar link navigasi Navbar Mische.
- * Dipisahkan ke hooks/ agar page/ hanya mengurus tampilan (UI murni).
- *
- * Struktur tiap item:
- * - label       : Teks yang ditampilkan
- * - href        : Path tujuan (react-router)
- * - hasDropdown : Tampilkan ikon panah dan dropdown
- * - subItems    : Daftar sub-menu (opsional)
+ * =========================================================================
+ * BUKU PETUNJUK ARAH RUANGAN KLINIK (useNavbarLinks)
+ * =========================================================================
+ * Ibarat peta lipat panduan arah di lobi depan yang mendaftarkan seluruh
+ * jalur lorong (Beranda, Produk, Promo, Event, Reservasi, Tentang Kami)
+ * agar tamu tidak tersesat saat menelusuri istana klinik Mische.
  */
 export const NAV_LINKS = [
   { label: "Beranda", href: "/" },

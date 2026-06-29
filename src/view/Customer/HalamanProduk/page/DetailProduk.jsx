@@ -3,6 +3,14 @@ import ProductGrid from './ProductGrid';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 import { useDetailProduk } from '../hooks/useDetailProduk';
 
+/**
+ * =========================================================================
+ * BALAI KONSULTASI SPESIFIKASI BARANG (DetailProduk)
+ * =========================================================================
+ * Ibarat satu meja bundar khusus tempat satu botol skincare dipajang di tengahnya.
+ * Di sini tamu bisa melihat wujud asli botol, mengecek jumlah stok di gudang,
+ * menambah atau mengurangi pesanan, lalu menaruhnya ke keranjang belanja dengan arahan Asisten Spesifikasi (useDetailProduk).
+ */
 const DetailProduk = () => {
   const {
     id,

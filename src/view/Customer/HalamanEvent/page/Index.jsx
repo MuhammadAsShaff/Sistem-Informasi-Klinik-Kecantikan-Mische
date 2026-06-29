@@ -8,12 +8,12 @@ import CustomerLoading from '@/components/CustomerLoading';
 
 /**
  * =========================================================================
- * KOMPONEN VIEW: HalamanEvent (Daftar Event & Penyelenggaraan)
+ * BALAI ALUN-ALUN ACARA KLINIK (HalamanEvent)
  * =========================================================================
- * Komponen ini berfungsi merender daftar kegiatan (event) kecantikan Mische.
- * 
- * Seluruh data event aktif, selesai, summary statistik, pencarian, dan pemanggilan
- * API dikoordinasikan secara penuh di hook `useEventData`.
+ * Ibarat alun-alun taman festival tempat seluruh kegiatan klinik dipaparkan.
+ * Bagian atas menampilkan spanduk penyambutan megah. Di sekelilingnya terdapat
+ * deretan Brosur Acara (EventCard) dan Papan Statistik (SummaryCard), dengan
+ * arahan dari Mandor Acara (useEventData).
  */
 export default function HalamanEvent() {
   const { events, searchQuery, setSearchQuery, activeFilter, setActiveFilter, summary, isLoading } = useEventData();
@@ -23,21 +23,21 @@ export default function HalamanEvent() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-10 pb-20">
       <div className="max-w-[1300px] mx-auto px-4 md:px-6">
-        
+
         {/* Hero Banner */}
         <div className="relative w-full bg-gradient-to-r from-[#56bc36] from-[55%] to-[#C6FFD1] rounded-tl-[30px] rounded-br-[30px] overflow-hidden mb-12 flex items-center min-h-[160px] md:min-h-[200px] p-8 shadow-sm">
-           <div className="relative z-10 max-w-lg">
-             <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
-               Event Yang Di Selenggarakan Oleh Mische
-             </h1>
-           </div>
-           <div className="absolute right-0 top-0 h-full w-1/3 sm:w-1/4 pointer-events-none flex items-center justify-end p-4 sm:p-12 z-10">
-             <img
-               src={logomischee}
-               alt="Mische Logo"
-               className="h-2/3 sm:h-full w-auto object-contain drop-shadow-md"
-             />
-           </div>
+          <div className="relative z-10 max-w-lg">
+            <h1 className="text-xl md:text-5xl font-bold text-white leading-tight">
+              Event Yang Akan <br /> Diselenggarakan
+            </h1>
+          </div>
+          <div className="absolute right-0 top-0 h-full w-1/3 sm:w-1/4 pointer-events-none flex items-center justify-end p-4 sm:p-12 z-10">
+            <img
+              src={logomischee}
+              alt="Mische Logo"
+              className="h-2/3 sm:h-full w-auto object-contain drop-shadow-md"
+            />
+          </div>
         </div>
 
         {/* Filter & Search Row */}
@@ -46,12 +46,12 @@ export default function HalamanEvent() {
           <div className="flex items-center gap-3 flex-wrap">
             <span className="font-bold text-lg text-black mr-2">Event:</span>
             {filters.map(filter => (
-              <button 
+              <button
                 key={filter}
                 onClick={() => setActiveFilter(activeFilter === filter ? 'Semua' : filter)}
                 className={`px-5 py-2.5 rounded-tl-[10px] rounded-br-[10px] font-semibold text-sm transition-all duration-300
-                  ${activeFilter === filter 
-                    ? 'bg-[#56BC36] text-white shadow-md' 
+                  ${activeFilter === filter
+                    ? 'bg-[#56BC36] text-white shadow-md'
                     : 'bg-[#56BC36]/90 text-white hover:bg-[#56BC36] hover:shadow-md'
                   }`}
               >
@@ -96,22 +96,22 @@ export default function HalamanEvent() {
 
           {/* Sidebar / Summary Cards (Right Side) */}
           <div className="lg:col-span-1 flex flex-col gap-5">
-             <SummaryCard 
-                title="Event Yang Akan Di Selenggarakan" 
-                count={summary.akanBerlangsung} 
-                suffix="Yang Akan Berlangsung" 
-                style={{ backgroundImage: `url(${bgEvent})` }}/>
-             <SummaryCard 
-                title="Event Yang Sudah Di Selenggarakan" 
-                count={summary.sudahSelesai} 
-                suffix="Yang Sudah Berlangsung" 
-                style={{ backgroundImage: `url(${bgEvent})` }}
-               />
-             <SummaryCard 
-                title="Event Yang Sedang Di Selenggarakan" 
-                count={summary.sedangBerlangsung} 
-                suffix="Yang Sedang Berlangsung" 
-                style={{ backgroundImage: `url(${bgEvent})` }}/>
+            <SummaryCard
+              title="Event Yang Akan Di Selenggarakan"
+              count={summary.akanBerlangsung}
+              suffix="Yang Akan Berlangsung"
+              style={{ backgroundImage: `url(${bgEvent})` }} />
+            <SummaryCard
+              title="Event Yang Sudah Di Selenggarakan"
+              count={summary.sudahSelesai}
+              suffix="Yang Sudah Berlangsung"
+              style={{ backgroundImage: `url(${bgEvent})` }}
+            />
+            <SummaryCard
+              title="Event Yang Sedang Di Selenggarakan"
+              count={summary.sedangBerlangsung}
+              suffix="Yang Sedang Berlangsung"
+              style={{ backgroundImage: `url(${bgEvent})` }} />
           </div>
         </div>
 
@@ -126,10 +126,10 @@ function SummaryCard({ title, count, suffix, style }) {
     <div className="relative w-full h-[140px] rounded-[24px] overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
       {/* Background Image */}
       <div className="absolute inset-0 bg-gray-800">
-         <div className="w-full h-full bg-cover bg-center duration-500 opacity-62" 
-              style={style || { backgroundImage: `url(${bgEvent})` }}></div>
+        <div className="w-full h-full bg-cover bg-center duration-500 opacity-62"
+          style={style || { backgroundImage: `url(${bgEvent})` }}></div>
       </div>
-      
+
       {/* Content */}
       <div className="relative z-10 w-full h-full flex flex-col justify-center p-6 text-white">
         <h3 className="text-xl font-bold leading-tight mb-2 pr-4">{title}</h3>

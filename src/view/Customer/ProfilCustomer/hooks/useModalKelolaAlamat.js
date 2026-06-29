@@ -1,5 +1,13 @@
 import { useState } from 'react';
 
+/**
+ * =========================================================================
+ * PETUGAS JENDELA KONTROL BUKU ALAMAT (useModalKelolaAlamat)
+ * =========================================================================
+ * Ibarat asisten jaga yang berdiri di pintu ruang kelola alamat. Bertugas membuka
+ * atau menutup pintu loket penambahan alamat baru serta menanyakan kepastian
+ * kepada tamu saat ingin membuang alamat lama dari catatan.
+ */
 export const useModalKelolaAlamat = (tambahAlamat, hapusAlamat) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [alamatToDelete, setAlamatToDelete] = useState(null);

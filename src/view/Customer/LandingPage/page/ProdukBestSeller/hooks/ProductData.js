@@ -2,6 +2,13 @@ import AcneImg from '@/assets/images/acne.jpg';
 import AntiAgingImg from '@/assets/images/anti aging.jpg';
 import WhiteningImg from '@/assets/images/whittening.jpg';
 
+/**
+ * =========================================================================
+ * KATALOG BERKAS PRODUK TERLARIS (ProductData)
+ * =========================================================================
+ * Ibarat selebaran daftar menu produk unggulan (Whitening, Acne, Anti Aging)
+ * yang dicetak tebal untuk memudahkan petugas memajang barang paling laku di rak etalase lobi.
+ */
 export const products = [
   {
     id: 1,

@@ -2,6 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
+/**
+ * =========================================================================
+ * KERTAS PAMFLET KUPON POTONGAN (PromoCard)
+ * =========================================================================
+ * Ibarat selembar tiket emas berornamen pita sabuk (Ribbon) di pojok kiri atas.
+ * Pita hijau menandakan kupon masih segar dan siap dipakai, sedangkan pita merah
+ * menandakan kupon telah kedaluwarsa. Tiket ini menggoda tamu untuk mengintip rahasia di baliknya.
+ */
 export default function PromoCard({ promo }) {
   // Status dari backend mungkin integer (1/0) atau boolean atau string
   const isActive = promo.status === "Aktif" || promo.status === 1 || promo.status === true;

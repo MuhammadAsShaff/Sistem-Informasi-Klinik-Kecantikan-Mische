@@ -10,6 +10,13 @@ const formatRupiah = (number) => {
     }).format(number);
 };
 
+/**
+ * =========================================================================
+ * LOKET JENDELA RINCIAN INVOICE BELANJA (ModalDetailPembelian)
+ * =========================================================================
+ * Ibarat loket kaca tempat petugas kasir menyerahkan nota bukti pembelian lengkap
+ * dengan rincian barang, kurir pengirim, nomor resi, serta perincian potongan harga promo.
+ */
 export default function ModalDetailPembelian({ isOpen, onClose, selectedOrder }) {
   if (!isOpen || !selectedOrder) return null;
 

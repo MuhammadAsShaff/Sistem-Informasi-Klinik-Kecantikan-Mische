@@ -2,10 +2,12 @@ import React from "react";
 import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 /**
- * Komponen UI murni untuk aksi navbar (keranjang, tombol auth).
- * Semua data diterima dari props — tidak ada logic / hook di sini.
- *
- * @param {{ isLoggedIn: boolean, isAdmin: boolean, cartCount: number }} props
+ * =========================================================================
+ * RAK TROLIKU & TOMBOL MASUK KLINIK (NavbarActions)
+ * =========================================================================
+ * Ibarat meja layanan khusus di sudut loket pendaftaran. Di sini tersedia troli
+ * belanja dengan angka bel merah (cartCount) serta pintu jalur kilat menuju
+ * halaman profil, dashboard admin, atau ruang login sesuai tiket tamu.
  */
 const NavbarActions = ({ isLoggedIn, isAdmin, cartCount }) => {
   

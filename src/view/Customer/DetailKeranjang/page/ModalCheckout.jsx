@@ -18,11 +18,12 @@ import imgAlfamart from '@/assets/images/MetodePembayaran/ALFAMART.png';
 
 /**
  * =========================================================================
- * KOMPONEN: ModalCheckout (VIEW CHECKOUT MURNI / VIEW)
+ * BALAI PEMBAYARAN KASIR PRIVAT (ModalCheckout)
  * =========================================================================
- * Komponen modal UI untuk memproses checkout belanja customer.
- * Seluruh logika pemuatan alamat, perhitungan ongkir (RajaOngkir), caching data, 
- * dan pembayaran (Midtrans Snap) dikelola oleh custom hook `useCheckout`.
+ * Ibarat ruang VIP kasir yang tertutup tirai gelap agar tamu fokus berbelanja.
+ * Di sini, tamu dipersilakan meninjau rak alamat pengiriman, memilih kurir
+ * (RajaOngkir), dan menunjuk lambang bank favorit. Seluruh lalu lintas uang
+ * dan data dikawal ekstra ketat oleh Mandor Kepala Loket (useCheckout).
  */
 export default function ModalCheckout({ 
   isOpen, 
@@ -244,7 +245,6 @@ export default function ModalCheckout({
                   { id: 'bca_va', name: 'BCA VA', logo: imgBCA },
                   { id: 'bni_va', name: 'BNI VA', logo: imgBNI },
                   { id: 'bri_va', name: 'BRI VA', logo: imgBRI },
-                  { id: 'echannel', name: 'Mandiri VA', logo: imgMandiri },
                   { id: 'permata_va', name: 'Permata VA', logo: imgPermata },
                   { id: 'gopay', name: 'GoPay', logo: imgGoPay },
                   { id: 'shopeepay', name: 'ShopeePay', logo: imgShopeePay },

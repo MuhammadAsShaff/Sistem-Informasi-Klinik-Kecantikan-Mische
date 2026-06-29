@@ -2,26 +2,33 @@ import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import { useModalHapusProduk } from '../hooks/useModalHapusProduk';
 
+/**
+ * KOTAK KONFIRMASI PENGHAPUSAN PRODUK (ModalHapusProduk)
+ * Ibarat tanda peringatan besar berseru (!) yang melompat keluar di depan mata admin 
+ * sebelum suatu barang dibuang secara permanen ke tempat sampah.
+ */
 const ModalHapusProduk = ({ isOpen, onClose, dataId, refetch, showToast }) => {
+  // Memanggil petugas pengurus penghapusan (yang akan menghubungi eksekutor di gudang pusat)
   const { isDeleting, handleDelete } = useModalHapusProduk(dataId, refetch, showToast, onClose);
 
+  // Jika saklar pembukanya mati, tetap sembunyikan kotak ini
   if (!isOpen) return null;
 
-    return (
+  return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white w-full max-w-md rounded-2xl p-8 text-center shadow-xl">
         
-        {/* Warning Icon */}
+        {/* Ikon Peringatan Tanda Seru (!) */}
         <div className="mx-auto w-20 h-20 border-4 border-gray-400 rounded-full flex items-center justify-center mb-6">
           <span className="text-gray-400 text-5xl font-bold">!</span>
         </div>
 
-        {/* Title */}
+        {/* Tulisan Pertanyaan Konfirmasi */}
         <h2 className="text-[22px] text-gray-500 font-medium mb-8">
           Apakah Anda yakin ingin menghapus produk ini?
         </h2>
 
-        {/* Actions */}
+        {/* Tombol Keputusan (Ya, Hapus atau Tidak, Batalkan) */}
         <div className="flex justify-center gap-4">
           <button 
             onClick={handleDelete}

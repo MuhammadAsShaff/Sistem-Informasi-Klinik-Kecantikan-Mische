@@ -1,5 +1,13 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * SPANDUK PERMAK ANJUNGAN PERAWATAN (TreatmentBanner)
+ * =========================================================================
+ * Ibarat spanduk pembuka bersalut warna hijau bercahaya dengan watermark lambang
+ * klinik di sudut bawahnya. Spanduk ini menyambut tamu dengan kehangatan dan
+ * mengajak mereka menemukan perawatan terbaik.
+ */
 const TreatmentBanner = ({ logo }) => {
   return (
     <div className="snap-start shrink-0 w-[85vw] md:w-[450px] lg:w-[550px] bg-[linear-gradient(225deg,#C6FFD1_0%,#56BC36_50%)] p-8 md:p-12 lg:p-16 text-white relative overflow-hidden flex flex-col justify-center shadow-lg">

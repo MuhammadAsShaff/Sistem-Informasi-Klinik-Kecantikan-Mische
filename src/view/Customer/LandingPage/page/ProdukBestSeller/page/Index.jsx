@@ -3,13 +3,17 @@ import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { useProdukData } from '../../../../HalamanProduk/hooks/useProdukData';
 
+/**
+ * =========================================================================
+ * RAK PAMERAN ETALASE PRODUK TERLARIS (ProdukBestSeller)
+ * =========================================================================
+ * Ibarat lemari etalase kaca bercahaya terang di lobi depan klinik:
+ * 1. Meminta Asisten Data Produk (useProdukData) untuk membawakan seluruh kotak skincare dari gudang.
+ * 2. Mengambil 3 kotak berlabel emas (Best Seller) untuk dipajang paling depan.
+ * 3. Menyediakan tombol "Lihat Lainnya" bagi tamu yang ingin melihat seluruh koleksi di ruang toko utama.
+ */
 export default function ProdukBestSeller() {
-  // Memanggil custom hook useProdukData untuk mengambil data produk dari server/API.
-  // 'products' berisi daftar produk, dan 'isLoading' menandakan apakah data masih dimuat.
   const { products, isLoading } = useProdukData();
-  
-  // Mengambil 3 produk pertama saja (Best Seller) dari daftar produk yang ada.
-  // Jika products belum ada (null/undefined), kembalikan array kosong [].
   const bestSellers = products ? products.slice(0, 3) : [];
 
   return (

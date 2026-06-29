@@ -1,5 +1,13 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * LACI TAB KLASIFIKASI RAK (CategoryTabs)
+ * =========================================================================
+ * Ibarat laci berlabel nama-nama kelompok barang di meja pameran. Ketika satu
+ * laci ditekan, labelnya menyala hijau menandakan bahwa barang di meja pameran
+ * kini khusus menampilkan kelompok tersebut.
+ */
 const CategoryTabs = ({ activeCategory, setActiveCategory, categories = [] }) => {
   const allCategories = [
     { id: 'semua', label: 'SEMUA PRODUK' },

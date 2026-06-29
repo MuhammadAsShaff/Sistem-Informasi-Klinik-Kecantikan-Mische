@@ -2,6 +2,14 @@ import React from 'react';
 import ProductCard from './ProductCard';
 import { useProductGrid } from '../hooks/useProductGrid';
 
+/**
+ * =========================================================================
+ * RAK PANJANG BARANG DAGANGAN (ProductGrid)
+ * =========================================================================
+ * Ibarat jajaran rak kabinet panjang di tengah toko. Rak ini dibantu oleh Petugas
+ * Pembuka Tirai (useProductGrid) yang senantiasa membuka pameran barang demi
+ * barang begitu tamu menekan tombol 'Lihat Produk Lainnya'.
+ */
 const ProductGrid = ({ products }) => {
   const { visibleCount, handleLoadMore, visibleProducts } = useProductGrid(products);
 

@@ -6,10 +6,21 @@ import HasilKlinik from "./HasilKlinik/page/Index";
 import KeunggulanKlinik from "./KeunggulanKlinik/page/Index";
 import WhatsAppButton from "./WhatsAppButton";
 
+/**
+ * =========================================================================
+ * BALAI UTAMA SERAMBI PAVILIUN KLINIK (LandingPage)
+ * =========================================================================
+ * Ibarat keseluruhan area paviliun istana Mische. Halaman ini menggabungkan
+ * berbagai anjungan pameran menjadi satu rute tur yang indah:
+ * 1. Panggung Komidi Putar (HeroCarousel)
+ * 2. Galeri Foto Dokter (DoctorSection)
+ * 3. Meja Penjelasan Perawatan (SectionInfoPerawatan)
+ * 4. Rak Pameran Produk Paling Laris (ProdukBestSeller)
+ * 5. Mading Bukti Nyata Hasil Perawatan (HasilKlinik)
+ * 6. Tugu Piagam Keunggulan Klinik (KeunggulanKlinik)
+ * 7. Kotak Telepon & Lift Melayang (WhatsAppButton)
+ */
 export default function LandingPage() {
-  // Komponen LandingPage ini adalah halaman utama yang dilihat pelanggan.
-  // Di sini kita menggabungkan berbagai "section" (bagian) halaman menjadi satu kesatuan.
-  // Setiap section telah dipisah ke dalam folder masing-masing yang memiliki struktur 'hooks' (untuk logika) dan 'page' (untuk tampilan UI).
   return (
     // Membungkus seluruh konten dengan div ber-class 'relative w-full' 
     // agar komponen di dalamnya seperti tombol WhatsApp bisa memiliki posisi yang relatif terhadap halaman.

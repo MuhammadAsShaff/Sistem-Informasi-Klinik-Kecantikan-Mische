@@ -6,7 +6,12 @@ import { saveUser } from "@/core/utils/authStorage";
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
 /**
- * Hook untuk mengelola form ubah password customer (UPDATE password).
+ * =========================================================================
+ * MANDOR KEAMANAN KUNCI BRANKAS (useUbahPasswordCustomer)
+ * =========================================================================
+ * Ibarat perwira keamanan brankas yang memastikan kunci baru memenuhi standar
+ * kokoh (minimal 8 karakter, ada huruf besar dan kecil) serta memeriksa
+ * kesesuaian kunci cadangan sebelum menyimpannya ke dalam brankas.
  *
  * @param {Object}   formData  - Data profil saat ini (dikirim bersama payload)
  * @param {Function} onSuccess - Callback dengan data user terbaru setelah berhasil

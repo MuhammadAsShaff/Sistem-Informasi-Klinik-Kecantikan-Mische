@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
 
-// REGEX VALIDASI PASSWORD: Wajib minimal 8 karakter, ada huruf besar (A-Z) dan huruf kecil (a-z)
+// ─── ALAT BANTU PENGECEK KEAMANAN SANDI ───────────────────────────────────────
+// Cetakan standar gembok: Wajib minimal 8 guratan, mencampur ukiran kapital (A-Z) dan ukiran kecil (a-z)
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 
-// DEFENISI DATA FORM AWAL (KOSONG)
+// ─── KERTAS FORMULIR BARU (KOSONG) ───────────────────────────────────────────
+// Template lembaran kertas bersih yang akan disodorkan kepada tamu pendaftar baru
 const INITIAL_FORM = {
   nama: "",
   email: "",
@@ -20,90 +22,104 @@ const INITIAL_FORM = {
 
 /**
  * =========================================================================
- * CUSTOM HOOK: useRegistrasi
+ * MANDOR KEPALA BAGIAN PENDAFTARAN (useRegistrasi)
  * =========================================================================
- * Hook ini mengelola seluruh logika pendaftaran akun customer baru, meliputi:
- * 1. Penyimpanan input form pendaftaran.
- * 2. Pembersihan input otomatis (misal: nomor WA hanya boleh diisi angka).
- * 3. Validasi kekuatan password & kesesuaian konfirmasi password.
- * 4. Pengiriman request pendaftaran akun ke endpoint Laravel `/auth/register`.
- * 
- * Tidak ada parameter yang dibutuhkan karena semua logic di-handle mandiri.
+ * Ibarat seorang petugas cekatan di meja registrasi warga baru, bertugas:
+ * 1. Menjaga laci arsip penyimpan isian biodata tamu.
+ * 2. Mengawasi pena tamu saat menulis: jika menulis nomor WhatsApp, Mandor langsung menghapus huruf/simbol agar tersisa angka murni.
+ * 3. Mengukur kekokohan sandi rahasia dan mencocokkan ulangan ketikan sandi di kolom kedua.
+ * 4. Mengirim kurir membawa map formulir ke loket Laravel `/auth/register`.
  */
 export function useRegistrasi() {
+  // Penunjuk jalan untuk memandu tamu setelah resmi terdaftar
   const navigate = useNavigate();
+
+  // ─── LACI PENGUMUMAN NOTIFIKASI (TOAST) ─────────────────────────────────────
+  // Papan tulisan melayang untuk memberi selamat atau menegur tamu
   const [toast, setToast] = useState({ isOpen: false, message: "", type: "success" });
+  // Tuas cepat untuk mengibarkan papan notifikasi
   const showToast = (message, type = "success") => setToast({ isOpen: true, message, type });
 
-  // formData: Menyimpan seluruh objek input pendaftaran sesuai dengan INITIAL_FORM
+  // ─── LACI ARSIP ISIAN FORMULIR ──────────────────────────────────────────────
+  // Laci utama penyimpan seluruh catatan di lembar kertas pendaftaran
   const [formData, setFormData] = useState(INITIAL_FORM);
-  const [showPassword, setShowPassword] = useState(false); // Status tampil/sembunyi password
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Status tampil/sembunyi konfirmasi password
+  // Tuas penyingkap tirai penutup kolom password pertama
+  const [showPassword, setShowPassword] = useState(false); 
+  // Tuas penyingkap tirai penutup kolom ulangan password kedua
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
 
   /**
-   * FUNGSI MENCATAT PERUBAHAN INPUT (onChange)
-   * Dipanggil setiap kali customer mengetik di salah satu input form.
+   * ─── PENGAMAT GURATAN PENA TAMU (handleChange) ─────────────────────────────
+   * Aktif berkedip seketika setiap kali ujung pena tamu menggores salah satu kotak isian.
    */
   const handleChange = (e) => {
+    // Mengidentifikasi nama kotak isian dan tulisan baru yang digoreskan
     const { name, value } = e.target;
     
-    // Keamanan Khusus: Jika inputnya adalah nomor WhatsApp
+    // Aturan Kedisiplinan Khusus: Jika kotak yang ditulis adalah "nomorWa" (Nomor WhatsApp)
     if (name === "nomorWa") {
-      // Otomatis hapus karakter non-angka agar data nomor telepon bersih
+      // Mandor langsung menyapu bersih semua coretan selain angka murni (regex \D)
       setFormData((prev) => ({ ...prev, [name]: value.replace(/\D/g, "") }));
     } else {
-      // Simpan input lainnya apa adanya ke state
+      // Untuk kotak isian lain (nama, alamat, dll.), simpan tulisan apa adanya ke dalam laci arsip
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   /**
-   * FUNGSI UTAMA: KIRIM PENDAFTARAN (onSubmit)
+   * ─── TUGAS EKSEKUSI PENDAFTARAN UTAMA (handleSubmit) ───────────────────────
+   * Ditekan ketika tamu selesai mengisi formulir dan menyodorkan kertasnya.
    */
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Cegah reload halaman
+    // Menolak tradisi usang browser yang gemar memuat ulang pekarangan gedung
+    e.preventDefault(); 
 
-    // 1. Validasi Keamanan: Password harus memenuhi kriteria regex (campuran besar-kecil & min 8)
+    // 1. Sidak Kekuatan Gembok: Pastikan sandi rahasia mematuhi standar (campuran huruf besar-kecil & minimal 8 karakter)
     if (!PASSWORD_REGEX.test(formData.password)) {
+      // Kirim teguran melayang jika sandi teramat lemah
       showToast("Password minimal 8 karakter dan harus mengandung huruf besar dan kecil!", "error");
-      return;
+      return; // Tolak dokumen, jangan kirim ke kurir
     }
     
-    // 2. Validasi Keamanan: Password di kolom 1 dan kolom 2 harus sama persis
+    // 2. Sidak Kecocokan Sandi: Pastikan tulisan di kolom sandi pertama sama persis dengan kolom sandi kedua
     if (formData.password !== formData.confirmPassword) {
+      // Kirim teguran melayang jika sandi tidak selaras
       showToast("Konfirmasi password tidak cocok!", "error");
-      return;
+      return; // Tolak dokumen
     }
 
     try {
-      // Hapus kolom 'confirmPassword' dari payload karena server backend hanya butuh field 'password'
+      // Menggunting dan memisahkan kolom 'confirmPassword' dari map, karena kantor pusat Laravel hanya butuh field 'password'
       const { confirmPassword, ...payload } = formData;
       
-      // Kirim data registrasi ke backend Laravel
+      // Mengutus kurir Axios berlari membawa map bersih (payload) ke loket pendaftaran pusat
       const res = await axiosClient.post(endpoints.auth.register, payload);
 
-      // Jika pendaftaran akun berhasil
+      // Jika kantor pusat memberi stempel persetujuan pendaftaran (success: true)
       if (res.data.success) {
+        // Angkat plang pengumuman selamat "Registrasi Berhasil!"
         showToast("Registrasi berhasil!", "success");
-        // Beri jeda 1 detik untuk menampilkan notifikasi sukses, lalu alihkan ke halaman login
+        // Beri waktu 1000 milidetik (1 detik) bagi tamu untuk membaca plang, lalu giring ke Pintu Masuk (Login)
         setTimeout(() => navigate("/login"), 1000);
       }
     } catch (error) {
-      // --- PENANGANAN ERROR JIKA REGISTRASI GAGAL ---
+      // ─── LOKET PUSAT MENOLAK MAP FORMULIR ──────────────────────────────────
       let errorMsg = "Registrasi gagal. Coba lagi.";
       
-      // Jika terjadi error validasi dari server backend (misal email sudah terdaftar)
+      // Mengorek isi map tolakan dari server pusat (misalnya: alamat email sudah pernah dipakai orang lain)
       if (error.response?.data?.errors) {
-        // Ambil rincian pesan kesalahan validasi pertama
+        // Mengutip omelan pertama dari staf pemeriksa di pusat Laravel
         errorMsg = Object.values(error.response.data.errors)[0][0];
       } else if (error.response?.data?.message) {
+        // Jika alasan tolakan tercantum di kertas surat umum
         errorMsg = error.response.data.message;
       }
+      // Kibarkan papan notifikasi merah berisi teguran/omelan tersebut
       showToast(errorMsg, "error");
     }
   };
 
-  // Kembalikan semua state & handler agar dapat digunakan di RegistrasiForm.jsx
+  // Serahkan kunci laci arsip dan seluruh tuas kendali kepada Meja Formulir (RegistrasiForm.jsx)
   return {
     formData,
     showPassword, setShowPassword,
@@ -114,3 +130,4 @@ export function useRegistrasi() {
     setToast
   };
 }
+

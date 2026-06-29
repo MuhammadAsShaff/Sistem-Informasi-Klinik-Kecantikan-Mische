@@ -1,6 +1,14 @@
 import React from "react";
 import { Trash2 } from "lucide-react";
 
+/**
+ * =========================================================================
+ * PLANG PERINGATAN PEMBUANGAN BARANG (ModalKonfirmasiHapus)
+ * =========================================================================
+ * Ibarat satpam berseragam merah yang berdiri menutupi keranjang Anda saat
+ * Anda menekan tombol tong sampah, lalu bertanya tegas: "Apakah Anda sungguh-sungguh
+ * ingin membuang barang berharga ini dari belanjaan Anda?"
+ */
 export default function ModalKonfirmasiHapus({ 
   isOpen, 
   onClose, 

@@ -9,6 +9,14 @@ import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
+/**
+ * =========================================================================
+ * ANJUNGAN PAMERAN HASIL NYATA KLINIK (HasilKlinik)
+ * =========================================================================
+ * Ibarat anjungan megah bernuansa hijau zamrud di sudut paviliun klinik. Di sini
+ * terpasang roda putar otomatis (Swiper) yang terus menampilkan deretan bingkai
+ * perbandingan wajah, mengundang tamu untuk segera mendaftarkan diri (Reservasi Sekarang).
+ */
 export default function HasilKlinik() {
   return (
     <section className="w-full bg-[#256E0F] py-24">

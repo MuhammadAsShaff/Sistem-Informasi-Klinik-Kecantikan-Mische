@@ -2,11 +2,13 @@ import React from "react";
 import { X } from "lucide-react";
 
 /**
- * Modal untuk memperbarui kegiatan — pure UI.
- * Logic state, fetch detail, validasi file, dan submit dikelola oleh hook `useEditKegiatan`
- * via prop `hook`.
+ * BILIK MEJA KOREKSI KEGIATAN LAMA (ModalEditKegiatan)
+ * Ibarat meja kerja khusus yang digelar mandor saat tombol pensil ditekan.
+ * Meja ini beralaskan catatan lama, tempat admin bisa mencoret nama acara lama, menulis cerita baru, 
+ * atau mengganti pasfoto. Seluruh aturan dan pena dipegang oleh Asisten Juru Tulis (useEditKegiatan).
  */
 const ModalEditKegiatan = ({ isOpen, onClose, hook }) => {
+  // Meminta pena, kertas isian, dan timbangan dari Asisten Juru Tulis
   const {
     formData,
     previewImage,
@@ -19,8 +21,9 @@ const ModalEditKegiatan = ({ isOpen, onClose, hook }) => {
     handleSubmit,
   } = hook;
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, meja ini disembunyikan
 
+  // Gembok otomatis: Tombol simpan terkunci rapat jika ada kotak kosong atau foto terlalu berat
   const isDisabled =
     isLoading ||
     !formData.namaKegiatan ||
@@ -32,7 +35,7 @@ const ModalEditKegiatan = ({ isOpen, onClose, hook }) => {
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white w-full max-w-[750px] rounded-[16px] shadow-2xl animate-in fade-in zoom-in duration-300 flex flex-col">
 
-        {/* HEADER */}
+        {/* ATAP BILIK KOREKSI */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-[20px] font-bold text-black">Perbarui Kegiatan</h2>
           <button onClick={onClose} disabled={isLoading} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -40,17 +43,17 @@ const ModalEditKegiatan = ({ isOpen, onClose, hook }) => {
           </button>
         </div>
 
-        {/* ERROR */}
+        {/* PAPAN TEGURAN MERAH */}
         {errorMessage && (
           <div className="mx-6 mt-6 bg-red-50 text-red-500 text-sm p-3 rounded-xl font-medium border border-red-100">
             {errorMessage}
           </div>
         )}
 
-        {/* BODY */}
+        {/* AREA FORMULIR ISIAN PADA MEJA */}
         <div className="p-6 grid grid-cols-12 gap-8">
 
-          {/* Kolom Foto */}
+          {/* Kolom Foto Pajangan */}
           <div className="col-span-5 flex flex-col">
             <div className="border border-black h-[180px] w-full flex items-center justify-center text-[15px] font-semibold mb-4 bg-gray-100 overflow-hidden">
               {previewImage ? (
@@ -74,7 +77,7 @@ const ModalEditKegiatan = ({ isOpen, onClose, hook }) => {
             </div>
           </div>
 
-          {/* Kolom Form */}
+          {/* Kolom Kotak Isian Teks */}
           <div className="col-span-7 flex flex-col">
             <p className="text-[13px] text-gray-800 mb-6 leading-relaxed">
               Anda dapat memperbarui informasi kegiatan dengan nama, deskripsi, dan gambar. Pastikan untuk memasukkan informasi terbaru agar data selalu akurat.
@@ -103,7 +106,7 @@ const ModalEditKegiatan = ({ isOpen, onClose, hook }) => {
 
         </div>
 
-        {/* FOOTER */}
+        {/* LACI TOMBOL UTUS KURIR */}
         <div className="p-6 border-t border-gray-200 flex justify-end">
           <button onClick={handleSubmit} disabled={isDisabled}
             className={`bg-[#55BC36] hover:bg-[#46a02b] text-white px-6 py-2.5 rounded-md font-medium text-[14px] transition-colors shadow-sm ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}>

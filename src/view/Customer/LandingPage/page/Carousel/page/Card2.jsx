@@ -1,5 +1,13 @@
 import HeroGirl from '@/assets/images/Bg-Hero.png';
 
+/**
+ * =========================================================================
+ * PANGGUNG BALIHO KEDUA: KULIT SEHAT (Card2)
+ * =========================================================================
+ * Ibarat panggung peragaan kedua berselimut gradasi hijau zamrud yang sejuk.
+ * Baliho ini membisikkan pesan tentang rasa percaya diri yang melambung berkat
+ * perawatan kulit profesional dan aman di Mische.
+ */
 export default function Card2() {
     return (
         // KONTEN UTAMA: Menggunakan gradasi hijau yang berbeda untuk variasi

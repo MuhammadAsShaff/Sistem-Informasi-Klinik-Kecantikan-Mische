@@ -1,5 +1,13 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * MEJA KASIR PENGHITUNGAN TOTAL (OrderSummary)
+ * =========================================================================
+ * Ibarat meja kalkulator besar di sudut lorong belanja. Meja ini secara otomatis
+ * merekapitulasi setiap pesanan Anda, mencetak laci tempat memasukkan kertas
+ * kupon diskon, dan menyalakan tombol hijau menyala "Bayar" begitu Anda siap melangkah ke ruang checkout.
+ */
 const OrderSummary = ({
   selectedItems,
   totalAmount,

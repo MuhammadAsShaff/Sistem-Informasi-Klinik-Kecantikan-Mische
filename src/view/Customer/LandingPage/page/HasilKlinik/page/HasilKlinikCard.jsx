@@ -1,5 +1,13 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * BINGKAI PERBANDINGAN SEBELUM & SESUDAH (HasilKlinikCard)
+ * =========================================================================
+ * Ibarat bingkai kayu berukir yang membagi dua cermin berdampingan: kiri untuk
+ * masa lalu (Before) dan kanan untuk masa kini yang indah (After). Bingkai ini
+ * dilabeli plakat nama perawatan di bagian bawahnya.
+ */
 const HasilKlinikCard = ({ item }) => {
   return (
     <div className="group">

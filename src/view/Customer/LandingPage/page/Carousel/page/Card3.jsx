@@ -1,5 +1,13 @@
 import HeroGirl from '@/assets/images/Bg-Hero.png';
 
+/**
+ * =========================================================================
+ * PANGGUNG BALIHO KETIGA: GLOWING SPESIAL (Card3)
+ * =========================================================================
+ * Ibarat panggung peragaan ketiga dengan pencahayaan paling terang. Baliho ini
+ * mengingatkan tamu bahwa inilah saat paling sempurna untuk membuat wajah
+ * berkilau berseri (glowing) dengan memanfaatkan promo bulanan.
+ */
 export default function Card3() {
     return (
         // KONTEN UTAMA: Menggunakan gradasi hijau yang paling terang

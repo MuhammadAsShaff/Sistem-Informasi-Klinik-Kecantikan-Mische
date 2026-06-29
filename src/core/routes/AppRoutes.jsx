@@ -1,6 +1,17 @@
 import React from 'react';
 import { Routes, Route } from "react-router-dom";
 
+/**
+ * =========================================================================
+ * PETUGAS PENGATUR LALU LINTAS & PETA LORONG (AppRoutes)
+ * =========================================================================
+ * Ibarat kepala petugas pengatur arah dan rambu-rambu di pintu gerbang utama istana klinik.
+ * File ini memegang "Peta Induk" seluruh ruangan dan lorong di Mische:
+ * - Jika tamu melangkah ke lorong "/promo", petugas mengarahkannya ke Ruang Pameran Promo.
+ * - Jika admin masuk ke lorong rahasia "/admin/dashboard", petugas memeriksa kunci dan membawanya ke Balai Kendali Admin.
+ * Tanpa petugas ini, semua tamu dan dokter akan tersesat di lorong kosong!
+ */
+
 // Layout
 import CustomerLayout from "@/view/Customer/CustomerLayout/page/Index";
 import AdminLayout from "@/view/admin/AdminLayout/page/Index";

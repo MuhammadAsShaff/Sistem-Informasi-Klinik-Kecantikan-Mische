@@ -1,6 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+/**
+ * =========================================================================
+ * KARTU PLAKAT RINGKASAN PERAWATAN (TreatmentCard)
+ * =========================================================================
+ * Ibarat tiang penyangga brosur di atas meja lobi. Saat tamu menatap fotonya,
+ * fotonya perlahan mendekat (scale-110), menyuguhkan rangkuman singkat dan
+ * tombol kilat menuju ruang penjelasan selengkapnya.
+ */
 const TreatmentCard = ({ item }) => {
   return (
     <div 

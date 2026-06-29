@@ -1,8 +1,34 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * PAPAN JUDUL HALAMAN (Ibarat Papan Petunjuk di Pintu Masuk Lorong)
+ * =========================================================================
+ * File ini ibarat "Papan Petunjuk" di atas lorong toko.
+ * Tugasnya sangat sederhana: Menampilkan judul besar "Data Jadwal Reservasi Treatment" 
+ * beserta penjelasan singkat agar admin tahu fungsi halaman ini.
+ */
 const Header = () => (
+  /*
+    KOTAK PEMBUNGKUS JUDUL:
+    'mb-4' memberikan sedikit jarak di bagian bawah papan judul,
+    agar tulisannya tidak menabrak kotak pencarian di bawahnya.
+  */
   <div className="mb-4">
+    {/* 
+      TULISAN UTAMA HALAMAN:
+      - 'text-3xl': Membuat tulisan berukuran sangat besar dan jelas.
+      - 'font-medium': Memberikan ketebalan huruf yang pas, tidak terlalu tebal atau tipis.
+      - 'text-black': Memberikan warna hitam bersih.
+      - 'tracking-tighter': Merapatkan sedikit jarak antar huruf agar terkesan rapi.
+    */}
     <h1 className="text-3xl font-medium text-black tracking-tighter">Data Jadwal Reservasi Treatment</h1>
+    
+    {/* 
+      TEKS KETERANGAN SINGKAT:
+      - 'text-black text-sm': Tulisan ukuran kecil berwarna hitam yang nyaman dibaca.
+      - 'mt-1': Memberikan sedikit jarak dari judul besar di atasnya.
+    */}
     <p className="text-black text-sm mt-1">
       Menampilkan data jadwal reservasi treatment lengkap dengan jadwal dan informasi pengguna. Admin dapat melakukan pencarian, edit, dan hapus data.
     </p>
@@ -10,9 +36,3 @@ const Header = () => (
 );
 
 export default Header;
-// const header itu berguna untuk membua komponen yang namanya header yang dimana tanda () akan langsung menampilkan isi didalamnya.
-//div classname itu untuk pembungkus kontainer agar bisa di styling
-// mb-4 itu untuk memberikan jarak antar baris, dalam kasus ini jarak antara header dan search bar.
-// text-3xl itu untuk mengubah ukuran font menjadi 3xl.
-// tracking-tight itu untuk mengatur jarak antar karakter agar sedikit lebih rapat.
-// mt-1 itu untuk memberikan jarak antar baris, dalam kasus ini jarak antara header dan search bar.

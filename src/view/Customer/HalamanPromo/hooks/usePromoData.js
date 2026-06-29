@@ -2,6 +2,15 @@ import { useState } from 'react';
 import { endpoints } from '@/core/api/endpoints';
 import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
+/**
+ * =========================================================================
+ * MANDOR ARSIP KUPON POTONGAN HARGA (usePromoData)
+ * =========================================================================
+ * Ibarat kepala bagian promosi di kantor pusat klinik:
+ * 1. Meminta seluruh tumpukan kupon promo dari brankas server (FetchWithCache).
+ * 2. Menyediakan kotak kaca pembesar (searchQuery) untuk mencocokkan judul promo.
+ * 3. Menggunakan stempel saringan jenis promo dan status aktif untuk memastikan tamu hanya melihat kupon yang benar-benar mereka butuhkan.
+ */
 export function usePromoData() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterJenis, setFilterJenis] = useState('Semua');

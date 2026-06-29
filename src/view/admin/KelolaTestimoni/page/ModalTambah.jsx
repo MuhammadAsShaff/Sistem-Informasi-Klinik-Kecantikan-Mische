@@ -1,7 +1,15 @@
 import React from "react";
 import { useModalTambah } from "../hooks/useModalTambah";
 
+/**
+ * BILIK MEJA PENDAFTARAN ULASAN BARU (ModalTambah)
+ * Ibarat bilik meja lipat di sudut balai tempat asisten membagikan kertas isian ulasan putih bersih.
+ * Di meja ini, admin bisa menyalin kalimat pujian dari pelanggan, menempel foto wajah pelanggan (wajib!), 
+ * mencatat tanggal perawatan, dan mengklasifikasikan jenis pujiannya (Treatment/Produk/Pelayanan).
+ * Segala urusan pengawalan kelengkapan formulir dijaga ketat oleh Asisten Pengawal Meja (useModalTambah).
+ */
 const ModalTambah = ({ isOpen, onClose, refetch, showToast }) => {
+  // Meminta pena, laci formulir, dan rambu kerja dari Asisten Pengawal Meja Pendaftaran
   const {
     fileName,
     formData,
@@ -11,11 +19,12 @@ const ModalTambah = ({ isOpen, onClose, refetch, showToast }) => {
     handleSubmit
   } = useModalTambah(isOpen, refetch, showToast, onClose);
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, bilik meja pendaftaran ini disimpan kembali
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 font-poppins">
       <div className="bg-white rounded-lg w-full max-w-4xl mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
+        {/* Atap Bilik Pendaftaran */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-black">Tambah Testimoni</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -23,8 +32,9 @@ const ModalTambah = ({ isOpen, onClose, refetch, showToast }) => {
           </button>
         </div>
 
+        {/* Ruangan Formulir Meja Kerja */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Column */}
+          {/* Kolom Kiri: Tempat Mengunggah Foto & Menulis Pujian */}
           <div className="flex flex-col gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-2">Unggah Gambar Testimoni</label>
@@ -57,7 +67,7 @@ const ModalTambah = ({ isOpen, onClose, refetch, showToast }) => {
             </div>
           </div>
 
-          {/* Right Column */}
+          {/* Kolom Kanan: Tempat Menulis Nama, Tanggal, dan Memilih Jenis Pujian */}
           <div className="flex flex-col gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-2">Nama Testimoni</label>
@@ -102,6 +112,7 @@ const ModalTambah = ({ isOpen, onClose, refetch, showToast }) => {
           </div>
         </div>
 
+        {/* Laci Tombol Utus Kurir Pendaftaran */}
         <div className="p-6 border-t border-gray-200 flex justify-end">
           <button 
             onClick={handleSubmit}

@@ -2,6 +2,14 @@ import React from 'react';
 import logomischee from '@/assets/images/LogoMischee.png';
 import { useModalDetailReservasi } from '../hooks/useModalDetailReservasi';
 
+/**
+ * =========================================================================
+ * JENDELA KASIR REKAP TIKET PERAWATAN (ModalDetailReservasi)
+ * =========================================================================
+ * Ibarat loket kaca eksklusif tempat petugas membentangkan lembaran jadwal,
+ * rincian tanggal, nama dokter, dan meminta kepastian akhir dari tamu sebelum
+ * meresmikannya ke dalam sistem klinik.
+ */
 export default function ModalDetailReservasi({ 
   isOpen, 
   onClose, 

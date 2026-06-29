@@ -37,7 +37,14 @@ const InfoItem = ({ label, value }) => (
   </div>
 );
 
-// --- KOMPONEN UTAMA FILTER ---
+/**
+ * =========================================================================
+ * MEJA RESEPSIONIS PILIHAN DOKTER & TANGGAL (FilterSection)
+ * =========================================================================
+ * Ibarat meja konsultasi awal tempat tamu memutar roda pilihan untuk menentukan
+ * jenis perawatan wajah yang diinginkan, dokter ahli yang dipercaya, serta
+ * memantau berapa banyak bilik praktek yang masih kosong hari ini.
+ */
 export default function FilterSection({ 
   treatment, setTreatment, 
   doctor, setDoctor, 

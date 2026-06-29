@@ -1,6 +1,14 @@
 import { endpoints } from "@/core/api/endpoints";
 import { useFetchWithCache } from "@/core/hooks/useFetchWithCache";
 
+/**
+ * =========================================================================
+ * MANDOR INFORMASI KETERSEDIAAN KAMAR PRAKTEK (useFetchPublicJadwal)
+ * =========================================================================
+ * Ibarat papan jadwal interaktif di lobi utama klinik. Saat tamu menunjuk tanggal
+ * dan dokter tertentu, mandor ini seketika memeriksa bilik mana saja yang kosong
+ * dan mana yang sedang terisi.
+ */
 export function useFetchPublicJadwal(tanggal, idDokter) {
   const params = new URLSearchParams();
   if (tanggal) params.append("tanggal", tanggal);

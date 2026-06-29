@@ -6,6 +6,16 @@ import { endpoints } from "@/core/api/endpoints";
 import { getToken, saveUser } from "@/core/utils/authStorage";
 import { CartProvider } from "@/core/context/CartContext";
 
+/**
+ * =========================================================================
+ * MANDOR JENDERAL GERBANG SISTEM UTAMA (App.jsx)
+ * =========================================================================
+ * Ibarat pos penjagaan utama tempat mandor jenderal berdiri mengawasi seluruh
+ * lorong gedung (AppRoutes). Tugas khususnya:
+ * 1. Memastikan setiap kali tamu berpindah ruangan, langkahnya dimulai dari lantai paling atas (scrollTo top).
+ * 2. Memeriksa tanda pengenal (token sesi) ke brankas pusat (checkSession) agar penyusup atau tamu kedaluwarsa segera diarahkan keluar.
+ * 3. Membekali tamu dengan keranjang belanja otomatis (CartProvider).
+ */
 export default function App() {
   const location = useLocation();
 

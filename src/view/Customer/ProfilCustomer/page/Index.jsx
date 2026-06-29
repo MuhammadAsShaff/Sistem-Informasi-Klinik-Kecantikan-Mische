@@ -3,6 +3,14 @@ import ProfileBanner from './ProfileBanner';
 import HistoryTabs from './HistoryTabs';
 import ProfileForm from './ProfileForm';
 
+/**
+ * =========================================================================
+ * BALAI PAVILIUN MEJA KELOLA PROFIL (ProfilCustomerPage)
+ * =========================================================================
+ * Ibarat balai paviliun luas tempat tamu mengatur identitasnya. Di bagian atas
+ * terbentang spanduk ucapan selamat datang (ProfileBanner), diikuti gapura arsip (HistoryTabs),
+ * dan di tengah terdapat meja utama pengisian data (ProfileForm).
+ */
 export default function ProfilCustomerPage() {
     return (
         <div className="w-full min-h-screen bg-[#FAF8F5] py-8 md:py-12 px-4 md:px-10">

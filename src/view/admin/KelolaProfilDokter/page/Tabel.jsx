@@ -4,15 +4,30 @@ import { STORAGE_BASE_URL } from "@/core/api/endpoints";
 import Table from '@/components/Table';
 import { useTabelProfilDokter } from "../hooks/useTabelProfilDokter";
 
+/**
+ * LEMARI ETALASE DAFTAR DOKTER (Tabel)
+ * Ibarat rak etalase rapi tempat memajang seluruh profil dokter. Di setiap barisnya, terpajang 
+ * pasfoto bundar, nama dokter, alamat email, kotak cerita (deskripsi) yang bisa dilipat atau dibentangkan, 
+ * stempel status kehadiran (Tersedia / Tidak Tersedia) yang bisa diputar seketika, serta tombol 
+ * aksi (pensil untuk mengoreksi dan tong sampah untuk mencabut izin).
+ */
 export default function Tabel({ isLoading, data, onEdit, onDelete, onStatusChange, startIndex = 1 }) {
+  // Meminjam asisten penolong kecil untuk mengurus lipat/bentang tulisan dan pergantian status
   const { expandedDescId, handleStatusSelect, toggleExpand } = useTabelProfilDokter(onStatusChange);
 
+  // --- MENYUSUN KEPALA / DAFTAR KOLOM DI ATAS ETALASE ---
   const columns = [
+    // Kolom 1: Nomor urut dokter
     { label: 'No', render: (item, index) => index, className: 'w-12 text-center', cellClassName: 'text-center text-xs font-medium text-gray-500' },
+    
+    // Kolom 2: Nama lengkap dokter
     { label: 'Nama', key: 'nama', className: '', cellClassName: 'text-xs font-bold text-[#1A1A1A] whitespace-nowrap' },
+    
+    // Kolom 3: Bingkai pasfoto bundar
     { 
       label: 'Foto', 
       render: (item) => {
+        // Membersihkan jalur foto. Jika fotonya hilang/kosong, pasang lukisan pengganti (placeholder)
         const imageUrl = item.foto && !item.foto.startsWith('http')
           ? `${STORAGE_BASE_URL}${String(item.foto).replace(/^(?:public\/|storage\/|\/)+/, '')}`
           : (item.foto || "https://via.placeholder.com/150");
@@ -24,6 +39,7 @@ export default function Tabel({ isLoading, data, onEdit, onDelete, onStatusChang
               alt={item.nama}
               className="w-full h-full object-cover object-top"
               onError={(e) => {
+                // Jika fotonya gagal dimuat saat dipajang, langsung ganti dengan lukisan pengganti
                 e.target.src = "https://via.placeholder.com/150";
               }}
             />
@@ -33,16 +49,23 @@ export default function Tabel({ isLoading, data, onEdit, onDelete, onStatusChang
       className: 'text-center w-24', 
       cellClassName: 'text-center'
     },
+
+    // Kolom 4: Alamat surel / email
     { label: 'Email', render: (item) => item.email || "-", className: '', cellClassName: 'text-xs text-gray-500 font-medium' },
+    
+    // Kolom 5: Kotak Cerita (Deskripsi) beserta tombol lipat / bentang tulisan
     { 
       label: 'Deskripsi', 
       render: (item) => {
         const docId = item.idDokter || item.id;
         return item.deskripsi ? (
           <div>
+            {/* Membentangkan tulisan penuh atau melipatnya menjadi 2 baris saja */}
             <div className={`transition-all duration-300 ${expandedDescId === docId ? "whitespace-normal" : "line-clamp-2"}`}>
               {item.deskripsi}
             </div>
+            
+            {/* Tombol Lipat/Bentang (muncul jika cerita dokternya lumayan panjang) */}
             {item.deskripsi.length > 60 && (
               <button
                 onClick={() => toggleExpand(docId)}
@@ -60,6 +83,8 @@ export default function Tabel({ isLoading, data, onEdit, onDelete, onStatusChang
       className: 'max-w-xs', 
       cellClassName: 'text-xs text-gray-500 font-medium max-w-xs' 
     },
+
+    // Kolom 6: Stempel Status Kehadiran (Tersedia / Tidak Tersedia)
     { 
       label: 'Status', 
       render: (item) => {
@@ -88,6 +113,8 @@ export default function Tabel({ isLoading, data, onEdit, onDelete, onStatusChang
       className: 'text-center w-36', 
       cellClassName: 'text-center relative' 
     },
+
+    // Kolom 7: Tombol Operasi (Pensil untuk Koreksi, Tong Sampah untuk Mencabut Profil)
     { 
       label: 'Action', 
       render: (item) => (
@@ -95,12 +122,14 @@ export default function Tabel({ isLoading, data, onEdit, onDelete, onStatusChang
           <button
             onClick={() => onEdit(item)}
             className="text-gray-400 hover:text-[#56BC36] transition-colors cursor-pointer"
+            title="Perbarui"
           >
             <PencilLine size={18} />
           </button>
           <button
             onClick={() => onDelete(item)}
             className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+            title="Hapus"
           >
             <Trash2 size={18} />
           </button>
@@ -111,9 +140,11 @@ export default function Tabel({ isLoading, data, onEdit, onDelete, onStatusChang
     }
   ];
 
+  // Menggelar rak tabel utama menggunakan rancangan kolom di atas
   return (
     <div className="mb-6">
-      <Table isLoading={isLoading} 
+      <Table 
+        isLoading={isLoading} 
         columns={columns} 
         data={data} 
         emptyStateText="Belum ada data dokter terdaftar."

@@ -1,33 +1,46 @@
 import React from "react";
 
+/**
+ * =========================================================================
+ * KOTAK POP-UP KONFIRMASI HAPUS (Ibarat Kotak Pertanyaan Sebelum Menghapus)
+ * =========================================================================
+ * Ini adalah kotak pop-up (jendela kecil) yang muncul saat admin menekan ikon tempat sampah.
+ * Tujuannya untuk memastikan admin tidak tidak sengaja menekan tombol hapus.
+ * Di sini ada tombol "Ya, Hapus" untuk melanjutkannya, atau "Tidak, Batalkan" untuk batal.
+ */
 const ModalHapus = ({ isOpen, onClose, onDelete }) => {
+  // Jika pop-up tidak sedang dibuka (isOpen = false), jangan tampilkan apa-apa
   if (!isOpen) return null;
 
-    return (
+  return (
+    // Latar belakang gelap transparan di belakang pop-up
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      {/* Kotak putih konfirmasi di tengah layar */}
       <div className="bg-white w-full max-w-md rounded-2xl p-8 text-center shadow-xl">
         
-        {/* Warning Icon */}
+        {/* IKON TANDA SERU BESAR (Penanda Peringatan) */}
         <div className="mx-auto w-20 h-20 border-4 border-gray-400 rounded-full flex items-center justify-center mb-6">
           <span className="text-gray-400 text-5xl font-bold">!</span>
         </div>
 
-        {/* Title */}
+        {/* PERTANYAAN KONFIRMASI */}
         <h2 className="text-[22px] text-gray-500 font-medium mb-8">
           Apakah Anda yakin ingin menghapus data ini?
         </h2>
 
-        {/* Actions */}
+        {/* DUA TOMBOL PILIHAN (Ya atau Tidak) */}
         <div className="flex justify-center gap-4">
+          {/* Tombol Hijau untuk jadi menghapus */}
           <button 
             onClick={onDelete}
-            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-8 py-3 rounded-lg font-medium transition-colors"
+            className="bg-[#56BC36] hover:bg-[#45a025] text-white px-8 py-3 rounded-lg font-medium transition-colors cursor-pointer"
           >
             Ya, Hapus
           </button>
+          {/* Tombol Putih untuk batal menghapus */}
           <button 
             onClick={onClose}
-            className="bg-white border border-gray-200 text-black px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            className="bg-white border border-gray-200 text-black px-8 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors cursor-pointer"
           >
             Tidak, Batalkan
           </button>

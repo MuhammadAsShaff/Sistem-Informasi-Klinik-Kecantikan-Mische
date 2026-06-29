@@ -4,108 +4,140 @@ import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
 import { saveAuth } from "@/core/utils/authStorage";
 
-// BATAS MAKSIMAL PERCOBAAN LOGIN GAGAL (Rate Limiting)
+// ─── ATURAN KEDISIPLINAN GERBANG ─────────────────────────────────────────────
+// BATAS MAKSIMAL SALAH KETIK: Jika tamu salah menebak sandi hingga 3 kali
 const MAX_ATTEMPTS = 3;
-// WAKTU TUNGGU JIKA TERKUNCI (60 Detik dalam Milidetik)
+// WAKTU GEMBOK OTOMATIS: Durasi gerbang dikunci mati (60 detik dalam satuan milidetik)
 const LOCKOUT_DURATION = 60 * 1000;
 
 /**
  * =========================================================================
- * CUSTOM HOOK: useLogin
+ * MANDOR GERBANG UTAMA PEMERIKSA KREDENSIAL (useLogin)
  * =========================================================================
- * Hook ini mengelola seluruh logika bisnis untuk halaman login, meliputi:
- * 1. Penyimpanan input form (email, password).
- * 2. Fitur Keamanan Rate Limiting (Membatasi percobaan login gagal & lockout timer).
- * 3. Kirim request login ke Laravel API & verifikasi role user (Admin/Customer).
- * 
- * Hook ini akan dipanggil oleh LoginForm.jsx untuk mendapatkan data state dan fungsi aksi.
+ * Ibarat seorang komandan jaga di gerbang benteng kantor yang super ketat:
+ * 1. Mengingat kartu pengenal (email) dan kata sandi rahasia (password) yang disodorkan tamu.
+ * 2. Memegang stopwatch gembok keamanan (Rate Limiting): jika tamu salah menebak sandi 3 kali, komandan akan menggembok gerbang selama 60 detik penuh.
+ * 3. Mengetuk pintu pusat data (API Login Laravel) untuk memeriksa apakah tamu ini Pejabat (Admin) atau Pengunjung Biasa (Customer), lalu mengawalnya ke balai yang tepat.
  */
 export function useLogin() {
+  // Alat navigasi pengawal tamu menuju ruangan yang benar
   const navigate = useNavigate();
-  // --- 1. STATE INPUT & UI STATUS ---
-  const [email, setEmail] = useState(""); // Menyimpan email yang diketik user
-  const [password, setPassword] = useState(""); // Menyimpan password yang diketik user
-  const [showPassword, setShowPassword] = useState(false); // Menyimpan status tampilkan/sembunyikan password
-  const [isLoading, setIsLoading] = useState(false); // Efek loading saat tombol masuk ditekan
-  const [errorMessage, setErrorMessage] = useState(""); // Menyimpan pesan kesalahan untuk ditampilkan di UI
 
-  // --- 2. STATE UNTUK RATE LIMIT (PENGUNCIAN AKUN) ---
-  const [attempts, setAttempts] = useState(0); // Menghitung berapa kali login gagal
-  const [lockoutTime, setLockoutTime] = useState(null); // Menyimpan timestamp kapan akun dikunci
-  const [timeLeft, setTimeLeft] = useState(0); // Menghitung detik mundur sisa waktu terkunci
+  // ─── 1. LACI PENYIMPANAN ISIAN FORMULIR & STATUS MEJA ───────────────────────
+  // Laci untuk mencatat apa yang diketik tamu di kolom email
+  const [email, setEmail] = useState(""); 
+  // Laci untuk mencatat sandi rahasia yang diketik tamu di kolom password
+  const [password, setPassword] = useState(""); 
+  // Tuas saklar untuk menyingkap tirai penutup password (agar teks terlihat atau disamarkan)
+  const [showPassword, setShowPassword] = useState(false); 
+  // Indikator lampu berputar tanda komandan sedang berlari memeriksa data ke arsip pusat
+  const [isLoading, setIsLoading] = useState(false); 
+  // Papan tulis kecil untuk mencatat pengumuman penolakan jika paspor salah
+  const [errorMessage, setErrorMessage] = useState(""); 
+
+  // ─── 2. LACI CATATAN HITUNG MUNDUR (GEMBOK KEDISIPLINAN) ───────────────────
+  // Buku penghitung dosa: mencatat berapa kali tamu ini sudah gagal menebak sandi
+  const [attempts, setAttempts] = useState(0); 
+  // Stempel waktu kapan komandan pertama kali menutup gembok gerbang
+  const [lockoutTime, setLockoutTime] = useState(null); 
+  // Angka hitung mundur (dalam detik) yang ditunjukkan ke tamu sebelum gerbang dibuka kembali
+  const [timeLeft, setTimeLeft] = useState(0); 
 
   /**
-   * DAUR HIDUP (useEffect) PERTAMA: Inisialisasi awal
-   * Membaca history percobaan gagal & status lockout yang tersimpan di localStorage browser.
-   * Supaya jika halaman di-refresh, user yang sedang terkunci tetap tidak bisa langsung login.
+   * ─── ASISTEN PEMERIKSA BUKU TAMU LAMA (useEffect Pertama) ──────────────────
+   * Saat tamu mendatangi meja, asisten ini langsung mengintip ke bawah meja (localStorage browser).
+   * Gunanya agar tamu yang sedang dihukum gembok tidak bisa mengakali sistem dengan me-refresh halaman.
    */
   useEffect(() => {
+    // Mengintip berapa kali tamu ini pernah gagal sebelumnya
     const savedAttempts = parseInt(localStorage.getItem("login_attempts")) || 0;
+    // Mengintip stempel waktu kunci gembok jika masih ada
     const savedLockout = localStorage.getItem("login_lockout_time");
+    
+    // Salin angka kegagalan ke dalam laci state
     setAttempts(savedAttempts);
+    // Jika stempel waktu kunci gembok ditemukan, nyalakan kembali status terkunci di laci
     if (savedLockout) setLockoutTime(parseInt(savedLockout));
   }, []);
 
   /**
-   * DAUR HIDUP (useEffect) KEDUA: Timer Hitung Mundur Lockout
-   * Berjalan setiap detik ketika `lockoutTime` (akun terkunci) aktif.
+   * ─── ASISTEN PEMEGANG STOPWATCH HITUNG MUNDUR (useEffect Kedua) ────────────
+   * Bekerja tanpa lelah setiap 1 detik sekali, khusus ketika gembok gerbang (lockoutTime) sedang aktif.
    */
   useEffect(() => {
     let timer;
+    // Jika stempel waktu kunci gembok terisi
     if (lockoutTime) {
+      // Nyalakan alarm jam berdetak setiap 1000 milidetik (1 detik)
       timer = setInterval(() => {
+        // Hitung jarak waktu antara jadwal buka gembok dengan waktu detik ini
         const diff = lockoutTime - Date.now();
+        
+        // Jika sisa waktu sudah habis (0 atau minus)
         if (diff <= 0) {
-          // Jika waktu tunggu sudah habis, reset semua status kunci ke awal
+          // Buka gembok gerbang (nol-kan stempel waktu)
           setLockoutTime(null);
+          // Putihkan kembali buku catatan dosa kegagalan tamu
           setAttempts(0);
+          // Reset angka hitung mundur di layar
           setTimeLeft(0);
+          // Buang catatan hukuman dari laci bawah meja (localStorage)
           localStorage.removeItem("login_lockout_time");
           localStorage.setItem("login_attempts", "0");
+          // Hapus tulisan pesan peringatan di papan pengumuman
           setErrorMessage("");
         } else {
-          // Hitung sisa detik mundur (pembulatan ke atas)
+          // Jika masih ada sisa waktu, bulatkan detiknya ke atas dan pajang di layar
           setTimeLeft(Math.ceil(diff / 1000));
         }
       }, 1000);
     }
-    // Bersihkan timer ketika komponen di-unmount agar tidak terjadi kebocoran memori
+    // Jika meja form ditutup atau tamu pergi, matikan alarm jam agar tidak bising (memory leak)
     return () => clearInterval(timer);
   }, [lockoutTime]);
 
   /**
-   * --- 3. FUNGSI UTAMA: handleLogin (SAAT FORM LOGIN DISUBMIT) ---
+   * ─── 3. TUGAS EKSEKUSI UTAMA: PROSES MENGETUK PINTU (handleLogin) ──────────
+   * Fungsi ini dipicu seketika saat tamu menekan tombol "Login" di formulir.
    */
   const handleLogin = async (e) => {
-    e.preventDefault(); // Mencegah reload halaman bawaan form HTML
+    // Mencegah kebiasaan kuno meja HTML yang gemar memuat ulang seluruh gedung (refresh page)
+    e.preventDefault(); 
 
-    // Jika user masih dalam masa hukuman/lockout, tolak login dan infokan sisa detik
+    // Jika tamu bersikeras memaksa masuk saat gembok masih terpasang
     if (lockoutTime) {
+      // Tegur dengan sopan dan pampang sisa detik gembok
       setErrorMessage(`Terlalu banyak percobaan gagal. Silakan coba lagi dalam ${timeLeft} detik.`);
       return;
     }
 
-    setErrorMessage(""); // Bersihkan pesan error sebelumnya
-    setIsLoading(true); // Tampilkan indikator memproses (loading)
+    // Bersihkan papan tulis pesan error dari sisa ketikan lama
+    setErrorMessage(""); 
+    // Nyalakan indikator lampu tanda komandan mulai memproses isian formulir
+    setIsLoading(true); 
 
     try {
-      // Kirim email & password dalam format JSON ke backend Laravel
+      // Mengutus kurir khusus (axiosClient) membawa map berisi email dan sandi ke brankas pusat (Laravel API)
       const res = await axiosClient.post(endpoints.auth.login, { email, password });
 
-      // Periksa apakah server merespon dengan token (akses login)
+      // Memeriksa isi tas kurir saat kembali: apakah ada surat izin resmi (token)?
       const hasToken = res.data.token || res.data.access_token || res.data.data?.token;
+      // Memeriksa stempel tanda lolos verifikasi dari kantor pusat
       const isSuccess = res.data.success !== false;
 
+      // Jika surat izin resmi (token) tersedia dan stempelnya lolos
       if (hasToken && isSuccess) {
-        // --- LOGIN BERHASIL ---
-        // Bersihkan seluruh status percobaan login gagal di local storage
+        // ─── TAMU DISAHKAN MASUK (LOGIN BERHASIL) ─────────────────────────────
+        
+        // Pemutihan seketika: hapus seluruh riwayat kegagalan dan stempel gembok di laci
         setAttempts(0);
         localStorage.removeItem("login_attempts");
         localStorage.removeItem("login_lockout_time");
 
+        // Ambil surat izin resmi (token) dari dalam map surat
         const token = res.data.token || res.data.access_token || res.data.data?.token;
         
-        // Cari objek user di dalam response API (mengatasi struktur response backend yang bervariasi)
+        // Membongkar tas kurir untuk mencari identitas lengkap tamu (mengakomodasi variasi format map dari server)
         let userData = null;
         if (res.data.user && res.data.user.role) {
           userData = res.data.user;
@@ -117,15 +149,17 @@ export function useLogin() {
           userData = res.data;
         }
 
-        // Jika data user & rolenya langsung dikembalikan oleh endpoint login
+        // Jika identitas tamu dan seragam jabatannya (role) sudah ada di dalam tas
         if (userData && userData.role) {
-          saveAuth(token, userData); // Simpan token & user data ke localStorage
-          navigate(userData.role === "admin" ? "/admin" : "/"); // Redirect sesuai Role
+          // Simpan token dan paspor tamu ke brankas permanen di pos penjagaan (localStorage)
+          saveAuth(token, userData); 
+          // Persilakan tamu masuk ke ruangan sesuai seragam: Ruang Pejabat (/admin) atau Taman Pengunjung (/)
+          navigate(userData.role === "admin" ? "/admin" : "/"); 
         } else {
-          // Jika backend hanya memberi token tanpa info user, simpan token dulu...
+          // Jika kantor pusat hanya mengirim kunci token tanpa rincian nama/jabatan, simpan kuncinya dulu...
           localStorage.setItem("token", token);
 
-          // ...lalu buat request tambahan ke endpoint '/auth/me' untuk mengambil profil & role user
+          // ...kemudian utus kurir kedua lari kilat ke loket profil ('/auth/me') untuk menanyakan jabatan tamu ini
           try {
             const profileRes = await axiosClient.get(endpoints.auth.me, {
               headers: {
@@ -133,48 +167,57 @@ export function useLogin() {
               }
             });
             
+            // Ambil rangkuman data diri tamu dari balasan kurir kedua
             const fetchedUser = profileRes.data.data || profileRes.data.user || profileRes.data;
             if (fetchedUser && fetchedUser.role) {
-              saveAuth(token, fetchedUser); // Simpan data profil lengkap
-              navigate(fetchedUser.role === "admin" ? "/admin" : "/"); // Alihkan halaman
+              // Kunci dan amankan paspor lengkap tersebut ke dalam brankas
+              saveAuth(token, fetchedUser); 
+              // Antar tamu menuju ruangannya yang tepat
+              navigate(fetchedUser.role === "admin" ? "/admin" : "/"); 
             } else {
+              // Jika data diri tetap samar, sampaikan teguran ke papan tulis
               setErrorMessage("Gagal memproses role pengguna dari server.");
             }
           } catch (profileError) {
+            // Jika kurir kedua tersandung di lorong, catat di buku keluhan
             console.error("Gagal mengambil profil/role:", profileError);
             setErrorMessage("Koneksi berhasil, namun gagal memverifikasi data profil.");
           }
         }
       } else {
-        // Jika server merespon sukses HTTP 200 namun sukses bernilai false
+        // Jika server menerima ketukan pintu namun menyatakan paspor tidak sah
         const msg = res.data.message || "Email atau password yang Anda masukkan salah.";
         setErrorMessage(msg);
       }
     } catch (error) {
-      // --- LOGIN GAGAL / ERROR API ---
+      // ─── KETUKAN DITOLAK / KENDALA JALUR DISTRIBUSI ───────────────────────
       console.error("Login error:", error);
       
-      // Jika error 429 (Too Many Requests), paksa langsung kunci (langsung limit penuh)
+      // Jika penolakan berupa kode 429 (Lalu lintas Terlalu Padat), anggap pelanggaran berat dan langsung gembok mati
       const isRateLimit = error.response?.status === 429;
       let newAttempts = isRateLimit ? MAX_ATTEMPTS : attempts + 1;
 
+      // Tambahkan angka dosa kegagalan ke dalam laci dan bawah meja
       setAttempts(newAttempts);
       localStorage.setItem("login_attempts", newAttempts.toString());
 
+      // Jika jumlah dosa sudah genap atau melebihi batas maksimal (3 kali)
       if (newAttempts >= MAX_ATTEMPTS) {
-        // Jika sudah melebihi 3 kali percobaan gagal, kunci login selama 60 detik
+        // Pasang stempel waktu gembok terhitung detik ini ditambah 60 detik ke depan
         const lockTime = Date.now() + LOCKOUT_DURATION;
         setLockoutTime(lockTime);
         localStorage.setItem("login_lockout_time", lockTime.toString());
+        // Set penghitung waktu ke angka 60
         setTimeLeft(60);
+        // Umumkan pengumuman gembok di papan tulis
         setErrorMessage("Terlalu banyak percobaan gagal. Akses ditangguhkan selama 60 detik.");
       } else {
-        // Tampilkan pesan error. Cek rincian error spesifik dari backend (seperti password kurang kompleks)
+        // Jika masih dalam batas toleransi, periksa alasan spesifik penolakan dari dalam amplop server
         let msg = "Terjadi kesalahan pada server.";
         if (error.response?.data) {
           const data = error.response.data;
           if (data.errors) {
-            // Ambil rincian validasi pertama yang error (misal password kurang campuran besar-kecil)
+            // Mengutip kalimat omelan pertama dari staf pemeriksa di pusat
             const firstErrorKey = Object.keys(data.errors)[0];
             const firstErrorVal = data.errors[firstErrorKey];
             msg = Array.isArray(firstErrorVal) ? firstErrorVal[0] : firstErrorVal;
@@ -182,14 +225,16 @@ export function useLogin() {
             msg = data.message || msg;
           }
         }
+        // Pajang omelan tersebut beserta jumlah nyawa (sisa percobaan) yang tersisa
         setErrorMessage(`${msg} (Sisa percobaan: ${MAX_ATTEMPTS - newAttempts})`);
       }
     } finally {
-      setIsLoading(false); // Matikan loading spin
+      // Seselesainya urusan (baik berhasil masuk maupun ditolak), matikan lampu indikator loading
+      setIsLoading(false); 
     }
   };
 
-  // Kembalikan semua state & fungsi agar bisa didestruktur dan digunakan di LoginForm.jsx
+  // Serahkan seluruh laci penyimpanan dan tuas kendali ke tangan komponen meja (LoginForm.jsx)
   return {
     email, setEmail,
     password, setPassword,

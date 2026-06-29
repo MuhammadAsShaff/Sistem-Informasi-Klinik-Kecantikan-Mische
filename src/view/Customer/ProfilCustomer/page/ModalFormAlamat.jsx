@@ -2,6 +2,13 @@ import { useModalFormAlamat } from '../hooks/useModalFormAlamat';
 import { X } from 'lucide-react';
 import ToastAlert from '@/view/components/ToastAlert/page/Index';
 
+/**
+ * =========================================================================
+ * JENDELA MEJA PENGISIAN ALAMAT BARU (ModalFormAlamat)
+ * =========================================================================
+ * Ibarat formulir pendaftaran meja pengiriman. Membuka layar pop-up bagi tamu
+ * untuk mengetikkan nama penerima, kontak, dan rincian jalan rumah secara lengkap.
+ */
 const ModalFormAlamat = ({ isOpen, onClose, onSave, provinces, cities, fetchCities }) => {
   const {
     formData,

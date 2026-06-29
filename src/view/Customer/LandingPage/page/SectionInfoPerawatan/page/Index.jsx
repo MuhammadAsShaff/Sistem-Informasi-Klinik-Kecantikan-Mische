@@ -4,6 +4,14 @@ import TreatmentBanner from './TreatmentBanner';
 import TreatmentCard from './TreatmentCard';
 import { treatments } from '../hooks/TreatmentsData';
 
+/**
+ * =========================================================================
+ * ANJUNGAN PAMERAN MENU PERAWATAN (SectionInfoPerawatan)
+ * =========================================================================
+ * Ibarat panggung peragaan memanjang di halaman samping klinik. Di ujung kiri
+ * berdiri panji spanduk besar (TreatmentBanner), diikuti barisan tiang plakat (TreatmentCard)
+ * yang memandu tamu menjelajahi opsi perawatan unggulan.
+ */
 const SectionInfoPerawatan = () => {
 
   return (

@@ -1,5 +1,11 @@
 import React from "react";
 
+/**
+ * PLANG MEGAH SAMBUTAN BALAI KEANGGOTAAN (Header)
+ * Ibarat papan plang kayu megah berukir indah yang terpasang di depan balai pendaftaran anggota.
+ * Plang ini menyambut setiap pimpinan yang datang dan menjelaskan bahwa di ruangan ini pimpinan 
+ * bisa melihat seluruh informasi keanggotaan klinik, baik admin, staf, maupun customer.
+ */
 export default function Header() {
   return (
     <div className="mb-10">

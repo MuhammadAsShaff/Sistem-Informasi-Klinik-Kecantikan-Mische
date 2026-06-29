@@ -5,18 +5,12 @@ import NavbarActions from './NavbarActions';
 import NavbarLogo from './NavbarLogo';
 
 /**
- * Komponen UI murni untuk navigasi mobile (Header & Drawer Slider).
- * Semua state & data diterima dari props — tidak ada logic di sini.
- *
- * @param {{
- *   isOpen        : boolean,
- *   onOpen        : () => void,
- *   onClose       : () => void,
- *   links         : Array,
- *   isLoggedIn    : boolean,
- *   isAdmin       : boolean,
- *   cartCount     : number,
- * }} props
+ * =========================================================================
+ * PINTU LIPAT AREA SAMPING (NavbarMobile)
+ * =========================================================================
+ * Ibarat pos pendaftaran mini untuk tamu yang datang membawa layar kecil (ponsel).
+ * Di bagian atas tersedia bel lipat (Menu Hamburger) yang jika ditekan akan
+ * menggelar karpet tirai samping (Drawer) berisi seluruh petunjuk arah klinik.
  */
 const NavbarMobile = ({ isOpen, onOpen, onClose, links = [], isLoggedIn, isAdmin, cartCount }) => {
   return (

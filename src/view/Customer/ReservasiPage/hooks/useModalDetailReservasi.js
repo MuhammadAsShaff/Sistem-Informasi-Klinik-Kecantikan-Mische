@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * =========================================================================
+ * ASISTEN JAGA BILIK KONFIRMASI BOOKING (useModalDetailReservasi)
+ * =========================================================================
+ * Ibarat pendamping ramah yang membantu tamu memeriksa rincian pemesanan sebelum
+ * ditandatangani. Ia juga bertugas menghitung bahwa sesi perawatan rata-rata
+ * berlangsung tepat selama satu jam dari jadwal awal.
+ */
 export const useModalDetailReservasi = (isOpen) => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 

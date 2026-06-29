@@ -4,13 +4,15 @@ import { useExportExcel } from '../hooks/useExportExcel';
 
 /**
  * =========================================================================
- * KOMPONEN: ModalExportExcel (TAMPILAN EXPORT EXCEL - VIEW)
+ * MEJA KERJA REKAPITULASI BUKU EXCEL (ModalExportExcel)
  * =========================================================================
- * Komponen modal UI untuk memfilter dan mengekspor data laporan ke file Excel.
- * Logika pembuatan request biner & pemicu unduhan dikelola oleh hook `useExportExcel`.
+ * Ibarat meja kerja khusus tempat pimpinan memilih rentang waktu kunjungan tamu 
+ * yang ingin dicetak menjadi buku besar Excel.
+ * Di atas meja ini terdapat laci pemilihan jenis perawatan, kalender tanggal mulai, dan kalender tanggal selesai.
+ * Segala urusan pencetakan dan kurir file biner dikerjakan oleh Asisten Perekap (useExportExcel).
  */
 export default function ModalExportExcel({ isOpen, onClose }) {
-  // Destrukturisasi state dan handler dari custom hook useExportExcel
+  // Meminta laci isian, kalender, dan mesin pencetak dari Asisten Perekap Excel
   const {
     jenisTreatment, setJenisTreatment,
     tanggalMulai, setTanggalMulai,
@@ -20,13 +22,13 @@ export default function ModalExportExcel({ isOpen, onClose }) {
     handleExport
   } = useExportExcel(onClose);
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, meja kerja rekap ini dilipat kembali
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-lg w-full max-w-3xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-200 font-poppins">
         
-        {/* Header */}
+        {/* Atap Meja Rekapitulasi */}
         <div className="px-8 py-5 border-b border-gray-300 flex justify-between items-center">
           <h3 className="text-[22px] font-bold text-black">Export Excel</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -34,11 +36,11 @@ export default function ModalExportExcel({ isOpen, onClose }) {
           </button>
         </div>
 
-        {/* Form Body */}
+        {/* Ruangan Formulir Meja Kerja */}
         <div className="p-8">
           <div className="space-y-6">
             
-            {/* ROW 1 */}
+            {/* BARIS 1: Laci Pemilihan Jenis Perawatan */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
                 <label className="text-sm text-black">Jenis Treatment</label>
@@ -56,7 +58,7 @@ export default function ModalExportExcel({ isOpen, onClose }) {
               </div>
             </div>
 
-            {/* ROW 2 */}
+            {/* BARIS 2: Kotak Kalender Tanggal Mulai & Tanggal Selesai */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
                 <label className="text-sm text-black">Tanggal Mulai</label>
@@ -85,7 +87,7 @@ export default function ModalExportExcel({ isOpen, onClose }) {
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Laci Tombol Cetak Buku */}
         <div className="px-8 py-5 border-t border-gray-300 flex justify-end mt-4">
           <button 
             type="button"

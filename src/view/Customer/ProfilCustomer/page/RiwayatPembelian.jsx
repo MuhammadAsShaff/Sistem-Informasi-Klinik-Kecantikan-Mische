@@ -18,11 +18,11 @@ const formatRupiah = (number) => {
 
 /**
  * =========================================================================
- * KOMPONEN: RiwayatPembelian (TAMPILAN MURNI / VIEW)
+ * RUANG ARSIP UTAMA RIWAYAT TRANSAKSI (RiwayatPembelian)
  * =========================================================================
- * Komponen ini hanya merender antarmuka halaman riwayat pembelian customer.
- * Seluruh logika fetch data, filter tab, penanganan konfirmasi penerimaan,
- * pembatalan, dan integrasi Midtrans Snap diserahkan ke hook `useRiwayatPembelian`.
+ * Ibarat ruang baca arsip transaksi di dalam klinik. Dilengkapi empat laci tab
+ * (Diproses, Dalam Perjalanan, Selesai, Batal) tempat tamu meneliti status belanjaan,
+ * melunasi tagihan, atau memberi cap konfirmasi penerimaan barang.
  */
 export default function RiwayatPembelian() {
   // Hubungkan ke custom hook useRiwayatPembelian untuk mendapatkan semua state dan handler logika

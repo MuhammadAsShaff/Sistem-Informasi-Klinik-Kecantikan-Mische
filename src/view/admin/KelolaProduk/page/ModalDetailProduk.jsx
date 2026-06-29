@@ -2,13 +2,21 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
+/**
+ * LEMARI KACA PAMERAN DETAIL PRODUK (ModalDetailProduk)
+ * Ibarat lemari kaca pameran khusus tempat memajang satu barang secara utuh dan mendalam.
+ * Ketika admin menekan tombol bergambar mata, jendela pop-up ini akan terbuka memperlihatkan 
+ * foto ukuran besar, status stok, harga, berat, dan cerita lengkap (deskripsi) barang tersebut.
+ */
 const ModalDetailProduk = ({ isOpen, onClose, data }) => {
+  // Jika saklar pembukanya mati atau datanya tidak ada, tetap sembunyikan kotak ini
   if (!isOpen || !data) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm font-sans transition-opacity">
       <div className="bg-white rounded-lg w-[900px] max-w-[95%] max-h-[90vh] overflow-y-auto shadow-[0_0_15px_rgba(0,0,0,0.1)] flex flex-col">
-        {/* Header */}
+        
+        {/* Papan Judul Atas Jendela & Tombol Tutup (X) */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-gray-200 sticky top-0 bg-white z-10">
           <h2 className="text-xl font-bold text-gray-900">Detail Produk</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -18,8 +26,9 @@ const ModalDetailProduk = ({ isOpen, onClose, data }) => {
 
         <div className="p-8 flex flex-col md:flex-row gap-10">
           
-          {/* Kolom Gambar */}
+          {/* 1. BAGIAN PAJANGAN FOTO & STATUS STOK */}
           <div className="md:w-1/3 flex flex-col items-center">
+            {/* Bingkai foto produk */}
             <div className="w-56 h-56 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center shadow-sm">
               {data.gambar ? (
                 <img 
@@ -31,6 +40,8 @@ const ModalDetailProduk = ({ isOpen, onClose, data }) => {
                 <span className="text-gray-400 text-sm">Tidak ada gambar</span>
               )}
             </div>
+
+            {/* Label status barang (Stok Tersedia berwarna hijau, atau Stok Habis berwarna merah) */}
             <div className="mt-4 w-full text-center">
               <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                 (data.stock !== undefined ? data.stock : data.count) > 0 
@@ -42,13 +53,16 @@ const ModalDetailProduk = ({ isOpen, onClose, data }) => {
             </div>
           </div>
 
-          {/* Kolom Detail Text */}
+          {/* 2. BAGIAN CATATAN INFORMASI PRODUK */}
           <div className="md:w-2/3 flex flex-col gap-6">
+            
+            {/* Nama Produk & Nama Kategori */}
             <div>
               <h3 className="text-3xl font-bold text-gray-900 mb-2">{data.nama || data.name || '-'}</h3>
               <p className="text-base font-medium text-blue-600">{data.kategori?.nama || data.kategori || '-'}</p>
             </div>
 
+            {/* Kotak Informasi Rangkuman (Harga, Jumlah Stok, Berat, dan ID Produk) */}
             <div className="grid grid-cols-2 gap-6 bg-gray-50 p-6 rounded-lg border border-gray-100">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Harga</p>
@@ -76,6 +90,7 @@ const ModalDetailProduk = ({ isOpen, onClose, data }) => {
               </div>
             </div>
 
+            {/* Kotak Cerita Penjelasan Lengkap (Deskripsi) */}
             <div>
               <p className="text-sm font-semibold text-gray-900 mb-3 border-b border-gray-200 pb-2">Deskripsi Produk</p>
               <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed bg-gray-50/50 p-5 rounded-lg border border-gray-100 min-h-[120px]">

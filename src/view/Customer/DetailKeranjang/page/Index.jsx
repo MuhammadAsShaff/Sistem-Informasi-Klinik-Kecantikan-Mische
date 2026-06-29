@@ -8,14 +8,12 @@ import { useDetailKeranjang } from '../hooks/useDetailKeranjang';
 
 /**
  * =========================================================================
- * KOMPONEN VIEW: DetailKeranjang (Halaman Keranjang & Checkout Customer)
+ * BALAI PEMERIKSAAN KERANJANG BELANJA (DetailKeranjang)
  * =========================================================================
- * Komponen ini berfungsi merender daftar produk di dalam keranjang belanja
- * customer, ringkasan belanja, input kode kupon promo, dan mengarahkan ke modal checkout.
- * 
- * Seluruh status pemuatan data keranjang, ubah kuantitas produk, kalkulasi diskon,
- * hapus produk dari keranjang, dan interaksi server dikoordinasikan secara penuh
- * di hook `useDetailKeranjang`.
+ * Ibarat ruangan lapang tempat troli Anda diparkir. Di sebelah kiri terjejer
+ * rapi seluruh Nampan Barang (CartItem) yang ingin Anda beli. Di sebelah kanan
+ * berdiri Meja Penghitungan (OrderSummary) untuk mengecek total harga dan
+ * memasukkan kupon rahasia, dibantu pengawasannya oleh Mandor Troli (useDetailKeranjang).
  */
 const DetailKeranjang = () => {
   const {

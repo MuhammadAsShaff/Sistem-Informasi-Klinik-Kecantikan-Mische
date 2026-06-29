@@ -1,5 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 
+/**
+ * =========================================================================
+ * PETUGAS PEMILAH KERTAS PROMO (useFilterPromo)
+ * =========================================================================
+ * Ibarat petugas di pos informasi yang memegang laci arsip pemisah kupon:
+ * 1. Menjaga tuas laci pemisah (isOpen).
+ * 2. Jika tamu menekan tombol filter, petugas membuka laci untuk menampilkan jenis kupon (Diskon, Gratis, Potongan) dan status keberlakuannya.
+ * 3. Jika tamu melengos atau mengklik tempat lain, petugas dengan sigap menutup lacinya kembali.
+ */
 export const useFilterPromo = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);

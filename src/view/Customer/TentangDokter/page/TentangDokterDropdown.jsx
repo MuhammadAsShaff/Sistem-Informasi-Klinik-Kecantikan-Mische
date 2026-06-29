@@ -3,6 +3,14 @@ import { Link } from 'react-router-dom';
 import { useDokterData } from '../hooks/useDokterData';
 import CustomerLoading from '@/components/CustomerLoading';
 
+/**
+ * =========================================================================
+ * KORIDOR FOTO DOKTER SIAGA (TentangDokterDropdown)
+ * =========================================================================
+ * Ibarat lorong panjang berkarpet di mana potret besar setiap dokter ahli
+ * dipajang berjajar. Menyediakan tombol kilat "Selengkapnya" agar tamu bisa
+ * melangkah masuk ke ruang biografi dokter pilihannya.
+ */
 export default function TentangDokterDropdown() {
   const { doctors, isLoading } = useDokterData();
 

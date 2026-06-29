@@ -3,6 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useProdukData } from './useProdukData';
 import { useCartContext } from '@/core/context/CartContext';
 
+/**
+ * =========================================================================
+ * ASISTEN SPESIFIKASI BARANG (useDetailProduk)
+ * =========================================================================
+ * Ibarat pramuniaga ahli yang mendampingi Anda di depan satu lemari kaca produk:
+ * 1. Melihat nomor katalog barang yang Anda tunjuk (ID).
+ * 2. Mengambil informasi detail dari laci data produk.
+ * 3. Menyediakan mesin penghitung kecil untuk menaik-turunkan jumlah yang ingin Anda beli, lalu membantu mengantarkannya ke dalam troli (CartContext).
+ */
 export const useDetailProduk = () => {
   const { id } = useParams();
   const navigate = useNavigate();

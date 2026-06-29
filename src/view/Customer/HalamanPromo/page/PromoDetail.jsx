@@ -3,6 +3,15 @@ import { Calendar, Eye, EyeOff, ShoppingBag, ArrowLeft, Percent, Gift, Banknote 
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 import { usePromoDetail } from '../hooks/usePromoDetail';
 
+/**
+ * =========================================================================
+ * BILIK KONSULTASI PENUKARAN KUPON (PromoDetail)
+ * =========================================================================
+ * Ibarat ruang privat tempat tamu disuguhkan penjelasan lengkap tentang kupon.
+ * Di meja pertama terdapat spanduk dan kalender masa berlaku. Di meja kedua
+ * terdapat papan syarat ketentuan serta laci pembuka rahasia kode voucher, yang
+ * diawasi langsung oleh Asisten Penjelas Kupon (usePromoDetail).
+ */
 export default function PromoDetail() {
   const {
     navigate,

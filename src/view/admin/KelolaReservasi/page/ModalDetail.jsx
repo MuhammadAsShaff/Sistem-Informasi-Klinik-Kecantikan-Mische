@@ -1,11 +1,18 @@
 import React from "react";
 import { X } from "lucide-react";
 
+/**
+ * BILIK PAMERAN RINCIAN RESERVASI TAMU (ModalDetail)
+ * Ibarat bilik pameran berkaca jernih tempat mandor memajang biodata lengkap seorang tamu.
+ * Di bilik ini, pimpinan bisa melihat jelas ID antrean, nama lengkap tamu, nomor WhatsApp, 
+ * kategori perawatan, jam pertemuan, nama dokter yang menangani, serta status kehadirannya.
+ */
 export default function ModalDetail({ isOpen, onClose, selectedReservasi }) {
-  if (!isOpen || !selectedReservasi) return null;
+  if (!isOpen || !selectedReservasi) return null; // Jika saklar ditutup, bilik pameran ini disembunyikan
 
   const data = selectedReservasi;
 
+  // Asisten penata letak tulisan agar tampak rapi seperti di buku cetak
   const renderField = (label, value) => (
     <div className="flex flex-col space-y-1">
       <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">{label}</span>
@@ -17,7 +24,7 @@ export default function ModalDetail({ isOpen, onClose, selectedReservasi }) {
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl relative flex flex-col animate-in zoom-in-95 duration-200 overflow-hidden">
         
-        {/* Header */}
+        {/* Atap Bilik Pameran */}
         <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-[#F9FAFB]">
           <h2 className="text-xl font-bold text-gray-800">Detail Reservasi</h2>
           <button onClick={onClose} className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors shadow-sm border border-gray-200">
@@ -25,9 +32,10 @@ export default function ModalDetail({ isOpen, onClose, selectedReservasi }) {
           </button>
         </div>
 
-        {/* Content */}
+        {/* Ruangan Dalam Bilik Pameran */}
         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
           
+          {/* Sisi Kiri: Informasi Tamu dan Perawatan */}
           <div className="space-y-6">
             {renderField("ID Reservasi", `#${data.idReservasi || data.id}`)}
             {renderField("Nama Customer", data.namaCustomer)}
@@ -36,6 +44,7 @@ export default function ModalDetail({ isOpen, onClose, selectedReservasi }) {
             {renderField("Jenis Treatment", data.jenisReservasi)}
           </div>
 
+          {/* Sisi Kanan: Informasi Jadwal dan Dokter */}
           <div className="space-y-6">
             {renderField("Tanggal Reservasi", data.tanggalReservasi)}
             {renderField("Jadwal Waktu", data.jadwal ? `${data.jadwal.jamMulai} - ${data.jadwal.jamSelesai}` : "-")}

@@ -2,20 +2,27 @@ import React from 'react';
 import { X, User as UserIcon, Mail, Phone, Calendar, Smile, Briefcase, MapPin } from 'lucide-react';
 import { formatDate } from "@/core/utils/formatDate";
 
+/**
+ * BILIK PAMERAN BUKU PROFIL ANGGOTA (ModalDetailUser)
+ * Ibarat bilik pameran terang benderang tempat pimpinan meletakkan buku profil anggota di bawah kaca pembesar.
+ * Di bilik ini, pimpinan bisa melihat dengan jelas inisial nama, lencana kedudukan (Admin/Staff/Customer), 
+ * alamat email, nomor WhatsApp, jenis kelamin, tanggal lahir, serta menyusuri seluruh rincian riwayat alamat 
+ * lengkap yang dimilikinya.
+ */
 export default function ModalDetailUser({ isOpen, onClose, user }) {
-  if (!isOpen || !user) return null;
+  if (!isOpen || !user) return null; // Jika saklar ditutup, bilik pameran ini disimpan kembali
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {/* Tirai penutup latar belakang */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       ></div>
 
-      {/* Modal Container */}
+      {/* Ruangan Buku Profil */}
       <div className="relative bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
+        {/* Atap Bilik Pameran */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
           <div className="flex items-center gap-3">
             <div className="bg-blue-100 p-2 rounded-full text-blue-600">
@@ -28,9 +35,10 @@ export default function ModalDetailUser({ isOpen, onClose, user }) {
           </button>
         </div>
 
-        {/* Body */}
+        {/* Lembaran Isi Buku Profil */}
         <div className="p-6 max-h-[70vh] overflow-y-auto">
           
+          {/* Bagian Lencana & Inisial Wajah */}
           <div className="flex flex-col items-center mb-6 border-b border-gray-100 pb-6">
             <div className="w-20 h-20 bg-gradient-to-tr from-blue-100 to-indigo-50 rounded-full flex items-center justify-center text-blue-500 font-bold text-2xl shadow-sm mb-3">
               {(user.nama || user.name || "U")[0].toUpperCase()}
@@ -48,7 +56,7 @@ export default function ModalDetailUser({ isOpen, onClose, user }) {
           </div>
 
           <div className="space-y-4">
-            {/* Email */}
+            {/* Kartu Catatan Email */}
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
               <div className="mt-0.5 text-gray-400">
                 <Mail size={18} />
@@ -59,7 +67,7 @@ export default function ModalDetailUser({ isOpen, onClose, user }) {
               </div>
             </div>
 
-            {/* Nomor WA */}
+            {/* Kartu Catatan Nomor WhatsApp */}
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
               <div className="mt-0.5 text-gray-400">
                 <Phone size={18} />
@@ -70,7 +78,7 @@ export default function ModalDetailUser({ isOpen, onClose, user }) {
               </div>
             </div>
 
-            {/* Jenis Kelamin & Tanggal Lahir (Grid) */}
+            {/* Kartu Catatan Jenis Kelamin & Tanggal Lahir */}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
                 <div className="mt-0.5 text-gray-400">
@@ -95,7 +103,7 @@ export default function ModalDetailUser({ isOpen, onClose, user }) {
               </div>
             </div>
 
-            {/* Alamat */}
+            {/* Kartu Arsip Riwayat Alamat */}
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 mt-4">
               <div className="mt-0.5 text-gray-400">
                 <MapPin size={18} />
@@ -149,7 +157,7 @@ export default function ModalDetailUser({ isOpen, onClose, user }) {
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Laci Tombol Penutup Bilik */}
         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-end">
           <button 
             onClick={onClose}

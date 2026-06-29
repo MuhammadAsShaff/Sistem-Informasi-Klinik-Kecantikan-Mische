@@ -5,9 +5,13 @@ import { getUser, saveUser, clearAuth } from "@/core/utils/authStorage";
 import { useFetchWithCache, invalidateCache } from "@/core/hooks/useFetchWithCache";
 
 /**
- * Hook untuk mengambil & memperbarui profil customer (READ + UPDATE + LOGOUT).
- * Menggunakan authStorage sebagai cache awal agar UI tidak blank saat loading.
- * Ditambah useFetchWithCache untuk SWR pattern.
+ * =========================================================================
+ * MANDOR KELOLA KARTU IDENTITAS KONSUMEN (useProfilCustomer)
+ * =========================================================================
+ * Ibarat mandor pencatat buku induk keanggotaan di meja resepsionis utama:
+ * 1. Menjaga dan memoles profil tamu agar selalu mutakhir (SWR cache).
+ * 2. Mencatat perubahan nomor WhatsApp, nama, dan tanggal lahir.
+ * 3. Membantu proses kepulangan tamu dari lobi klinik (Logout).
  */
 export function useProfilCustomer(showToast, navigate) {
   // Init dari authStorage agar langsung tampil tanpa flash kosong

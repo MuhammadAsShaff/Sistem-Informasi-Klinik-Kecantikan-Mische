@@ -4,6 +4,14 @@ import gambarEvent from '@/assets/images/gambar event.png';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 import { useEventDetail } from '../hooks/useEventDetail';
 
+/**
+ * =========================================================================
+ * BALAI MIMBAR PENJELASAN ACARA (EventDetail)
+ * =========================================================================
+ * Ibarat ruangan besar tempat sebuah spanduk acara raksasa dibentangkan.
+ * Di sini pemandu (useEventDetail) menjelaskan secara mendalam mulai dari peta
+ * lokasi, kalender pelaksanaan, hingga narasi lengkap mengenai kegiatan tersebut.
+ */
 export default function EventDetail() {
   const { navigate, isLoading, event, formatTanggal } = useEventDetail();
 

@@ -1,5 +1,13 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * BUKU MENU ELEGAN PERAWATAN MENDALAM (JenisPerawatanCard)
+ * =========================================================================
+ * Ibarat papan pengumuman premium bersalut putih yang menjelaskan satu tindakan
+ * spesifik secara detail: foto kondisi, durasi waktu, penjabaran manfaat, dan
+ * tarif tercetak tebal di bawah garis putus-putus.
+ */
 const JenisPerawatanCard = ({ item }) => {
   // Format harga ke Rupiah
   const formattedPrice = new Intl.NumberFormat('id-ID', {

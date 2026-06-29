@@ -5,12 +5,12 @@ import { endpoints } from '@/core/api/endpoints';
 
 /**
  * =========================================================================
- * CUSTOM HOOK: useCheckout
+ * MANDOR KEPALA LOKET PEMBAYARAN (useCheckout)
  * =========================================================================
- * Hook ini mengelola seluruh logika checkout belanja customer, meliputi:
- * 1. Mengambil alamat pengiriman customer dari backend.
- * 2. Mengambil tarif ongkos kirim (RajaOngkir) secara dinamis & caching.
- * 3. Menyimpan transaksi dan memicu gateway pembayaran Midtrans Snap.
+ * Ibarat manajer keuangan senior di kasir utama klinik:
+ * 1. Menanyakan buku alamat lengkap tamu ke gudang arsip (API Alamat).
+ * 2. Menelepon biro pengiriman (RajaOngkir) untuk menanyakan ongkos kirim secara instan, serta pintar mencatat tarif di buku memori (Cache) agar tidak perlu menelepon ulang untuk alamat yang sama.
+ * 3. Memeriksa validitas kupon potongan harga, menyepakati total akhir tagihan, lalu membukakan pintu besi mesin kasir otomatis (Midtrans Snap) untuk transaksi tuntas.
  */
 export function useCheckout({
   isOpen,

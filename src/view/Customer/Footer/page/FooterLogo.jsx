@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * LAMBANG TUGU KLINIK (FooterLogo)
+ * =========================================================================
+ * Ibarat pahatan lambang besar berlogo Mische di taman depan gedung, yang
+ * memancarkan identitas resmi klinik kepada setiap orang yang melintas.
+ */
 const FooterLogo = ({ logo }) => {
   return (
     <div className="flex flex-col items-center md:items-start justify-center">

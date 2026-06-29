@@ -3,6 +3,15 @@ import axiosClient from '@/core/api/axiosClient';
 import { endpoints } from '@/core/api/endpoints';
 import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
+/**
+ * =========================================================================
+ * MANDOR JADWAL ACARA KLINIK (useEventData)
+ * =========================================================================
+ * Ibarat ketua panitia penyelenggara acara di klinik:
+ * 1. Memeriksa daftar kalender acara dari arsip laci utama (Cache/API).
+ * 2. Mencocokkan tanggal jam dinding saat ini dengan tanggal acara untuk menempelkan stempel status ("Akan Berlangsung", "Sedang Berlangsung", atau "Sudah Selesai").
+ * 3. Menyediakan kotak kacamata pembesar (searchQuery) dan laci pemilih (Filter) agar tamu mudah memilih jadwal favorit.
+ */
 export function useEventData() {
   const [events, setEvents] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');

@@ -2,13 +2,22 @@ import React from 'react';
 import { STORAGE_BASE_URL } from "@/core/api/endpoints";
 import Table from '@/components/Table';
 
+/**
+ * MEJA PAMERAN ETALASE TESTIMONI (Tabel)
+ * Ibarat etalase pameran memanjang di lobi tempat memajang foto senyum pelanggan beserta pujian mereka.
+ * Etalase ini membeberkan pilar nomor, foto wajah, nama pelanggan, tanggal perawatan, kalimat ulasan, 
+ * dan jenis ulasannya. Di ujung kanan setiap baris, terdapat tombol pensil untuk mengoreksi tulisan 
+ * dan tombol tong sampah untuk mencopot ulasan.
+ */
 const Tabel = ({ isLoading, data, onEdit, onDelete, currentPage = 1, itemsPerPage = 6 }) => {
+  // Pilar-pilar etalase tabel tempat menaruh informasi ulasan
   const columns = [
     { label: 'No', render: (item, index) => index, className: 'text-center w-16', cellClassName: 'text-center' },
     { 
       label: 'Foto', 
       render: (item) => (
         <div className="flex justify-center">
+          {/* Bingkai bingkai foto dinding */}
           <div className="w-10 h-10 rounded overflow-hidden bg-gray-200 flex items-center justify-center">
             {item.buktiFoto ? (
               <img 
@@ -41,6 +50,7 @@ const Tabel = ({ isLoading, data, onEdit, onDelete, currentPage = 1, itemsPerPag
       label: 'Action', 
       render: (item) => (
         <div className="flex justify-center gap-3 items-center">
+          {/* Tombol Pensil (Klik untuk membuka meja perbaikan) */}
           <button
             onClick={() => onEdit(item)}
             className="text-gray-500 hover:text-black transition-colors"
@@ -48,6 +58,8 @@ const Tabel = ({ isLoading, data, onEdit, onDelete, currentPage = 1, itemsPerPag
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
           </button>
+          
+          {/* Tombol Tong Sampah (Klik untuk membuka plang pencopotan) */}
           <button
             onClick={() => onDelete(item)}
             className="text-gray-500 hover:text-black transition-colors"
@@ -65,6 +77,7 @@ const Tabel = ({ isLoading, data, onEdit, onDelete, currentPage = 1, itemsPerPag
   return (
     <div className="w-full flex flex-col items-center mb-6">
       <div className="w-full font-poppins">
+        {/* Menggelar Etalase Tabel Bersama Asisten Arsip */}
         <Table 
           isLoading={isLoading}
           columns={columns} 

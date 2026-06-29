@@ -42,6 +42,14 @@ const advantages = [
   }
 ];
 
+/**
+ * =========================================================================
+ * TUGU PAMERAN LIMA PILAR KEUNGGULAN (KeunggulanKlinik)
+ * =========================================================================
+ * Ibarat tugu pameran putih bersih di tengah alun-alun klinik yang memamerkan
+ * lima piagam emas keunggulan Mische. Pameran ini meyakinkan tamu bahwa klinik
+ * ini memiliki layanan personal, dokter ahli, dan produk berkualitas tinggi.
+ */
 export default function KeunggulanKlinik() {
   return (
     <section className="w-full py-24 bg-white relative">

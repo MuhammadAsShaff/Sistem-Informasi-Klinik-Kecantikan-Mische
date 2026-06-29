@@ -1,7 +1,15 @@
 import React from "react";
 import { useModalEdit } from "../hooks/useModalEdit";
 
+/**
+ * BILIK MEJA PERBAIKAN ULASAN (ModalEdit)
+ * Ibarat bilik meja kerja tertutup tempat pimpinan mengoreksi lembar ulasan pelanggan lama yang salah tulis.
+ * Di meja ini, pimpinan bisa mengunggah foto wajah pelanggan yang baru, membetulkan kalimat pujian, 
+ * mengubah nama pelanggan, tanggal kunjungan, serta jenis pujiannya (Treatment/Produk/Pelayanan).
+ * Segala urusan pengawalan berkas dikerjakan oleh Asisten Pengawal Meja (useModalEdit).
+ */
 const ModalEdit = ({ isOpen, onClose, data, refetch, showToast }) => {
+  // Meminta pena, laci isian, dan rambu kerja dari Asisten Pengawal Meja Koreksi
   const {
     fileName,
     formData,
@@ -11,11 +19,12 @@ const ModalEdit = ({ isOpen, onClose, data, refetch, showToast }) => {
     handleSubmit
   } = useModalEdit(data, isOpen, refetch, showToast, onClose);
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, bilik meja perbaikan ini dilipat kembali
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 font-poppins">
       <div className="bg-white rounded-lg w-full max-w-4xl mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
+        {/* Atap Bilik Perbaikan */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-xl font-bold text-black">Perbarui Testimoni</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -23,8 +32,9 @@ const ModalEdit = ({ isOpen, onClose, data, refetch, showToast }) => {
           </button>
         </div>
 
+        {/* Ruangan Formulir Meja Kerja */}
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Column */}
+          {/* Kolom Kiri: Tempat Mengunggah Foto & Menulis Deskripsi */}
           <div className="flex flex-col gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-2">Unggah Gambar Testimoni</label>
@@ -57,7 +67,7 @@ const ModalEdit = ({ isOpen, onClose, data, refetch, showToast }) => {
             </div>
           </div>
 
-          {/* Right Column */}
+          {/* Kolom Kanan: Tempat Menulis Nama, Tanggal, dan Jenis Pujian */}
           <div className="flex flex-col gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-2">Nama Testimoni</label>
@@ -101,6 +111,7 @@ const ModalEdit = ({ isOpen, onClose, data, refetch, showToast }) => {
           </div>
         </div>
 
+        {/* Laci Tombol Utus Juru Tulis Perbaikan */}
         <div className="p-6 border-t border-gray-200 flex justify-end">
           <button 
             onClick={handleSubmit}

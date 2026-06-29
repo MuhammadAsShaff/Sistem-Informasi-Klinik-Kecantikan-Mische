@@ -1,9 +1,16 @@
 import React from "react";
 import { Calendar } from "lucide-react";
 
+/**
+ * BILIK PAMERAN RINCIAN PROMO (ModalDetailPromo)
+ * Ibarat bilik pameran berkaca jernih tempat mandor membeberkan seluruh rahasia satu promo.
+ * Di bilik ini, admin bisa melihat jelas nama promo, potongan harga, tanggal berlakunya, 
+ * kode rahasia, dan apakah promo ini khusus untuk kategori/produk tertentu atau berlaku global.
+ */
 export default function ModalDetailPromo({ isOpen, onClose, promo }) {
-  if (!isOpen || !promo) return null;
+  if (!isOpen || !promo) return null; // Jika saklar ditutup, bilik pameran ini disembunyikan
 
+  // Kamus penerjemah sandi angka kategori menjadi nama asli
   const getKategoriName = (id) => {
     switch (String(id)) {
       case "1": return "Skincare";
@@ -14,6 +21,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
     }
   };
 
+  // Kamus penerjemah sandi angka produk menjadi nama asli
   const getProdukName = (id) => {
     switch (String(id)) {
       case "1": return "Facial Wash";
@@ -25,11 +33,11 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
     }
   };
 
-  // Ambil ID dari berbagai kemungkinan nama field API (camelCase / snake_case)
+  // Ambil sandi ID dari berbagai kemungkinan nama field di gudang API
   const katId = promo.idKategori || promo.id_kategori || promo.kategori_id;
   const prodId = promo.idProduk || promo.id_produk || promo.produk_id;
 
-  // Cek apakah ada data teks (string) atau ambil nama berdasarkan ID
+  // Asisten pemeriksa apakah ada tulisan langsung atau perlu diterjemahkan dari kamus
   const parseName = (val) => {
     if (!val) return null;
     if (typeof val === 'object') {
@@ -43,26 +51,26 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {/* Tirai pembatas gelap di latar belakang */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       ></div>
 
-      {/* Modal Container */}
+      {/* Rangkaian Kotak Bilik Pameran */}
       <div className="relative bg-white rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
+        {/* Atap Bilik Pameran */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-bold text-black">Detail Promo</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl font-light">&times;</button>
         </div>
 
-        {/* Body */}
+        {/* Ruangan Dalam Bilik Pameran */}
         <div className="p-6 max-h-[70vh] overflow-y-auto">
           <div className="space-y-6">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Nama Promo */}
+              {/* Kotak Nama Promo */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Nama Promo</label>
                 <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
@@ -70,7 +78,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Jenis Promo */}
+              {/* Kotak Jenis Promo */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Jenis Promo</label>
                 <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
@@ -78,7 +86,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Kode Promo */}
+              {/* Kotak Kode Promo */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Kode Promo</label>
                 <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
@@ -86,7 +94,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Diskon */}
+              {/* Kotak Potongan Harga (Diskon) */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Diskon</label>
                 <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm font-medium">
@@ -104,7 +112,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Tanggal Mulai */}
+              {/* Kotak Tanggal Mulai */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Tanggal Mulai</label>
                 <div className="relative">
@@ -115,7 +123,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Tanggal Selesai */}
+              {/* Kotak Tanggal Selesai */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Tanggal Selesai</label>
                 <div className="relative">
@@ -126,7 +134,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Minimal Transaksi */}
+              {/* Kotak Minimal Transaksi */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Minimal Transaksi</label>
                 <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
@@ -134,7 +142,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Status */}
+              {/* Kotak Status Aktif */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Status</label>
                 <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm">
@@ -142,7 +150,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
                 </div>
               </div>
 
-              {/* Target Promo */}
+              {/* Kotak Sasaran Berlaku Promo */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Berlaku Untuk</label>
                 <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-[#56BC36] font-bold text-sm">
@@ -151,7 +159,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
               </div>
             </div>
 
-            {/* Deskripsi */}
+            {/* Kotak Keterangan Lengkap */}
             <div>
               <label className="block text-sm font-medium text-gray-800 mb-2">Deskripsi Promo</label>
               <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 text-sm whitespace-pre-wrap min-h-[100px]">
@@ -162,7 +170,7 @@ export default function ModalDetailPromo({ isOpen, onClose, promo }) {
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Laci Tombol Tutup Bilik */}
         <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
           <button 
             onClick={onClose}

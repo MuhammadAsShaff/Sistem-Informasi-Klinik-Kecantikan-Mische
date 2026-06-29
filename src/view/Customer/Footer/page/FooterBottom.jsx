@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * STEMPEL HAK CIPTA GEDUNG (FooterBottom)
+ * =========================================================================
+ * Ibarat stempel prasasti emas di lantai paling dasar gedung yang menyatakan
+ * bahwa bangunan ini resmi dilindungi hukum dan sepenuhnya milik klinik Mische.
+ */
 const FooterBottom = () => {
   return (
     <div className="w-full bg-black py-8 mt-6">

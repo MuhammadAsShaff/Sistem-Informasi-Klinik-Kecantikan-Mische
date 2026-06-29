@@ -15,6 +15,14 @@ import AfterThreadlift from '@/assets/images/Hasiltreatment/AfterThreadlift.jpeg
 import BeforeRadianceGlowInfusion from '@/assets/images/Hasiltreatment/BeforeRadianceGlowInfusion.jpeg';
 import AfterRadianceGlowInfusion from '@/assets/images/Hasiltreatment/AfterRadianceGlowInfusion.jpeg';
 
+/**
+ * =========================================================================
+ * ARSIP FOTO HASIL NYATA SEBELUM & SESUDAH (HasilKlinikData)
+ * =========================================================================
+ * Ibarat map album foto tebal di lobi klinik yang berisi bukti nyata hasil
+ * karya dokter. Map ini memuat foto kondisi wajah tamu sebelum (before) dan
+ * sesudah (after) tindakan untuk dipamerkan di panggung pameran.
+ */
 export const results = [
   {
     id: 1,

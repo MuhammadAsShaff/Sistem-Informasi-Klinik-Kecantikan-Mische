@@ -8,25 +8,29 @@ import ModalExportExcel from "./ModalExportExcel";
 import ToastAlert from "@/view/components/ToastAlert/page/Index";
 import { useKelolaReservasi } from "../hooks/useKelolaReservasi";
 
+/**
+ * RUANGAN UTAMA PENGELOLAAN RESERVASI (KelolaReservasi)
+ * Ibarat balai agung tempat mandor memantau seluruh jadwal kunjungan tamu klinik.
+ * Di dalam ruangan ini terdapat:
+ * 1. Bagian Plang Selamat Datang & Kotak Ketikan Pencarian.
+ * 2. Tombol Cetak Buku Excel & Tombol Plus Pendaftaran Tamu Baru.
+ * 3. Meja Pameran Daftar Antrean (Tabel).
+ * 4. TOA Pengumuman di atap balai (ToastAlert).
+ * 5. Lima meja lipat pop-up rahasia (Ubah Status, Detail Tamu, Hapus Tamu, Tambah Tamu, Export Excel).
+ * Balai ini dipimpin langsung oleh Mandor Besar (useKelolaReservasi).
+ */
 export default function KelolaReservasi() {
+  // Memanggil Mandor Besar untuk memegang seluruh kunci gembok, asisten, dan laci data
   const {
     selectedReservasi,
-    isStatusOpen,
-    setIsStatusOpen,
-    isDetailOpen,
-    setIsDetailOpen,
-    isHapusOpen,
-    setIsHapusOpen,
-    isTambahOpen,
-    setIsTambahOpen,
-    isExcelOpen,
-    setIsExcelOpen,
-    toast,
-    setToast,
-    page,
-    setPage,
-    searchTerm,
-    setSearchTerm,
+    isStatusOpen, setIsStatusOpen,
+    isDetailOpen, setIsDetailOpen,
+    isHapusOpen, setIsHapusOpen,
+    isTambahOpen, setIsTambahOpen,
+    isExcelOpen, setIsExcelOpen,
+    toast, setToast,
+    page, setPage,
+    searchTerm, setSearchTerm,
     filteredReservasi,
     meta,
     isLoading,
@@ -41,6 +45,7 @@ export default function KelolaReservasi() {
 
   return (
     <div className="p-8 bg-[#F8F9FA] min-h-screen animate-in fade-in duration-700">
+      {/* TOA Pengumuman di Atap Balai */}
       <ToastAlert
         isOpen={toast.isOpen}
         message={toast.message}
@@ -50,7 +55,7 @@ export default function KelolaReservasi() {
 
       <div className="max-w-[1440px] mx-auto flex flex-col gap-6 font-poppins">
         
-        {/* Header Sederhana */}
+        {/* Plang Sambutan & Deretan Tombol Pencarian */}
         <div className="flex flex-col lg:flex-row justify-between lg:items-end mb-2 gap-4">
           <div>
             <h1 className="text-3xl font-medium text-black tracking-tight">Data Reservasi Treatment</h1>
@@ -60,7 +65,7 @@ export default function KelolaReservasi() {
           </div>
           
           <div className="flex items-center gap-3">
-            {/* Search Input */}
+            {/* Kotak Ketikan Pencarian Nama/Treatment/Dokter */}
             <div className="flex items-center">
               <input 
                 type="text"
@@ -74,7 +79,7 @@ export default function KelolaReservasi() {
               </button>
             </div>
 
-            {/* Export Excel Button */}
+            {/* Tombol Pembuka Meja Kerja Rekap Excel */}
             <button 
               onClick={() => setIsExcelOpen(true)}
               className="bg-[#56BC36] hover:bg-[#469e2c] text-white text-sm py-2 px-4 shadow-sm hover:shadow transition-all flex items-center gap-2"
@@ -83,7 +88,7 @@ export default function KelolaReservasi() {
               Excel
             </button>
 
-            {/* Tambah Button */}
+            {/* Tombol Plus (+) Pembuka Meja Pendaftaran Tamu Baru */}
             <button 
               onClick={() => setIsTambahOpen(true)}
               className="bg-[#56BC36] hover:bg-[#469e2c] text-white text-sm py-2 px-3 shadow-sm hover:shadow transition-all flex items-center justify-center"
@@ -93,12 +98,15 @@ export default function KelolaReservasi() {
           </div>
         </div>
 
+        {/* Papan Penanda Buku Arsip Sedang Dibuka */}
         {isLoading ? (
           <div className="flex justify-center items-center py-20 text-gray-500 font-bold">
             Mengambil data reservasi dari server...
           </div>
         ) : (
-          <Tabel isLoading={isLoading}
+          /* Meja Pameran Daftar Antrean Tamu */
+          <Tabel 
+            isLoading={isLoading}
             data={filteredReservasi}
             meta={meta}
             page={page}
@@ -109,6 +117,9 @@ export default function KelolaReservasi() {
           />
         )}
 
+        {/* --- LIMA MEJA LIPAT POP-UP RAHASIA --- */}
+
+        {/* Meja Pengecapan Status Kehadiran Tamu */}
         <ModalUbahStatus
           isOpen={isStatusOpen}
           onClose={() => setIsStatusOpen(false)}
@@ -116,18 +127,21 @@ export default function KelolaReservasi() {
           hook={ubahStatusHook}
         />
 
+        {/* Bilik Pameran Rincian Lengkap Biodata Tamu */}
         <ModalDetail
           isOpen={isDetailOpen}
           onClose={() => setIsDetailOpen(false)}
           selectedReservasi={selectedReservasi}
         />
 
+        {/* Plang Peringatan Pencoretan Tamu Permanen */}
         <ModalHapus
           isOpen={isHapusOpen}
           onClose={() => setIsHapusOpen(false)}
           hook={hapusHook}
         />
 
+        {/* Bilik Meja Pendaftaran Tamu Baru */}
         <ModalTambahReservasi
           isOpen={isTambahOpen}
           onClose={() => setIsTambahOpen(false)}
@@ -135,6 +149,7 @@ export default function KelolaReservasi() {
           isSubmitting={isTambahSubmitting}
         />
 
+        {/* Meja Kerja Rekapitulasi Laporan Excel */}
         <ModalExportExcel
           isOpen={isExcelOpen}
           onClose={() => setIsExcelOpen(false)}

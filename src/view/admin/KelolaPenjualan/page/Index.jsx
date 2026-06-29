@@ -11,6 +11,16 @@ import Pagination from '@/components/Pagination';
 import { useKelolaPenjualan } from '../hooks/useKelolaPenjualan';
 import ToastAlert from '@/view/components/ToastAlert/page/Index';
 
+/**
+ * =========================================================================
+ * BALAI AULA KENDALI DATA PENJUALAN (Index)
+ * =========================================================================
+ * Ibarat ruangan balai pengawasan luas tempat memantau seluruh uang masuk dan paket keluar.
+ * Di dalam ruangan megah ini terpasang papan panji judul (HeaderSection), meja kaca pembesar
+ * untuk menyaring pesanan (SearchBar), rak arsip catatan transaksi (TableSection), serta
+ * deretan ruang rapat tertutup (ModalResi, ModalDetailPenjualan, ModalExportExcel) yang siap
+ * dibuka kapan saja atas arahan Mandor Kepala Pencatat (useKelolaPenjualan).
+ */
 const KelolaPenjualan = () => {
   const {
     searchQuery,

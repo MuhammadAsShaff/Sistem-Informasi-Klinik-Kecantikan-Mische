@@ -4,6 +4,14 @@ import { useDetailDokter } from '../hooks/useDetailDokter';
 import EmailIcon from '../../../../assets/icons/ic_round-email.png';
 import CustomerLoading from '@/components/CustomerLoading';
 
+/**
+ * =========================================================================
+ * RUANG PAMER BIOGRAFI DOKTER MURNI (DetailDokterPage)
+ * =========================================================================
+ * Ibarat galeri eksklusif di dalam klinik tempat tamu membaca kisah hidup,
+ * pengalaman, dan keahlian spesifik sang dokter. Galeri ini memajang potret
+ * megah di sisi kiri dan surat tugas serta kontak di sisi kanan.
+ */
 export default function DetailDokterPage() {
   const { doctor, isLoading } = useDetailDokter();
 

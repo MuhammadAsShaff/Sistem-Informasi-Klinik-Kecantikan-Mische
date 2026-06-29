@@ -7,7 +7,15 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { renderTimeViewClock } from '@mui/x-date-pickers/timeViewRenderers';
 import dayjs from 'dayjs';
 
+/**
+ * MEJA FORMULIR BUKU RIWAYAT KLINIK (PengaturanTentangKami)
+ * Ibarat meja besar berbingkai hitam tempat admin menulis cerita riwayat klinik, visi, misi, 
+ * memutar jam dinding buka/tutup, mencatat nomor telepon CS, dan menempel pasfoto gedung.
+ * Segala aturan pena, pencegahan huruf pada nomor telepon, dan pengukur berat foto diatur oleh 
+ * Asisten Juru Tulis Buku (usePengaturanTentangKami).
+ */
 const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
+  // Meminta formulir, pena, dan saringan dari Asisten Juru Tulis Buku
   const {
     formData,
     setFormData,
@@ -21,6 +29,7 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
 
   return (
     <div className="border border-black p-6 mb-6 rounded-none bg-transparent">
+      {/* KOTAK CERITA KLINIK */}
       <div className="mb-4">
         <label className="block text-[13px] font-semibold text-black mb-1">Deskripsi Klinik <span className="text-red-500">*</span></label>
         <Editor
@@ -34,6 +43,7 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
         {!formData.deskripsiPerusahaan && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
       </div>
 
+      {/* KOTAK VISI DAN MISI KLINIK */}
       <div className="grid grid-cols-2 gap-6 mb-4">
         <div>
           <label className="block text-[13px] font-semibold text-black mb-1">Visi Klinik <span className="text-red-500">*</span></label>
@@ -61,6 +71,7 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
         </div>
       </div>
 
+      {/* JAM DINDING OPERASIONAL (BUKA & TUTUP) */}
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <div className="grid grid-cols-2 gap-6 mb-4">
           <div>
@@ -132,12 +143,14 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
         </div>
       </LocalizationProvider>
 
+      {/* KOTAK NOMOR TELEPON CUSTOMER SERVICE */}
       <div className="mb-6">
         <label className="block text-[13px] font-semibold text-black mb-1">Nomor Customer Service <span className="text-red-500">*</span></label>
         <input name="nomorCustomerService" value={formData.nomorCustomerService} onChange={handleChange} type="text" placeholder="08xx-xxxx-xxxx" className="w-full border border-gray-400 p-2 text-sm focus:outline-none bg-white" />
         {!formData.nomorCustomerService && <p className="text-[11px] text-red-500 mt-1">* Wajib diisi</p>}
       </div>
 
+      {/* AREA UNGGAH FOTO GEDUNG KLINIK */}
       <div className="mb-6">
         <div className="w-36 h-24 border border-black flex items-center justify-center text-[13px] font-semibold mb-2 bg-gray-100 overflow-hidden">
           {previewImage ? (
@@ -166,6 +179,7 @@ const PengaturanTentangKami = ({ data, onSimpan, onError, onHapusClick }) => {
         </div>
       </div>
 
+      {/* LACI TOMBOL UTUS KURIR (SIMPAN / PERBARUI / HAPUS) */}
       <div className="flex flex-row gap-4 mt-4">
         {data ? (
           <>

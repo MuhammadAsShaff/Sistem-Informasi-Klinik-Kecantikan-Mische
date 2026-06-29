@@ -4,7 +4,16 @@ import ModalKelolaAlamat from "@/view/Customer/ProfilCustomer/page/ModalKelolaAl
 import ToastAlert from "@/view/components/ToastAlert/page/Index";
 import { useModalPerbaruiUser } from "../hooks/useModalPerbaruiUser";
 
+/**
+ * BILIK MEJA KOREKSI BIODATA ANGGOTA (ModalPerbaruiUser)
+ * Ibarat bilik meja kerja tertutup tempat pimpinan membetulkan tulisan biodata anggota klinik.
+ * Di meja ini, pimpinan bisa mengubah nama, email, mengganti kata sandi baru (atau membiarkannya kosong agar utuh),
+ * mengubah jenis kelamin, kedudukan (Admin/Customer), tanggal lahir, nomor WhatsApp (dijamin hanya angka!),
+ * serta membuka laci khusus untuk mengelola riwayat alamat lengkap bagi Customer.
+ * Segala urusan pengawalan kelengkapan berkas dibantu oleh Asisten Pengawal Meja (useModalPerbaruiUser).
+ */
 export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
+  // Meminta pena, laci isian, saklar senter, dan gembok alamat dari Asisten Pengawal Meja Koreksi
   const {
     formData,
     showPassword,
@@ -19,14 +28,14 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
     handleAlamatClick
   } = useModalPerbaruiUser(hook);
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, bilik meja kerja ini dilipat kembali
 
   return (
     <>
       <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white w-full max-w-[900px] rounded-[24px] shadow-2xl animate-in fade-in zoom-in duration-300 max-h-[90vh] flex flex-col">
 
-        {/* HEADER MODAL */}
+        {/* Atap Bilik Koreksi Biodata */}
         <div className="px-10 py-6 flex items-center justify-between border-b border-gray-100 shrink-0">
           <h2 className="text-2xl font-bold text-[#1A1A1A]">Perbarui User</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors">
@@ -34,11 +43,11 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
           </button>
         </div>
 
-        {/* FORM BODY */}
+        {/* Ruangan Formulir Meja Kerja */}
         <div className="px-10 py-8 overflow-y-auto custom-scrollbar">
           <div className="grid grid-cols-2 gap-x-12 gap-y-8 mb-10">
 
-            {/* Nama User */}
+            {/* Kotak Isian Nama User */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Nama user</label>
               <input
@@ -51,7 +60,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
               />
             </div>
 
-            {/* Email */}
+            {/* Kotak Isian Email */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Email</label>
               <input
@@ -65,7 +74,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
               <p className="text-[11px] text-red-500 italic mt-0.5">* Pastikan format email valid (@gmail.com)</p>
             </div>
 
-            {/* Password (Opsional) */}
+            {/* Kotak Isian Password (Opsional) */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Password (Opsional)</label>
               <div className="relative">
@@ -88,7 +97,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
               <p className="text-[11px] text-red-500 italic mt-0.5">* Minimal 8 karakter, mengandung huruf BESAR dan kecil</p>
             </div>
 
-            {/* Jenis Kelamin */}
+            {/* Kotak Pilihan Jenis Kelamin */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Jenis Kelamin</label>
               <select
@@ -103,7 +112,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
               </select>
             </div>
 
-            {/* Alamat */}
+            {/* Laci Pembuka Buku Alamat Lengkap */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Alamat</label>
               <button
@@ -126,7 +135,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
               </button>
             </div>
 
-            {/* Role */}
+            {/* Kotak Pilihan Role */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Role</label>
               <select
@@ -141,7 +150,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
               </select>
             </div>
 
-            {/* Tanggal Lahir */}
+            {/* Kotak Isian Tanggal Lahir */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Tanggal Lahir</label>
               <input
@@ -153,7 +162,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
               />
             </div>
 
-            {/* Nomor Whatsapp */}
+            {/* Kotak Isian Nomor Whatsapp */}
             <div className="flex flex-col gap-2.5">
               <label className="text-sm font-bold text-[#1A1A1A]">Nomor Whatsapp</label>
               <input
@@ -172,7 +181,7 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
 
         </div>
         
-        {/* FOOTER ACTION */}
+        {/* LACI TOMBOL UTUS JURU TULIS PERUBAHAN */}
         <div className="px-10 py-6 flex justify-end border-t border-gray-100 shrink-0 bg-white">
           <button
             onClick={handleSubmit}
@@ -184,12 +193,14 @@ export default function ModalPerbaruiUser({ isOpen, onClose, hook }) {
       </div>
     </div>
 
+    {/* Laci Meja Khusus Pengelolaan Alamat Lengkap */}
     <ModalKelolaAlamat
       isOpen={isModalAlamatOpen}
       onClose={() => setIsModalAlamatOpen(false)}
       hookKelolaAlamat={dummyHookKelolaAlamat}
     />
     
+    {/* TOA Pengumuman Kecil di Meja */}
     <ToastAlert 
       isOpen={toast.isOpen} 
       message={toast.message} 

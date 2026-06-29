@@ -11,14 +11,12 @@ import { useReservasiPage } from '../hooks/useReservasiPage';
 
 /**
  * =========================================================================
- * KOMPONEN VIEW: ReservasiPage (Halaman Pendaftaran Reservasi Customer)
+ * BALAI UTAMA PENDAFTARAN JADWAL TEMU (ReservasiPage)
  * =========================================================================
- * Komponen ini berfungsi sebagai kerangka tampilan (UI/Layout) untuk proses
- * reservasi treatment kecantikan di Mische.
- * 
- * Seluruh logika bisnis seperti pemilihan tanggal, dokter, pencarian ketersediaan
- * slot waktu, penutupan dropdown otomatis, dan fungsi booking dienkapsulasi
- * secara rapi di dalam custom hook `useReservasiPage`.
+ * Ibarat gedung paviliun luas tempat seluruh proses pemesanan tiket perawatan
+ * dilangsungkan. Tersusun dari spanduk selamat datang (HeaderSection), meja pilih
+ * jadwal (FilterSection), deretan petak jam praktek (JadwalSection), dan diatur
+ * seluruh geraknya oleh mandor besar (useReservasiPage).
  */
 export default function ReservasiPage() {
   // Memanggil custom hook yang mengelola status dan aksi dari halaman ini

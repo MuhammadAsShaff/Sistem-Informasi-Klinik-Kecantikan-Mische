@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * PLANG PAPAN ALAMAT KLINIK (FooterAddress)
+ * =========================================================================
+ * Ibarat papan ukir kayu di dinding lobi bawah yang mencantumkan peta dan
+ * tulisan alamat lengkap gedung klinik, agar tamu tidak salah mendatangi tempat.
+ */
 const FooterAddress = () => {
   return (
     <div className="flex flex-col gap-3 md:gap-6 text-left">

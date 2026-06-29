@@ -2,7 +2,14 @@ import React from 'react';
 import { X, Upload } from 'lucide-react';
 import { useModalTambahProduk } from '../hooks/useModalTambahProduk';
 
+/**
+ * TAMPILAN FORMULIR PENDAFTARAN PRODUK BARU (ModalTambahProduk)
+ * Ibarat meja pendaftaran yang muncul saat admin menekan tombol hijau (+). Di meja ini, 
+ * admin diberikan selembar formulir kosong untuk menulis nama barang baru, harga, berat, 
+ * stok awal, dan menempelkan foto barang sebelum diserahkan ke gudang pusat.
+ */
 const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
+  // Memanggil juru tulis pendaftaran yang menyediakan kotak isian dan memandu penyerahan formulir
   const {
     nama, setNama,
     harga, setHarga,
@@ -18,30 +25,33 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
     handleSave
   } = useModalTambahProduk(isOpen, refetch, showToast, onClose);
 
+  // Jika saklar pembukanya mati, meja pendaftaran ini tetap sembunyi
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {/* Layar Belakang Gelap (Peredam Ruangan) */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       ></div>
 
-      {/* Modal Container */}
+      {/* Bingkai Utama Meja Formulir */}
       <div className="relative bg-white rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
+        
+        {/* Papan Judul Atas Formulir & Tombol Silang Tutup (X) */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-bold text-black">Tambah Produk</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl font-light">&times;</button>
         </div>
 
-        {/* Body */}
+        {/* --- BAGIAN KOTAK-KOTAK ISIAN FORMULIR --- */}
         <div className="p-6 max-h-[70vh] overflow-y-auto">
           <form id="tambah-produk-form" onSubmit={handleSave} className="space-y-6">
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Nama Produk */}
+              
+              {/* Kotak Isian Nama Produk */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Nama Produk</label>
                 <input
@@ -54,7 +64,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
                 />
               </div>
 
-              {/* Harga Produk */}
+              {/* Kotak Isian Harga Produk */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Harga Produk</label>
                 <input
@@ -68,7 +78,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
                 <p className="text-[11px] text-red-500 italic mt-1">* Hanya angka, tidak boleh negatif</p>
               </div>
 
-              {/* Stock */}
+              {/* Kotak Isian Jumlah Stok Awal */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Stock</label>
                 <input
@@ -82,7 +92,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
                 <p className="text-[11px] text-red-500 italic mt-1">* Hanya angka</p>
               </div>
 
-              {/* Berat Produk */}
+              {/* Kotak Isian Berat Produk */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Berat Produk (gram)</label>
                 <input
@@ -96,7 +106,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
                 <p className="text-[11px] text-red-500 italic mt-1">* Hanya angka dalam satuan gram</p>
               </div>
 
-              {/* Kategori */}
+              {/* Kotak Pemilihan Kategori */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Kategori</label>
                 <select
@@ -114,7 +124,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
                 </select>
               </div>
 
-              {/* Gambar Produk */}
+              {/* Tombol Pemilihan Berkas Gambar / Foto Barang */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Gambar Produk (Opsional)</label>
                 <div className="flex items-center gap-3">
@@ -137,7 +147,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
             </div>
 
             <div className="mt-6">
-              {/* Deskripsi Produk */}
+              {/* Kotak Cerita Penjelasan Lengkap (Deskripsi Produk) */}
               <div>
                 <label className="block text-sm font-medium text-gray-800 mb-2">Deskripsi Produk</label>
                 <textarea 
@@ -152,7 +162,7 @@ const ModalTambahProduk = ({ isOpen, onClose, refetch, showToast }) => {
           </form>
         </div>
 
-        {/* Footer */}
+        {/* Tombol Simpan di Bagian Bawah Formulir */}
         <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
           <button
             type="submit"

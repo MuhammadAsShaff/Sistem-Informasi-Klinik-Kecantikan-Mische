@@ -2,9 +2,15 @@ import React from 'react';
 import { useDokterData } from '@/view/Customer/TentangDokter/hooks/useDokterData';
 import DoctorCard from './DoctorCard';
 
+/**
+ * =========================================================================
+ * GALERI MEGAH POTRET PARA DOKTER (DoctorSection)
+ * =========================================================================
+ * Ibarat lorong galeri khusus di paviliun klinik tempat potret para ahli dipajang:
+ * 1. Mempekerjakan Asisten Data Dokter (useDokterData) untuk menyusun daftar riwayat hidup para dokter.
+ * 2. Menyusun bingkai foto secara rapi dalam satu jajar yang bisa digeser (slider) atau berjejer megah di meja besar.
+ */
 export default function DoctorSection() {
-  // Mengambil daftar 'doctors' (data dokter) menggunakan custom hook useDokterData.
-  // Hook ini memisahkan logika pengambilan data dari tampilan (View).
   const { doctors } = useDokterData();
   
   return (

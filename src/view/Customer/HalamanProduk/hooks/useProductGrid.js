@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * =========================================================================
+ * PETUGAS PEMBUKA TIRAI ETALASE (useProductGrid)
+ * =========================================================================
+ * Ibarat penanggung jawab tirai penutup di lemari panjang toko:
+ * 1. Mengatur agar awalnya hanya 3 barang yang dibuka tirainya agar tamu.
+ * 2. Jika tamu mengetuk tombol 'Lihat Lainnya', petugas ini membuka tirai untuk 3 barang berikutnya secara perlahan.
+ */
 export const useProductGrid = (products) => {
   const [visibleCount, setVisibleCount] = useState(3);
 

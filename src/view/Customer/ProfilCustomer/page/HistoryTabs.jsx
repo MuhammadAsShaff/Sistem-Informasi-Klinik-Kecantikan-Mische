@@ -2,6 +2,13 @@ import React from 'react';
 import { ShoppingBag, BookmarkCheck } from 'lucide-react';
 import { useHistoryTabs } from '../hooks/useHistoryTabs';
 
+/**
+ * =========================================================================
+ * DUA PINTU MASUK LORONG ARSIP (HistoryTabs)
+ * =========================================================================
+ * Ibarat dua gapura elegan di lobi profil: satu bergapura hijau emas menuju
+ * ruang riwayat pembelian produk, dan satu lagi bergapura asri menuju ruang riwayat reservasi.
+ */
 const HistoryTabs = () => {
     const { goToRiwayatPembelian, goToRiwayatReservasi } = useHistoryTabs();
     

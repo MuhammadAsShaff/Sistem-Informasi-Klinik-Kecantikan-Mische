@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * PAPAN JAM BUKA KLINIK (FooterHours)
+ * =========================================================================
+ * Ibarat papan jam gantung di pintu masuk utama yang menunjukkan waktu
+ * operasional klinik, agar tamu tahu kapan dokter siap melayani.
+ */
 const FooterHours = () => {
   return (
     <div className="flex flex-col gap-3 md:gap-6 text-left">

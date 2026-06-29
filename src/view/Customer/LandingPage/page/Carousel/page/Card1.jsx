@@ -1,6 +1,14 @@
 import React from 'react';
 import HeroGirl from '@/assets/images/Bg-Hero.png';
 
+/**
+ * =========================================================================
+ * PANGGUNG BALIHO PERTAMA: ACNE EXPERT (Card1)
+ * =========================================================================
+ * Ibarat panggung peragaan busana pertama di alun-alun depan klinik. Baliho ini
+ * memajang kebanggaan Mische sebagai pakar jerawat terdepan di kota, lengkap
+ * dengan foto anggun dan tombol kilat menuju penawaran promo.
+ */
 export default function Card1() {
   return (
     // KONTEN UTAMA: Menggunakan Gradient Hijau Mische

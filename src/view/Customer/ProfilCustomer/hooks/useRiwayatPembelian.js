@@ -5,13 +5,12 @@ import { endpoints } from '@/core/api/endpoints';
 
 /**
  * =========================================================================
- * CUSTOM HOOK: useRiwayatPembelian
+ * MANDOR KEPALA ARSIP TRANSAKSI SKINCARE (useRiwayatPembelian)
  * =========================================================================
- * Hook ini mengelola seluruh logika bisnis untuk halaman riwayat pembelian customer:
- * 1. State data transaksi (orders), status loading, dan filter tab status pesanan.
- * 2. Mengambil riwayat pembelian dari database Laravel.
- * 3. Memproses pembayaran susulan menggunakan Midtrans Snap.
- * 4. Memproses konfirmasi pesanan selesai atau pembatalan pesanan.
+ * Ibarat kepala bagian akuntansi di ruang loket riwayat belanja:
+ * 1. Memilah rak pesanan berdasarkan empat laci: Sedang Diproses, Dalam Perjalanan, Selesai, atau Batal.
+ * 2. Mengurus pembayaran susulan via loket kasir elektronik (Midtrans Snap).
+ * 3. Menerima cap stempel bukti tanda terima pesanan dari tamu.
  * 
  * @param {Function} navigate - Fungsi routing dari React Router untuk berpindah halaman
  */

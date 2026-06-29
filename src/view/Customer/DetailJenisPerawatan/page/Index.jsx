@@ -5,13 +5,11 @@ import { useDetailJenisPerawatan } from '../hooks/useDetailJenisPerawatan';
 
 /**
  * =========================================================================
- * KOMPONEN VIEW: DetailJenisPerawatan (Halaman Pilihan Jenis Perawatan)
+ * BALAI PAMERAN VARIASI PERAWATAN (DetailJenisPerawatan)
  * =========================================================================
- * Komponen ini hanya merender tampilan (UI/Layout) dari daftar jenis perawatan
- * spesifik berdasarkan kategori yang diklik (misal: Facial, Botox, Laser).
- * 
- * Seluruh logika parameter URL, pencarian data kategori, penyaringan perawatan,
- * dan pengaturan posisi scroll diatur di dalam custom hook `useDetailJenisPerawatan`.
+ * Ibarat aula pameran megah yang memajang spanduk besar (Banner) bergambar
+ * ilustrasi perawatan di bagian atas. Di bawahnya terbentang jajaran etalase
+ * (Grid Cards) yang menawarkan rincian jenis perawatan yang cocok untuk kebutuhan tamu, dikawal penuh oleh Mandor Arsip (useDetailJenisPerawatan).
  */
 const DetailJenisPerawatan = () => {
   const { category, items, navigate } = useDetailJenisPerawatan();

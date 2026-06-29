@@ -1,5 +1,13 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * MADING UTAMA TESTIMONI PILIHAN (FeaturedTestimoni)
+ * =========================================================================
+ * Ibarat bingkai emas raksasa di tengah dinding lobi klinik yang memajang
+ * kisah kesuksesan pasien paling berkesan. Pajangan ini memikat tamu dengan
+ * foto besar dan cerita ulasan menyentuh dari pengalaman nyata perawatan.
+ */
 const FeaturedTestimoni = () => {
   return (
     <div className="flex flex-col lg:flex-row gap-6 mb-12 items-stretch">

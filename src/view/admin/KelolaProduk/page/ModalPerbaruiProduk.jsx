@@ -2,7 +2,14 @@ import React from 'react';
 import { X, Upload } from 'lucide-react';
 import { useModalPerbaruiProduk } from '../hooks/useModalPerbaruiProduk';
 
+/**
+ * TAMPILAN FORMULIR PERBARUI PRODUK LAMA (ModalPerbaruiProduk)
+ * Ibarat meja khusus yang muncul membawa formulir isian saat admin menekan tombol pensil (edit).
+ * Formulir ini sudah ditulisi dengan informasi barang yang lama (seperti harga lama dan foto lama), 
+ * sehingga admin tinggal mencoret bagian yang salah dan menggantinya dengan tulisan baru.
+ */
 const ModalPerbaruiProduk = ({ isOpen, onClose, categoryData, refetch, showToast }) => {
+  // Memanggil pengurus juru tulis yang memegang kertas isian dan tinta pena
   const {
     nama, setNama,
     harga, setHarga,
@@ -17,12 +24,14 @@ const ModalPerbaruiProduk = ({ isOpen, onClose, categoryData, refetch, showToast
     handleSave
   } = useModalPerbaruiProduk(categoryData, isOpen, refetch, showToast, onClose);
 
+  // Jika saklar pembukanya mati, meja formulir ini tetap ditutup
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm font-sans transition-opacity">
       <div className="bg-white rounded-lg w-[700px] max-w-[95%] shadow-[0_0_15px_rgba(0,0,0,0.1)] flex flex-col">
-        {/* Header */}
+        
+        {/* Judul Atas Meja Formulir & Tombol Tutup (X) */}
         <div className="flex items-center justify-between px-8 py-5 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">Perbarui Produk</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -30,9 +39,10 @@ const ModalPerbaruiProduk = ({ isOpen, onClose, categoryData, refetch, showToast
           </button>
         </div>
 
-        {/* Body */}
+        {/* --- BAGIAN KOTAK-KOTAK ISIAN FORMULIR --- */}
         <div className="p-8 grid grid-cols-2 gap-x-6 gap-y-6">
-          {/* Row 1 */}
+          
+          {/* Baris 1: Kotak Isian Nama Barang dan Harga */}
           <div className="flex flex-col">
             <label className="text-gray-900 mb-2">Nama Produk</label>
             <input
@@ -55,7 +65,7 @@ const ModalPerbaruiProduk = ({ isOpen, onClose, categoryData, refetch, showToast
             <p className="text-[11px] text-red-500 italic mt-0.5">* Hanya angka, tidak boleh negatif</p>
           </div>
 
-          {/* Row 2 */}
+          {/* Baris 2: Kotak Isian Jumlah Stok dan Berat Barang */}
           <div className="flex flex-col">
             <label className="text-gray-900 mb-2">Stock</label>
             <input
@@ -79,7 +89,7 @@ const ModalPerbaruiProduk = ({ isOpen, onClose, categoryData, refetch, showToast
             <p className="text-[11px] text-red-500 italic mt-0.5">* Hanya angka dalam satuan gram</p>
           </div>
 
-          {/* Row 3 */}
+          {/* Baris 3: Pemilihan Kategori dan Cerita Deskripsi */}
           <div className="flex flex-col">
             <label className="text-gray-900 mb-2">Kategori</label>
             <select
@@ -105,7 +115,7 @@ const ModalPerbaruiProduk = ({ isOpen, onClose, categoryData, refetch, showToast
             />
           </div>
 
-          {/* Row 4 */}
+          {/* Baris 4: Kotak Unggah dan Pajangan Intip Foto Baru */}
           <div className="flex flex-col col-span-2 lg:col-span-1">
             <label className="text-gray-900 mb-2">Gambar Produk</label>
             <label className="border-2 border-dashed border-gray-300 rounded p-4 text-sm flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 h-[130px] transition-colors overflow-hidden relative">
@@ -123,7 +133,7 @@ const ModalPerbaruiProduk = ({ isOpen, onClose, categoryData, refetch, showToast
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Tombol Simpan di Bagian Bawah Meja Formulir */}
         <div className="px-8 py-5 border-t border-gray-200 flex justify-end">
           <button 
             onClick={handleSave}

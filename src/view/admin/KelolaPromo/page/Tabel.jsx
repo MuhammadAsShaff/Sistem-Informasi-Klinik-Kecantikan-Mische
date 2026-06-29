@@ -5,6 +5,12 @@ import Table from '@/components/Table';
 import Pagination from '@/components/Pagination';
 import { useKelolaPromoTabel, useStatusDropdown } from "../hooks/useKelolaPromoTabel";
 
+/**
+ * ASISTEN PENJAGA SAKLAR STATUS PROMO (StatusDropdown)
+ * Ibarat tombol lipat pintar di atas meja pameran. Ketika ditekan, tombol ini membuka daftar pilihan:
+ * "Aktif" (hijau) atau "Tidak Aktif" (merah).
+ * Pengawasan ketukan luar dilindungi oleh Asisten Tombol Lipat (useStatusDropdown).
+ */
 const StatusDropdown = ({ status, onChange }) => {
   const { isOpen, setIsOpen, dropdownRef } = useStatusDropdown();
 
@@ -60,7 +66,17 @@ const StatusDropdown = ({ status, onChange }) => {
   );
 };
 
+/**
+ * MEJA PAMERAN DAFTAR PROMO (Tabel)
+ * Ibarat meja pameran panjang tempat memajang deretan promo klinik beserta pasfotonya.
+ * Meja ini menyediakan 4 tombol aksi penting di ujung setiap baris:
+ * 1. Mata (Eye): Membuka bilik pameran rincian promo.
+ * 2. Pensil (PencilLine): Membuka bilik meja koreksi promo lama.
+ * 3. Tong Sampah (Trash2): Membuka plang peringatan pemusnahan promo.
+ * 4. Pesawat Kertas (Send): Membuka meja kerja distribusi kurir selebaran.
+ */
 export default function Tabel({ isLoading, data, onEdit, onDelete, onDetail, onSend, updateStatus }) {
+  // Meminta bantuan Asisten Papan Halaman untuk membatasi 6 baris per meja
   const {
     currentPage,
     setCurrentPage,
@@ -69,6 +85,7 @@ export default function Tabel({ isLoading, data, onEdit, onDelete, onDetail, onS
     paginatedData
   } = useKelolaPromoTabel(data);
 
+  // Deretan pilar pembatas antar kolom tabel
   const columns = [
     { label: 'No', render: (item, index) => index, className: 'w-16', cellClassName: 'align-top' },
     { 
@@ -176,6 +193,7 @@ export default function Tabel({ isLoading, data, onEdit, onDelete, onDetail, onS
         startIndex={(currentPage - 1) * itemsPerPage + 1}
       />
       
+      {/* Papan Nomor Halaman */}
       <Pagination 
         currentPage={currentPage}
         totalPages={totalPages}

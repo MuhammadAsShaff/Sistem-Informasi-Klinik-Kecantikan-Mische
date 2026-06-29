@@ -1,5 +1,13 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * PLANG PENJELAS MANFAAT PRODUK (DescriptionSection)
+ * =========================================================================
+ * Ibarat plang prasasti besar di tengah taman pameran yang menceritakan
+ * keunggulan ramuan rahasia Mische Skincare. Tulisan ini menjelaskan bagaimana
+ * produk merawat, melembapkan, dan mencerahkan wajah tamu dengan harga terjangkau.
+ */
 const DescriptionSection = () => {
   return (
     <section className="py-12 md:py-16 px-4">

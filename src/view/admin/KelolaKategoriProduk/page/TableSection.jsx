@@ -1,11 +1,28 @@
 import React from 'react';
+// Mengimpor ikon pena edit (Edit) dan tempat sampah (Trash2)
 import { Edit, Trash2 } from 'lucide-react';
+// Mengimpor komponen dasar tabel
 import Table from '@/components/Table';
 
+/**
+ * =========================================================================
+ * TABEL DAFTAR KATEGORI (Ibarat Papan Daftar Rak Kategori di Toko)
+ * =========================================================================
+ * File ini ibarat "Tabel Catatan Kategori" di toko.
+ * Di sinilah seluruh daftar kategori ditampilkan lengkap dengan jumlah produknya.
+ * Tabel ini dibagi menjadi 5 kolom utama yang rapi.
+ */
 const TableSection = ({ isLoading, categories, onDeleteClick, onEditClick, currentPage = 1, itemsPerPage = 6 }) => {
+  
+  // --- DAFTAR 5 KOLOM TABEL UTAMA ---
   const columns = [
+    // Kolom 1: Kolom Nomor Urut (dihitung otomatis sesuai halaman aktif)
     { label: 'No', render: (item, index) => index, className: 'w-16 text-center', cellClassName: 'text-center' },
+    
+    // Kolom 2: Kolom Nama Kategori (mengambil tulisan dari 'nama' atau 'name')
     { label: 'Nama', key: 'nama', render: (item) => item.nama || item.name, className: 'text-center', cellClassName: 'text-center' },
+    
+    // Kolom 3: Kolom Deskripsi (dilengkapi pemotong teks 'truncate' agar tulisan tidak berantakan jika terlalu panjang)
     { 
       label: 'Deskripsi', 
       render: (item) => (
@@ -16,19 +33,25 @@ const TableSection = ({ isLoading, categories, onDeleteClick, onEditClick, curre
       className: 'text-center', 
       cellClassName: 'text-center' 
     },
+    
+    // Kolom 4: Kolom Jumlah Produk (menampilkan hitungan produk, jika kosong tampilkan tanda strip '-')
     { label: 'Jumlah Produk', render: (item) => <span className="font-medium">{item.count !== undefined ? item.count : '-'}</span>, className: 'text-center w-40', cellClassName: 'text-center' },
+    
+    // Kolom 5: Kolom Tombol Pilihan (Tombol Edit Biru & Tombol Hapus Merah)
     { 
       label: 'Action', 
       render: (item) => (
         <div className="flex items-center justify-center gap-3 text-gray-600">
+          {/* Tombol Edit Biru */}
           <button 
             onClick={() => onEditClick(item)}
-            className="hover:text-blue-600 transition-colors" 
+            className="hover:text-blue-600 transition-colors cursor-pointer" 
             title="Edit"
           >
             <Edit size={18} />
           </button>
-          <button onClick={() => onDeleteClick(item.idKategori || item.id)} className="hover:text-red-600 transition-colors" title="Hapus">
+          {/* Tombol Hapus Merah */}
+          <button onClick={() => onDeleteClick(item.idKategori || item.id)} className="hover:text-red-600 transition-colors cursor-pointer" title="Hapus">
             <Trash2 size={18} />
           </button>
         </div>
@@ -39,7 +62,9 @@ const TableSection = ({ isLoading, categories, onDeleteClick, onEditClick, curre
   ];
 
   return (
-    <Table isLoading={isLoading} 
+    // Memasukkan seluruh pengaturan kolom dan data kategori ke dalam tabel utama
+    <Table 
+      isLoading={isLoading} 
       columns={columns} 
       data={categories} 
       emptyStateText="Data tidak ditemukan"

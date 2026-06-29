@@ -1,3 +1,11 @@
+/**
+ * =========================================================================
+ * ENSIKLOPEDIA GUDANG RINCIAN PERAWATAN (DataJenisPerawatan)
+ * =========================================================================
+ * Ibarat buku besar ensiklopedia berhias emas di perpustakaan klinik yang mencatat
+ * spesifikasi terlengkap, tarif resmi, durasi waktu, dan kegunaan dari puluhan
+ * jenis tindakan di Mische Aesthetic Clinic.
+ */
 import acneImg from '@/assets/images/acne.jpg';
 import antiAgingImg from '@/assets/images/anti aging.jpg';
 import RefreshFacial from '@/assets/images/Treatment/RefreshFacial.jpg';

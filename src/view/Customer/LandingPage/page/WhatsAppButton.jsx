@@ -4,10 +4,11 @@ import { useWhatsAppButton } from '../hooks/useWhatsAppButton';
 
 /**
  * =========================================================================
- * KOMPONEN VIEW: WhatsAppButton (Tombol WA & Scroll ke Atas Melayang)
+ * KOTAK TELEPON DARURAT & TOMBOL LIFT (WhatsAppButton)
  * =========================================================================
- * Komponen ini hanya menangani tampilan visual tombol melayang di pojok kanan bawah.
- * Logika scroll listener dan redirect WhatsApp dikelola di hook `useWhatsAppButton`.
+ * Ibarat tuas telepon hijau melayang di sudut lobi. Ketika ditekan, pintu
+ * komunikasi WhatsApp langsung terbuka. Di atasnya terdapat tombol lift (ChevronUp)
+ * untuk meluncur kembali ke lantai paling atas bersama Mandor Komunikasi (useWhatsAppButton).
  */
 const WhatsAppButton = () => {
   const { isVisible, scrollToTop, openWhatsApp } = useWhatsAppButton();

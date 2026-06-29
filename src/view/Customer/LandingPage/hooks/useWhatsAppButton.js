@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react';
 
 /**
  * =========================================================================
- * CUSTOM HOOK: useWhatsAppButton
+ * MANDOR KOMUNIKASI WHATSAPP & LIFTER (useWhatsAppButton)
  * =========================================================================
- * Hook ini mengelola logika untuk tombol WhatsApp melayang (Floating Button)
- * dan tombol Scroll-to-Top:
- * 1. Mendeteksi perubahan scroll halaman untuk memunculkan tombol kembali ke atas.
- * 2. Mengarahkan pengguna ke link WhatsApp API dengan pesan template kustom.
+ * Ibarat petugas operator lift dan telepon di pos satpam lobi:
+ * 1. Menjaga mata pada langkah tamu. Jika tamu sudah turun jauh ke bawah (scroll > 300), petugas memunculkan tombol lift khusus untuk naik ke atas seketika.
+ * 2. Memegang kabel saluran langsung ke pusat bantuan WhatsApp Mische, siap menghubungkan tamu dengan dokter kapan saja.
  */
 export function useWhatsAppButton() {
   const [isVisible, setIsVisible] = useState(false);

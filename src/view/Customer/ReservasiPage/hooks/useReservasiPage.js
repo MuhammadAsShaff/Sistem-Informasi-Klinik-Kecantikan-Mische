@@ -8,13 +8,13 @@ import { dataJenisPerawatan } from '@/view/Customer/LandingPage/page/SectionInfo
 
 /**
  * =========================================================================
- * CUSTOM HOOK: useReservasiPage
+ * MANDOR BESAR PENGELOLA LOBI RESERVASI (useReservasiPage)
  * =========================================================================
- * Hook ini mengelola seluruh logika untuk Halaman Reservasi Customer:
- * 1. Mengatur state untuk tanggal terpilih, treatment terpilih, dokter, slot jadwal, dan dropdown.
- * 2. Mengambil data dokter dan jadwal ketersediaan klinik secara dinamis melalui API.
- * 3. Memetakan data slot waktu yang diterima dari API ke format visual UI.
- * 4. Menangani aksi klik di luar untuk menutup dropdown serta pengiriman form reservasi (booking).
+ * Ibarat kepala direksi di balai pendaftaran klinik yang mengurus segala urusan:
+ * 1. Memeriksa daftar nama dokter yang bersedia bertugas (useDokterData).
+ * 2. Mencatat hari dan tanggal kedatangan yang diinginkan tamu.
+ * 3. Membuka dan menutup rak menu gulung (dropdown) secara cerdas.
+ * 4. Meresmikan permohonan pesanan (Booking) ke dalam buku kasir.
  */
 export function useReservasiPage() {
   const navigate = useNavigate();

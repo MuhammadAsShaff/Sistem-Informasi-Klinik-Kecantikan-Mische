@@ -4,6 +4,16 @@ import { endpoints } from "@/core/api/endpoints";
 import { PROVINCES, CITIES } from "@/core/utils/rajaOngkirData";
 import { getUser, saveUser } from "@/core/utils/authStorage";
 
+/**
+ * =========================================================================
+ * MANDOR KEPALA BUKU ALAMAT PENGIRIMAN (useKelolaAlamat)
+ * =========================================================================
+ * Ibarat juru tulis di bagian ekspedisi klinik yang tugasnya mencatat daftar alamat
+ * pengiriman tamu:
+ * 1. Mengambil seluruh daftar alamat dari brankas arsip (fetchAlamat).
+ * 2. Menandai mana alamat rumah utama dan mana alamat cadangan.
+ * 3. Mengatur penambahan alamat baru atau membuang alamat lama.
+ */
 export function useKelolaAlamat(showToast) {
   const [alamatList, setAlamatList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

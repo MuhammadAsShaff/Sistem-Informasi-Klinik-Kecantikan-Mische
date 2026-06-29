@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * KOTAK SALURAN KOMUNIKASI (FooterSocial)
+ * =========================================================================
+ * Ibarat deretan telepon umum dan brosur siaran di pos satpam bawah, yang
+ * menghubungkan tamu dengan saluran hiburan dan berita klinik (Instagram, TikTok, Facebook).
+ */
 const FooterSocial = () => {
   return (
     <div className="flex flex-col gap-3 md:gap-6 text-left">

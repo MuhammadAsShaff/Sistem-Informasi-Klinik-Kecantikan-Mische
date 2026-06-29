@@ -3,10 +3,12 @@ import { ChevronDown } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 /**
- * Komponen UI murni untuk daftar link navigasi desktop.
- * Data link diterima dari props — tidak ada logic / import constants di sini.
- *
- * @param {{ links: Array }} props
+ * =========================================================================
+ * PAPAN NAMA PETUNJUK ARAH (NavbarLinks)
+ * =========================================================================
+ * Ibarat plang arah bergaya elegan di atas meja lobi. Tiap plang mengarahkan
+ * tamu ke ruang Beranda, Produk, Promo, Event, atau Reservasi. Jika ada menu
+ * khusus (Tentang Kami), panah kecilnya akan menunduk membuka gulungan daftar ruangan rahasia di bawahnya.
  */
 const NavbarLinks = ({ links = [] }) => {
   return (

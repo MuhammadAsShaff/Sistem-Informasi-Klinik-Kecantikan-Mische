@@ -10,6 +10,15 @@ import Card1 from "./Card1";
 import Card2 from "./Card2";
 import Card3 from "./Card3";
 
+/**
+ * =========================================================================
+ * PANGGUNG UTAMA KOMIDI PUTAR (HeroCarousel)
+ * =========================================================================
+ * Ibarat roda panggung berputar megah (Swiper) di beranda istana klinik.
+ * Panggung ini dijaga oleh petugas mesin pemutar yang secara otomatis mengganti
+ * layar presentasi (Card1, Card2, Card3) setiap 4 detik, dilengkapi tuas panah
+ * kiri-kanan agar tamu bisa mempercepat atau memutar ulang pameran.
+ */
 export default function Hero() {
   return (
     <section className="w-full h-[350px] sm:h-[450px] md:h-[650px] lg:h-[700px] relative overflow-hidden">

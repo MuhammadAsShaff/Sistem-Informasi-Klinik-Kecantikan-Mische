@@ -5,60 +5,67 @@ import ToastAlert from "@/view/components/ToastAlert/page/Index";
 
 /**
  * =========================================================================
- * KOMPONEN: RegistrasiForm (FORM REGISTRASI - TAMPILAN MURNI / VIEW)
+ * MEJA FORMULIR BUKU INDUK PENDAFTARAN (RegistrasiForm)
  * =========================================================================
- * Komponen ini hanya fokus pada rendering tampilan form pendaftaran customer.
- * Semua state input, validasi kekuatan password, dan pengiriman data ke server 
- * didelegasikan sepenuhnya ke custom hook `useRegistrasi`.
+ * Ibarat meja panjang di balai pendaftaran yang membentangkan kertas isian
+ * terbagi dalam dua lajur rapi. Meja ini dibantu oleh Mandor Pendaftaran 
+ * (useRegistrasi) yang memegang pena pencatat, penghapus otomatis nomor WA,
+ * serta mistar pengukur kekuatan sandi rahasia.
  */
 const RegistrasiForm = () => {
-  // Destrukturisasi semua state & fungsi yang disediakan oleh hook `useRegistrasi`
+  // Meminjam seluruh laci penyimpanan dan tuas kendali dari Mandor Pendaftaran (useRegistrasi)
   const {
-    formData,                       // Objek utama penyimpan seluruh input form
-    showPassword, setShowPassword,   // State & fungsi tampil/sembunyi password
-    showConfirmPassword, setShowConfirmPassword, // State & fungsi tampil/sembunyi konfirmasi password
-    handleChange,                   // Fungsi pencatat perubahan ketikan user
-    handleSubmit,                   // Fungsi pengirim data form pendaftaran ke server
-    toast,
-    setToast
+    formData,                       // Laci arsip penyimpan ketikan biodata tamu
+    showPassword, setShowPassword,   // Tuas penyingkap tirai sandi pertama & pengaturnya
+    showConfirmPassword, setShowConfirmPassword, // Tuas penyingkap tirai sandi kedua & pengaturnya
+    handleChange,                   // Pena otomatis pencatat gerak-gerik ketikan tamu
+    handleSubmit,                   // Tombol lonceng pengutus kurir ke pusat pendaftaran
+    toast,                          // Kotak pengumuman plang melayang
+    setToast                        // Tuas penurun plang pengumuman
   } = useRegistrasi();
 
   return (
     <>
-      {/* TOAST ALERT: Umpan balik notifikasi melayang (sukses / gagal) */}
+      {/* ─── PAPAN PLANG NOTIFIKASI MELAYANG (TOAST ALERT) ──────────────────── */}
+      {/* Muncul melayang di hadapan tamu untuk memberi selamat atau menegur kesalahan isian */}
       <ToastAlert
-        isOpen={toast.isOpen}
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ ...toast, isOpen: false })}
+        isOpen={toast.isOpen} // Syarat pembuka plang
+        message={toast.message} // Kalimat ukiran pada plang
+        type={toast.type} // Warna plang (hijau sukses / merah error)
+        onClose={() => setToast({ ...toast, isOpen: false })} // Tuas penutup plang
       />
 
-      {/* onSubmit={handleSubmit}: Saat tombol registrasi ditekan, kirim data via handleSubmit */}
+      {/* ─── PEMBUNGKUS UTAMA MEJA FORMULIR ─────────────────────────────────── */}
+      {/* onSubmit={handleSubmit}: Begitu tombol Registrasi ditekan, bunyikan lonceng Mandor */}
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        
+        {/* Kisi-kisi laci isian yang membagi meja menjadi 2 lajur bersebelahan (grid-cols-2) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-x-8 md:gap-y-6">
 
-          {/* KOLOM NAMA */}
+          {/* ─── KOTAK ISIAN NAMA LENGKAP ───────────────────────────────────── */}
           <div>
+            {/* Plang penunjuk nama kotak isian */}
             <label className="block text-black font-semibold text-[15px] mb-2">Nama</label>
             <input 
               type="text" 
               name="nama" 
-              value={formData.nama} // Diikat ke properti nama di state formData
-              onChange={handleChange} // Pantau perubahan ketikan
+              value={formData.nama} // Ditambatkan pada arsip laci 'nama'
+              onChange={handleChange} // Digerakkan oleh pena Mandor
               placeholder="Nama" 
-              required
+              required // Wajib diisi (pantang dikosongkan)
               className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 placeholder:text-gray-300 focus:outline-none focus:border-[#56BC36] transition-colors" 
             />
+            {/* Catatan kaki penjelas syarat pengisian */}
             <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan nama lengkap Anda.</p>
           </div>
 
-          {/* KOLOM EMAIL */}
+          {/* ─── KOTAK ISIAN ALAMAT EMAIL ───────────────────────────────────── */}
           <div>
             <label className="block text-black font-semibold text-[15px] mb-2">Email</label>
             <input 
               type="email" 
               name="email" 
-              value={formData.email} // Diikat ke properti email
+              value={formData.email} // Ditambatkan pada arsip laci 'email'
               onChange={handleChange} 
               placeholder="Email" 
               required
@@ -67,13 +74,13 @@ const RegistrasiForm = () => {
             <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan format email yang valid.</p>
           </div>
 
-          {/* KOLOM NOMOR WHATSAPP */}
+          {/* ─── KOTAK ISIAN NOMOR WHATSAPP ─────────────────────────────────── */}
           <div>
             <label className="block text-black font-semibold text-[15px] mb-2">Nomor WhatsApp</label>
             <input 
               type="text" 
               name="nomorWa" 
-              value={formData.nomorWa} // Diikat ke properti nomorWa (otomatis difilter hanya angka di hook)
+              value={formData.nomorWa} // Ditambatkan pada laci 'nomorWa' (otomatis dijaga Mandor agar hanya berisi angka)
               onChange={handleChange} 
               placeholder="Nomor WhatsApp" 
               required
@@ -82,13 +89,13 @@ const RegistrasiForm = () => {
             <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan nomor telepon aktif.</p>
           </div>
 
-          {/* KOLOM ALAMAT */}
+          {/* ─── KOTAK ISIAN ALAMAT DOMISILI ────────────────────────────────── */}
           <div>
             <label className="block text-black font-semibold text-[15px] mb-2">Alamat</label>
             <input 
               type="text" 
               name="alamat" 
-              value={formData.alamat} // Diikat ke properti alamat
+              value={formData.alamat} // Ditambatkan pada arsip laci 'alamat'
               onChange={handleChange} 
               placeholder="Alamat" 
               required
@@ -97,16 +104,17 @@ const RegistrasiForm = () => {
             <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan alamat domisili.</p>
           </div>
 
-          {/* PILIHAN JENIS KELAMIN */}
+          {/* ─── LACI PEMILIH JENIS KELAMIN (DROPDOWN SELECT) ───────────────── */}
           <div>
             <label className="block text-black font-semibold text-[15px] mb-2">Jenis Kelamin</label>
             <select 
               name="jenisKelamin" 
-              value={formData.jenisKelamin} // Diikat ke jenisKelamin
+              value={formData.jenisKelamin} // Ditambatkan pada arsip laci 'jenisKelamin'
               onChange={handleChange} 
-              required
+              required // Wajib memilih salah satu
               className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 bg-white focus:outline-none focus:border-[#56BC36] transition-colors"
             >
+              {/* Menu pembuka pembatas (tidak bisa dipilih) */}
               <option value="" disabled>Pilih Jenis Kelamin</option>
               <option value="Laki-laki">Laki-laki</option>
               <option value="Perempuan">Perempuan</option>
@@ -114,13 +122,13 @@ const RegistrasiForm = () => {
             <p className="text-xs text-gray-500 mt-1">* Wajib memilih jenis kelamin.</p>
           </div>
 
-          {/* KOLOM TANGGAL LAHIR */}
+          {/* ─── KOTAK ISIAN TANGGAL LAHIR (DATE PICKER) ────────────────────── */}
           <div>
             <label className="block text-black font-semibold text-[15px] mb-2">Tanggal Lahir</label>
             <input 
               type="date" 
               name="tanggalLahir" 
-              value={formData.tanggalLahir} // Diikat ke tanggalLahir
+              value={formData.tanggalLahir} // Ditambatkan pada arsip laci 'tanggalLahir'
               onChange={handleChange} 
               required
               className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 placeholder:text-gray-300 focus:outline-none focus:border-[#56BC36] transition-colors" 
@@ -128,43 +136,50 @@ const RegistrasiForm = () => {
             <p className="text-xs text-gray-500 mt-1">* Wajib diisi dengan tanggal lahir yang sesuai.</p>
           </div>
 
-          {/* KOLOM PASSWORD */}
+          {/* ─── KOTAK ISIAN SANDI RAHASIA UTAMA ────────────────────────────── */}
           <div>
             <label className="block text-black font-semibold text-[15px] mb-2">Password</label>
             <div className="relative">
               <input 
-                type={showPassword ? "text" : "password"} // Sembunyi/tampilkan password secara dinamis
+                // Tirai otomatis penyingkap/penyembunyi huruf sandi
+                type={showPassword ? "text" : "password"} 
                 name="password" 
-                value={formData.password} // Diikat ke properti password
+                value={formData.password} // Ditambatkan pada laci 'password'
                 onChange={handleChange}
                 placeholder="******" 
                 required
                 className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 placeholder:text-gray-300 focus:outline-none focus:border-[#56BC36] transition-colors pr-12" 
               />
+              
+              {/* Tuas pembuka tirai sandi pertama */}
               <button 
-                type="button" 
+                type="button" // type="button" agar tidak memicu lonceng pengiriman form
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            {/* Peringatan ketat mengenai syarat ketangguhan sandi */}
             <p className="text-xs text-red-500 font-medium mt-1">* Wajib diisi. Minimal 8 karakter dan mengandung huruf besar dan kecil.</p>
           </div>
 
-          {/* KOLOM KONFIRMASI PASSWORD */}
+          {/* ─── KOTAK ISIAN ULANGAN SANDI (KONFIRMASI) ─────────────────────── */}
           <div>
             <label className="block text-black font-semibold text-[15px] mb-2">Konfirmasi Password</label>
             <div className="relative">
               <input 
-                type={showConfirmPassword ? "text" : "password"} // Sembunyi/tampilkan secara dinamis
+                // Tirai otomatis untuk kotak ulangan sandi
+                type={showConfirmPassword ? "text" : "password"} 
                 name="confirmPassword" 
-                value={formData.confirmPassword} // Diikat ke confirmPassword untuk dicocokkan di hook
+                value={formData.confirmPassword} // Ditambatkan pada laci 'confirmPassword' untuk dicocokkan Mandor
                 onChange={handleChange}
                 placeholder="******" 
                 required
                 className="w-full border-[1.5px] border-gray-800 rounded-xl px-4 py-3 placeholder:text-gray-300 focus:outline-none focus:border-[#56BC36] transition-colors pr-12" 
               />
+              
+              {/* Tuas pembuka tirai sandi kedua */}
               <button 
                 type="button" 
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -173,15 +188,17 @@ const RegistrasiForm = () => {
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            {/* Catatan pengingat agar isian sama persis dengan kotak sebelumnya */}
             <p className="text-xs text-gray-500 mt-1">* Wajib diisi. Pastikan sama dengan kolom password.</p>
           </div>
 
         </div>
 
-        {/* TOMBOL REGISTRASI */}
+        {/* ─── TOMBOL LONCENG REGISTRASI UTAMA ──────────────────────────────── */}
         <div className="mt-2">
+          {/* Tombol lonceng hijau besar pembawa formulir ke pusat pendaftaran */}
           <button 
-            type="submit"
+            type="submit" // type="submit" untuk memicu lonceng handleSubmit
             className="w-fit px-12 bg-[#56BC36] hover:bg-[#4ea830] transition-colors duration-300 text-white font-bold text-[18px] py-3 rounded-full shadow-lg active:scale-[0.98]"
           >
             Registrasi
@@ -193,3 +210,4 @@ const RegistrasiForm = () => {
 };
 
 export default RegistrasiForm;
+

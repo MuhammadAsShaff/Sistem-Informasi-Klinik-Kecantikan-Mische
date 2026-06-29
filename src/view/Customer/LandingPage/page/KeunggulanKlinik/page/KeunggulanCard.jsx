@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * PIAGAM MEDALI KEUNGGULAN (KeunggulanCard)
+ * =========================================================================
+ * Ibarat plakat kaca beralas beludru yang memajang satu lambang medali (icon),
+ * judul kebanggaan, dan tulisan penjelas mengenai standar tinggi klinik Mische.
+ */
 const KeunggulanCard = ({ item }) => {
   return (
     <div className="flex flex-col md:flex-row gap-2 md:gap-8 items-start group">

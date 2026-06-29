@@ -10,18 +10,23 @@ import ToastAlert from "@/view/components/ToastAlert/page/Index";
 import Pagination from '@/components/Pagination';
 import { useKelolaProfilDokter } from "../hooks/useKelolaProfilDokter";
 
+/**
+ * RUANGAN UTAMA MANAJEMEN PROFIL DOKTER (Index)
+ * Ibarat sebuah ruangan besar bergaya modern tempat berkumpulnya seluruh informasi dokter. 
+ * Di ruangan ini, Mandor Utama (useKelolaProfilDokter) telah menata seluruh pos kerja:
+ * 1. Papan nama ruangan di sisi atas (Header).
+ * 2. Loket pencarian cepat yang bersanding dengan tombol hijau tambah (+) dokter baru.
+ * 3. Lemari etalase panjang (Tabel) tempat memajang foto, nama, email, dan status dokter.
+ * 4. Papan penentu halaman buku (Pagination) dan bilik-bilik pop-up tersembunyi yang siap muncul saat dibutuhkan.
+ */
 export default function KelolaProfilDokter() {
+  // Memanggil Mandor Utama yang memegang saklar pop-up, catatan dokter, dan TOA pengumuman
   const {
-    isTambahOpen,
-    setIsTambahOpen,
-    isEditOpen,
-    setIsEditOpen,
-    isHapusOpen,
-    setIsHapusOpen,
-    toast,
-    setToast,
-    searchQuery,
-    setSearchQuery,
+    isTambahOpen, setIsTambahOpen,
+    isEditOpen, setIsEditOpen,
+    isHapusOpen, setIsHapusOpen,
+    toast, setToast,
+    searchQuery, setSearchQuery,
     isLoading,
     tambahDokter,
     editDokter,
@@ -29,8 +34,7 @@ export default function KelolaProfilDokter() {
     handleEdit,
     handleDelete,
     handleStatusChange,
-    currentPage,
-    setCurrentPage,
+    currentPage, setCurrentPage,
     totalPages,
     ITEMS_PER_PAGE,
     paginatedDokter
@@ -38,9 +42,13 @@ export default function KelolaProfilDokter() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* HEADER DAN SEARCH */}
+      
+      {/* --- BAGIAN ATAS: PAPAN NAMA RUANGAN DAN LOKET PENCARIAN --- */}
       <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-6">
+        {/* Papan Plang Nama (Header) */}
         <Header />
+        
+        {/* Loket Pencarian Cepat & Tombol Hijau Tambah Dokter (+) */}
         <SearchBar 
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -55,13 +63,16 @@ export default function KelolaProfilDokter() {
         />
       </div>
 
-      {/* TABLE DATA */}
+      {/* --- BAGIAN TENGAH: LEMARI ETALASE TABEL DOKTER --- */}
       {isLoading ? (
+        // Jika asisten sedang mengambil buku dari rak, tampilkan tulisan tunggu
         <div className="flex justify-center items-center py-20 text-gray-500 font-bold">
           Mengambil data dokter...
         </div>
       ) : (
-        <Tabel isLoading={isLoading}
+        // Memajang lemari etalase yang berisi foto, nama, email, dan tombol aksi
+        <Tabel 
+          isLoading={isLoading}
           data={paginatedDokter}
           onEdit={handleEdit}
           onDelete={handleDelete}
@@ -71,32 +82,37 @@ export default function KelolaProfilDokter() {
         />
       )}
 
+      {/* --- BAGIAN BAWAH: ALAT BOLAK-BALIK HALAMAN BUKU (PAGINATION) --- */}
       <Pagination 
         currentPage={currentPage} 
         totalPages={totalPages} 
         onPageChange={setCurrentPage} 
       />
 
-      {/* MODALS */}
+      {/* --- BILIK-BILIK KOTAK POP-UP TERSEMBUNYI --- */}
+      
+      {/* Bilik 1: Meja Pendaftaran Dokter Baru */}
       <ModalTambahDokter
         isOpen={isTambahOpen}
         onClose={() => setIsTambahOpen(false)}
         hook={tambahDokter}
       />
 
+      {/* Bilik 2: Meja Formulir Koreksi Dokter Lama */}
       <ModalPerbaruiDokter
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         hook={editDokter}
       />
 
+      {/* Bilik 3: Tanda Peringatan Pencabutan / Hapus Dokter */}
       <ModalHapusDokter
         isOpen={isHapusOpen}
         onClose={() => setIsHapusOpen(false)}
         onConfirm={() => confirmDelete(() => setIsHapusOpen(false))}
       />
 
-      {/* TOAST NOTIFICATION */}
+      {/* --- TOA PENGUMUMAN JIKA SUKSES / GAGAL (TOAST ALERT) --- */}
       <ToastAlert
         isOpen={toast.isOpen}
         message={toast.message}

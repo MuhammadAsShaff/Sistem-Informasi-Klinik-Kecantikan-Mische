@@ -4,73 +4,81 @@ import { endpoints } from '@/core/api/endpoints';
 
 /**
  * =========================================================================
- * CUSTOM HOOK: useExportExcel
+ * ASISTEN PEREKAP & PENCETAK BUKU LAPORAN EXCEL (useExportExcel)
  * =========================================================================
- * Hook ini mengelola logika untuk mengunduh laporan reservasi dalam format Excel:
- * 1. Menyimpan state parameter tanggal dan jenis treatment.
- * 2. Mengirim request unduhan ke backend dengan format file Blob (Binary Large Object).
- * 3. Membuat tautan unduhan dinamis di browser dan membersihkan memorinya.
+ * Ibarat asisten khusus di meja arsip yang bertugas menyalin data kehadiran tamu 
+ * dan menyusunnya menjadi buku besar berformat Excel.
+ * Tugas utama asisten ini meliputi:
+ * 1. Mengingat batas tanggal mulai, tanggal selesai, dan jenis perawatan yang dipilih pimpinan.
+ * 2. Mengutus kurir ke kantor pusat untuk meminta bungkusan file biner (Blob).
+ * 3. Menyiapkan jembatan penyeberangan sementara di peramban (browser) untuk mengunduh file, 
+ *    lalu merobohkan jembatannya kembali agar tidak memenuhi ingatan mesin.
  */
 export function useExportExcel(onClose) {
-  const [jenisTreatment, setJenisTreatment] = useState('semua'); // State pilihan jenis treatment
-  const [tanggalMulai, setTanggalMulai] = useState(''); // Tanggal awal filter
-  const [tanggalSelesai, setTanggalSelesai] = useState(''); // Tanggal akhir filter
-  const [isExporting, setIsExporting] = useState(false); // Status loading unduh file
-  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' }); // Toast notifikasi
+  // Laci penyimpan pilihan jenis perawatan (bisa semua atau satu jenis saja)
+  const [jenisTreatment, setJenisTreatment] = useState('semua'); 
+  // Kotak kalender penanda tanggal awal pencatatan
+  const [tanggalMulai, setTanggalMulai] = useState(''); 
+  // Kotak kalender penanda tanggal akhir pencatatan
+  const [tanggalSelesai, setTanggalSelesai] = useState(''); 
+  // Rambu penanda asisten sedang sibuk menyusun dan mengetik laporan
+  const [isExporting, setIsExporting] = useState(false); 
+  // Rambu toa pengumuman jika pencetakan buku berhasil atau kandas
+  const [toast, setToast] = useState({ isOpen: false, message: '', type: 'success' }); 
 
-  // Fungsi memicu unduhan file Excel
+  /**
+   * TUGAS MEMICU PENCETAKAN BUKU EXCEL (handleExport)
+   * Asisten mengemas semua persyaratan kalender lalu meminta kantor pusat mengirim berkas utuh.
+   */
   const handleExport = async () => {
     try {
-      setIsExporting(true);
+      setIsExporting(true); // Nyalakan lampu tanda mesin pencetak sedang berputar
       
-      // Kirim request GET ke endpoint laporan excel dengan parameter tanggal & filter
+      // Mengutus kurir mengambil bungkusan biner (blob) dari gudang arsip
       const response = await axiosClient.get(endpoints.admin.report.reservasi, {
         params: {
           jenisTreatment: jenisTreatment === 'semua' ? '' : jenisTreatment,
           tanggalMulai,
           tanggalSelesai
         },
-        responseType: 'blob' // Wajib diset 'blob' agar Axios membaca response sebagai file biner
+        responseType: 'blob' // Wajib diset 'blob' agar sistem menerima paket dalam bentuk buku biner utuh
       });
 
-      // Membuat URL biner temporer dari data biner (blob) yang dikirim backend
+      // Membuat jembatan penyeberangan sementara (URL) dari paket biner yang diterima
       const url = window.URL.createObjectURL(new Blob([response.data]));
       
-      // Membuat elemen tautan HTML <a> dinamis di memori browser
+      // Menyiapkan kereta gantung (tautan HTML <a>) di memori bayangan
       const link = document.createElement('a');
       link.href = url;
       
-      // Susun nama file unduhan (misal: Laporan_Reservasi_2026-06-22.xlsx)
+      // Memberi stempel nama pada buku laporan (contoh: Laporan_Reservasi_2026-06-22.xlsx)
       const dateStr = new Date().toISOString().split('T')[0];
       link.setAttribute('download', `Laporan_Reservasi_${dateStr}.xlsx`);
       
-      // Masukkan tautan ke halaman DOM, picu klik unduhan otomatis, lalu hapus kembali
+      // Meluncurkan kereta gantung ke layar utama, menekan tombol unduh, lalu menyingkirkannya
       document.body.appendChild(link);
       link.click();
       
-      // Bersihkan elemen & cabut URL biner dari memori browser agar tidak bocor memory
+      // Membereskan sisa potongan kabel dan jembatan agar memori komputer tetap lega dan bersih
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
       
-      onClose(); // Tutup modal setelah unduhan berhasil dipicu
+      onClose(); // Menutup meja kerja rekapitulasi setelah unduhan meluncur
     } catch (error) {
       console.error("Gagal melakukan export excel:", error);
       setToast({ isOpen: true, message: "Terjadi kesalahan saat mengunduh file Excel.", type: "error" });
     } finally {
-      setIsExporting(false);
+      setIsExporting(false); // Matikan lampu tanda mesin pencetak berputar
     }
   };
 
+  // Asisten menyerahkan seluruh laci isian dan saklar pencetak kepada meja kerja utama (view)
   return {
-    jenisTreatment,
-    setJenisTreatment,
-    tanggalMulai,
-    setTanggalMulai,
-    tanggalSelesai,
-    setTanggalSelesai,
+    jenisTreatment, setJenisTreatment,
+    tanggalMulai, setTanggalMulai,
+    tanggalSelesai, setTanggalSelesai,
     isExporting,
-    toast,
-    setToast,
+    toast, setToast,
     handleExport
   };
 }

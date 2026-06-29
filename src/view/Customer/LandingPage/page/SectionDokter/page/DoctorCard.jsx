@@ -1,6 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+/**
+ * =========================================================================
+ * BINGKAI LUKISAN ELEGAN DOKTER (DoctorCard)
+ * =========================================================================
+ * Ibarat lukisan potret besar di dinding galeri. Mulanya bernuansa klasik elegan (grayscale),
+ * namun saat tamu mendekati lukisannya (hover), warna aslinya akan terpancar indah
+ * disertai plakat ajakan untuk melihat profil lengkap sang dokter.
+ */
 const DoctorCard = ({ doc }) => {
   return (
     <div 

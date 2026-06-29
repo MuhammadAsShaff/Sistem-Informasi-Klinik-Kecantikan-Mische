@@ -3,7 +3,22 @@ import { ShoppingCart } from 'lucide-react';
 import bgProduk from '@/assets/images/BG_halaman_produk.png';
 import bgDaun from '@/assets/images/Daun_Halaman_Produk.png';
 
+/**
+ * =========================================================================
+ * GERBANG PENYAMBUTAN TAMAN PRODUK (HeroSection)
+ * =========================================================================
+ * Ibarat gapura megah berwarna hijau zamrud di pintu masuk taman skincare.
+ * Gapura ini menyambut tamu dengan ucapan hangat dan menyediakan tombol 'Lihat Produk'
+ * yang jika ditekan akan mengantarkan tamu meluncur mulus langsung ke hadapan deretan etalase.
+ */
 const HeroSection = () => {
+  const handleScrollToProducts = () => {
+    const element = document.getElementById('katalog-produk');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative bg-gradient-to-r from-[#56BC36] from-20% md:from-30% to-[#C6FFD1] pt-20 pb-20 md:pt-24 md:pb-32 overflow-hidden">
       <div className="container mx-auto px-4 md:px-8 lg:px-16 flex flex-col md:flex-row items-center relative z-10">
@@ -16,7 +31,10 @@ const HeroSection = () => {
           <p className="text-lg md:text-xl mb-8 opacity-90 drop-shadow-sm">
             Pilihan Cerdas Untuk Kulit Sehat Dan Terawat
           </p>
-          <button className="bg-white text-gray-800 hover:text-green-600 font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition duration-300 flex items-center justify-center mx-auto md:mx-0 gap-2">
+          <button 
+            onClick={handleScrollToProducts}
+            className="bg-white text-gray-800 hover:text-green-600 font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition duration-300 flex items-center justify-center mx-auto md:mx-0 gap-2 cursor-pointer"
+          >
             <ShoppingCart size={20} className="text-green-500" />
             Lihat Produk
           </button>

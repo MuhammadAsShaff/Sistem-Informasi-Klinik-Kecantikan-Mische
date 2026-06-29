@@ -3,6 +3,14 @@ import { ArrowLeft, Clock, Calendar, Hash, Stethoscope, Eye } from 'lucide-react
 import ModalDetailReservasi from './ModalDetailReservasi';
 import { useRiwayatReservasi } from '../hooks/useRiwayatReservasi';
 
+/**
+ * =========================================================================
+ * RUANG ARSIP UTAMA JADWAL KEDATANGAN (RiwayatReservasi)
+ * =========================================================================
+ * Ibarat ruang tabel marmer di sebelah lobi klinik tempat seluruh jadwal temu tamu
+ * dicetak rapi. Menyediakan stempel status dan tombol kilat untuk mengintip
+ * surat tanda bukti reservasi secara lengkap.
+ */
 export default function RiwayatReservasi() {
   const {
     navigate,

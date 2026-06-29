@@ -1,7 +1,15 @@
 import React from 'react';
 import { useModalTambahReservasi } from '../hooks/useModalTambahReservasi';
 
+/**
+ * BILIK MEJA PENDAFTARAN TAMU BARU (ModalTambahReservasi)
+ * Ibarat meja lipat khusus di lobi klinik tempat asisten menyodorkan kertas formulir baru.
+ * Di meja ini, admin bisa menuliskan nama tamu, nomor WhatsApp, memilih jenis perawatan, 
+ * memilih nama dokter, serta memilih jam berkunjung yang masih kosong.
+ * Segala urusan pencegahan bentrok jadwal dikawal ketat oleh Asisten Pendaftaran (useModalTambahReservasi).
+ */
 export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubmitting }) {
+  // Meminta kertas formulir, laci dokter, dan daftar jadwal kosong dari Asisten Pendaftaran
   const {
     formData,
     jamSelesai,
@@ -12,13 +20,13 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
     handleSubmit
   } = useModalTambahReservasi(isOpen, onSubmit);
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, meja pendaftaran ini disimpan kembali
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-lg w-full max-w-3xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-200 font-poppins">
         
-        {/* Header */}
+        {/* Atap Bilik Pendaftaran */}
         <div className="px-8 py-5 border-b border-gray-300 flex justify-between items-center">
           <h3 className="text-[22px] font-bold text-black">Tambah Customer Treatment</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -26,11 +34,11 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
           </button>
         </div>
 
-        {/* Form Body */}
+        {/* Ruangan Formulir Meja Kerja */}
         <div className="p-8">
           <form id="formTambahReservasi" onSubmit={handleSubmit} className="space-y-6">
             
-            {/* ROW 1 */}
+            {/* BARIS 1: Kotak Nama Tamu & Nomor WhatsApp */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
                 <label className="text-sm text-black">Nama Customer</label>
@@ -60,7 +68,7 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
               </div>
             </div>
 
-            {/* ROW 2: Jenis Treatment */}
+            {/* BARIS 2: Laci Pemilihan Jenis Treatment */}
             <div className="grid grid-cols-1 gap-8">
               <div className="space-y-2">
                 <label className="text-sm text-black">Jenis Treatment</label>
@@ -79,9 +87,8 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
               </div>
             </div>
 
-            {/* ROW 3: Dokter */}
+            {/* BARIS 3: Laci Pemilihan Dokter */}
             <div className="grid grid-cols-1 gap-8">
-
               <div className="space-y-2">
                 <label className="text-sm text-black">Dokter</label>
                 <select
@@ -105,7 +112,7 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
               </div>
             </div>
 
-            {/* ROW 4: Jam */}
+            {/* BARIS 4: Kotak Pemilihan Jam Mulai & Jam Selesai */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
                 <label className="text-sm text-black">Jam Mulai</label>
@@ -148,7 +155,7 @@ export default function ModalTambahReservasi({ isOpen, onClose, onSubmit, isSubm
           </form>
         </div>
 
-        {/* Footer */}
+        {/* Laci Tombol Utus Kurir Pendaftaran */}
         <div className="px-8 py-5 border-t border-gray-300 flex justify-end mt-4">
           <button 
             type="submit"

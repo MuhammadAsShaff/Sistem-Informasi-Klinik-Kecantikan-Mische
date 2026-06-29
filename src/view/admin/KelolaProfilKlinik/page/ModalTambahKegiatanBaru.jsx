@@ -2,11 +2,13 @@ import React from "react";
 import { X } from "lucide-react";
 
 /**
- * Modal untuk menambah kegiatan baru — pure UI.
- * Logic state, validasi file, dan submit dikelola oleh hook `useTambahKegiatan`
- * via prop `hook`.
+ * BILIK MEJA PENDAFTARAN KEGIATAN BARU (ModalTambahKegiatanBaru)
+ * Ibarat meja lipat khusus yang dibuka mandor saat admin menekan tombol "Tambah".
+ * Meja ini menyediakan kertas isian kosong untuk mencatat nama acara, tanggal, cerita kegiatan, dan menaruh foto.
+ * Segala aturan pena dan timbangan foto diurus tuntas oleh Asisten Juru Tulis Pendaftaran (useTambahKegiatan).
  */
 const ModalTambahKegiatanBaru = ({ isOpen, onClose, hook }) => {
+  // Meminta pena, kertas isian, dan laci foto dari Asisten Juru Tulis Pendaftaran
   const {
     formData,
     previewImage,
@@ -19,8 +21,9 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, hook }) => {
     handleSubmit,
   } = hook;
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, meja lipat ini disimpan kembali
 
+  // Gembok pengaman: Tombol kirim terkunci jika ada satu saja kotak isian yang dibiarkan kosong
   const isDisabled =
     isLoading ||
     !formData.namaKegiatan ||
@@ -33,7 +36,7 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, hook }) => {
     <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white w-full max-w-[750px] rounded-[16px] shadow-2xl animate-in fade-in zoom-in duration-300 flex flex-col">
 
-        {/* HEADER */}
+        {/* ATAP BILIK PENDAFTARAN */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-[20px] font-bold text-black">Tambah Kegiatan Baru</h2>
           <button onClick={onClose} disabled={isLoading} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -41,17 +44,17 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, hook }) => {
           </button>
         </div>
 
-        {/* ERROR */}
+        {/* PAPAN TEGURAN MERAH */}
         {errorMessage && (
           <div className="mx-6 mt-6 bg-red-50 text-red-500 text-sm p-3 rounded-xl font-medium border border-red-100">
             {errorMessage}
           </div>
         )}
 
-        {/* BODY */}
+        {/* AREA FORMULIR KOSONG PADA MEJA */}
         <div className="p-6 grid grid-cols-12 gap-8">
 
-          {/* Kolom Foto */}
+          {/* Kolom Unggah Foto */}
           <div className="col-span-5 flex flex-col pt-10 pl-4">
             <p className="text-[14px] text-gray-800 mb-6">Unggah Gambar Kegiatan</p>
             <div className="mb-4">
@@ -83,7 +86,7 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, hook }) => {
             </div>
           </div>
 
-          {/* Kolom Form */}
+          {/* Kolom Kotak Isian Teks */}
           <div className="col-span-7 flex flex-col pt-4">
             <div className="mb-5">
               <label className="block text-[14px] text-black mb-2">Nama Kegiatan <span className="text-red-500">*</span></label>
@@ -109,7 +112,7 @@ const ModalTambahKegiatanBaru = ({ isOpen, onClose, hook }) => {
 
         </div>
 
-        {/* FOOTER */}
+        {/* LACI TOMBOL UTUS KURIR */}
         <div className="p-6 border-t border-gray-200 flex justify-end">
           <button onClick={handleSubmit} disabled={isDisabled}
             className={`bg-[#55BC36] hover:bg-[#46a02b] text-white px-6 py-2.5 rounded-md font-medium text-[14px] transition-colors shadow-sm ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}>

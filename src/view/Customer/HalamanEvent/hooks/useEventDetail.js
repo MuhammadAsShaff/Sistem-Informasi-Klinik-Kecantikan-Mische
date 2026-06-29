@@ -3,6 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { endpoints } from '@/core/api/endpoints';
 import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
+/**
+ * =========================================================================
+ * ASISTEN PENJELAS RINCIAN ACARA (useEventDetail)
+ * =========================================================================
+ * Ibarat pemandu khusus di depan mimbar acara:
+ * 1. Menerima tiket undangan tamu (ID dari URL).
+ * 2. Membuka map arsip kegiatan untuk mencari kertas rincian acara yang nomornya persis sama.
+ * 3. Menghaluskan format penulisan tanggal di kertas undangan agar mudah dan indah dipahami oleh tamu.
+ */
 export const useEventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();

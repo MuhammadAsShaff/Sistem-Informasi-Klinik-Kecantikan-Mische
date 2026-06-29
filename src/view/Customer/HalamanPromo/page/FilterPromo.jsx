@@ -2,6 +2,14 @@ import React from 'react';
 import { SlidersHorizontal, Check } from 'lucide-react';
 import { useFilterPromo } from '../hooks/useFilterPromo';
 
+/**
+ * =========================================================================
+ * LACI TOMBOL SARINGAN PROMO (FilterPromo)
+ * =========================================================================
+ * Ibarat tuas kayu elegan di atas meja kasir yang jika ditekan akan menurunkan
+ * rak menu pemilih. Di sini tamu bisa mencentang jenis promosi atau menyeleksi
+ * kupon yang masih berlaku, dibantu penuh oleh Petugas Pemilah (useFilterPromo).
+ */
 export default function FilterPromo({ 
   selectedJenis, 
   setSelectedJenis, 

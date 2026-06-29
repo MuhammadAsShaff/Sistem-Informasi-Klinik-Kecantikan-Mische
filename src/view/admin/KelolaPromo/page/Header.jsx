@@ -1,5 +1,11 @@
 import React from "react";
 
+/**
+ * PAPAN PLANG PENGUMUMAN BALAI PROMO (Header)
+ * Ibarat papan plang besar yang terpasang di atas pintu gerbang "Balai Pengelolaan Promo".
+ * Papan ini menyapa admin dengan jelas: "Di ruangan ini Anda bisa mendaftarkan promo baru, 
+ * mengoreksi syarat yang keliru, atau menghapus promo yang sudah kadaluarsa".
+ */
 export default function Header() {
   return (
     <div className="mb-6">

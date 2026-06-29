@@ -2,8 +2,12 @@ import React from "react";
 import { Lock, Eye, EyeOff } from "lucide-react";
 
 /**
- * Modal ubah password customer — pure UI.
- * Logic dikelola oleh hook `useUbahPasswordCustomer` via prop `hook`.
+ * =========================================================================
+ * JENDELA PRIVASI KELOLA KUNCI BRANKAS (ModalUbahPassword)
+ * =========================================================================
+ * Ibarat bilik privasi tertutup di sudut meja resepsionis tempat tamu mengganti
+ * kombinasi kunci rahasianya. Bilik ini dilengkapi cermin pengintip (icon mata)
+ * untuk melihat atau menyembunyikan ketikan kata sandi.
  */
 const ModalUbahPassword = ({ isOpen, onClose, hook }) => {
   const {

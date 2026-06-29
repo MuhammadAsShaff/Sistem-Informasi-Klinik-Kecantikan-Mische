@@ -11,7 +11,15 @@ import Pagination from '@/components/Pagination';
 import ToastAlert from '@/view/components/ToastAlert/page/Index';
 import { useKelolaProduk } from '../hooks/useKelolaProduk';
 
+/**
+ * RUANGAN UTAMA KELOLA PRODUK (Index)
+ * Ibarat aula besar tempat seluruh komponen pengelolaan produk dipajang. Di dalam ruangan ini terdapat 
+ * papan judul utama, meja kasir untuk mencari barang, lemari etalase (tabel) yang memajang produk, 
+ * tombol untuk berpindah halaman, serta berbagai bilik rahasia (kotak pop-up) yang baru akan terbuka 
+ * saat tombol tambah, edit, detail, atau hapus ditekan.
+ */
 const KelolaProduk = () => {
+  // Memanggil Mandor Utama yang mengatur semua fungsi, saklar, dan data di dalam ruangan ini
   const {
     isLoading,
     refetch,
@@ -44,20 +52,28 @@ const KelolaProduk = () => {
 
   return (
     <div className="p-8 font-sans w-full bg-[#f8f9fa] min-h-screen relative animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* 1. PAPAN JUDUL UTAMA DI ATAS RUANGAN */}
       <HeaderSection />
-        <SearchBar 
-          searchQuery={searchQuery} 
-          setSearchQuery={setSearchQuery}
+      
+      {/* 2. BARIS PENCARIAN & TOMBOL TAMBAH PRODUK BARU */}
+      {/* Ibarat meja loket tempat admin bisa mengetik nama barang atau menekan tombol hijau (+) */}
+      <SearchBar 
+        searchQuery={searchQuery} 
+        setSearchQuery={setSearchQuery}
         rightComponents={
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsModalOpen(true)} // Buka saklar formulir Tambah Produk
             className="bg-[#56BC36] text-white p-2.5 rounded-md hover:bg-[#469e2c] transition-colors shadow-sm cursor-pointer"
           >
             <Plus size={20} />
           </button>
         }
       />
-      <TableSection isLoading={isLoading} 
+
+      {/* 3. LEMARI ETALASE TABEL PRODUK */}
+      {/* Tempat memajang daftar produk, foto, harga, dan tombol-tombol operasi (tambah stok, edit, hapus, detail) */}
+      <TableSection 
+        isLoading={isLoading} 
         categories={paginatedCategories} 
         onDeleteClick={handleDeleteClick} 
         onEditClick={handleEditClick}
@@ -68,12 +84,18 @@ const KelolaProduk = () => {
         itemsPerPage={ITEMS_PER_PAGE}
       />
       
+      {/* 4. TOMBOL PINDAH HALAMAN (PAGINATION) */}
+      {/* Ibarat penomoran laci tabel, agar admin bisa berpindah dari halaman 1, 2, 3, dan seterusnya */}
       <Pagination 
         currentPage={currentPage} 
         totalPages={totalPages} 
         onPageChange={setCurrentPage} 
       />
       
+      {/* --- KELOMPOK BILIK JENDELA POP-UP (MODAL) --- */}
+      {/* Semua kotak ini tersembunyi dan baru muncul jika saklar pembukanya dinyalakan oleh Mandor */}
+      
+      {/* Formulir Pendaftaran Produk Baru */}
       <ModalTambahProduk 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
@@ -81,6 +103,7 @@ const KelolaProduk = () => {
         showToast={showToast}
       />
 
+      {/* Formulir Edit/Perbarui Produk Lama */}
       <ModalPerbaruiProduk 
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -89,6 +112,7 @@ const KelolaProduk = () => {
         showToast={showToast}
       />
 
+      {/* Kotak Konfirmasi Sebelum Menghapus Produk */}
       <ModalHapusProduk 
         isOpen={isDeleteModalOpen} 
         onClose={() => setIsDeleteModalOpen(false)} 
@@ -97,12 +121,15 @@ const KelolaProduk = () => {
         showToast={showToast}
       />
       
+      {/* Kotak Tampilan Informasi Detail Lengkap Produk */}
       <ModalDetailProduk
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         data={selectedDetailCategory}
       />
 
+      {/* TOA PENGUMUMAN (TOAST ALERT) */}
+      {/* Muncul sesaat di pojok layar untuk menyampaikan pengumuman sukses/gagal */}
       <ToastAlert
         isOpen={toast.isOpen}
         message={toast.message}

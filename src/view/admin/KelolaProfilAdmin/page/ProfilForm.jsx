@@ -3,13 +3,17 @@ import ModalUbahPasswordAdmin from "./ModalUbahPasswordAdmin";
 import { useProfilForm } from "../hooks/useProfilForm";
 
 /**
- * Form profil admin — pure UI.
- * Logic state form & submit dikelola oleh hook `useUpdateProfilAdmin`
- * yang dipass lewat prop `hook`.
+ * MEJA FORMULIR ISIAN BIODATA (ProfilForm)
+ * Ibarat meja panjang tempat meletakkan selembar kertas formulir lengkap berisi kotak isian 
+ * nama, email, tanggal lahir, jenis kelamin, nomor WA, dan tombol ganti password. 
+ * Urusan ketik-mengetik dan penyerahannya dibantu oleh juru tulis (useUpdateProfilAdmin) 
+ * yang dititipkan lewat 'hook'.
  */
 const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
+  // Meminjam pena, kertas isian, dan tombol penyerahan dari juru tulis profil
   const { formData, handleChange, handleSimpan } = hook;
   
+  // Memanggil petugas penjaga gembok rahasia (untuk mengurus tombol Ubah Password)
   const {
     isModalPasswordOpen,
     setIsModalPasswordOpen,
@@ -18,9 +22,10 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
 
   return (
     <div className="w-full">
+      {/* KOTAK-KOTAK ISIAN BIODATA DI ATAS MEJA */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mb-12">
 
-        {/* NAMA */}
+        {/* Kotak Isian 1: NAMA LENGKAP */}
         <div className="flex flex-col gap-2">
           <label className="text-black font-medium text-lg">Nama</label>
           <input
@@ -33,7 +38,7 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
           />
         </div>
 
-        {/* EMAIL */}
+        {/* Kotak Isian 2: ALAMAT EMAIL */}
         <div className="flex flex-col gap-2">
           <label className="text-black font-medium text-lg">Email</label>
           <input
@@ -46,7 +51,7 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
           />
         </div>
 
-        {/* TANGGAL LAHIR */}
+        {/* Kotak Isian 3: TANGGAL LAHIR */}
         <div className="flex flex-col gap-2">
           <label className="text-black font-medium text-lg">Tanggal Lahir</label>
           <input
@@ -58,7 +63,7 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
           />
         </div>
 
-        {/* JENIS KELAMIN */}
+        {/* Kotak Isian 4: PEMILIHAN JENIS KELAMIN */}
         <div className="flex flex-col gap-2">
           <label className="text-black font-medium text-lg">Jenis Kelamin</label>
           <select
@@ -79,7 +84,7 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
           </select>
         </div>
 
-        {/* NOMOR WHATSAPP */}
+        {/* Kotak Isian 5: NOMOR WHATSAPP */}
         <div className="flex flex-col gap-2">
           <label className="text-black font-medium text-lg">Nomor Whatsapp</label>
           <input
@@ -92,7 +97,7 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
           />
         </div>
 
-        {/* PASSWORD */}
+        {/* Kotak Isian 6: TOMBOL UBAH PASSWORD */}
         <div className="flex flex-col gap-2 items-start">
           <label className="text-black font-medium text-lg">Password</label>
           <button
@@ -103,7 +108,7 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
           </button>
         </div>
 
-        {/* FOTO PROFIL */}
+        {/* Kotak Isian 7: UNGGAH FOTO PROFIL BARU */}
         <div className="flex flex-col gap-2">
           <label className="text-black font-medium text-lg">Foto Profil</label>
           <div className="flex items-center gap-3">
@@ -125,9 +130,10 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
 
       </div>
 
+      {/* Garis Pemisah Pembatas Meja */}
       <hr className="border-gray-300 mb-8" />
 
-      {/* BUTTONS */}
+      {/* TOMBOL SIMPAN DI BAGIAN BAWAH MEJA */}
       <div className="flex flex-col gap-10">
         <div className="flex justify-end">
           <button
@@ -139,7 +145,7 @@ const ProfilForm = ({ hook, user, showToast, onUserUpdated }) => {
         </div>
       </div>
 
-      {/* MODAL UBAH PASSWORD */}
+      {/* BILIK KOTAK POP-UP UBAH PASSWORD (MUNCUL KALAU TOMBOL DITEKAN) */}
       <ModalUbahPasswordAdmin
         isOpen={isModalPasswordOpen}
         onClose={() => {

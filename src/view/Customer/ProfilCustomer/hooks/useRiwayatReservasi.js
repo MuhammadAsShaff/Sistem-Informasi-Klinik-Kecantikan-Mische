@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFetchMyReservasi } from '../../ReservasiPage/hooks/useFetchMyReservasi';
 
+/**
+ * =========================================================================
+ * MANDOR KEPALA JADWAL TEMU RESERVASI (useRiwayatReservasi)
+ * =========================================================================
+ * Ibarat pengawas buku jadwal temu di meja resepsionis klinik. Bertugas menugaskan
+ * warna cap stempel (hijau untuk selesai/datang, kuning untuk menunggu, merah untuk batal)
+ * dan membuka map detail saat tamu ingin melihat rincian pemesanannya.
+ */
 export const useRiwayatReservasi = () => {
   const navigate = useNavigate();
   const { myReservasi, isLoading } = useFetchMyReservasi();

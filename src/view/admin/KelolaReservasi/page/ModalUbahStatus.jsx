@@ -1,16 +1,23 @@
 import React from "react";
 import { useUbahStatusReservasi } from "../hooks/useUbahStatusReservasi";
 
+/**
+ * MEJA PENGECAPAN STATUS KEHADIRAN (ModalUbahStatus)
+ * Ibarat meja kecil di sudut resepsionis tempat pimpinan memilih stempel kehadiran tamu.
+ * Di meja ini terdapat laci berisi 4 pilihan stempel: "Menunggu", "Dikonfirmasi", "Selesai", dan "Dibatalkan".
+ * Segala urusan pengiriman cap ke kantor pusat dikerjakan oleh Petugas Penanda Status (hook).
+ */
 export default function ModalUbahStatus({ isOpen, onClose, selectedReservasi, hook }) {
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, meja pengecapan ini disembunyikan
 
+  // Meminta laci stempel dan rambu kerja dari Petugas Penanda Status
   const { status, setStatus, submitStatus, isSubmitting, error } = hook;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative animate-in zoom-in-95 duration-200">
         
-        {/* Header */}
+        {/* Atap Meja Pengecapan */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800">Ubah Status Reservasi</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -18,6 +25,7 @@ export default function ModalUbahStatus({ isOpen, onClose, selectedReservasi, ho
           </button>
         </div>
 
+        {/* Papan Teguran Merah */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-500 text-sm">
             {error}
@@ -25,6 +33,7 @@ export default function ModalUbahStatus({ isOpen, onClose, selectedReservasi, ho
         )}
 
         <form onSubmit={submitStatus} className="space-y-6">
+          {/* Laci Pilihan Stempel */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 ml-1">Status Reservasi</label>
             <div className="relative">
@@ -46,7 +55,7 @@ export default function ModalUbahStatus({ isOpen, onClose, selectedReservasi, ho
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Deretan Tombol Tindakan */}
           <div className="flex gap-4 pt-2">
             <button
               type="button"

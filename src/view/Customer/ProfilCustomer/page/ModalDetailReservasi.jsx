@@ -1,6 +1,13 @@
 import React from "react";
 import { X, Calendar, Clock, Stethoscope, CheckCircle2 } from "lucide-react";
 
+/**
+ * =========================================================================
+ * LOKET JENDELA TANDA BUKTI RESERVASI (ModalDetailReservasi)
+ * =========================================================================
+ * Ibarat loket khusus penerbitan surat tanda bukti reservasi. Menampilkan status,
+ * jam kedatangan, jenis perawatan, dan nama dokter ahli yang dijadwalkan menangani.
+ */
 export default function ModalDetailReservasi({ isOpen, onClose, selectedReservasi }) {
   if (!isOpen || !selectedReservasi) return null;
 

@@ -3,6 +3,14 @@ import { X, MapPin, Plus, CheckCircle2, Trash2 } from 'lucide-react';
 import ModalFormAlamat from './ModalFormAlamat';
 import ModalKonfirmasiHapus from '../../DetailKeranjang/page/ModalKonfirmasiHapus';
 
+/**
+ * =========================================================================
+ * JENDELA DAFTAR BUKU ALAMAT PENGIRIMAN (ModalKelolaAlamat)
+ * =========================================================================
+ * Ibarat buku lipat di meja kasir yang menampilkan maksimal 3 kartu alamat tamu.
+ * Membolehkan tamu memberi cap stempel "Utama" pada alamat favorit atau membuang
+ * alamat yang sudah tidak terpakai.
+ */
 const ModalKelolaAlamat = ({ isOpen, onClose, hookKelolaAlamat }) => {
   const { 
     alamatList, 

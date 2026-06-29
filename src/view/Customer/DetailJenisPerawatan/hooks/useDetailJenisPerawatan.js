@@ -5,13 +5,13 @@ import { dataJenisPerawatan } from '@/view/Customer/LandingPage/page/SectionInfo
 
 /**
  * =========================================================================
- * CUSTOM HOOK: useDetailJenisPerawatan
+ * MANDOR ARSIP KLASIFIKASI PERAWATAN (useDetailJenisPerawatan)
  * =========================================================================
- * Hook ini mengelola logika untuk halaman Detail Jenis Perawatan:
- * 1. Mengambil parameter ID kategori dari rute URL.
- * 2. Mencari data kategori perawatan yang sesuai dari file treatments static.
- * 3. Memfilter daftar perawatan (treatment) berdasarkan ID kategori tersebut.
- * 4. Melakukan scroll otomatis ke atas layar saat halaman pertama kali dibuka.
+ * Ibarat kepala pustakawan yang khusus menjaga laci arsip perawatan di klinik:
+ * 1. Melihat nomor map (ID kategori) yang dibawa oleh tamu dari lorong depan.
+ * 2. Membuka laci rak buku utama untuk mencocokkan sampul kategori perawatan (t.id === categoryId).
+ * 3. Mengumpulkan seluruh brosur variasi perawatan yang sesuai dengan map tersebut.
+ * 4. Merapikan karpet penyambutan dengan mengarahkan mata tamu langsung ke puncak atas halaman (scrollTo 0,0).
  */
 export function useDetailJenisPerawatan() {
   const { id } = useParams();

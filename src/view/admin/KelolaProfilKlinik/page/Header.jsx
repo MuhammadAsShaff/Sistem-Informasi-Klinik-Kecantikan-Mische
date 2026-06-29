@@ -1,5 +1,11 @@
 import React from 'react';
 
+/**
+ * PAPAN PLANG NAMA RUANGAN (Header)
+ * Ibarat papan plang besar yang terpaku kokoh di atas pintu masuk ruangan "Pengaturan Tentang Kami".
+ * Papan ini menjelaskan kepada admin bahwa di ruangan ini mereka berhak meracik cerita riwayat klinik, 
+ * visi-misi, serta memajang foto dokumentasi kegiatan klinik.
+ */
 const Header = () => {
   return (
     <div className="mb-6">

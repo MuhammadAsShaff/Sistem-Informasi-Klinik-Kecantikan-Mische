@@ -1,5 +1,12 @@
 import React from 'react';
 
+/**
+ * =========================================================================
+ * SPANDUK BERKIBAR BALAI PROFIL (ProfileBanner)
+ * =========================================================================
+ * Ibarat spanduk sutra hijau bermotif siluet asri di dinding lobi profil yang
+ * menyambut tamu dan mengingatkan pentingnya menjaga keakuratan informasi akun.
+ */
 const ProfileBanner = () => {
     return (
         <div className="w-full bg-gradient-to-r from-[#74b35e] to-[#a3e69a] rounded-3xl p-8 relative overflow-hidden shadow-md flex flex-col justify-center min-h-[160px]">

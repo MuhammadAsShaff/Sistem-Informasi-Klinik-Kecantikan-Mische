@@ -13,6 +13,14 @@ import MesotherapyImg from '@/assets/images/Treatment/Mesotherapy.jpg';
 import SkinBoosterImg from '@/assets/images/Treatment/Mische Skin Booster.jpg';
 import BotoxImg from '@/assets/images/Treatment/Mische Royal Lift (Botox).jpg';
 
+/**
+ * =========================================================================
+ * KUMPULAN ARSIP MENU PERAWATAN SINGKAT (TreatmentsData)
+ * =========================================================================
+ * Ibarat kartu catatan ringkas di laci meja resepsionis yang merangkum 13 layanan
+ * dasar klinik (Facial, Peeling, Laser, Botox) agar petugas bisa menjelaskannya
+ * kepada tamu secara kilat.
+ */
 export const treatments = [
   {
     id: 1,

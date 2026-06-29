@@ -3,6 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { endpoints } from '@/core/api/endpoints';
 import { useFetchWithCache } from '@/core/hooks/useFetchWithCache';
 
+/**
+ * =========================================================================
+ * ASISTEN PENJELAS KUPON RAHASIA (usePromoDetail)
+ * =========================================================================
+ * Ibarat asisten khusus di ruang penukaran kupon:
+ * 1. Melihat lembar kupon yang dibawa tamu (ID dari URL).
+ * 2. Membuka arsip promo dan arsip produk sekaligus untuk mengetahui kupon ini diperuntukkan bagi botol atau perawatan apa.
+ * 3. Membawa gembok pembuka kode rahasia (showVoucher) yang jika ditekan akan mengubah tanda bintang-bintang menjadi kode voucher asli.
+ */
 export const usePromoDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();

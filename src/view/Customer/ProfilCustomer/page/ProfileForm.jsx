@@ -4,8 +4,12 @@ import ModalKelolaAlamat from "./ModalKelolaAlamat";
 import ToastAlert from "@/view/components/ToastAlert/page/Index";
 
 /**
- * Form profil customer — semi-pure UI.
- * Logic profil dari useProfilCustomer, logic password dari useUbahPasswordCustomer.
+ * =========================================================================
+ * MEJA FORMULIR KELOLA DATA IDENTITAS (ProfileForm)
+ * =========================================================================
+ * Ibarat meja bundar tempat tamu mengisi kelengkapan biodatanya. Meja ini dirancang
+ * khusus dengan dua penataan: versi praktis untuk pengguna ponsel genggam (Mobile)
+ * dan versi elegan bergaya galeri untuk pengguna layar komputer besar (Desktop).
  */
 const ProfileForm = () => {
   const {

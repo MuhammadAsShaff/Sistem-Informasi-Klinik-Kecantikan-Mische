@@ -4,6 +4,14 @@ import gambarEvent from '@/assets/images/gambar event.png';
 import bgEvent from '@/assets/images/gambar event yang berlangsung.png';
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
+/**
+ * =========================================================================
+ * KERTAS BROSUR ACARA (EventCard)
+ * =========================================================================
+ * Ibarat selembar pamflet tebal bergambar warna-warni di atas meja penerima tamu.
+ * Pamflet ini mencantumkan foto kemeriahan acara, stempel tanggal di pojok atas,
+ * serta ringkasan cerita yang mengundang tamu untuk membukanya.
+ */
 export default function EventCard({ event }) {
 
   const formatTanggalSingkat = (dateString) => {

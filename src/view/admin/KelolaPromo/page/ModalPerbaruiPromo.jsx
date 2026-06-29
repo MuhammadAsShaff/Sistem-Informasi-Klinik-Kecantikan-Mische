@@ -3,6 +3,13 @@ import { X } from "lucide-react";
 import { useFetchKategori } from "../../KelolaKategoriProduk/hooks/useFetchKategori";
 import { useFetchProduk } from "../../KelolaProduk/hooks/useFetchProduk";
 
+/**
+ * BILIK MEJA KOREKSI LEMBAR PROMO (ModalPerbaruiPromo)
+ * Ibarat meja kerja khusus yang dibuka mandor saat tombol pensil ditekan.
+ * Meja ini menggelar formulir berisi riwayat promo lama, tempat admin bisa membetulkan nama promo, 
+ * mengubah masa berlaku, mengganti kode, atau menaruh foto baru.
+ * Segala aturan pena, timbangan foto, dan pencegahan tabrakan syarat diurus oleh Asisten Juru Tulis Koreksi (useEditPromo).
+ */
 export default function ModalPerbaruiPromo({
   isOpen,
   onClose,
@@ -12,22 +19,23 @@ export default function ModalPerbaruiPromo({
   isSubmitting,
   error,
 }) {
+  // Meminta daftar nama kategori dan produk dari gudang arsip klinik
   const { categories } = useFetchKategori();
   const { products } = useFetchProduk();
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, bilik meja ini disembunyikan
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+      {/* Tirai pembatas gelap di latar belakang */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       ></div>
 
-      {/* Modal Container */}
+      {/* Rangkaian Kotak Bilik Koreksi */}
       <div className="relative bg-white rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
+        {/* Atap Bilik Koreksi */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-800">Perbarui Promo</h2>
           <button
@@ -38,8 +46,9 @@ export default function ModalPerbaruiPromo({
           </button>
         </div>
 
-        {/* Content */}
+        {/* Ruangan Dalam Meja Formulir */}
         <div className="p-6 max-h-[80vh] overflow-y-auto">
+          {/* Papan Teguran Merah */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium">
               {error}
@@ -48,7 +57,7 @@ export default function ModalPerbaruiPromo({
 
           <form id="perbaruiPromoForm" onSubmit={submitEditPromo} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             
-            {/* Kiri */}
+            {/* Sisi Kiri Meja Kerja */}
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Nama Promo</label>
@@ -120,7 +129,7 @@ export default function ModalPerbaruiPromo({
               </div>
             </div>
 
-            {/* Kanan */}
+            {/* Sisi Kanan Meja Kerja */}
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Jenis Promo</label>
@@ -221,7 +230,7 @@ export default function ModalPerbaruiPromo({
           </form>
         </div>
 
-        {/* Footer */}
+        {/* Laci Tombol Utus Kurir */}
         <div className="p-6 border-t border-gray-100 flex justify-end">
           <button
             form="perbaruiPromoForm"

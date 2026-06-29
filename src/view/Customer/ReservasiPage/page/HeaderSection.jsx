@@ -1,7 +1,13 @@
 import React from 'react';
 import logomischee from '@/assets/images/LogoMischee.png';
 
-// Section Banner paling atas
+/**
+ * =========================================================================
+ * SPANDUK MEGAH JADWAL KLINIK (HeaderSection)
+ * =========================================================================
+ * Ibarat papan reklame panggung berwarna hijau zamrud di teras klinik yang
+ * bertuliskan salam hangat pemesanan jadwal perawatan kecantikan Mische.
+ */
 export default function HeaderSection() {
   return (
     <div className="relative w-full bg-gradient-to-r from-[#56bc36] from-[55%] to-[#C6FFD1] rounded-[2rem] md:rounded-[3rem] p-8 md:p-14 lg:p-20 overflow-hidden shadow-2xl shadow-green-900/20 animate-in fade-in slide-in-from-top duration-700">

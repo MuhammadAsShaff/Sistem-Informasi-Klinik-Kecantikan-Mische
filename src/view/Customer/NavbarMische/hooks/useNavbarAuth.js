@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { getToken, getUser, AUTH_UPDATED_EVENT } from "@/core/utils/authStorage";
 
 /**
- * Hook untuk mengecek status login dan role user secara reaktif.
- * Sumber data: authStorage (localStorage) — tidak ada logic baca/parse langsung.
- * Reaktif terhadap event `AUTH_UPDATED_EVENT` sehingga Navbar otomatis update
- * saat user login / logout / ganti profil dari halaman mana pun.
- *
- * @returns {{ isLoggedIn: boolean, isAdmin: boolean }}
+ * =========================================================================
+ * PETUGAS LOKET PEMERIKSA KARTU IDENTITAS (useNavbarAuth)
+ * =========================================================================
+ * Ibarat sekuriti berjaga di loket depan pintu masuk utama:
+ * 1. Mengintip catatan dompet tamu (authStorage/localStorage) untuk memverifikasi apakah tamu sudah resmi memiliki izin masuk (isLoggedIn).
+ * 2. Memastikan apakah tamu adalah pelanggan biasa atau pemegang kunci mahkota (isAdmin).
+ * 3. Senantiasa waspada terhadap siaran pergantian giliran kerja (AUTH_UPDATED_EVENT) agar sapaan di meja loket selalu akurat.
  */
 export function useNavbarAuth() {
   const [authState, setAuthState] = useState({ isLoggedIn: false, isAdmin: false });

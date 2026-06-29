@@ -4,7 +4,12 @@ import NavbarLinks from './NavbarLinks';
 import NavbarActions from './NavbarActions';
 
 /**
- * Komponen UI murni untuk navigasi desktop.
+ * =========================================================================
+ * MEJA RESEPSIONIS PANJANG (NavbarDesktop)
+ * =========================================================================
+ * Ibarat meja resepsionis marmer panjang di gedung utama untuk tamu yang datang
+ * membawa layar besar (laptop/komputer). Di sini Lambang Klinik, Deretan Peta
+ * Arah, dan Rak Troli dipajang berjajar tanpa perlu ditekuk atau dilipat.
  */
 const NavbarDesktop = ({ navLinks, isLoggedIn, isAdmin, cartCount }) => {
   return (

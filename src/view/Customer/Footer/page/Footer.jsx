@@ -7,7 +7,15 @@ import FooterSocial from './FooterSocial';
 import FooterBottom from './FooterBottom';
 
 
-// folder ini berguna untuk mengatur tata letak (layout) footer
+/**
+ * =========================================================================
+ * ALAS FONDASI GEDUNG KLINIK (Footer)
+ * =========================================================================
+ * Ibarat fondasi dasar di bagian paling bawah gedung klinik Mische.
+ * Fondasi ini menyangga seluruh struktur bangunan dan menampung plang informasi
+ * penting seperti lambang klinik, alamat kantor, jam buka, kontak sosial media,
+ * serta stempel hak cipta di lantai terbawah.
+ */
 export default function Footer() {
   return (
     <footer className="w-full bg-[#2B8F41] pt-24 pb-0">

@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * =========================================================================
+ * PETUGAS FORMULIR REKAM ALAMAT BARU (useModalFormAlamat)
+ * =========================================================================
+ * Ibarat petugas loket pengisian formulir pendaftaran alamat baru di meja kurir.
+ * Bertanggung jawab memastikan nomor telepon hanya berisi angka dan memverifikasi
+ * bahwa semua kolom (jalan, kecamatan, kodepos) terisi sebelum diserahkan ke kurir.
+ */
 export const useModalFormAlamat = (isOpen, onClose, onSave, fetchCities) => {
   const [formData, setFormData] = useState({
     namaPenerima: '',

@@ -1,11 +1,18 @@
 import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 
+/**
+ * MEJA PAMERAN DAFTAR ANTREAN TAMU (Tabel)
+ * Ibarat meja pameran panjang di lobi utama klinik tempat membeberkan urutan tamu yang sudah mendaftar.
+ * Meja ini memajang nama tamu, kategori perawatan, jam berkunjung, nama dokter, dan tombol status warna-warni.
+ * Di ujung kanan setiap baris, terdapat tombol tong sampah untuk mencoret tamu dari antrean.
+ */
 const Tabel = ({ isLoading, data, meta, page, setPage, onEditStatus, onDelete, onDetail }) => {
-  // Pagination helpers
+  // Asisten pembalik halaman ke kiri (sebelumnya)
   const handlePrev = () => {
     if (page > 1) setPage(page - 1);
   };
+  // Asisten pembalik halaman ke kanan (selanjutnya)
   const handleNext = () => {
     if (meta && page < meta.last_page) setPage(page + 1);
   };
@@ -15,6 +22,7 @@ const Tabel = ({ isLoading, data, meta, page, setPage, onEditStatus, onDelete, o
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6 w-full font-poppins">
         <div className="overflow-x-auto no-scrollbar w-full">
           <table className="w-full text-[13px] text-left">
+            {/* Pilar Judul Kolom Tabel */}
             <thead className="bg-white text-gray-500 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 font-medium whitespace-nowrap">Nama Customer</th>
@@ -32,30 +40,30 @@ const Tabel = ({ isLoading, data, meta, page, setPage, onEditStatus, onDelete, o
               {data && data.length > 0 ? (
                 data.map((item, index) => {
 
-                  // Tentukan warna status untuk button dropdown
+                  // Tentukan warna latar belakang tombol status berdasarkan riwayat kedatangan tamu
                   let statusBg = "bg-gray-100";
                   let statusText = "text-gray-600";
                   let statusIcon = "text-gray-400";
 
                   if (item.status === 'Konfirmasi' || item.status === 'Dikonfirmasi' || item.status === 'Selesai') {
-                    statusBg = "bg-[#56BC36]";
+                    statusBg = "bg-[#56BC36]"; // Hijau resmi klinik
                     statusText = "text-white";
                     statusIcon = "text-white";
                   } else if (item.status === 'Tidak Datang' || item.status === 'Dibatalkan') {
-                    statusBg = "bg-[#C43636]"; // Merah tua seperti di desain
+                    statusBg = "bg-[#C43636]"; // Merah tua penanda batal
                     statusText = "text-white";
                     statusIcon = "text-white";
                   } else if (item.status === 'Datang') {
-                    statusBg = "bg-[#65d343]"; // Hijau lebih terang
+                    statusBg = "bg-[#65d343]"; // Hijau terang
                     statusText = "text-white";
                     statusIcon = "text-white";
                   } else if (item.status === 'Menunggu') {
-                    statusBg = "bg-yellow-500";
+                    statusBg = "bg-yellow-500"; // Kuning tanda bersiap
                     statusText = "text-white";
                     statusIcon = "text-white";
                   }
 
-                  // Label yang ditampilkan di UI
+                  // Menyingkat label status agar pas di tombol
                   let displayStatus = item.status;
                   if (displayStatus === 'Dikonfirmasi') displayStatus = 'Konfirmasi';
 
@@ -71,6 +79,7 @@ const Tabel = ({ isLoading, data, meta, page, setPage, onEditStatus, onDelete, o
                       <td className="px-4 py-4">{item.dokter?.nama || "-"}</td>
                       <td className="px-4 py-4">{item.nomorWa || item.nomor || "-"}</td>
 
+                      {/* Kolom Tombol Status (Klik untuk membuka meja pengecapan) */}
                       <td className="px-4 py-4 text-center">
                         <button
                           onClick={() => onEditStatus(item)}
@@ -80,9 +89,10 @@ const Tabel = ({ isLoading, data, meta, page, setPage, onEditStatus, onDelete, o
                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`ml-1 ${statusIcon}`}><path d="m6 9 6 6 6-6" /></svg>
                         </button>
                       </td>
+                      
+                      {/* Kolom Tombol Hapus (Tong Sampah) */}
                       <td className="px-4 py-4 text-right">
                         <div className="flex justify-end gap-3 items-center">
-
                           <button
                             onClick={() => onDelete(item)}
                             className="text-gray-500 hover:text-black transition-colors"
@@ -107,7 +117,7 @@ const Tabel = ({ isLoading, data, meta, page, setPage, onEditStatus, onDelete, o
         </div>
       </div>
 
-      {/* Pagination Footer */}
+      {/* Laci Papan Nomor Halaman */}
       <div className="flex w-full justify-between items-center font-poppins px-2">
         <button
           onClick={handlePrev}

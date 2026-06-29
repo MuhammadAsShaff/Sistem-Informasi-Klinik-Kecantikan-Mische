@@ -5,6 +5,15 @@ import { useCartItem } from '../hooks/useCartItem';
 
 import { STORAGE_BASE_URL } from '@/core/api/endpoints';
 
+/**
+ * =========================================================================
+ * KOTAK ETALASE BARANG DALAM TROLI (CartItem)
+ * =========================================================================
+ * Ibarat satu wadah nampan beroda dalam troli belanja Anda. Nampan ini
+ * memperlihatkan foto produk, label harga, tombol sentuh tambah-kurang, dan
+ * tong sampah merah. Nampan ini langsung didampingi Petugas Pengatur Jumlah
+ * (useCartItem) untuk menjaga agar barang tidak terbuang tanpa sengaja.
+ */
 const CartItem = ({ item, onQuantityChange, onToggleSelect, onRemove, formatRupiah }) => {
   const {
     isDeleteModalOpen,

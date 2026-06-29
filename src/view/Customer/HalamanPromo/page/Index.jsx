@@ -7,12 +7,12 @@ import CustomerLoading from '@/components/CustomerLoading';
 
 /**
  * =========================================================================
- * KOMPONEN VIEW: HalamanPromo (Daftar Promo Aktif & Pencarian)
+ * BALAI ANJUNGAN KUPON POTONGAN HARGA (HalamanPromo)
  * =========================================================================
- * Komponen ini berfungsi merender daftar promo menarik yang tersedia di Mische.
- * 
- * Seluruh data pencarian, filter jenis promo, status ketersediaan, dan interaksi
- * API dikoordinasikan secara penuh di hook `usePromoData`.
+ * Ibarat alun-alun tempat segala penawaran hemat dipamerkan. Di bagian atas
+ * tersedia Kotak Pencarian dan Laci Saringan (FilterPromo). Di bagian tengah
+ * berbaris rapi Lembar Kupon Promo (PromoCard) yang perputarannya dipantau
+ * langsung oleh Mandor Arsip Kupon (usePromoData).
  */
 export default function HalamanPromo() {
   const { 

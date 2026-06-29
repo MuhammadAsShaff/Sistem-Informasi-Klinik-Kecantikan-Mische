@@ -2,6 +2,15 @@ import { useState } from "react";
 import axiosClient from "@/core/api/axiosClient";
 import { endpoints } from "@/core/api/endpoints";
 
+/**
+ * =========================================================================
+ * PETUGAS LOKET CETAK BUKTI RESERVASI (useCreateReservasi)
+ * =========================================================================
+ * Ibarat petugas pencetak tiket antrean di depan pintu klinik:
+ * 1. Menerima pengajuan pesanan dari tamu.
+ * 2. Menghubungi mandor arsip (API backend) untuk memverifikasi slot.
+ * 3. Menampilkan pesan berhasil atau pesan peringatan jika terjadi kendala.
+ */
 export function useCreateReservasi() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);

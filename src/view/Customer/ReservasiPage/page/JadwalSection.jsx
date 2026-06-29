@@ -1,6 +1,14 @@
 import React from 'react';
 import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
+/**
+ * =========================================================================
+ * RAK KOTAK PETAK JADWAL KEDATANGAN (JadwalSection)
+ * =========================================================================
+ * Ibarat jajaran ubin penunjuk waktu di dinding lobi. Ubin berwarna hijau
+ * mencerminkan kursi praktek yang siap dipesan, sedangkan ubin kelabu berarti
+ * kursi tersebut telah dipesan oleh tamu lain atau dokter sedang rehat.
+ */
 export default function JadwalSection({ timeSlots, isDoctorAvailable = true, onSlotClick }) {
   // Tampilan jika Dokter TIDAK tersedia
   if (!isDoctorAvailable) {

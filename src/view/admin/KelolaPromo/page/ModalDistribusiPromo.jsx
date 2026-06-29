@@ -4,13 +4,15 @@ import { useDistribusiPromo } from '../hooks/useDistribusiPromo';
 
 /**
  * =========================================================================
- * KOMPONEN: ModalDistribusiPromo (VIEW DISTRIBUSI PROMO - VIEW)
+ * MEJA KERJA KURIR PENGANTAR SELEBARAN PROMO (ModalDistribusiPromo)
  * =========================================================================
- * Komponen modal UI untuk mendistribusikan promo ke daftar customer terdaftar.
- * Logika pengambilan data customer dan post payload dikelola oleh hook `useDistribusiPromo`.
+ * Ibarat meja kerja panjang tempat mandor membeberkan peta dan buku alamat pelanggan.
+ * Di meja ini, admin bisa memilih apakah ingin mengirim promo ke satu per satu rumah pelanggan 
+ * atau menyebar borongan ke semua orang.
+ * Seluruh tugas pencatatan dan pengutusan kurir dikerjakan oleh Asisten Kurir (useDistribusiPromo).
  */
 export default function ModalDistribusiPromo({ isOpen, onClose, promo, showToast }) {
-  // Destrukturisasi state dan handler dari custom hook
+  // Meminta buku alamat, kotak pencarian, dan tim kurir dari Asisten Kurir
   const {
     targetType, setTargetType,
     searchQuery, setSearchQuery,
@@ -23,15 +25,15 @@ export default function ModalDistribusiPromo({ isOpen, onClose, promo, showToast
     handleDistribute
   } = useDistribusiPromo({ isOpen, onClose, promo, showToast });
 
-  if (!isOpen) return null;
+  if (!isOpen) return null; // Jika saklar ditutup, meja kerja ini dilipat kembali
 
-  // Tampilkan data customer yang tersimpan di state hook
+  // Tampilkan buku alamat pelanggan yang sudah dirapikan asisten
   const filteredCustomers = customers;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="bg-white rounded-xl w-full max-w-4xl overflow-hidden shadow-xl flex flex-col max-h-[90vh]">
-        {/* Header */}
+        {/* Atap Meja Distribusi */}
         <div className="px-8 py-5 flex justify-between items-center border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">
             Distribusi Promo <span className="text-[#56BC36] text-lg block sm:inline mt-1 sm:mt-0">{promo?.namaPromo || promo?.nama || ''}</span>
@@ -41,9 +43,9 @@ export default function ModalDistribusiPromo({ isOpen, onClose, promo, showToast
           </button>
         </div>
 
-        {/* Content */}
+        {/* Ruangan Meja Kerja */}
         <div className="p-8 overflow-y-auto">
-          {/* Target Type Dropdown */}
+          {/* Tombol Pemilih Sasaran (Pilih-Pilih atau Borongan) */}
           <div className="mb-10">
             <label className="block text-[15px] font-medium text-gray-800 mb-3">Customer Yang Di Tuju</label>
             <div className="relative max-w-[320px]">
@@ -58,7 +60,7 @@ export default function ModalDistribusiPromo({ isOpen, onClose, promo, showToast
             </div>
           </div>
 
-          {/* Table Area */}
+          {/* Area Buku Alamat dan Pencarian Nama */}
           <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-4 gap-4">
             <h3 className="text-[15px] font-medium text-gray-800">Daftar Nama Yang Di Tuju</h3>
             <div className="flex w-full md:w-auto">
@@ -78,6 +80,7 @@ export default function ModalDistribusiPromo({ isOpen, onClose, promo, showToast
             </div>
           </div>
 
+          {/* Daftar Tabel Pelanggan beserta Kotak Centang */}
           <div className="border border-gray-200 rounded-xl overflow-hidden mb-4">
             <table className="w-full text-left border-collapse text-[15px]">
               <thead>
@@ -119,7 +122,7 @@ export default function ModalDistribusiPromo({ isOpen, onClose, promo, showToast
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Laci Tombol Utus Kurir */}
         <div className="px-8 py-5 border-t border-gray-200 flex justify-end bg-white">
           <button 
             onClick={handleDistribute}
