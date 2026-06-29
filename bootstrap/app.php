@@ -12,17 +12,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // [Middleware Custom Kita]: 
-        // Mendaftarkan penjaga pintu (JwtFromCookie) pada keseluruhan rute API dan Web.
-        // Jika file ini dipasang, setiap request akan dicek Token-nya, lalu otomatis ditaruh di Header
+        // Paksa CORS jalan paling awal
+        $middleware->prepend(\App\Http\Middleware\ForceCors::class);
+
+        // Middleware custom JWT dari cookie
         $middleware->append(\App\Http\Middleware\JwtFromCookie::class);
 
-        // [Middleware Custom Kita]:
-        // Mendaftarkan label alias 'role' sehingga kita bisa pakai `->middleware('role:admin')` atau `role:customer`
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->create();
