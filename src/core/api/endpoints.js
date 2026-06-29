@@ -8,8 +8,10 @@
  * - Alamat loket untuk memeriksa data tamu (/admin/users)
  * Dengan buku pintar ini, para asisten kurir (Axios) tidak perlu menghafal atau mengetik ulang alamat panjang satu per satu!
  */
-export const API_BASE_URL = 'http://127.0.0.1:8000/api';
-export const STORAGE_BASE_URL = 'http://127.0.0.1:8000/storage/';
+
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
+
+export const STORAGE_BASE_URL = import.meta.env.VITE_STORAGE_BASE_URL || 'http://127.0.0.1:8000/storage/';
 
 // Buku alamat pusat (Kamus URL). Semua alamat API dikumpulkan di sini supaya kita tidak perlu mengetik ulang alamat yang sama satu per satu di setiap halaman.
 export const endpoints = {
